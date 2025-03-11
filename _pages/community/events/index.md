@@ -16,6 +16,18 @@ are formatted with two slides per page.
 
 ---
 
+## ISCA 2025: gem5 Workshop
+
+[More information can be found on the event's page](/events/isca-2025).
+
+We will be hosting the gem5 Workshop at ISCA 2025.
+
+The gem5 Workshop is an opportunity for members of the gem5 community to give presentations on their contributions to gem5 and gem5-related research.
+The workshop will be held in conjunction with ISCA 2025.
+
+---
+
+
 ## gem5 bootcamp in Latin America 2024
 
 [More information can be found on the event's page](/events/boot-camp-latin-america-2024)

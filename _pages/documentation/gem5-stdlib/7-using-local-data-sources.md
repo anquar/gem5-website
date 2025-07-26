@@ -25,7 +25,6 @@ Additionally, if you wish to utilize or add a local resource JSON file to the cu
 
 It's essential to note that overriding or appending doesn't modify the actual configuration files themselves. These methods allow you to temporarily specify or add resource configurations during runtime without altering the original configuration files.
 
-
 MongoDB Atlas Config Format:
 
 ```json
@@ -56,6 +55,7 @@ JSON Config Format:
     }
 }
 ```
+
 ### Setting up a MongoDB Atlas Database
 
 You would need to set up an Atlas cluster, steps on setting up an Atlas cluster can be found here:
@@ -162,25 +162,29 @@ Create a file named `gem5-config.json` with the following content:
     }
 }
 ```
+
 **Note**: It is implied that isMongo = false means that the data source is a JSON data source as gem5 currently only supports 2 types of data sources.
 
 #### Running gem5 with a Local Data Source
 
-First, build gem5 with RISCV:
+First, build gem5 with the ALL build, which contains RISCV:
 
 ```bash
-scons build/RISCV/gem5.opt -j`nproc`
+scons build/ALL/gem5.opt -j`nproc`
 ```
 
 Next, run the `local-resource-example.py` file using our local `test-binary` resource:
 
 Using environment variable
+
 ```bash
-GEM5_RESOURCE_JSON_APPEND=path/to/my-resources.json ./build/RISCV/gem5.opt configs/example/gem5_library/local-resource-example.py --resource test-binary
+GEM5_RESOURCE_JSON_APPEND=path/to/my-resources.json ./build/ALL/gem5.opt configs/example/gem5_library/local-resource-example.py --resource test-binary
 ```
+
 or you can overwrite the `gem5_default_config` with our own custom config:
 
 ```bash
-GEM5_CONFIG=path/to/gem5-config.json ./build/RISCV/gem5.opt configs/example/gem5_library/local-resource-example.py --resource test-binary
+GEM5_CONFIG=path/to/gem5-config.json ./build/ALL/gem5.opt configs/example/gem5_library/local-resource-example.py --resource test-binary
 ```
+
 This command will execute the `local-resource-example.py` script using our locally downloaded resource. This script just calls the obtain_resource function and prints the local path of the resource. This script indicates that local resources function similarly as resources on the gem5 resources database.

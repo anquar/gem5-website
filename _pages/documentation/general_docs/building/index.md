@@ -12,7 +12,7 @@ authors: Bobby R. Bruce
 ## Supported operating systems and environments
 
 gem5 has been designed with a Linux environment in mind. We test regularly
-on **Ubuntu 20.04**, **Ubuntu 22.04** and **Ubuntu 24.04** to ensure gem5 functions well in
+on **Ubuntu 22.04** and **Ubuntu 24.04** to ensure gem5 functions well in
 these environments. Though **any Linux based OS should function if the correct
 dependencies are installed**. We ensure that gem5 is compilable with both gcc
 and clang (see [Dependencies](#dependencies)  below for compiler version
@@ -49,7 +49,7 @@ implementation.
 If compiling gem5 on Ubuntu 24.04, or related Linux distributions, you may
 install all these dependencies using APT:
 
-```
+```bash
 sudo apt install build-essential scons python3-dev git pre-commit zlib1g zlib1g-dev \
     libprotobuf-dev protobuf-compiler libprotoc-dev libgoogle-perftools-dev \
     libboost-all-dev  libhdf5-serial-dev python3-pydot python3-venv python3-tk mypy \
@@ -61,7 +61,7 @@ sudo apt install build-essential scons python3-dev git pre-commit zlib1g zlib1g-
 If compiling gem5 on Ubuntu 22.04, or related Linux distributions, you may
 install all these dependencies using APT:
 
-```
+```bash
 sudo apt install build-essential git m4 scons zlib1g zlib1g-dev \
     libprotobuf-dev protobuf-compiler libprotoc-dev libgoogle-perftools-dev \
     python3-dev libboost-all-dev pkg-config python3-tk
@@ -72,13 +72,12 @@ sudo apt install build-essential git m4 scons zlib1g zlib1g-dev \
 If compiling gem5 on Ubuntu 20.04, or related Linux distributions, you may
 install all these dependencies using APT:
 
-```
+```bash
 sudo apt install build-essential git m4 scons zlib1g zlib1g-dev \
     libprotobuf-dev protobuf-compiler libprotoc-dev libgoogle-perftools-dev \
     python3-dev python-is-python3 libboost-all-dev pkg-config gcc-10 g++-10 \
     python3-tk
 ```
-
 
 ### Docker
 
@@ -112,19 +111,19 @@ https://github.com/gem5/gem5/blob/v23.0.1.0/util/dockerfiles/ubuntu-18.04_all-de
 
 To obtain a docker image:
 
-```
+```bash
 docker pull <image>
 ```
 
 E.g., for Ubuntu 20.04 with all optional dependencies:
 
-```
+```bash
 docker pull ghcr.io/gem5/ubuntu-20.04_all-dependencies:v23-0
 ```
 
 Then, to work within this environment, we suggest using the following:
 
-```
+```bash
 docker run -u $UID:$GID --volume <gem5 directory>:/gem5 --rm -it <image>
 ```
 
@@ -137,7 +136,7 @@ directory.
 
 ## Getting the code
 
-```
+```bash
 git clone https://github.com/gem5/gem5
 ```
 
@@ -151,7 +150,7 @@ tree, usually near the files they're associated with.
 
 Within the root of the gem5 directory, gem5 can be built with SCons using:
 
-```
+```bash
 scons build/{ISA}/gem5.{variant} -j {cpus}
 ```
 
@@ -167,6 +166,7 @@ memory, it is recommended to use fewer threads (e.g. `-j 1` or `-j 2`).
 
 The valid ISAs are:
 
+* ALL - recommended, as it has all ISAs and all Ruby protocols as of gem5 v24.1
 * ARM
 * NULL
 * MIPS
@@ -202,10 +202,10 @@ These versions are summarized in the following table.
 |**opt**      |X            |X                         |
 |**fast**     |X            |                          |
 
-For example, to build gem5 on 4 threads with `opt` and targeting x86:
+For example, to build gem5 on 4 threads with `opt` and with all ISAs:
 
-```
-scons build/X86/gem5.opt -j 4
+```bash
+scons build/ALL/gem5.opt -j 4
 ```
 
 In addition, users may make use of the "gprof" and "pperf" build options to
@@ -213,10 +213,10 @@ enable profiling:
 
 * **gprof** allows gem5 to be used with the gprof profiling tool. It can be
 enabled by compiling with the `--gprof` flag. E.g.,
-`scons build/ARM/gem5.debug --gprof`.
+`scons build/ALL/gem5.debug --gprof`.
 * **pprof** allows gem5 to be used with the pprof profiling tool. It can be
 enabled by compiling with the `--pprof` flag. E.g.,
-`scons build/X86/gem5.debug --pprof`.
+`scons build/ALL/gem5.debug --pprof`.
 
 ## Build with Kconfig
 
@@ -226,13 +226,19 @@ Please see [here](https://www.gem5.org/documentation/general_docs/kconfig_build_
 
 Once compiled, gem5 can then be run using:
 
-```
+```console
 ./build/{ISA}/gem5.{variant} [gem5 options] {simulation script} [script options]
+```
+
+If you are building gem5 from a pre-compiled binary, gem5 can be run with the following command:
+
+```console
+gem5 [gem5 options] {simulation script} [script options]
 ```
 
 Running with the `--help` flag will display all the available options:
 
-```
+```txt
 Usage
 =====
   gem5.opt [gem5 options] script.py [script options]

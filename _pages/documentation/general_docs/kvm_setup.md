@@ -62,12 +62,19 @@ Now if you run the `groups` command below you should see `kvm` and `libvirt`.
 
 ## Proving KVM is working
 
-The "configs/example/gem5_library/x86-ubuntu-run.py" file is a gem5 configuration that will create a simulation which boots a Ubuntu 18.04 image using KVM.
+The "configs/example/gem5_library/x86-ubuntu-run-with-kvm.py" file is a gem5 configuration that will create a simulation which boots a Ubuntu 24.04 image using KVM.
 It can be executed with the following:
 
 ```console
-scons build/X86/gem5.opt -j`nproc`
-./build/X86/gem5.opt configs/example/gem5_library/x86-ubuntu-run-with-kvm.py
+scons build/ALL/gem5.opt -j`nproc`
+./build/ALL/gem5.opt configs/example/gem5_library/x86-ubuntu-run-with-kvm.py
+```
+
+If you are using a pre-built gem5 binary, use the following command:
+
+```console
+gem5 configs/example/gem5_library/x86-ubuntu-run-with-kvm.py
+
 ```
 
 If the simulation runs successfully, you have successfully installed KVM and can use it with gem5.

@@ -9,7 +9,14 @@ author: Jason Lowe-Power
 
 # gem5 Documentation
 
+## gem5 Bootcamp 2024
+
+As of gem5 v24.0, the most comprehensive, up to date guide for learning how to use gem5 is the
+material from the [summer 2024 gem5 bootcamp](https://bootcamp.gem5.org/).
+
 ## Learning gem5
+
+**Notice: Many parts of Learning gem5 are outdated. Some sections of Learning gem5 have been updated for gem5 v24.1 based on content from the 2024 gem5 bootcamp, but others have not. Proceed with caution!**
 
 [Learning gem5](learning_gem5/introduction/) gives a prose-heavy introduction to using gem5 for computer architecture research written by Jason Lowe-Power.
 This is a great resource for junior researchers who plan on using gem5 heavily for a research project.

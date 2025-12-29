@@ -17,24 +17,24 @@
 
         <li class="nav-item">
           <a class="nav-link {% if page.url == '/' %}active{% endif %}" href="{{ '/' | prepend: site.baseurl }}">
-            Home
+            首页
           </a>
         </li>
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle {% if page.parent == 'about' %}active{% endif %}" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            About
+            关于
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <li><a class="dropdown-item" href="{{ '/about' | prepend: site.baseurl }}">About gem5</a></li>
-            <li><a class="dropdown-item" href="{{ '/publications' | prepend: site.baseurl }}">Publications</a></li>
-            <li><a class="dropdown-item" href="{{ '/governance' | prepend: site.baseurl }}">Governance</a></li>
+            <li><a class="dropdown-item" href="{{ '/about' | prepend: site.baseurl }}">关于 gem5</a></li>
+            <li><a class="dropdown-item" href="{{ '/publications' | prepend: site.baseurl }}">发表刊物</a></li>
+            <li><a class="dropdown-item" href="{{ '/governance' | prepend: site.baseurl }}">项目治理</a></li>
           </ul>
         </li>
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle {% if page.layout == 'documentation' %}active{% endif %}" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Documentation
+            文档
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <!-- Pull navigation from _data/documentation.yml -->
@@ -46,29 +46,29 @@
 
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle {% if page.title == 'Events' or page.title == 'Developer Meetings' %}active{% endif %}" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Community
+            社区
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <li><a class="dropdown-item" href="{{ '/events' | prepend: site.baseurl }}">Events</a></li>
-            <li><a class="dropdown-item" href="{{ '/dev_meetings' | prepend: site.baseurl }}">Developer Meetings</a></li>
+            <li><a class="dropdown-item" href="{{ '/events' | prepend: site.baseurl }}">活动</a></li>
+            <li><a class="dropdown-item" href="{{ '/dev_meetings' | prepend: site.baseurl }}">开发者会议</a></li>
           </ul>
         </li>
 
         <li class="nav-item ">
           <a class="nav-link {% if page.title == 'A guide to contributing' %}active{% endif %}" href="{{ '/contributing' | prepend: site.baseurl }}">
-            Contributing
+            贡献指南
           </a>
         </li>
 
         <li class="nav-item">
           <a class="nav-link {% if page.url == '/blog/' %}active{% endif %}" href="{{ '/blog' | prepend: site.baseurl }}">
-            Blog
+            博客
           </a>
         </li>
 
         <li class="nav-item">
           <a class="nav-link {% if page.title == 'Search' %}active{% endif %}" href="{{ '/search' | prepend: site.baseurl }}">
-            Search
+            搜索
           </a>
         </li>
       </ul>

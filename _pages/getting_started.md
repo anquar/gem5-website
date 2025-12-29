@@ -1,118 +1,109 @@
 ---
 layout: page
-title: Getting Started with gem5
+title: gem5 新手入门
 permalink: /getting_started/
 author: Jason Lowe-Power
 ---
 
-# Getting Started with gem5
+# gem5 新手入门
 
-## First steps
+## 第一步
 
-The gem5 simulator is most useful for research when you build new models and new features on top of the current codebase.
-Thus, the most common way to use gem5 is to download the source and build it yourself.
+当您在当前代码库的基础上构建新模型和新功能时，gem5 模拟器对研究最为有用。
+因此，使用 gem5 最常见的方式是下载源代码并自己构建它。
 
-To download gem5, you can use [`git`](https://git-scm.com/) to checkout to current stable branch.
-If you're not familiar with version control or git, The [git book](https://git-scm.com/book/en/v2) (available online for free) is a great way to learn more about git and become more comfortable using version control.
-The canonical version of gem5 is hosted on [GitHub](https://github.com/gem5/gem5).
+要下载 gem5，您可以使用 [`git`](https://git-scm.com/) 检出当前的 stable 分支。
+如果您不熟悉版本控制或 git，[git book](https://git-scm.com/book/zh/v2)（可免费在线阅读）是了解更多关于 git 并熟悉使用版本控制的好方法。
+gem5 的规范版本托管在 [GitHub](https://github.com/gem5/gem5) 上。
 
 ```
 git clone https://github.com/gem5/gem5
 ```
 
-After cloning the source code, you can build gem5 by using [`scons`](https://scons.org/).
-Building gem5 can take anywhere from a few minutes on a large server to 45 minutes on a laptop.
-Building gem5 is compute and memory intensive and using additional threads causes the build process to consume more memory.
-It is therefore recommended to use fewer threads if building gem5 on a lower end machine (e.g. -j 1 or -j 2).
-gem5 must be built on a Unix platform.
-Linux is tested on every commit, and some people have been able to use MacOS as well, though it is not regularly tested.
-It is strongly suggested to *not* try to compile gem5 when running on a virtual machine.
-When running with a VM on a laptop gem5 can take over an hour just to compile.
-The [building gem5](/documentation/general_docs/building) provides more details on building gem5 and its dependencies.
+克隆源代码后，您可以使用 [`scons`](https://scons.org/) 构建 gem5。
+构建 gem5 所需的时间从大型服务器上的几分钟到笔记本电脑上的 45 分钟不等。
+构建 gem5 是计算和内存密集型的，使用额外的线程会导致构建过程消耗更多内存。
+因此，如果在低端机器上构建 gem5，建议使用较少的线程（例如 -j 1 或 -j 2）。
+gem5 必须在 Unix 平台上构建。
+Linux 在每次提交时都会进行测试，有些人也能使用 MacOS，虽然它没有经过定期测试。
+强烈建议 *不要* 尝试在虚拟机上编译 gem5。
+当在笔记本电脑上的虚拟机中运行时，gem5 可能需要一个多小时才能完成编译。
+[构建 gem5](/documentation/general_docs/building) 提供了有关构建 gem5 及其依赖项的更多详细信息。
 
 ```
 cd gem5
 scons build/ALL/gem5.opt -j <NUMBER OF CPUs ON YOUR PLATFORM>
 ```
 
-Now that you have a gem5 binary, you can run your first simulation!
-gem5's interface is Python scripts.
-The gem5 binary reads in and executes the provided Python script which creates the system under test and executes the simulator.
-In this example, the script creates a *very* simple system and executes a "hello world" binary.
-More information about the script can be found in the [Simple Config chapter](/documentation/learning_gem5/part1/simple_config) of the [Learning gem5](/documentation/learning_gem5/introduction) book.
+现在您拥有了一个 gem5 二进制文件，可以运行您的第一次模拟了！
+gem5 的接口是 Python 脚本。
+gem5 二进制文件读取并执行提供的 Python 脚本，该脚本创建待测系统并执行模拟器。
+在这个例子中，脚本创建了一个 *非常* 简单的系统并执行一个 "hello world" 二进制文件。
+有关脚本的更多信息，可以在 [学习 gem5](/documentation/learning_gem5/introduction) 书籍的 [简单配置章节](/documentation/learning_gem5/part1/simple_config) 中找到。
 
 ```
 build/ALL/gem5.opt configs/learning_gem5/part1/simple.py
 ```
 
-After running this command, you'll see gem5's output as well as `Hello world`, which comes from the hello world binary!
-Now, you can start digging into how to use and extend gem5!
+运行此命令后，您将看到 gem5 的输出以及 `Hello world`，它来自 hello world 二进制文件！
+现在，您可以开始深入研究如何使用和扩展 gem5 了！
 
-## Next steps
+## 下一步
 
-- [Learning gem5](/documentation/learning_gem5/introduction) is a work in progress book describing how to use and develop with gem5. It contains details on how to create configurations files, extend gem5 with new models, gem5's cache coherence model, and more.
-- [gem5 Events](/events) are frequently occurring with computer architecture conferences and at other locations.
-- You can get help on [gem5's channels](/ask-a-question) or by following the [gem5 tag on Stack Overflow](https://stackoverflow.com/questions/tagged/gem5).
-- [The contributing guide](/contributing) describes how to contribute your code changes and other ways to contribute to gem5.
+- [学习 gem5](/documentation/learning_gem5/introduction) 是一本正在编写中的书籍，描述了如何使用和开发 gem5。它包含有关如何创建配置文件、使用新模型扩展 gem5、gem5 的缓存一致性模型等详细信息。
+- [gem5 活动](/events) 经常与计算机架构会议同时举行，也会在其他地点举行。
+- 您可以在 [gem5 的频道](/ask-a-question) 上获得帮助，或者关注 [Stack Overflow 上的 gem5 标签](https://stackoverflow.com/questions/tagged/gem5)。
+- [贡献指南](/contributing) 描述了如何贡献您的代码更改以及其他为 gem5 做贡献的方式。
 
-## Tips for Using gem5 in Research
+## 研究中使用 gem5 的提示
 
-### What version of gem5 should I use?
+### 我应该使用哪个版本的 gem5？
 
-The gem5 git repository has two branches: `develop` and `stable`. The `develop`
-branch contains the very latest gem5 changes **but is not stable**. It is
-frequently updated. **The `develop` branch should only be used when
-contributing the the gem5 project** (please see our [Contributing Guide](
-/contributing) for more information on how to submit code to gem5).
+gem5 git 仓库有两个分支：`develop` 和 `stable`。`develop` 分支包含最新的 gem5 更改，**但不稳定**。它更新频繁。**`develop` 分支应仅在为 gem5 项目做贡献时使用**（有关如何向 gem5 提交代码的更多信息，请参阅我们的 [贡献指南](/contributing)）。
 
-The stable branch contains stable gem5 code. The HEAD of the stable branch
-points towards the latest gem5 release. We would advise researchers use the
-latest stable release of gem5 and report which version was used when publishing
-results (use `git describe` to see latest gem5 release version number).
+stable 分支包含稳定的 gem5 代码。stable 分支的 HEAD 指向最新的 gem5 版本。我们建议研究人员使用最新的 gem5 稳定版本，并在发表结果时报告使用的版本（使用 `git describe` 查看最新的 gem5 发布版本号）。
 
-If replicating previous work, please find which version of gem5 was used. This
-version should be tagged on the `stable` branch and can thereby be checked-out
-on a new branch using `git checkout -b {branch} {version}`.
-E.g., to checkout `v19.0.0` on a new branch called `version19`:
-`git checkout -b version19 v19.0.0`. A complete list of released gem5
-versions can be determined by executing `git tag` on the `stable` branch.
+如果复现之前的工作，请查找使用了哪个版本的 gem5。
+该版本应该在 `stable` 分支上有标签，并可以通过 `git checkout -b {branch} {version}` 检出到一个新分支。
+例如，要在一个名为 `version19` 的新分支上检出 `v19.0.0`：
+`git checkout -b version19 v19.0.0`。执行 `git tag` 可以查看 `stable` 分支上已发布的 gem5 版本的完整列表。
 
-### How should I cite gem5?
+### 我应该如何引用 gem5？
 
-You should cite the [gem5-20 paper](https://arxiv.org/abs/2007.03152).
+您应该引用 [gem5-20 论文](https://arxiv.org/abs/2007.03152)。
 
 ```
 The gem5 Simulator: Version 20.0+. Jason Lowe-Power, Abdul Mutaal Ahmad, Ayaz Akram, Mohammad Alian, Rico Amslinger, Matteo Andreozzi, Adrià Armejach, Nils Asmussen, Brad Beckmann, Srikant Bharadwaj, Gabe Black, Gedare Bloom, Bobby R. Bruce, Daniel Rodrigues Carvalho, Jeronimo Castrillon, Lizhong Chen, Nicolas Derumigny, Stephan Diestelhorst, Wendy Elsasser, Carlos Escuin, Marjan Fariborz, Amin Farmahini-Farahani, Pouya Fotouhi, Ryan Gambord, Jayneel Gandhi, Dibakar Gope, Thomas Grass, Anthony Gutierrez, Bagus Hanindhito, Andreas Hansson, Swapnil Haria, Austin Harris, Timothy Hayes, Adrian Herrera, Matthew Horsnell, Syed Ali Raza Jafri, Radhika Jagtap, Hanhwi Jang, Reiley Jeyapaul, Timothy M. Jones, Matthias Jung, Subash Kannoth, Hamidreza Khaleghzadeh, Yuetsu Kodama, Tushar Krishna, Tommaso Marinelli, Christian Menard, Andrea Mondelli, Miquel Moreto, Tiago Mück, Omar Naji, Krishnendra Nathella, Hoa Nguyen, Nikos Nikoleris, Lena E. Olson, Marc Orr, Binh Pham, Pablo Prieto, Trivikram Reddy, Alec Roelke, Mahyar Samani, Andreas Sandberg, Javier Setoain, Boris Shingarov, Matthew D. Sinclair, Tuan Ta, Rahul Thakur, Giacomo Travaglini, Michael Upton, Nilay Vaish, Ilias Vougioukas, William Wang, Zhengrong Wang, Norbert Wehn, Christian Weis, David A. Wood, Hongil Yoon, Éder F. Zulian. ArXiv Preprint ArXiv:2007.03152, 2021.
 
 ```
 
-[Download the .bib file.](/assets/files/gem5-20.bib)
+[下载 .bib 文件。](/assets/files/gem5-20.bib)
 
-You may also cite the [original gem5 paper](http://dx.doi.org/10.1145/2024716.2024718).
+您也可以引用 [原始 gem5 论文](http://dx.doi.org/10.1145/2024716.2024718)。
 
 ```
 The gem5 Simulator. Nathan Binkert, Bradford Beckmann, Gabriel Black, Steven K. Reinhardt, Ali Saidi, Arkaprava Basu, Joel Hestness, Derek R. Hower, Tushar Krishna, Somayeh Sardashti, Rathijit Sen, Korey Sewell, Muhammad Shoaib, Nilay Vaish, Mark D. Hill, and David A. Wood. May 2011, ACM SIGARCH Computer Architecture News.
 ```
 
-You should also specify the **version** of gem5 you use in your methodology section.
-If you didn't use a specific stable version of gem5 (e.g., gem5-20.1.3), you should state the commit hash *as shown on https://github.com/gem5/gem5*.
+您还应该在方法部分指定您使用的 gem5 **版本**。
+如果您没有使用特定的 gem5 稳定版本（例如 gem5-20.1.3），则应声明提交哈希值（*显示在 https://github.com/gem5/gem5 上*）。
 
-If you use the GPU model, the DRAM model, or any of the other models in gem5 that have been [published](/publications/), you're encouraged to cite those works as well.
-See [the publications page](/publications/) for a list of models that have been contributed to gem5 beyond the original paper.
+如果您使用 GPU 模型、DRAM 模型或 gem5 中任何其他已 [发表](/publications/) 的模型，我们也鼓励您引用这些作品。
+请参阅 [出版物页面](/publications/) 以获取除原始论文之外为 gem5 做出贡献的模型列表。
 
-### How should I refer to gem5?
+### 我应该如何称呼 gem5？
 
-"gem5" should *always* have a lowercase "g".
-If it makes you uncomfortable beginning a sentence with a lowercase letter or your editor requires a capital letter, you can instead refer to gem5 as "The gem5 Simulator".
+"gem5" 应 *始终* 使用小写 "g"。
+如果不习惯以小写字母开头，或者您的编辑器要求大写字母，您可以将 gem5 称为 "The gem5 Simulator"（gem5 模拟器）。
 
-### Can I use the gem5 logo?
+### 我可以使用 gem5 logo 吗？
 
-Absolutely!
-The gem5 logo was created by [Nicole Hill](http://nicoledhill.com/) and put into the public domain under the CC0 license.
-You can download the full sized logo from these links:
-- [Vertical color](/assets/img/gem5logo/Color/noBackground/vertical/gem5ColorVert.png)
-- [Horizontal color](/assets/img/gem5logo/Color/noBackground/horizontal/gem5ColorLong.jpg)
-- [All logos (svg)](/assets/img/gem5logo/gem5masterFile.svg)
+当然！
+gem5 logo 由 [Nicole Hill](http://nicoledhill.com/) 创作，并在 CC0 许可下进入公共领域。
+您可以从以下链接下载全尺寸 logo：
+- [垂直彩色](/assets/img/gem5logo/Color/noBackground/vertical/gem5ColorVert.png)
+- [水平彩色](/assets/img/gem5logo/Color/noBackground/horizontal/gem5ColorLong.jpg)
+- [所有 logo (svg)](/assets/img/gem5logo/gem5masterFile.svg)
 
-Please follow the [gem5 logo style guide](/assets/img/gem5logo/gem5styleguide.pdf) when using the gem5 logo.
-More details and more versions of the logo can be found in [the source for gem5's documentation](https://github.com/gem5/new-website/tree/master/assets/img/gem5logo).
+使用 gem5 logo 时，请遵循 [gem5 logo 风格指南](/assets/img/gem5logo/gem5styleguide.pdf)。
+更多详细信息和更多版本的 logo 可以在 [gem5 文档源码](https://github.com/gem5/new-website/tree/master/assets/img/gem5logo) 中找到。

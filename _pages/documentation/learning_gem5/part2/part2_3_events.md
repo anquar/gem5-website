@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Event-driven programming
+title: 事件驱动编程
 doc: Learning gem5
 parent: part2
 permalink: /documentation/learning_gem5/part2/events/
@@ -8,30 +8,21 @@ author: Jason Lowe-Power
 ---
 
 
-Event-driven programming
+事件驱动编程
 ========================
 
-gem5 is an event-driven simulator. In this chapter, we will explore how
-to create and schedule events. We will be building from the simple
-`HelloObject` from [hello-simobject-chapter](../helloobject).
+gem5 是一个事件驱动的模拟器。在本章中，我们将探索如何创建和调度事件。我们将以 [hello-simobject-chapter](../helloobject) 中的简单 `HelloObject` 为基础。
 
-Creating a simple event callback
+创建一个简单的事件回调
 --------------------------------
 
-In gem5's event-driven model, each event has a callback function in
-which the event is *processed*. Generally, this is a class that inherits
-from :cppEvent. However, gem5 provides a wrapper function for creating
-simple events.
+在 gem5 的事件驱动模型中，每个事件都有一个回调函数，在该函数中 *处理* 事件。通常，这是一个继承自 :cppEvent 的类。但是，gem5 提供了一个包装函数来创建简单事件。
 
-In the header file for our `HelloObject`, we simply need to declare a
-new function that we want to execute every time the event fires
-(`processEvent()`). This function must take no parameters and return
-nothing.
+在我们的 `HelloObject` 的头文件中，我们只需声明一个要在每次事件触发时执行的新函数 (`processEvent()`)。此函数必须不带参数且不返回任何内容。
 
-Next, we add an `Event` instance. In this case, we will use an
-`EventFunctionWrapper` which allows us to execute any function.
+接下来，我们添加一个 `Event` 实例。在这种情况下，我们将使用 `EventFunctionWrapper`，它允许我们执行任何函数。
 
-We also add a `startup()` function that will be explained below.
+我们还添加了一个 `startup()` 函数，将在下面进行解释。
 
 ```cpp
 class HelloObject : public SimObject
@@ -48,17 +39,9 @@ class HelloObject : public SimObject
 };
 ```
 
-Next, we must construct this event in the constructor of `HelloObject`.
-The `EventFuntionWrapper` takes two parameters, a function to execute
-and a name. The name is usually the name of the SimObject that owns the
-event. When printing the name, there will be an automatic
-".wrapped\_function\_event" appended to the end of the name.
+接下来，我们必须在 `HelloObject` 的构造函数中构造此事件。`EventFuntionWrapper` 接受两个参数，一个要执行的函数和一个名称。名称通常是拥有事件的 SimObject 的名称。打印名称时，会在名称末尾自动附加 ".wrapped\_function\_event"。
 
-The first parameter is simply a function that takes no parameters and
-has no return value (`std::function<void(void)>`). Usually, this is a
-simple lambda function that calls a member function. However, it can be
-any function you want. Below, we captute `this` in the lambda (`[this]`)
-so we can call member functions of the instance of the class.
+第一个参数只是一个不带参数且没有返回值 (`std::function<void(void)>`) 的函数。通常，这是一个调用成员函数的简单 lambda 函数。但是，它可以是您想要的任何函数。在下面，我们在 lambda (`[this]`) 中捕获 `this`，以便我们可以调用类的实例的成员函数。
 
 ```cpp
 HelloObject::HelloObject(const HelloObjectParams &params) :
@@ -68,8 +51,7 @@ HelloObject::HelloObject(const HelloObjectParams &params) :
 }
 ```
 
-We also must define the implementation of the process function. In this
-case, we'll simply print something if we are debugging.
+我们还必须定义处理函数的实现。在这种情况下，如果我们正在调试，我们将简单地打印一些内容。
 
 ```cpp
 void
@@ -79,19 +61,12 @@ HelloObject::processEvent()
 }
 ```
 
-Scheduling events
+调度事件
 -----------------
 
-Finally, for the event to be processed, we first have to *schedule* the
-event. For this we use the :cppschedule function. This function
-schedules some instance of an `Event` for some time in the future
-(event-driven simulation does not allow events to execute in the past).
+最后，为了处理事件，我们首先必须 *调度* 事件。为此，我们使用 :cppschedule 函数。此函数将 `Event` 的某个实例调度到未来的某个时间（事件驱动模拟不允许事件在过去执行）。
 
-We will initially schedule the event in the `startup()` function we
-added to the `HelloObject` class. The `startup()` function is where
-SimObjects are allowed to schedule internal events. It does not get
-executed until the simulation begins for the first time (i.e. the
-`simulate()` function is called from a Python config file).
+我们最初将在我们添加到 `HelloObject` 类的 `startup()` 函数中调度事件。`startup()` 函数是允许 SimObject 调度内部事件的地方。直到第一次开始模拟（即从 Python 配置文件调用 `simulate()` 函数）时，它才会执行。
 
 ```cpp
 void
@@ -101,12 +76,9 @@ HelloObject::startup()
 }
 ```
 
-Here, we simply schedule the event to execute at tick 100. Normally, you
-would use some offset from `curTick()`, but since we know the startup()
-function is called when the time is currently 0, we can use an explicit
-tick value.
+在这里，我们只是将事件调度为在 tick 100 执行。通常，您会使用相对于 `curTick()` 的偏移量，但由于我们知道调用 startup() 函数时当前时间为 0，因此我们可以使用显式的 tick 值。
 
-The output when you run gem5 with the "HelloExample" debug flag is now
+当您使用 "HelloExample" 调试标志运行 gem5 时，现在的输出是
 
     gem5 Simulator System.  http://gem5.org
     gem5 is copyrighted software; use the --copyright option for details.
@@ -123,17 +95,12 @@ The output when you run gem5 with the "HelloExample" debug flag is now
         100: hello: Hello world! Processing the event!
     Exiting @ tick 18446744073709551615 because simulate() limit reached
 
-More event scheduling
+更多事件调度
 ---------------------
 
-We can also schedule new events within an event process action. For
-instance, we are going to add a latency parameter to the `HelloObject`
-and a parameter for how many times to fire the event. In the [next
-chapter](parameters-chapter) we will make these parameters accessible
-from the Python config files.
+我们还可以在事件处理动作中调度新事件。例如，我们将向 `HelloObject` 添加一个延迟参数和一个关于触发事件次数的参数。在 [下一章](parameters-chapter) 中，我们将使这些参数可从 Python 配置文件访问。
 
-To the HelloObject class declaration, add a member variable for the
-latency and number of times to fire.
+在 HelloObject 类声明中，添加延迟和触发次数的成员变量。
 
 ```cpp
 class HelloObject : public SimObject
@@ -154,8 +121,7 @@ class HelloObject : public SimObject
 };
 ```
 
-Then, in the constructor add default values for the `latency` and
-`timesLeft`.
+然后，在构造函数中添加 `latency` 和 `timesLeft` 的默认值。
 
 ```cpp
 HelloObject::HelloObject(const HelloObjectParams &params) :
@@ -166,7 +132,7 @@ HelloObject::HelloObject(const HelloObjectParams &params) :
 }
 ```
 
-Finally, update `startup()` and `processEvent()`.
+最后，更新 `startup()` 和 `processEvent()`。
 
 ```cpp
 void
@@ -189,9 +155,7 @@ HelloObject::processEvent()
 }
 ```
 
-Now, when we run gem5, the event should fire 10 times, and the
-simulation will end after 1000 ticks. The output should now look like
-the following.
+现在，当我们运行 gem5 时，事件应该触发 10 次，并且模拟将在 1000 个 tick 后结束。输出现在应该如下所示。
 
     gem5 Simulator System.  http://gem5.org
     gem5 is copyrighted software; use the --copyright option for details.
@@ -218,7 +182,6 @@ the following.
        1000: hello: Done firing!
     Exiting @ tick 18446744073709551615 because simulate() limit reached
 
-You can find the updated header file
-[here](/_pages/static/scripts/part2/events/hello_object.hh) and the
-implementation file
-[here](/_pages/static/scripts/part2/events/hello_object.cc).
+您可以找到更新后的头文件
+[这里](/_pages/static/scripts/part2/events/hello_object.hh) 和实现文件
+[这里](/_pages/static/scripts/part2/events/hello_object.cc)。

@@ -1,54 +1,52 @@
 ---
 layout: documentation
-title: Homework 1 for CS 752
+title: CS 752 作业 1
 doc: Learning gem5
 parent: gem5_101
 permalink: /documentation/learning_gem5/gem5_101/homework-1
 authors:
 ---
 
-# Homework 1 for CS 752: Advanced Computer Architecture I (Fall 2015 Section 1 of 1)
+# CS 752: 高级计算机体系结构 I 作业 1 (2015 年秋季 1 组)
 
-**Due Monday, 9/14**
+**截止日期：9/14 星期一**
 
-**You should do this assignment on your own. No late assignments**
+**您应该独自完成此作业。不接受逾期作业**
 
-Person of contact for this assignment: Nilay Vaish  <nilay@cs.wisc.edu>
+此作业的联系人：Nilay Vaish  <nilay@cs.wisc.edu>
 
-For this assignment, you will go through the first few parts of the gem5 tutorial we are currently constructing. This gem5 tutorial is a current work-in-progress and may have typos and bugs in it. Feedback about errors, big or small, is appreciated. Please email <powerjg@cs.wisc.edu> with subject "gem5-tutorial comments" with any comments or errors you find.
+对于此作业，您将完成我们目前正在构建的 gem5 教程的前几部分。此 gem5 教程目前正在进行中，其中可能存在拼写错误和错误。欢迎反馈任何大小错误。如果发现任何评论或错误，请发送电子邮件至 <powerjg@cs.wisc.edu>，主题为 "gem5-tutorial comments"。
 
-## Step 1: complete Part I of the gem5 tutorial
+## 步骤 1：完成 gem5 教程的第一部分
 
-There are currently four (three complete) chapters of this tutorial. The first chapter covers downloading and building gem5. The second chapter walks you through creating a simple configuration script and how to run gem5. The third chapter adds some complexity to your first script by adding a two-level cache hierarchy. And the fourth section (incomplete as of this writing) goes through the gem5 output and how to understand the statistics.
+本教程目前有四章（三章完整）。第一章介绍下载和构建 gem5。第二章将指导您创建简单的配置脚本以及如何运行 gem5。第三章通过添加两级缓存层次结构为您的第一个脚本增加了一些复杂性。第四部分（撰写本文时尚未完成）将介绍 gem5 输出以及如何理解统计数据。
 
-The tutorial does include links to the final scripts at the end of each section. However, it's in your best interest to walk through the tutorial step-by-step and create the scripts yourself.
+本教程确实在每一节的末尾包含了最终脚本的链接。但是，为了您的最大利益，最好逐步完成教程并自己创建脚本。
 
-## Step 2: Write an interesting application
+## 步骤 2：编写一个有趣的应用程序
 
-Write a program that implements Sieve of Eratosthenes and outputs one single integer at the end: the number of prime numbers <= 100,000,000. Compile your program as a static binary.  The output should be: 5761455.
+编写一个实现埃拉托斯特尼筛法 (Sieve of Eratosthenes) 的程序，并在最后输出一个整数：<= 100,000,000 的素数数量。将程序编译为静态二进制文件。输出应为：5761455。
 
-## Step 3: Use gem5!
+## 步骤 3：使用 gem5！
 
-Here, you will run your application in gem5 and change the CPU model, CPU frequency, and memory configuration and describe the changes in performance.
+在这里，您将在 gem5 中运行您的应用程序，并更改 CPU 模型、CPU 频率和内存配置，并描述性能的变化。
 
-* Run your sieve program in gem5 instead of the 'hello' example. '''Choose an appropriate input size.''' You should use something large enough that the application is interesting, but not too large that gem5 takes more than 10 minutes to execute a simulation. I found that 1,000,000 on my machine takes about 5 minutes. ''Note: The MinorCPU (next step) takes about 10x longer than TimingSimpleCPU takes.''
-* Change the CPU model from TimingSimpleCPU to MinorCPU. Hint: you may want to add a command line parameter to control the CPU model.
-* Vary the CPU clock from 1 GHz to 3 GHz (in steps of 500 MHz) with both CPU models. Hint: again, you may want to add a command line parameter for the frequency.
-* Change the memory configuration from DDR3_1600_x64 to DDR3_2133_x64 (DDR3 with a faster clock) and LPDDR2_S4_1066_x32 (low-power DRAM often found in mobile devices).
+* 在 gem5 中运行您的筛法程序，而不是 'hello' 示例。'''选择合适的输入大小。''' 您应该使用足够大的输入，使应用程序有趣，但不要太大，以免 gem5 执行模拟需要超过 10 分钟。我发现我的机器上 1,000,000 大约需要 5 分钟。''注意：MinorCPU（下一步）比 TimingSimpleCPU 慢约 10 倍。''
+* 将 CPU 模型从 TimingSimpleCPU 更改为 MinorCPU。提示：您可能想添加一个命令行参数来控制 CPU 模型。
+* 使用两种 CPU 模型将 CPU 时钟从 1 GHz 更改为 3 GHz（步长为 500 MHz）。提示：同样，您可能想为频率添加一个命令行参数。
+* 将内存配置从 DDR3_1600_x64 更改为 DDR3_2133_x64（具有更快时钟的 DDR3）和 LPDDR2_S4_1066_x32（通常在移动设备中发现的低功耗 DRAM）。
 
-## What to Hand In
-Turn in your assignment by sending an email message to Nilay Vaish <nilay@cs.wisc.edu> and Prof. David Wood <david@cs.wisc.edu> with the subject line:
+## 提交内容
+通过发送电子邮件给 Nilay Vaish <nilay@cs.wisc.edu> 和 David Wood 教授 <david@cs.wisc.edu> 提交您的作业，主题行：
 "[CS752 Homework1]"
 
-* The email should contain the name and ID numbers of the student submitting the assignment. The files below should be attached as a zip file to the email.
-* A file named sieve.c with the implementation of sieve of Eratosthenes.
-* A file named sieve-config.py (and any other necessary files) that was used to run gem5. This file should be set up to use TimingSimpleCPU at 1 GHz and DDR3_1600_x64 by default. '''Also bring a print out of this to class'''
-* A file named report.pdf containing a short report with your observations and conclusions from the experiment. This report should contain answers to the following questions:
-    * Which CPU model is more sensitive to changing the CPU frequency? Why do you think this is?
-    * Which CPU model is more sensitive to the memory technology? Why?
-    * Is the sieve application more sensitive to the CPU frequency or the memory technology? Why?
-    * If you were to use a different application, do you think your conclusions would change? Why?
+* 电子邮件应包含提交作业的学生的姓名和 ID 号。以下文件应作为 zip 文件附加到电子邮件中。
+* 一个名为 sieve.c 的文件，包含埃拉托斯特尼筛法的实现。
+* 一个名为 sieve-config.py 的文件（以及任何其他必要的文件），用于运行 gem5。此文件应设置为默认使用 1 GHz 的 TimingSimpleCPU 和 DDR3_1600_x64。'''还要带一份打印出来的副本到课堂上'''
+* 一个名为 report.pdf 的文件，包含一份简短报告，其中包含实验的观察结果和结论。本报告应包含以下问题的答案：
+    * 哪种 CPU 模型对改变 CPU 频率更敏感？您认为这是为什么？
+    * 哪种 CPU 模型对内存技术更敏感？为什么？
+    * 筛法应用程序对 CPU 频率还是内存技术更敏感？为什么？
+    * 如果您使用不同的应用程序，您认为您的结论会改变吗？为什么？
 
-**Bring a paper copy of your report to class on Monday!**
-
-
+**周一请带一份纸质报告到课堂上！**

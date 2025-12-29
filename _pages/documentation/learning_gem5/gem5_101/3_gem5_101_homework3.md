@@ -1,23 +1,23 @@
 ---
 layout: documentation
-title: Homework 3 for CS 752
+title: CS 752 作业 3
 doc: Learning gem5
 parent: gem5_101
 permalink: /documentation/learning_gem5/gem5_101/homework-3
 authors:
 ---
 
-# Homework 3 for CS 752: Advanced Computer Architecture I (Fall 2015 Section 1 of 1)
+# CS 752: 高级计算机体系结构 I 作业 3 (2015 年秋季 1 组)
 
-**Due 1pm, Tuesday, 9/29**
+**截止日期：9/29 星期二 下午 1 点**
 
-**You should do this assignment alone. No late assignments.**
+**您应该独自完成此作业。不接受逾期作业。**
 
-The purpose of this assignment is to give you experience with pipelined CPUs.  You will simulate a given program with simple timing cpu to understand the instruction mix of the program.  Then, you will simulate the same program with an pipelined inorder CPU to understand how the latency and bandwidth of different parts of pipeline affect performance.  You will also be exposed to pseudo-instructions that are used for carrying out functions required by the underlying experiment.  This homework is based on exercise 3.6 of CA:AQA 3rd edition.
+本作业的目的是让您体验流水线 CPU。您将使用简单的时序 CPU 模拟给定的程序，以了解程序的指令组合。然后，您将使用流水线按序 CPU 模拟相同的程序，以了解流水线不同部分的延迟和带宽如何影响性能。您还将接触到用于执行底层实验所需功能的伪指令。此作业基于 CA:AQA 第三版练习 3.6。
 
 ----
 
-1. The DAXPY loop (double precision aX + Y) is an oft used operation in programs that work with matrices and vectors.  The following code implements DAXPY in C++11.
+1. DAXPY 循环 (双精度 aX + Y) 是处理矩阵和向量的程序中常用的操作。以下代码在 C++11 中实现了 DAXPY。
 
 ```cpp
   #include <cstdio>
@@ -35,12 +35,12 @@ The purpose of this assignment is to give you experience with pipelined CPUs.  Y
       Y[i] = dis(gen);
     }
 
-    // Start of daxpy loop
+    // DAXPY 循环开始
     for (int i = 0; i < N; ++i)
     {
       Y[i] = alpha * X[i] + Y[i];
     }
-    // End of daxpy loop
+    // DAXPY 循环结束
 
     double sum = 0;
     for (int i = 0; i < N; ++i)
@@ -52,16 +52,16 @@ The purpose of this assignment is to give you experience with pipelined CPUs.  Y
   }
 ```
 
-Your first task is to compile this code statically and simulate it with gem5 using the timing simple cpu.  Compile the program with `-O2` flag to avoid running into unimplemented x87 instructions while simulating with gem5.  Report the breakup of instructions for different op classes.  For this, grep for op_class in the file stats.txt.
+您的第一个任务是静态编译此代码，并使用时序简单 CPU 在 gem5 中模拟它。使用 `-O2` 标志编译程序，以避免在 gem5 中模拟时遇到未实现的 x87 指令。报告不同操作类的指令分解。为此，在文件 stats.txt 中 grep op_class。
 
 
-2. Generate the assembly code for the daxpy program above by using the `-S` and `-O2` options when compiling with GCC.  As you can see from the assembly code, instructions that are not central to the actual task of the program (computing `aX + Y`) will also be simulated.  This includes the instructions for generating the vectors `X` and `Y`, summing elements in `Y` and printing the sum.  When I compiled the code with `-S`, I got about 350 lines of assembly code, with only about 10-15 lines for the actual daxpy loop.
+2. 通过在编译 GCC 时使用 `-S` 和 `-O2` 选项，为上面的 daxpy 程序生成汇编代码。正如您从汇编代码中看到的那样，对程序实际任务（计算 `aX + Y`）不重要的指令也将被模拟。这包括用于生成向量 `X` 和 `Y`、求和 `Y` 中的元素以及打印总和的指令。当我用 `-S` 编译代码时，我得到了大约 350 行汇编代码，只有大约 10-15 行用于实际的 daxpy 循环。
 
-Usually while carrying out experiments for evaluating a design, one would like to look only at statistics for the portion of the code that is most important.  To do so, typically programs are annotated so that the simulator, on reaching an annotated portion of the code, carries out functions like create a checkpoint, output and reset statistical variables.
+通常，在进行评估设计的实验时，人们只想查看最重要的代码部分的统计信息。为此，通常会对程序进行注释，以便模拟器在到达代码的带注释部分时执行诸如创建检查点、输出和重置统计变量之类的功能。
 
-You will edit the C++ code from the first part to output and reset stats just before the start of the DAXPY loop and just after it.  For this, include the file `util/m5/m5op.h` in the program.  You will find this file in `util/m5` directory of the gem5 repository.  Use the function `m5_dump_reset_stats()` from this file in your program. This function outputs the statistical variables and then resets them. You can provide 0 as the value for the delay and the period arguments.
+您将编辑第一部分的 C++ 代码，在 DAXPY 循环开始之前和之后输出并重置统计信息。为此，在程序中包含文件 `util/m5/m5op.h`。您将在 gem5 仓库的 `util/m5` 目录中找到此文件。在您的程序中使用此文件中的函数 `m5_dump_reset_stats()`。此函数输出统计变量然后重置它们。您可以为延迟和周期参数提供 0 值。
 
-To provide the definition of the `m5_dump_reset_stats()`, go to the directory `util/m5` and edit the Makefile.x86 in the following way:
+要提供 `m5_dump_reset_stats()` 的定义，请转到目录 `util/m5` 并按以下方式编辑 Makefile.x86：
 
 ```
   diff --git a/util/m5/Makefile.x86 b/util/m5/Makefile.x86
@@ -78,29 +78,28 @@ To provide the definition of the `m5_dump_reset_stats()`, go to the directory `u
    all: m5
 ```
 
-Execute the command `make -f Makefile.x86` in the directory `util/m5`.  This will create an object file named `m5op_x86.o`.  Link this file with the program for DAXPY.  Now again simulate the program with the timing simple CPU.  This time you should see three sets of statistics in the file stats.txt.  Report the breakup of instructions among different op classes for the three parts of the program.  Provide the fragment of the generated assembly code that starts with call to `m5_dump_reset_stats()` and ends `m5_dump_reset_stats()`, and has the main daxpy loop in between.
+在目录 `util/m5` 中执行命令 `make -f Makefile.x86`。这将创建一个名为 `m5op_x86.o` 的对象文件。将此文件与 DAXPY 程序链接。现在再次使用时序简单 CPU 模拟程序。这次您应该在文件 stats.txt 中看到三组统计信息。报告程序三个部分中不同操作类之间的指令分解。提供生成的汇编代码片段，该片段以调用 `m5_dump_reset_stats()` 开始，以 `m5_dump_reset_stats()` 结束，并在中间包含主 daxpy 循环。
 
 
-3. There are several different types of CPUs that gem5 supports: atomic, timing, out-of-order, inorder and kvm.  Let's talk about the timing and the inorder cpus.  The timing CPU (also known as SimpleTimingCPU) executes each arithmetic instruction in a single cycle, but requires multiple cycles for memory accesses.  Also, it is not pipelined.  So only a single instruction is being worked upon at any time.  The inorder cpu (also known as Minor) executes instructions in a pipelined fashion.  As I understand it has the following pipe stages: fetch1, fetch2, decode and execute.
+3. gem5 支持几种不同类型的 CPU：atomic、timing、out-of-order、inorder 和 kvm。让我们谈谈 timing 和 inorder cpu。timing CPU（也称为 SimpleTimingCPU）在单个周期内执行每个算术指令，但内存访问需要多个周期。此外，它不是流水线的。所以任何时候都只有一个指令在被处理。inorder cpu（也称为 Minor）以流水线方式执行指令。据我了解，它具有以下流水线阶段：fetch1、fetch2、decode 和 execute。
 
-Take a look at the file `src/cpu/minor/MinorCPU.py`.  In the definition of `MinorFU`, the class for functional units, we define two quantities `opLat` and `issueLat`.  From the comments provided in the file, understand how these two parameters are to be used.  Also note the different functional units that are instantiated as defined in class `MinorDefaultFUPool`.
-
-
-Assume that the issueLat and the opLat of the FloatSimdFU can vary from 1 to 6 cycles and that they always sum to 7 cycles.  For each decrease in the opLat, we need to pay with a unit increase in issueLat.  Which design of the FloatSimd functional unit would you prefer?  Provide statistical evidence obtained through simulations of the annotated portion of the code.
-
-You can find a skeleton file that extends the minor CPU here <$urlbase}html/cpu.py>. If you use this file, you will have to modify your config scripts to work with it. Also, you'll have to modify this file to support the next part.
-
-4. The Minor CPU has by default two integer functional units as defined in the file MinorCPU.py (ignore the Multiplication and the Division units).  Assume our original Minor CPU design requires 2 cycles for integer functions and 4 cycles for floating point functions.  In our upcoming Minor CPU, we can halve either of these latencies.  Which one should we go for?  Provide statistical evidence obtained through simulations.
+查看文件 `src/cpu/minor/MinorCPU.py`。在 `MinorFU`（功能单元类）的定义中，我们定义了两个量 `opLat` 和 `issueLat`。从文件中提供的注释中，了解这两个参数是如何使用的。还要注意 `MinorDefaultFUPool` 类中定义的实例化的不同功能单元。
 
 
-## What to Hand In
-Turn in your assignment by sending an email message to Prof. David Wood <david@cs.wisc.edu> and Nilay Vaish <nilay@cs.wisc.edu>  with the subject line: "CS752 Homework3".
+假设 FloatSimdFU 的 issueLat 和 opLat 可以从 1 到 6 个周期变化，并且它们的总和总是为 7 个周期。对于 opLat 的每一次减少，我们需要付出 issueLat 增加一个单位的代价。您更喜欢哪种 FloatSimd 功能单元设计？提供通过模拟代码的注释部分获得的统计证据。
 
-1. The email should contain the name and ID numbers of the student submitting
-the assignment. The files below should be attached as a zip file to the email.
+您可以在此处找到扩展 minor CPU 的骨架文件 <$urlbase}html/cpu.py>。如果您使用此文件，您将不得不修改您的配置脚本以使其工作。此外，您必须修改此文件以支持下一部分。
 
-2. A file named daxpy.cpp which is used for testing.  This file should also include the pseudo-instructions (`m5_dump_reset_stats()`) as asked in part 2.  Also provide a file daxpy.s with the fragment of the generated assembly code as asked for in part 2.
+4. 默认情况下，Minor CPU 具有两个整数功能单元，如文件 MinorCPU.py 中定义的那样（忽略乘法和除法单元）。假设我们最初的 Minor CPU 设计需要 2 个周期用于整数函数，4 个周期用于浮点函数。在我们即将推出的 Minor CPU 中，我们可以将这些延迟中的任何一个减半。我们应该选哪一个？提供通过模拟获得的统计证据。
 
-3. stats.txt and config.ini files for all the simulations.
 
-4. A short report (200 words) on questions asked.
+## 提交内容
+通过发送电子邮件给 David Wood 教授 <david@cs.wisc.edu> 和 Nilay Vaish <nilay@cs.wisc.edu> 提交您的作业，主题行："CS752 Homework3"。
+
+1. 电子邮件应包含提交作业的学生的姓名和 ID 号。以下文件应作为 zip 文件附加到电子邮件中。
+
+2. 一个名为 daxpy.cpp 的文件，用于测试。此文件还应包括第 2 部分要求的伪指令 (`m5_dump_reset_stats()`)。还要提供一个文件 daxpy.s，其中包含第 2 部分要求的生成的汇编代码片段。
+
+3. 所有模拟的 stats.txt 和 config.ini 文件。
+
+4. 一份关于所提问题的简短报告（200 字）。

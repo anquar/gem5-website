@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Configuring a simple Ruby system
+title: 配置一个简单的 Ruby 系统
 doc: Learning gem5
 parent: part3
 permalink: /documentation/learning_gem5/part3/configuration/
@@ -8,60 +8,37 @@ author: Jason Lowe-Power
 ---
 
 
-## A configuration script for the MSI protocol
+## MSI 协议的配置脚本
 
-First, create a new configuration directory in `configs/`. Just like all
-gem5 configuration files, we will have a configuration run script. For
-the run script, we can start with `simple.py` from
-simple-config-chapter. Copy this file to `simple_ruby.py` in your new
-directory.
+首先，在 `configs/` 中创建一个新的配置目录。就像所有 gem5 配置文件一样，我们将有一个配置运行脚本。对于运行脚本，我们可以从 simple-config-chapter 中的 `simple.py` 开始。将此文件复制到新目录中的 `simple_ruby.py`。
 
-We will make a couple of small changes to this file to use Ruby instead
-of directly connecting the CPU to the memory controllers.
+我们将对此文件进行一些小更改，以使用 Ruby 而不是直接将 CPU 连接到内存控制器。
 
-First, so we can test our *coherence* protocol, let's use two CPUs.
+首先，为了我们可以测试我们的 *一致性* 协议，让我们使用两个 CPU。
 
 ```python
 system.cpu = [X86TimingSimpleCPU(), X86TimingSimpleCPU()]
 ```
 
-Next, after the memory controllers have been instantiated, we are going
-to create the cache system and set up all of the caches. Add the
-following lines *after the CPU interrupts have been created, but before
-instantiating the system*.
+接下来，在实例化内存控制器之后，我们将创建缓存系统并设置所有缓存。在 *创建 CPU 中断之后，但在实例化系统之前* 添加以下行。
 
 ```python
 system.caches = MyCacheSystem()
 system.caches.setup(system, system.cpu, [system.mem_ctrl])
 ```
 
-Like the classic cache example in cache-config-chapter, we are going to
-create a second file that contains the cache configuration code. In this
-file we are going to have a class called `MyCacheSystem` and we will
-create a `setup` function that takes as parameters the CPUs in the
-system and the memory controllers.
+像 cache-config-chapter 中的经典缓存示例一样，我们将创建包含缓存配置代码的第二个文件。在此文件中，我们将有一个名为 `MyCacheSystem` 的类，并且我们将创建一个 `setup` 函数，该函数将系统中的 CPU 和内存控制器作为参数。
 
-You can download the complete run script
-[here](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part3/simple_ruby.py).
+您可以下载完整的运行脚本
+[这里](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part3/simple_ruby.py)。
 
-### Cache system configuration
+### 缓存系统配置
 
-Now, let's create a file `msi_caches.py`. In this file, we will create
-four classes: `MyCacheSystem` which will inherit from `RubySystem`,
-`L1Cache` and `Directory` which will inherit from the SimObjects created
-by SLICC from our two state machines, and `MyNetwork` which will inherit
-from `SimpleNetwork`.
+现在，让我们创建一个文件 `msi_caches.py`。在这个文件中，我们将创建四个类：`MyCacheSystem` 将继承自 `RubySystem`，`L1Cache` 和 `Directory` 将继承自 SLICC 从我们的两个状态机创建的 SimObject，以及 `MyNetwork` 将继承自 `SimpleNetwork`。
 
-#### L1 Cache
+#### L1 缓存
 
-Let's start with the `L1Cache`. First, we will inherit from
-`L1Cache_Controller` since we named our L1 cache "L1Cache" in the state
-machine file. We also include a special class variable and class method
-for tracking the "version number". For each SLICC state machine, you
-have to number them in ascending order from 0. Each machine of the same
-type should have a unique version number. This is used to differentiate
-the individual machines. (Hopefully, in the future this requirement will
-be removed.)
+让我们从 `L1Cache` 开始。首先，我们将继承自 `L1Cache_Controller`，因为我们在状态机文件中将我们的 L1 缓存命名为 "L1Cache"。我们还包括一个特殊的类变量和类方法来跟踪“版本号”。对于每个 SLICC 状态机，您必须按从 0 开始的升序对它们进行编号。同一类型的每台机器都应该有一个唯一的版本号。这用于区分各个机器。（希望将来这个要求会被取消。）
 
 ```python
 class L1Cache(L1Cache_Controller):
@@ -69,11 +46,11 @@ class L1Cache(L1Cache_Controller):
     _version = 0
     @classmethod
     def versionCount(cls):
-        cls._version += 1 # Use count for this particular type
+        cls._version += 1 # 使用此特定类型的计数
         return cls._version - 1
 ```
 
-Next, we implement the constructor for the class.
+接下来，我们实现该类的构造函数。
 
 ```python
 def __init__(self, system, ruby_system, cpu):
@@ -89,18 +66,9 @@ def __init__(self, system, ruby_system, cpu):
     self.connectQueues(ruby_system)
 ```
 
-We need the CPUs in this function to grab the clock domain and system is
-needed for the cache block size. Here, we set all of the parameters that
-we named in the state machine file (e.g., `cacheMemory`). We will set
-`sequencer` later. We also hardcode the size an associativity of the
-cache. You could add command line parameters for these options, if it is
-important to vary them at runtime.
+我们需要此函数中的 CPU 来获取时钟域，并且需要系统来获取缓存块大小。在这里，我们设置我们在状态机文件中命名的所有参数（例如，`cacheMemory`）。我们将稍后设置 `sequencer`。我们还硬编码了缓存的大小和关联性。如果要在运行时更改它们，您可以为这些选项添加命令行参数。
 
-Next, we implement a couple of helper functions. First, we need to
-figure out how many bits of the address to use for indexing into the
-cache, which is a simple log operation. We also need to decide whether
-to send eviction notices to the CPU. Only if we are using the
-out-of-order CPU and using x86 or ARM ISA should we forward evictions.
+接下来，我们实现几个辅助函数。首先，我们需要弄清楚使用地址的多少位来索引缓存，这是一个简单的对数运算。我们还需要决定是否向 CPU 发送驱逐通知。仅当我们使用乱序 CPU 并使用 x86 或 ARM ISA 时，我们才应该转发驱逐。
 
 ```python
 def getBlockSizeBits(self, system):
@@ -119,17 +87,7 @@ def sendEvicts(self, cpu):
     return True
 ```
 
-Finally, we need to implement `connectQueues` to connect all of the
-message buffers to the Ruby network. First, we create a message buffer
-for the mandatory queue. Since this is an L1 cache and it will have a
-sequencer, we need to instantiate this special message buffer. Next, we
-instantiate a message buffer for each buffer in the controller. All of
-the "to" buffers we must set the "master" to the network (i.e., the
-buffer will send messages into the network), and all of the "from"
-buffers we must set the "slave" to the network. These *names* are the
-same as the gem5 ports, but *message buffers are not currently
-implemented as gem5 ports*. In this protocol, we are assuming the
-message buffers are ordered for simplicity.
+最后，我们需要实现 `connectQueues` 以将所有消息缓冲区连接到 Ruby 网络。首先，我们为强制队列创建一个消息缓冲区。由于这是一个 L1 缓存并且它将有一个定序器，我们需要实例化这个特殊的消息缓冲区。接下来，我们为控制器中的每个缓冲区实例化一个消息缓冲区。对于所有的 "to" 缓冲区，我们必须将 "master" 设置为网络（即，缓冲区将向网络发送消息），并且对于所有的 "from" 缓冲区，我们必须将 "slave" 设置为网络。这些 *名称* 与 gem5 端口相同，但 *消息缓冲区目前并未实现为 gem5 端口*。在这个协议中，为了简单起见，我们假设消息缓冲区是有序的。
 
 ```python
 def connectQueues(self, ruby_system):
@@ -145,20 +103,11 @@ def connectQueues(self, ruby_system):
     self.responseFromDirOrSibling.slave = ruby_system.network.master
 ```
 
-#### Directory
+#### 目录
 
-Now, we can similarly implement the directory. There are three
-differences from the L1 cache. First, we need to set the address ranges
-for the directory. Since each directory corresponds to a particular
-memory controller for a subset of the address range (possibly), we need
-to make sure the ranges match. The default address ranges for Ruby
-controllers is `AllMemory`.
+现在，我们可以类似地实现目录。与 L1 缓存有三个不同之处。首先，我们需要为目录设置地址范围。由于每个目录对应于特定内存控制器的一部分地址范围（可能），我们需要确保范围匹配。Ruby 控制器的默认地址范围是 `AllMemory`。
 
-Next, we need to set the master port `memory`. This is the port that
-sends messages when `queueMemoryRead/Write` is called in the SLICC code.
-We set it the to the memory controller port. Similarly, in
-`connectQueues` we need to instantiate the special message buffer
-`responseFromMemory` like the `mandatoryQueue` in the L1 cache.
+接下来，我们需要设置主端口 `memory`。这是在 SLICC 代码中调用 `queueMemoryRead/Write` 时发送消息的端口。我们将其设置为内存控制器端口。同样，在 `connectQueues` 中，我们需要实例化特殊的消息缓冲区 `responseFromMemory`，就像 L1 缓存中的 `mandatoryQueue` 一样。
 
 ```python
 class DirController(Directory_Controller):
@@ -166,7 +115,7 @@ class DirController(Directory_Controller):
     _version = 0
     @classmethod
     def versionCount(cls):
-        cls._version += 1 # Use count for this particular type
+        cls._version += 1 # 使用此特定类型的计数
         return cls._version - 1
 
     def __init__(self, ruby_system, ranges, mem_ctrls):
@@ -197,16 +146,9 @@ class DirController(Directory_Controller):
         self.responseFromMemory = MessageBuffer()
 ```
 
-#### Ruby System
+#### Ruby 系统
 
-Now, we can implement the Ruby system object. For this object, the
-constructor is simple. It just checks the SCons variable `PROTOCOL` to
-be sure that we are using the right configuration file for the protocol
-that was compiled. We cannot create the controllers in the constructor
-because they require a pointer to the this object. If we were to create
-them in the constructor, there would be a circular dependence in the
-SimObject hierarchy which will cause infinite recursion in when the
-system in instantiated with `m5.instantiate`.
+现在，我们可以实现 Ruby 系统对象。对于此对象，构造函数很简单。它只是检查 SCons 变量 `PROTOCOL` 以确保我们使用了为编译的协议的正确配置文件。我们不能在构造函数中创建控制器，因为它们需要指向此对象的指针。如果我们要在构造函数中创建它们，SimObject 层次结构中将存在循环依赖，这将在使用 `m5.instantiate` 实例化系统时导致无限递归。
 
 ```python
 class MyCacheSystem(RubySystem):
@@ -218,37 +160,19 @@ class MyCacheSystem(RubySystem):
         super(MyCacheSystem, self).__init__()
 ```
 
-Instead of create the controllers in the constructor, we create a new
-function to create all of the needed objects: `setup`. First, we create
-the network. We will look at this object next. With the network, we need
-to set the number of virtual networks in the system.
+我们不构造函数中创建控制器，而是创建一个新函数来创建所有需要的对象：`setup`。首先，我们创建网络。我们要看的是这对象。对于网络，我们需要设置系统中的虚拟网络数量。
 
-Next, we instantiate all of the controllers. Here, we use a single
-global list of the controllers to make it easier to connect them to the
-network later. However, for more complicated cache topologies, it can
-make sense to use multiple lists of controllers. We create one L1 cache
-for each CPU and one directory for the system.
+接下来，我们实例化所有的控制器。在这里，我们使用控制器的单个全局列表，以便以后更容易将它们连接到网络。但是，对于更复杂的缓存拓扑，使用多个控制器列表可能是有意义的。我们为每个 CPU 创建一个 L1 缓存，并为系统创建一个目录。
 
-Then, we instantiate all of the sequencers, one for each CPU. Each
-sequencer needs a pointer to the instruction and data cache to simulate
-the correct latency when initially accessing the cache. In more
-complicated systems, you also have to create sequencers for other
-objects like DMA controllers.
+然后，我们实例化所有的定序器，每个 CPU 一个。每个定序器都需要一个指向指令和数据缓存的指针，以模拟最初访问缓存时的正确延迟。在更复杂的系统中，您还必须为其他对象（如 DMA 控制器）创建定序器。
 
-After creating the sequencers, we set the sequencer variable on each L1
-cache controller.
+创建定序器后，我们在每个 L1 缓存控制器上设置定序器变量。
 
-Then, we connect all of the controllers to the network and call the
-`setup_buffers` function on the network.
+然后，我们将所有控制器连接到网络，并在网络上调用 `setup_buffers` 函数。
 
-We then have to set the "port proxy" for both the Ruby system and the
-`system` for making functional accesses (e.g., loading the binary in SE
-mode).
+然后我们必须为 Ruby 系统和 `system` 设置“端口代理”，以便进行 functional 访问（例如，在 SE 模式下加载二进制文件）。
 
-Finally, we connect all of the CPUs to the ruby system. In this example,
-we assume that there are only CPU sequencers so the first CPU is
-connected to the first sequencer, and so on. We also have to connect the
-TLBs and interrupt ports (if we are using x86).
+最后，我们将所有 CPU 连接到 ruby 系统。在此示例中，我们假设只有 CPU 定序器，因此第一个 CPU 连接到第一个定序器，依此类推。我们还必须连接 TLB 和中断端口（如果我们使用的是 x86）。
 
 ```python
 def setup(self, system, cpus, mem_ctrls):
@@ -262,7 +186,7 @@ def setup(self, system, cpus, mem_ctrls):
         [DirController(self, system.mem_ranges, mem_ctrls)]
 
     self.sequencers = [RubySequencer(version = i,
-                            # I/D cache is combined and grab from ctrl
+                            # I/D 缓存合并并从 ctrl 获取
                             icache = self.controllers[i].cacheMemory,
                             dcache = self.controllers[i].cacheMemory,
                             clk_domain = self.controllers[i].clk_domain,
@@ -292,23 +216,13 @@ def setup(self, system, cpus, mem_ctrls):
             cpu.dtb.walker.port = self.sequencers[i].slave
 ```
 
-#### Network
+#### 网络
 
-Finally, the last object we have to implement is the network. The
-constructor is simple, but we need to declare an empty list for the list
-of network interfaces (`netifs`).
+最后，我们要实现的最后一个对象是网络。构造函数很简单，但我们需要为网络接口列表 (`netifs`) 声明一个空列表。
 
-Most of the code is in `connectControllers`. This function implements a
-*very simple, unrealistic* point-to-point network. In other words, every
-controller has a direct link to every other controller.
+大部分代码都在 `connectControllers` 中。此函数实现了一个 *非常简单、不切实际* 的点对点网络。换句话说，每个控制器都与每个其他控制器有直接链接。
 
-The Ruby network is made of three parts: routers that route data from
-one router to another or to external controllers, external links that
-link a controller to a router, and internal links that link two routers
-together. First, we create a router for each controller. Then, we create
-an external link from that router to the controller. Finally, we add all
-of the "internal" links. Each router is connected to all other routers
-to make the point-to-point network.
+Ruby 网络由三部分组成：将数据从一个路由器路由到另一个路由器或外部控制器的路由器，将控制器链接到路由器的外部链接，以及将两个路由器链接在一起的内部链接。首先，我们为每个控制器创建一个路由器。然后，我们创建一个从该路由器到控制器的外部链接。最后，我们添加所有的“内部”链接。每个路由器都连接到所有其他路由器，以构成点对点网络。
 
 ```python
 class MyNetwork(SimpleNetwork):
@@ -329,12 +243,12 @@ class MyNetwork(SimpleNetwork):
         self.int_links = []
         for ri in self.routers:
             for rj in self.routers:
-                if ri == rj: continue # Don't connect a router to itself!
+                if ri == rj: continue # 不要将路由器连接到其自身！
                 link_count += 1
                 self.int_links.append(SimpleIntLink(link_id = link_count,
                                                     src_node = ri,
                                                     dst_node = rj))
 ```
 
-You can download the complete `msi_caches.py` file
-[here](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part3/msi_caches.py).
+您可以下载完整的 `msi_caches.py` 文件
+[这里](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part3/msi_caches.py)。

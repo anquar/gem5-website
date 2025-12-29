@@ -1,63 +1,62 @@
 ---
 layout: documentation
-title: Homework 5 for CS 752
+title: CS 752 作业 5
 doc: Learning gem5
 parent: gem5_101
 permalink: /documentation/learning_gem5/gem5_101/homework-5
 authors:
 ---
 
-# Homework 5 for CS 752: Advanced Computer Architecture I (Fall 2015 Section 1 of 1)
+# CS 752: 高级计算机体系结构 I 作业 5 (2015 年秋季 1 组)
 
-**Due Wednesday, 10/28**
+**截止日期：10/28 星期三**
 
-**You should do this assignment on your own. No late assignments.**
+**您应该独自完成此作业。不接受逾期作业。**
 
-Person of contact for this assignment: "Nilay Vaish'" <nilay@cs.wisc.edu>
+此作业的联系人："Nilay Vaish'" <nilay@cs.wisc.edu>
 
-The goal of this assignment is two-fold. First, for you to experience creating a new SimObject in gem5, and second for you to consider tradeoffs in cache design.
+此作业的目标是双重的。首先，让您体验在 gem5 中创建新的 SimObject，其次让您考虑缓存设计中的权衡。
 
-An updated cache.py for configuration can be downloaded here <{$urlbase}html/hw5/caches.py>. You can replace the cache.py found in the previous homework here: <{$urlbase}html/hw4-configs.tar.gz>.
+更新的 cache.py 配置可以在这里下载 <{$urlbase}html/hw5/caches.py>。您可以替换上一个作业中的 cache.py，这里：<{$urlbase}html/hw4-configs.tar.gz>。
 
-## Step 1: Implement NMRU replacement policy
+## 步骤 1：实现 NMRU 替换策略
 
-You can follow the tutorial here: <http://pages.cs.wisc.edu/~david/courses/cs752/Spring2015/gem5-tutorial/index.html>
-Part 2 of the tutorial will walk you through how to create the NMRU policy.
+您可以按照这里的教程进行操作：<http://pages.cs.wisc.edu/~david/courses/cs752/Spring2015/gem5-tutorial/index.html>
+教程的第 2 部分将指导您如何创建 NMRU 策略。
 
-## Step 2: Implement PLRU replacement policy
+## 步骤 2：实现 PLRU 替换策略
 
-Follow similar steps as you did to implement NRU, but implement pseudo-LRU instead.
-Psuedo-LRU uses a binary tree to encode which blocks are less recently used than other blocks in the set. These slides from Mikko Lipasti do a good job explaining the PLRU algorithm: <https://ece752.ece.wisc.edu/lect11-cache-replacement.pdf>.
+按照实现 NRU 的类似步骤进行操作，但实现伪 LRU (pseudo-LRU)。
+伪 LRU 使用二叉树来编码哪些块比集合中的其他块更少使用。Mikko Lipasti 的这些幻灯片很好地解释了 PLRU 算法：<https://ece752.ece.wisc.edu/lect11-cache-replacement.pdf>。
 
-## Step 3: Architectural exploration
+## 步骤 3：架构探索
 
-This time, the Entil CEO has tasked you with designing the L1 data cache of their new processor based on the out-of-order O3CPU. For this task, the marketing director of Entil claims that most of their customers' workload is in the matrix multiply kernel. Due to it's memory intensity, Entil believe a better cache design could make their processor outperform the competition (AMM, Advanced Micro Machines if you're keeping track). 
+这一次，Entil 首席执行官已委托您设计基于乱序 O3CPU 的新处理器的 L1 数据缓存。对于这项任务，Entil 的营销总监声称他们的大多数客户的工作负载都在矩阵乘法内核中。由于其内存密集型，Entil 相信更好的缓存设计可以使其处理器的性能优于竞争对手（AMM，Advanced Micro Machines，如果您一直在跟踪）。
 
-A blocked matrix multiply implementation can be downloaded here: <{$urlbase}html/hw5/mm.cpp>. Use an input of 128x128 matrix (./mm 128).
+分块矩阵乘法实现可以在这里下载：<{$urlbase}html/hw5/mm.cpp>。使用 128x128 矩阵的输入 (./mm 128)。
 
-You can choose from three replacement policies for the L1D cache: 'Random', 'NMRU', 'PLRU'. As the associativity increases, the costs for NMRU and PLRU rises, whereas the cost for Random stays the same. Therefore, Random can be used with higher associativities than the other replacement policies. Additionally, because NMRU and PLRU must update the recently used bits in the tag they access, these policies limit the clock rate of the CPU. Note, the max clock of the O3 CPU is 2.3 GHz in this generation.
+您可以从三种 L1D 缓存替换策略中进行选择：'Random', 'NMRU', 'PLRU'。随着关联性的增加，NMRU 和 PLRU 的成本上升，而 Random 的成本保持不变。因此，Random 可以使用比其他替换策略更高的关联性。此外，由于 NMRU 和 PLRU 必须更新它们访问的标记中的最近使用位，因此这些策略限制了 CPU 的时钟速率。注意，这代 O3 CPU 的最大时钟为 2.3 GHz。
 
-The constraints for these policies are summarized below.
+这些策略的约束总结如下。
 
 |            |Random |NMRU   |PLRU    |
 |------------|-------|-------|--------|
-|Max assoc.  |16     |8      |8       |
-|Lookup time |100 ps |500 ps | 666 ps |
+|最大关联性  |16     |8      |8       |
+|查找时间 |100 ps |500 ps | 666 ps |
 
-Clearly describe in a one page memo to the CEO of Entil, all of the configurations you simulated, the results of your simulations, and your overall conclusion of how to architect the L1 data cache.
-Additionally, answer the following specific questions:
-* Why does the 16-way set-associative cache perform better/worse/similar to the 8-way set-associative cache?
-* Why does Random/NMRU/PLRU/None perform better than the other replacement policies?
-* Is the cache replacement/associativity important for this workload, or are you only getting benefits from clock cycle? Explain why the cache architecture is important/unimportant.
+在给 Entil 首席执行官的一页备忘录中清楚地描述您模拟的所有配置、模拟结果以及关于如何构建 L1 数据缓存的总体结论。
+此外，回答以下具体问题：
+* 为什么 16 路组相联缓存的性能比 8 路组相联缓存更好/更差/相似？
+* 为什么 Random/NMRU/PLRU/None 比其他替换策略表现更好？
+* 缓存替换/关联性对此工作负载重要吗，还是您只从时钟周期中获得好处？解释为什么缓存架构重要/不重要。
 
 
-##What to Hand In
+## 提交内容
 
-Turn in your assignment by sending an email message to Nilay Vaish <nilay@cs.wisc.edu> and Prof. David Wood <david@cs.wisc.edu> with the subject line:
+通过发送电子邮件给 Nilay Vaish <nilay@cs.wisc.edu> 和 David Wood 教授 <david@cs.wisc.edu> 提交您的作业，主题行：
 "[CS752 Homework5]"
 
-1. The email should contain the name and ID numbers of the student submitting
-the assignment. The files below should be attached as a zip file to the email.
-2. A patch file containing all the changes you made to gem5.
-3. stats.txt and config.ini files for all the simulations.
-4. A short report on the questions asked. The report should be in PDF.
+1. 电子邮件应包含提交作业的学生的姓名和 ID 号。以下文件应作为 zip 文件附加到电子邮件中。
+2. 一个包含您对 gem5 所做所有更改的补丁文件。
+3. 所有模拟的 stats.txt 和 config.ini 文件。
+4. 关于所提问题的简短报告。报告应为 PDF 格式。

@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Understanding gem5 statistics and output
+title: 理解 gem5 统计信息和输出
 doc: Learning gem5
 parent: part1
 permalink: /documentation/learning_gem5/part1/gem5_stats/
@@ -8,36 +8,26 @@ author: Jason Lowe-Power
 ---
 
 
-Understanding gem5 statistics and output
+理解 gem5 统计信息和输出
 ========================================
 
-In addition to any information which your simulation script prints out,
-after running gem5, there are three files generated in a directory
-called `m5out`:
+除了您的模拟脚本打印出的任何信息外，运行 gem5 后，会在名为 `m5out` 的目录中生成三个文件：
 
 **config.ini**
-:   Contains a list of every SimObject created for the simulation and
-    the values for its parameters.
+:   包含为模拟创建的每个 SimObject 的列表及其参数值。
 
 **config.json**
-:   The same as config.ini, but in json format.
+:   与 config.ini 相同，但为 json 格式。
 
 **stats.txt**
-:   A text representation of all of the gem5 statistics registered for
-    the simulation.
+:   为模拟注册的所有 gem5 统计信息的文本表示。
 
 config.ini
 ----------
 
-This file is the definitive version of what was simulated. All of the
-parameters for each SimObject that is simulated, whether they were set
-in the configuration scripts or the defaults were used, are shown in
-this file.
+此文件是模拟内容的最终版本。每个被模拟的 SimObject 的所有参数，无论是在配置脚本中设置的还是使用默认值的，都显示在此文件中。
 
-Below is pulled from the config.ini generated when the `simple.py`
-configuration file from
-[simple-config-chapter](http://www.gem5.org/documentation/learning_gem5/part1/simple_config/)
-is run.
+以下内容摘自运行 [simple-config-chapter](http://www.gem5.org/documentation/learning_gem5/part1/simple_config/) 中的 `simple.py` 配置文件时生成的 config.ini。
 
     [root]
     type=Root
@@ -99,35 +89,18 @@ is run.
     max_capacity=8388608
     system=system
 
-Here we see that at the beginning of the description of each SimObject
-is first its name as created in the configuration file surrounded by
-square brackets (e.g., `[system.membus]`).
+在这里我们看到，在每个 SimObject 描述的开头，首先是用方括号括起来的配置文件中创建的名称（例如，`[system.membus]`）。
 
-Next, every parameter of the SimObject is shown with its value,
-including parameters not explicitly set in the configuration file. For
-instance, the configuration file sets the clock domain to be 1 GHz (1000
-ticks in this case). However, it did not set the cache line size (which
-is 64 in the `system`) object.
+接下来，显示 SimObject 的每个参数及其值，包括未在配置文件中显式设置的参数。例如，配置文件将时钟域设置为 1 GHz（在本例中为 1000 ticks）。但是，它没有设置缓存行大小（在 `system` 对象中为 64）。
 
-The `config.ini` file is a valuable tool for ensuring that you are
-simulating what you think you're simulating. There are many possible
-ways to set default values, and to override default values, in gem5. It
-is a "best-practice" to always check the `config.ini` as a sanity check
-that values set in the configuration file are propagated to the actual
-SimObject instantiation.
+`config.ini` 文件是确保您正在模拟您认为正在模拟的内容的宝贵工具。在 gem5 中有许多设置默认值和覆盖默认值的方法。始终检查 `config.ini` 作为健全性检查，以确在配置文件中设置的值已传播到实际的 SimObject 实例化，这是一个“最佳实践”。
 
 stats.txt
 ---------
 
-gem5 has a flexible statistics generating system. gem5 statistics is
-covered in some detail on the [gem5 stats](
-https://www.gem5.org/documentation/general_docs/statistics/). Each instantiation of a SimObject
-has it's own statistics. At the end of simulation, or when special
-statistic-dumping commands are issued, the current state of the
-statistics for all SimObjects is dumped to a file.
+gem5 有一个灵活的统计生成系统。gem5 统计信息在 [gem5 统计](https://www.gem5.org/documentation/general_docs/statistics/) 中有详细介绍。SimObject 的每个实例化都有自己的统计信息。在模拟结束时，或者发出特殊的统计转储命令时，所有 SimObject 的统计信息的当前状态都会转储到文件中。
 
-First, the statistics file contains general statistics about the
-execution:
+首先，统计文件包含有关执行的一般统计信息：
 
     ---------- Begin Simulation Statistics ----------
     simSeconds                                   0.000057                       # Number of seconds simulated (Second)
@@ -155,25 +128,13 @@ execution:
     hostInstRate                                   202054                       # Simulator instruction rate (inst/s) ((Count/Second))
     hostOpRate                                     363571                       # Simulator op (including micro ops) rate (op/s) ((Count/Second))
 
-The statistic dump begins with
-`---------- Begin Simulation Statistics ----------`. There may be
-multiple of these in a single file if there are multiple statistic dumps
-during the gem5 execution. This is common for long running applications,
-or when restoring from checkpoints.
+统计转储以 `---------- Begin Simulation Statistics ----------` 开始。如果在 gem5 执行期间有多次统计转储，单个文件中可能会有多个这样的部分。这对于长时间运行的应用程序或从检查点恢复时很常见。
 
-Each statistic has a name (first column), a value (second column), and a
-description (last column preceded by \#) followed by the unit of the
-statistic.
+每个统计信息都有一个名称（第一列）、一个值（第二列）和一个描述（最后一列，以 \# 开头），后面是统计信息的单位。
 
-Most of the statistics are self explanatory from their descriptions. A
-couple of important statistics are `sim_seconds` which is the total
-simulated time for the simulation, `sim_insts` which is the number of
-instructions committed by the CPU, and `host_inst_rate` which tells you
-the performance of gem5.
+大多数统计信息从它们的描述中是不言自明的。几个重要的统计信息是 `sim_seconds`，即模拟的总模拟时间，`sim_insts`，即 CPU 提交的指令数，以及 `host_inst_rate`，它告诉您 gem5 的性能。
 
-Next, the SimObjects' statistics are printed. For instance, the CPU
-statistics, which contains information on the number of syscalls,
-statistics for cache system and translation buffers, etc.
+接下来，打印 SimObject 的统计信息。例如，CPU 统计信息，其中包含有关系统调用数量的信息，缓存系统和转换缓冲区的统计信息等。
 
     system.clk_domain.clock                          1000                       # Clock period in ticks (Tick)
     system.clk_domain.voltage_domain.voltage            1                       # Voltage in Volts (Volt)
@@ -221,9 +182,7 @@ statistics for cache system and translation buffers, etc.
     system.cpu.thread_0.numMemRefs                      0                       # Number of Memory References (Count)
     system.cpu.workload.numSyscalls                    11                       # Number of system calls (Count)
 
-Later in the file is memory controller statistics. This has information like
-the bytes read by each component and the average bandwidth used by those
-components.
+稍后在文件中是内存控制器统计信息。这包含诸如每个组件读取的字节数以及这些组件使用的平均带宽等信息。
 
     system.mem_ctrl.bytesReadWrQ                        0                       # Total number of bytes read from write queue (Byte)
     system.mem_ctrl.bytesReadSys                    23168                       # Total read bytes from the system interface side (Byte)

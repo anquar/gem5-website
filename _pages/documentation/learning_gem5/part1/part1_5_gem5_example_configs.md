@@ -1,71 +1,53 @@
 ---
 layout: documentation
-title: Using the default configuration scripts
+title: 使用默认配置脚本
 doc: Learning gem5
 parent: part1
 permalink: /documentation/learning_gem5/part1/example_configs/
 author: Jason Lowe-Power
 ---
 
-gem5 v24.1: Using the gem5 standard library configuration scripts
+gem5 v24.1: 使用 gem5 标准库配置脚本
 =================================================================
 
-The introduction of the gem5 standard library has changed the way
-that gem5 configuration scripts are written. Many of the older
-configuration scripts mentioned in the gem5 v21.0 section below are
-now deprecated in favor of configuration scripts for the gem5 standard
-library, located at `configs/example/gem5_library`.
+gem5 标准库的引入改变了 gem5 配置脚本的编写方式。
+下面 gem5 v21.0 部分中提到的许多旧配置脚本现在已被弃用，取而代之的是位于 `configs/example/gem5_library` 的 gem5 标准库配置脚本。
 
-A brief look at the directory structure is as follows:
+简要查看目录结构如下：
 
 ```txt
 gem5_library
     |
-    |- caches       #contains a configuration script for the octopi cache
+    |- caches       #包含 octopi 缓存的配置脚本
     |
-    |- checkpoints  #scripts for taking and restoring from checkpoints
+    |- checkpoints  #用于获取和从检查点恢复的脚本
     |
-    |- dramsys      #scripts for using gem5 with dramsys
+    |- dramsys      #用于将 gem5 与 dramsys 一起使用的脚本
     |
-    |- looppoints   #scripts for taking and restoring from looppoints
+    |- looppoints   #用于获取和从 looppoints 恢复的脚本
     |
-    |- multisim     #scripts for launching multiple simulations at once using multisim
+    |- multisim     #用于使用 multisim 一次启动多个模拟的脚本
     |
-    |- spatter_gen  #scripts for SpatterGen
+    |- spatter_gen  #用于 SpatterGen 的脚本
     |
-    |- (various example configuration scripts not sorted into a subdirectory)
+    |- (各种未分类到子目录的示例配置脚本)
 
 ```
 
-The example configuration scripts placed directly in the gem5_library directory
-are similar to what you've seen in previous parts of Learning gem5, but with more
-variety, e.g. different ISAs, boards, and workloads. The source for these scripts
-can be viewed [here](https://github.com/gem5/gem5/tree/stable/configs/example/gem5_library).
+直接放置在 `gem5_library` 目录中的示例配置脚本类似于您在 Learning gem5 之前部分中看到的脚本，但种类更多，例如不同的 ISA、板和工作负载。可以在 [这里](https://github.com/gem5/gem5/tree/stable/configs/example/gem5_library) 查看这些脚本的源代码。
 
-gem5 v21.0: Using the default configuration scripts
+gem5 v21.0: 使用默认配置脚本
 =======================================
 
-In this chapter, we'll explore using the default configuration scripts
-that come with gem5. gem5 ships with many configuration scripts that
-allow you to use gem5 very quickly. However, a common pitfall is to use
-these scripts without fully understanding what is being simulated. It is
-important when doing computer architecture research with gem5 to fully
-understand the system you are simulating. This chapter will walk you
-through some important options and parts of the default configuration
-scripts.
+在本章中，我们将探索使用 gem5 附带的默认配置脚本。gem5 附带了许多配置脚本，让您可以非常快速地使用 gem5。然而，一个常见的陷阱是在没有完全理解正在模拟什么的情况下使用这些脚本。在使用 gem5 进行计算机架构研究时，完全理解您正在模拟的系统非常重要。本章将引导您了解默认配置脚本的一些重要选项和部分。
 
-In the last few chapters you have created your own configuration scripts
-from scratch. This is very powerful, as it allows you to specify every
-single system parameter. However, some systems are very complex to set
-up (e.g., a full-system ARM or x86 machine). Luckily, the gem5
-developers have provided many scripts to bootstrap the process of
-building systems.
+在最后几章中，您已经从头开始创建了自己的配置脚本。这非常强大，因为它允许您指定每一个系统参数。但是，有些系统非常复杂（例如，全系统 ARM 或 x86 机器）。幸运的是，gem5 开发人员提供了许多脚本来引导构建系统的过程。
 
-A tour of the directory structure
+目录结构概览
 ---------------------------------
 
-All of gem5's configuration files can be found in `configs/`. The
-directory structure is shown below:
+所有 gem5 的配置文件都可以在 `configs/` 中找到。
+目录结构如下所示：
 
     configs/boot:
     bbench-gb.rcS  bbench-ics.rcS  hack_back_ckpt.rcS  halt.sh
@@ -103,99 +85,62 @@ directory structure is shown below:
     configs/topologies:
     BaseTopology.py  Cluster.py  CrossbarGarnet.py  Crossbar.py  CustomMesh.py  __init__.py  MeshDirCorners_XY.py  Mesh_westfirst.py  Mesh_XY.py  Pt2Pt.py
 
-Each directory is briefly described below:
+每个目录的简要说明如下：
 
 **boot/**
-:   These are rcS files which are used in full-system mode. These files
-    are loaded by the simulator after Linux boots and are executed by
-    the shell. Most of these are used to control benchmarks when running
-    in full-system mode. Some are utility functions, like
-    `hack_back_ckpt.rcS`. These files are covered in more depth in the
-    chapter on full-system simulation.
+:   这些是用于全系统模式的 rcS 文件。这些文件在 Linux 启动后由模拟器加载，并由 shell 执行。其中大多数用于在全系统模式下运行时控制基准测试。有些是实用函数，如 `hack_back_ckpt.rcS`。这些文件在全系统模拟一章中有更深入的介绍。
 
 **common/**
-:   This directory contains a number of helper scripts and functions to
-    create simulated systems. For instance, `Caches.py` is similar to
-    the `caches.py` and `caches_opts.py` files created in previous
-    chapters.
+:   此目录包含许多用于创建模拟系统的辅助脚本和函数。例如，`Caches.py` 类似于我们在前几章中创建的 `caches.py` 和 `caches_opts.py` 文件。
 
-    `Options.py` contains a variety of options that can be set on the
-    command line. Like the number of CPUs, system clock, and many, many
-    more. This is a good place to look to see if the option you want to
-    change already has a command line parameter.
+    `Options.py` 包含可以在命令行上设置的各种选项。比如 CPU 数量、系统时钟等等。如果要查看想要更改的选项是否已经有命令行参数，这是一个很好的去处。
 
-    `CacheConfig.py` contains the options and functions for setting
-    cache parameters for the classic memory system.
+    `CacheConfig.py` 包含用于为经典内存系统设置缓存参数的选项和函数。
 
-    `MemConfig.py` provides some helper functions for setting the memory
-    system.
+    `MemConfig.py` 提供了一些用于设置内存系统的辅助函数。
 
-    `FSConfig.py` contains the necessary functions to set up full-system
-    simulation for many different kinds of systems. Full-system
-    simulation is discussed further in it's own chapter.
+    `FSConfig.py` 包含为许多不同类型的系统设置全系统模拟所需的函数。全系统模拟将在其自己的章节中进一步讨论。
 
-    `Simulation.py` contains many helper functions to set up and run
-    gem5. A lot of the code contained in this file manages saving and
-    restoring checkpoints. The example configuration files below in
-    `examples/` use the functions in this file to execute the gem5
-    simulation. This file is quite complicated, but it also allows a lot
-    of flexibility in how the simulation is run.
+    `Simulation.py` 包含许多用于设置和运行 gem5 的辅助函数。此文件中包含的大量代码管理保存和恢复检查点。下面 `examples/` 中的示例配置文件使用此文件中的函数来执行 gem5 模拟。这个文件相当复杂，但也允许在如何运行模拟方面有很大的灵活性。
 
 **dram/**
-:   Contains scripts to test DRAM.
+:   包含用于测试 DRAM 的脚本。
 
 **example/**
-:   This directory contains some example gem5 configuration scripts that
-    can be used out-of-the-box to run gem5. Specifically, `se.py` and
-    `fs.py` are quite useful. More on these files can be found in the
-    next section. There are also some other utility configuration
-    scripts in this directory.
+:   此目录包含一些示例 gem5 配置脚本，可以直接用来运行 gem5。具体来说，`se.py` 和 `fs.py` 非常有用。有关这些文件的更多信息可以在下一节中找到。此目录中还有一些其他实用配置脚本。
 
 **learning_gem5/**
-:   This directory contains all gem5 configuration scripts found in the
-    learning\_gem5 book.
+:   此目录包含 learning\_gem5 书中找到的所有 gem5 配置脚本。
 
 **network/**
-:   This directory contains the configurations scripts for a HeteroGarnet
-    network.
+:   此目录包含 HeteroGarnet 网络的配置脚本。
 
 **nvm/**
-:   This directory contains example scripts using the NVM interface.
+:   此目录包含使用 NVM 接口的示例脚本。
 
 **ruby/**
-:   This directory contains the configurations scripts for Ruby and its
-    included cache coherence protocols. More details can be found in the
-    chapter on Ruby.
+:   此目录包含 Ruby 及其包含的缓存一致性协议的配置脚本。更多详细信息可以在 Ruby 一章中找到。
 
 **splash2/**
-:   This directory contains scripts to run the splash2 benchmark suite
-    with a few options to configure the simulated system.
+:   此目录包含运行 splash2 基准测试套件的脚本，带有一些用于配置模拟系统的选项。
 
 **topologies/**
-:   This directory contains the implementation of the topologies that
-    can be used when creating the Ruby cache hierarchy. More details can
-    be found in the chapter on Ruby.
+:   此目录包含在创建 Ruby 缓存层次结构时可以使用的拓扑实现。更多详细信息可以在 Ruby 一章中找到。
 
-Using `se.py` and `fs.py`
+使用 `se.py` 和 `fs.py`
 -------------------------
 
-In this section, I'll discuss some of the common options that can be
-passed on the command line to `se.py` and `fs.py`. More details on how
-to run full-system simulation can be found in the full-system simulation
-chapter. Here I'll discuss the options that are common to the two files.
+在本节中，我将讨论一些可以传递给 `se.py` 和 `fs.py` 命令行的常见选项。有关如何运行全系统模拟的更多详细信息，请参见全系统模拟一章。在这里，我将讨论这两个文件通用的选项。
 
-Most of the options discussed in this section are found in Options.py
-and are registered in the function `addCommonOptions`. This section does
-not detail all of the options. To see all of the options, run the
-configuration script with `--help`, or read the script's source code.
+本节中讨论的大多数选项都可以在 Options.py 中找到，并在函数 `addCommonOptions` 中注册。本节不详细介绍所有选项。要查看所有选项，请使用 `--help` 运行配置脚本，或阅读脚本的源代码。
 
-First, let's simply run the hello world program without any parameters:
+首先，让我们简单地运行 hello world 程序，不带任何参数：
 
 ```
 build/X86/gem5.opt configs/example/se.py --cmd=tests/test-progs/hello/bin/x86/linux/hello
 ```
 
-And we get the following as output:
+我们得到以下输出：
 
     gem5 Simulator System.  http://gem5.org
     gem5 is copyrighted software; use the --copyright option for details.
@@ -215,10 +160,7 @@ And we get the following as output:
     Hello world!
     Exiting @ tick 5943000 because exiting with last active thread context
 
-However, this isn't a very interesting simulation at all! By default,
-gem5 uses the atomic CPU and uses atomic memory accesses, so there's no
-real timing data reported! To confirm this, you can look at
-m5out/config.ini. The CPU is shown on line 51:
+然而，这根本不是一个非常有趣的模拟！默认情况下，gem5 使用 atomic CPU 并使用原子内存访问，因此没有报告真正的时序数据！要确认这一点，您可以查看 `m5out/config.ini`。CPU 显示在第 51 行：
 
     [system.cpu]
     type=X86AtomicSimpleCPU
@@ -230,8 +172,7 @@ m5out/config.ini. The CPU is shown on line 51:
     do_checkpoint_insts=true
     do_statistics_insts=true
 
-To actually run gem5 in timing mode, let's specify a CPU type. While
-we're at it, we can also specify sizes for the L1 caches.
+要实际上以 timing 模式运行 gem5，让我们指定一个 CPU 类型。与此同时，我们也可以指定 L1 缓存的大小。
 
 ```
 build/X86/gem5.opt configs/example/se.py --cmd=tests/test-progs/hello/bin/x86/linux/hello --cpu-type=TimingSimpleCPU --l1d_size=64kB --l1i_size=16kB
@@ -255,12 +196,7 @@ build/X86/gem5.opt configs/example/se.py --cmd=tests/test-progs/hello/bin/x86/li
     Hello world!
     Exiting @ tick 454646000 because exiting with last active thread context
 
-Now, let's check the config.ini file and make sure that these options
-propagated correctly to the final system. If you search
-`m5out/config.ini` for "cache", you'll find that no caches were created!
-Even though we specified the size of the caches, we didn't specify that
-the system should use caches, so they weren't created. The correct
-command line should be:
+现在，让我们检查 config.ini 文件并确保这些选项正确传播到了最终系统。如果您在 `m5out/config.ini` 中搜索 "cache"，您会发现没有创建任何缓存！即使我们指定了缓存的大小，我们也没有指定系统应该使用缓存，所以它们没有被创建。正确的命令行应该是：
 
 ```
 build/X86/gem5.opt configs/example/se.py --cmd=tests/test-progs/hello/bin/x86/linux/hello --cpu-type=TimingSimpleCPU --l1d_size=64kB --l1i_size=16kB --caches
@@ -284,9 +220,7 @@ build/X86/gem5.opt configs/example/se.py --cmd=tests/test-progs/hello/bin/x86/li
     Hello world!
     Exiting @ tick 31680000 because exiting with last active thread context
 
-On the last line, we see that the total time went from 454646000 ticks
-to 31680000, much faster! Looks like caches are probably enabled now.
-But, it's always a good idea to double check the `config.ini` file.
+在最后一行，我们看到总时间从 454646000 ticks 变为 31680000，快得多！看起来缓存现在可能已启用了。但是，仔细检查 `config.ini` 文件总是一个好主意。
 
     [system.cpu.dcache]
     type=Cache
@@ -323,66 +257,66 @@ But, it's always a good idea to double check the `config.ini` file.
     cpu_side=system.cpu.dcache_port
     mem_side=system.membus.cpu_side_ports[2]
 
-Some common options `se.py` and `fs.py`
+`se.py` 和 `fs.py` 的一些常见选项
 ---------------------------------------
 
-All of the possible options are printed when you run:
+当您运行以下命令时，会打印所有可能的选项：
 
 ```
 build/X86/gem5.opt configs/example/se.py --help
 ```
 
-Below are a few important options from that list:
+以下是该列表中的一些重要选项：
 
 
 * `--cpu-type=CPU_TYPE`
 
-    * The type of cpu to run with. This is an important parameter to always set. The default is atomic, which doesn’t perform a timing simulation.
+    * 要运行的 cpu 类型。这是一个始终设置的重要参数。默认值为 atomic，不执行时序模拟。
 
 * `--sys-clock=SYS_CLOCK`
 
-    * Top-level clock for blocks running at system speed.
+    * 以系统速度运行的块的顶级时钟。
 
 * `--cpu-clock=CPU_CLOCK`
 
-    * Clock for blocks running at CPU speed. This is separate from the system clock above.
+    * 以 CPU 速度运行的块的时钟。这与上面的系统时钟是分开的。
 
 * `--mem-type=MEM_TYPE`
 
-    * Type of memory to use. Options include different DDR memories, and the ruby memory controller.
+    * 要使用的内存类型。选项包括不同的 DDR 内存和 ruby 内存控制器。
 
 * `--caches`
 
-    * Perform the simulation with classic caches.
+    * 使用经典缓存执行模拟。
 
 * `--l2cache`
 
-    * Perform the simulation with an L2 cache, if using classic caches.
+    * 如果使用经典缓存，则使用 L2 缓存执行模拟。
 
 * `--ruby`
 
-    * Use Ruby instead of the classic caches as the cache system simulation.
+    * 使用 Ruby 而不是经典缓存作为缓存系统模拟。
 
 * `-m TICKS, --abs-max-tick=TICKS`
 
-    * Run to absolute simulated tick specified including ticks from a restored checkpoint. This is useful if you only want simulate for a certain amount of simulated time.
+    * 运行到指定的绝对模拟 tick，包括从恢复的检查点开始的 tick。如果您只想模拟一定的模拟时间，这很有用。
 
 * `-I MAXINSTS, --maxinsts=MAXINSTS`
 
-    * Total number of instructions to simulate (default: run forever). This is useful if you want to stop simulation after a certain number of instructions has been executed.
+    * 要模拟的总指令数（默认值：永远运行）。如果您想在执行了一定数量的指令后停止模拟，这很有用。
 
 * `-c CMD, --cmd=CMD`
 
-    * The binary to run in syscall emulation mode.
+    * 在系统调用仿真模式下运行的二进制文件。
 
 * `-o OPTIONS, --options=OPTIONS`
 
-    * The options to pass to the binary, use ” ” around the entire string. This is useful when you are running a command which takes options. You can pass both arguments and options (e.g., –whatever) through this variable.
+    * 传递给二进制文件的选项，在整个字符串周围使用 ” ”。这在运行带选项的命令时很有用。您可以通过此变量传递参数和选项（例如，–whatever）。
 
 * `--output=OUTPUT`
 
-    * Redirect stdout to a file. This is useful if you want to redirect the output of the simulated application to a file instead of printing to the screen. Note: to redirect gem5 output, you have to pass a parameter before the configuration script.
+    * 将 stdout 重定向到文件。如果您想将模拟应用程序的输出重定向到文件而不是打印到屏幕，这很有用。注意：要重定向 gem5 输出，您必须在配置脚本之前传递一个参数。
 
 * `--errout=ERROUT`
 
-    * Redirect stderr to a file. Similar to above.
+    * 将 stderr 重定向到文件。类似于上面。

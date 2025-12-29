@@ -1,62 +1,62 @@
 ---
 layout: documentation
-title: Adding cache to configuration script
+title: 向配置脚本添加缓存
 doc: Learning gem5
 parent: part1
 permalink: /documentation/learning_gem5/part1/cache_config/
 author: Jason Lowe-Power
 ---
 
-More complex config for gem5 v24.1
+gem5 v24.1 更复杂的配置
 ===============================
 
-**Notice: The material in the following section is taken from section 2, part 1 of the 2024 gem5 bootcamp. The link to the slides is [here](https://bootcamp.gem5.org/#02-Using-gem5/01-stdlib)**
+**注意：下一节中的材料取自 2024 gem5 bootcamp 第一部分第 2 节。幻灯片链接在 [这里](https://bootcamp.gem5.org/#02-Using-gem5/01-stdlib)**
 
-In the previous section, we learned the basics of setting up a Python configuration script for use with gem5.
-The previous section's config script uses the X86DemoBoard, which is pre-configured with caches, memory, etc.
-In this section, we will learn how to use other components in the gem5 standard library to set up a simulation.
+在上一节中，我们学习了设置 gem5 Python 配置脚本的基础知识。
+上一节的配置脚本使用了 X86DemoBoard，它预先配置了缓存、内存等。
+在本节中，我们将学习如何使用 gem5 标准库中的其他组件来设置模拟。
 
-What is the gem5 standard library?
+什么是 gem5 标准库？
 ----------------------------------
 
-The gem5 standard library provides a set of predefined components that can be used to define a system in a configuration script.
-Without the standard library, you would have to define every part of your simulation, potentially resulting in scripts with hundreds of lines of code even for the most basic of simulations.
+gem5 标准库提供了一组预定义的组件，可用于在配置脚本中定义系统。
+如果没有标准库，您将不得不定义模拟的每个部分，即使是最基本的模拟，也可能导致脚本包含数百行代码。
 
-Main Idea
+主要思想
 ---------
 
-Due to its modular, object-oriented design, gem5 can be thought of as a set of components that can be plugged together to form a simulation.
-The types of components are boards, processors, memory systems, and cache hierarchies:
+由于其模块化、面向对象的设计，gem5 可以被看作是一组可以插入在一起形成模拟的组件。
+组件的类型包括板 (boards)、处理器 (processors)、内存系统 (memory systems) 和缓存层次结构 (cache hierarchies)：
 
-- Board: The "backbone" of the system. You plug components into the board. The board also contains the system-level things like devices, workload, etc. It's the boards job to negotiate the connections between other components.
-- Processor: Processors connect to boards and have one or more cores.
-- Cache hierarchy: A cache hierarchy is a set of caches that can be connected to a processor and memory system.
-- Memory system: A memory system is a set of memory controllers and memory devices that can be connected to the cache hierarchy.
+- Board (板): 系统的“骨干”。您将组件插入板中。板还包含系统级的东西，如设备、工作负载等。板的工作是协商其他组件之间的连接。
+- Processor (处理器): 处理器连接到板并具有一个或多个核心。
+- Cache hierarchy (缓存层次结构): 缓存层次结构是一组可以连接到处理器和内存系统的缓存。
+- Memory system (内存系统): 内存系统是一组可以连接到缓存层次结构的内存控制器和内存设备。
 
-Relationship to gem5 models
+与 gem5 模型的名为
 ---------------------------
 
-The C++ code in gem5 specifies parameterized models (typically referred to "SimObjects" in most gem5 literature).
-These models are then instantiated in the pre-made Python scripts in the gem5 standard library.
+gem5 中的 C++ 代码指定了参数化模型（在大多数 gem5 文献中通常称为 "SimObjects"）。
+然后在 gem5 标准库中的预制 Python 脚本中实例化这些模型。
 
-The standard library is a way to wrap these models in a standard API into, what we call, components.
+标准库是一种将这些模型包装在标准 API 中成为我们所谓的组件的方法。
 
-The gem5 models are fine grained concepts, while components are coarser grained and typically contain many models instantiated with sensible parameters.
-For example, a gem5 model could be a core, and a component could be a processor with multiple cores that also specifies bus connections and sets parameters to sensible vlaues.
+gem5 模型是细粒度的概念，而组件是粗粒度的，通常包含许多用合理参数实例化的模型。
+例如，一个 gem5 模型可以是一个核心，而一个组件可以是一个具有多个核心的处理器，它还指定了总线连接并将参数设置为合理的值。
 
-If you want to create a new component you are encouraged to extend (i.e., subclass) the components in the standard library or create new components.
-This allows you to choose the models within the component and the value of their parameters.
+如果您想创建一个新组件，鼓励您扩展（即子类化）标准库中的组件或创建新组件。
+这允许您选择组件内的模型及其参数的值。
 
-Setting up the configuration script
+设置配置脚本
 -----------------------------------
-First, let's make a configuration file:
+首先，让我们制作一个配置文件：
 
 ```bash
 mkdir configs/tutorial/part1/
 touch configs/tutorial/part1/components.py
 ```
 
-Let's add our imports:
+让我们添加导入：
 
 ```python
 from gem5.components.boards.simple_board import SimpleBoard
@@ -71,7 +71,7 @@ from gem5.resources.resource import obtain_resource
 from gem5.simulate.simulator import Simulator
 ```
 
-Next, let's add our cache hierarchy:
+接下来，让我们添加我们的缓存层次结构：
 
 ```python
 cache_hierarchy = MESITwoLevelCacheHierarchy(
@@ -85,33 +85,33 @@ cache_hierarchy = MESITwoLevelCacheHierarchy(
 )
 ```
 
-MESITwoLevelCacheHierarchy is a component that represents a two-level MESI cache hierarchy.
-This uses the Ruby memory model. See [here]https://bootcamp.gem5.org/#02-Using-gem5/05-cache-hierarchies for more information about caches in gem5.
+MESITwoLevelCacheHierarchy 是一个代表两级 MESI 缓存层次结构的组件。
+这使用了 Ruby 内存模型。有关 gem5 中缓存的更多信息，请参见 [这里](https://bootcamp.gem5.org/#02-Using-gem5/05-cache-hierarchies)。
 
-The component for the cache hierarchy is parameterized with the sizes and associativities of the L1 and L2 caches.
+缓存层次结构的组件使用 L1 和 L2 缓存的大小和关联度进行参数化。
 
-Next, let's add a memory system:
+接下来，让我们添加一个内存系统：
 
 ```python
 memory = SingleChannelDDR4_2400()
 ```
 
-This component represents a single-channel DDR3 memory system.
+此组件代表单通道 DDR3 内存系统。
 
-There is a size parameter that can be used to specify the size of the memory system of the simulated system.
-You can reduce the size to save simulation time, or use the default for the memory type (e.g., one channel of DDR3 defaults to 8 GiB).
-There are also multi channel memories available. You can see [these](https://bootcamp.gem5.org/#02-Using-gem5/06-memory) gem5 2024 bootcamp slides for more information.
+有一个 size 参数可用于指定模拟系统的内存系统大小。
+您可以减小大小以节省模拟时间，或使用内存类型的默认值（例如，一个 DDR3 通道默认为 8 GiB）。
+还有多通道内存可用。您可以查看 [这些](https://bootcamp.gem5.org/#02-Using-gem5/06-memory) gem5 2024 bootcamp 幻灯片以获取更多信息。
 
-Next, let's add a processor:
+接下来，让我们添加一个处理器：
 
 ```python
 processor = SimpleProcessor(cpu_type=CPUTypes.TIMING, isa=ISA.ARM, num_cores=1)
 ```
 
-The `SimpleProcessor` is a component that allows you to customize the model for the underlying cores.
-The `cpu_type` parameter specifies the type of CPU model to use.
+`SimpleProcessor` 是一个允许您自定义底层核心模型的组件。
+`cpu_type` 参数指定要使用的 CPU 模型类型。
 
-Next, let's add a board and plug in components:
+接下来，让我们添加一个板并插入组件：
 
 ```python
 board = SimpleBoard(
@@ -122,37 +122,37 @@ board = SimpleBoard(
 )
 ```
 
-The SimpleBoard can run any ISA in Syscall Emulation (SE) mode.
-It is "Simple" due the relative simplicity of SE mode.
-Most boards are tied to a specific ISA and require more complex designs to run Full System (FS) simulation.
-You can find the boards in the gem5 standard library at `src/python/gem5/components/boards`. The demo boards are located in `src/python/gem5/prebuilt/demo`.
+SimpleBoard 可以在系统调用仿真 (SE) 模式下运行任何 ISA。
+它是 "Simple" 的，因为 SE 模式相对简单。
+大多数板都绑定到特定 ISA，并且需要更复杂的设计来运行全系统 (FS) 模拟。
+您可以在 `src/python/gem5/components/boards` 的 gem5 标准库中找到板。演示板位于 `src/python/gem5/prebuilt/demo` 中。
 
-Next, set up the workload:
+接下来，设置工作负载：
 
 ```python
 board.set_workload(obtain_resource("arm-gapbs-bfs-run"))
 ```
 
-The obtain_resource function downloads the files needed to run the specified workload.
-In this case "arm-gapbs-bfs-run" is a BFS workload from the GAP Benchmark Suite.
-You can see more information about this resources at the gem5 resources website [here](https://resources.gem5.org/resources/arm-gapbs-bfs-run?version=1.0.0).
-In general, you can browse all gem5 resources at the [gem5 resources website](https://resources.gem5.org/).
+obtain_resource 函数下载运行指定工作负载所需的文件。
+在这种情况下，"arm-gapbs-bfs-run" 是来自 GAP Benchmark Suite 的 BFS 工作负载。
+您可以在 gem5 资源网站 [这里](https://resources.gem5.org/resources/arm-gapbs-bfs-run?version=1.0.0) 查看有关此资源的更多信息。
+通常，您可以在 [gem5 资源网站](https://resources.gem5.org/) 浏览所有 gem5 资源。
 
-Next, set up the simulation:
+接下来，设置模拟：
 
 ```python
 simulator = Simulator(board=board)
 simulator.run()
 ```
 
-You can now run the simulation using
+您现在可以使用以下命令运行模拟
 
 ```bash
 ./build/ALL/gem5.opt configs/tutorial/part1/components.py
 
 ```
 
-The output should look something like this:
+输出应如下所示：
 
 ```txt
 gem5 Simulator System.  https://www.gem5.org
@@ -194,16 +194,17 @@ Trial Time:          0.00010
 Trial Time:          0.00010
 Trial Time:          0.00010
 Trial Time:          0.00010
+Trial Time:          0.00010
 Trial Time:          0.00013
 Average Time:        0.00010
 
 ```
 
-gem5 stdlib File Structure
+gem5 stdlib 文件结构
 --------------------------
 
-The gem5 stdlib is located in `src/python/gem5/`.
-Of interest here are the `components` and `prebuilt` folders:
+gem5 stdlib 位于 `src/python/gem5/`。
+这里感兴趣的是 `components` 和 `prebuilt` 文件夹：
 
 ```txt
 gem5/src/python/gem5/components
@@ -217,7 +218,7 @@ gem5/src/python/gem5/prebuilt
 ----/riscvmatched
 ```
 
-The `components` folder contains components with which you can build systems. The `prebuilt` folder contains various prebuilt systems, including demo systems for the X86, Arm, and RISC-V isas, and riscvmatched, which is a model of SiFive Unmatched.
+`components` 文件夹包含可用于构建系统的组件。`prebuilt` 文件夹包含各种预构建系统，包括用于 X86、Arm 和 RISC-V isa 的演示系统，以及 riscvmatched，它是 SiFive Unmatched 的模型。
 
 ```txt
 gem5/src/python/gem5/components
@@ -231,8 +232,9 @@ gem5/src/python/gem5/components
 ----/processors
 ```
 
-Boards are what components plug into. The SimpleBoard has SE mode only, the ArmBoard has FS mode only, and X86Board and RiscvBoard have both FS and SE mode.
+Board 是组件插入的地方。SimpleBoard 只有 SE 模式，ArmBoard 只有 FS 模式，X86Board 和 RiscvBoard 既有 FS 模式也有 SE 模式。
 
+```txt
 gem5/src/python/gem5/components
 ----/boards
 ----/cachehierarchies
@@ -241,15 +243,16 @@ gem5/src/python/gem5/components
     ----/ruby
 ----/memory
 ----/processors
+```
 
-Cache hierarchy components have a fixed interface to processors and memory.
+Cache hierarchy 组件具有到处理器和内存的固定接口。
 
-- Ruby: detailed cache coherence and interconnect
-- CHI: Arm CHI-based protocol implemented in Ruby
-- Classic caches: Hierarchy of crossbars with inflexible coherence
+- Ruby: 详细的缓存一致性和互连
+- CHI: 基于 Arm CHI 的协议，在 Ruby 中实现
+- Classic caches: 交叉开关的层次结构，具有不灵活的一致性
 
-As of gem5 v24.1, it is possible to use any Ruby cache coherence protocol with the ALL gem5 build.
-This is the build included in pre-compiled binaries.
+从 gem5 v24.1 开始，可以将任何 Ruby 缓存一致性协议与 ALL gem5 构建一起使用。
+这是预编译二进制文件中包含的构建。
 
 ```txt
 gem5/src/python/gem5/components
@@ -264,9 +267,9 @@ gem5/src/python/gem5/components
 ----/processors
 ```
 
-The memory directory contains pre-configured (LP)DDR3/4/5 DIMMs. Single and multi channel memory systems are available.
-There is integration with DRAMSim and DRAMSys, which while not needed for accuracy, is useful for comparisons.
-The `hbm` directory is an HBM stack.
+memory 目录包含预配置的 (LP)DDR3/4/5 DIMM。提供单通道和多通道内存系统。
+与 DRAMSim 和 DRAMSys 集成，虽然不需要精度，但对于比较很有用。
+`hbm` 目录是一个 HBM 堆栈。
 
 ```txt
 gem5/src/python/gem5/components
@@ -279,66 +282,66 @@ gem5/src/python/gem5/components
     ----/switchable
 ```
 
-The `processors` directory mostly contains configurable processors to build off of.
+`processors` 目录主要包含可配置的处理器以供构建。
 
-Generators create synthetic traffic, but act like processors. They have linear, random, and more interesting patterns.
+Generators 创建合成流量，但像处理器一样行动。它们有线性、随机和更有趣的模式。
 
-Simple processors only have default parameters and one ISA.
+Simple processors 只有默认参数和一个 ISA。
 
-Switchable processors allow you to change processor types during simulation.
+Switchable processors 允许您在模拟期间更改处理器类型。
 
-More on processors
+关于处理器的更多信息
 ------------------
 
-Processors are made up of cores.
-Cores have a "BaseCPU" as a member. This is the actual CPU model.
-`Processor` is what interfaces with `CacheHierarchy` and `Board`
-Processors are organized, structured sets of cores. They define how cores connect with each other and with outside components and the board though standard interface.
+处理器由核心组成。
+核心有一个 "BaseCPU" 作为成员。这是实际的 CPU 模型。
+`Processor` 是与 `CacheHierarchy` 和 `Board` 接口的东西
+处理器是有组织的、结构化的核心集。它们通过标准接口定义核心如何相互连接以及与外部组件和板连接。
 
-**gem5 has three (or four or five) different processor models**
+**gem5 有三种（或四种或五种）不同的处理器模型**
 
-They are as follows:
+它们如下：
 
-`CPUTypes.TIMING`: A simple in-order CPU model
-This is a "single cycle" CPU. Each instruction takes the time to fetch and executes immediately.
-Memory operations take the latency of the memory system.
-OK for doing memory-centric studies, but not good for most research.
+`CPUTypes.TIMING`: 一个简单的按序 CPU 模型
+这是一个“单周期” CPU。每条指令花费时间来获取并立即执行。
+内存操作花费内存系统的延迟。
+适合做以内存为中心的研究，但不适合大多数研究。
 
-`CPUTypes.O3`: An out-of-order CPU model
-Highly detailed model based on the Alpha 21264.
-Has ROB, physical registers, LSQ, etc.
-Don't use SimpleProcessor if you want to configure this.
+`CPUTypes.O3`: 一个乱序 CPU 模型
+基于 Alpha 21264 的高度详细模型。
+具有 ROB、物理寄存器、LSQ 等。
+如果您想配置它，请不要使用 SimpleProcessor。
 
-`CPUTypes.MINOR`: An in-order core model
-A high-performance in-order core model.
-Configurable four-stage pipeline
-Don't use SimpleProcessor if you want to configure this.
+`CPUTypes.MINOR`: 一个按序核心模型
+一个高性能的按序核心模型。
+可配置的四级流水线
+如果您想配置它，请不要使用 SimpleProcessor。
 
-`CPUTypes.ATOMIC`: Used in "atomic" mode (more later)
-`CPUTypes.KVM`: This is covered in detail in the [2024 gem5 bootcamp](https://bootcamp.gem5.org/#02-Using-gem5/08-accelerating-simulation).
+`CPUTypes.ATOMIC`: 用于“原子”模式（稍后详细介绍）
+`CPUTypes.KVM`: 这在 [2024 gem5 bootcamp](https://bootcamp.gem5.org/#02-Using-gem5/08-accelerating-simulation) 中有详细介绍。
 
 
-FS vs SE mode
+FS vs SE 模式
 -------------
 
-SE mode relays application syscalls to the host OS. This means we don't need to simulate an OS for applications to run.
+SE 模式将应用程序系统调用转发给主机操作系统。这意味着我们不需要模拟操作系统即可运行应用程序。
 
-In addition, we can access host resources such as files of libraries to dynamically link in.
+此外，我们可以访问主机资源，例如要动态链接的库文件。
 
-Don't treat SE mode as "FS but faster": You must understand what you're simulating and whether it will impact results.
-Not all syscalls will ever be implemented: We'd love to have all the syscalls implemented but Linux changes rapidly. We try to cover common use-cases but we can't cover everything. If a Syscall is missing, you can implement it, ignore it, or use FS mode.
-Binaries with elevated privileges do not work in SE mode: If you're running a binary that requires elevated privileges, you'll need to run it in FS mode.
+不要将 SE 模式视为“FS 但更快”：您必须了解您正在模拟什么以及它是否会影响结果。
+并非所有系统调用都会被实现：我们很乐意实现所有系统调用，但 Linux 变化很快。我们尝试涵盖常见的用例，但我们无法涵盖所有内容。如果缺少系统调用，您可以实现它、忽略它或使用 FS 模式。
+具有提升权限的二进制文件在 SE 模式下不起作用：如果您运行的二进制文件需要提升权限，则需要在 FS 模式下运行它。
 
-FS mode does everything SE mode does (and more!) but can take longer to get to the region of interest. You have to wait for the OS to boot each time (unless you accelerate the simulation).
+FS 模式执行 SE 模式执行的所有操作（以及更多！），但可能需要更长的时间才能到达感兴趣的区域。您每次都必须等待操作系统启动（除非您加速模拟）。
 
-However, as SE mode doesn't simulate the OS, you risk missing important events triggered via syscalls, I/O, or the operating system, which may mean your simulated system doesn't properly reflect the real system.
+但是，由于 SE 模式不模拟操作系统，因此您可能会错过通过系统调用、I/O 或操作系统触发的重要事件，这意味着您的模拟系统无法正确反映真实系统。
 
-Think through what SE mode is doing and if it's right for your use-case. If in doubt, use FS mode. It's (generally) not worth the risk using SE mode if you're not sure.
+仔细思考 SE 模式正在做什么，以及它是否适合您的用例。如果有疑问，请使用 FS 模式。如果您不确定，使用 SE 模式通常不值得冒险。
 
-Full Boot Example
+完整启动示例
 -----------------
 
-For an example of a configuration file that runs the entire boot of Ubuntu 24.04 on an X86 system, see [the gem5 stdlib documentation](../../gem5-stdlib/2-tutorial-x86-fs.md). Of note is that we need to define an exit event handler in order to get through the entire boot:
+有关在 X86 系统上运行 Ubuntu 24.04 完整启动的配置文件示例，请参阅 [gem5 stdlib 文档](../../gem5-stdlib/2-tutorial-x86-fs.md)。值得注意的是，我们需要定义一个退出事件处理程序才能完成整个启动：
 
 ```python
 def exit_event_handler():
@@ -364,9 +367,9 @@ simulator = Simulator(
 )
 ```
 
-At the first exit event, the generator yields False to continue the simulation. At the second exit event, the generator switches the CPUs, then yields False again. At the third exit event, it yields `True` to end the simulation.
+在第一个退出事件中，生成器产生 False 以继续模拟。在第二个退出事件中，生成器切换 CPU，然后再次产生 False。在第三个退出事件中，它产生 `True` 以结束模拟。
 
-There are various types of exit events. The Simulator has default behavior for these events, but they can be overridden.
+有各种类型的退出事件。模拟器对这些事件有默认行为，但它们可以被覆盖。
 
 ```python
 ExitEvent.EXIT
@@ -379,43 +382,43 @@ ExitEvent.USER_INTERRUPT
 ExitEvent.MAX_TICK
 ```
 
-Key idea: The Simulator object controls simulation
+关键思想：Simulator 对象控制模拟
 --------------------------------------------------
 
-To place our idea of gem5:
+定位 gem5 的概念：
 
-models (or SimObjects) are the fine-grained objects that are connected together in Python scripts to form a simulation.
-components are the coarse-grained objects that are connected defined as a set of configured models in Python scripts to form and delivered as part of the Standard Library
-The standard library allows users to specify a board and specify the properties of the board by specify the components that are connected to it.
-The Simulator takes a board and launches the simulation and gives an API which allows for control of the simulation: specifying the simulation stopping and restarting condition, replacing components "on the fly", defining when the simulation should stop and start, etc.
-See [src/python/gem5/simulate/simulator.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/simulator.py) for the Simulator source.
+models (或 SimObjects) 是细粒度对象，在 Python 脚本中连接在一起形成模拟。
+components 是粗粒度对象，定义为 Python 脚本中的一组配置模型，并作为标准库的一部分交付
+标准库允许用户指定一个板，并通过指定连接到它的组件来指定板的属性。
+Simulator 接收一个板并启动模拟，并给出一个 API，允许控制模拟：指定模拟停止和重新启动条件，"即时"替换组件，定义模拟何时停止和启动等。
+有关 Simulator 源代码，请参见 [src/python/gem5/simulate/simulator.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/simulator.py)。
 
-Simulator parameters are as follows:
+Simulator 参数如下：
 
-board: The Board to simulate (required)
-full_system: Whether to simulate a full system (default: False, can be inferred from the board, not needed specified in most cases)
-on_exit_event: A complex data structure that allows you to control the simulation. The simulator exits for many reasons, this allows you to customize what happens. We just saw an example.
-checkpoint_path: If we're restoring from a checkpoint, this is the path to the checkpoint. More on checkpoints later.
-id: An optional name for this simulation. Used in multisim. More on this in the future.
+board: 要模拟的 Board（必需）
+full_system: 是否模拟全系统（默认值：False，可以从板推断，在大多数情况下不需要指定）
+on_exit_event: 一个复杂的数据结构，允许您控制模拟。模拟器因多种原因退出，这允许您自定义发生的情况。我们刚刚看了一个例子。
+checkpoint_path: 如果我们从检查点恢复，这是检查点的路径。稍后会有更多关于检查点的内容。
+id: 此模拟的可选名称。用于 multisim。将来会有更多关于此的内容。
 
-Some useful functions are below:
+一些有用的函数如下：
 
-run(): Run the simulation
-get/set_max_ticks(max_tick): Set the absolute tick to stop simulation. Generates a MAX_TICK exit event that can be handled.
-schedule_max_insts(inst_number): Set the number of instructions to run before stopping. Generates a MAX_INSTS exit event that can be handled. Note that if running multiple cores, this happens if any core reaches this number of instructions.
-get_stats(): Get the statistics from the simulation. Returns a dictionary of statistics.
+run(): 运行模拟
+get/set_max_ticks(max_tick): 设置停止模拟的绝对 tick。生成一个可以处理的 MAX_TICK 退出事件。
+schedule_max_insts(inst_number): 设置在停止之前运行的指令数。生成一个可以处理的 MAX_INSTS 退出事件。请注意，如果运行多个核心，如果任何核心达到此指令数，就会发生这种情况。
+get_stats(): 获取模拟的统计信息。返回统计信息字典。
 
-See [src/python/gem5/simulate/simulator.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/simulator.py) for more details.
+有关更多详细信息，请参阅 [src/python/gem5/simulate/simulator.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/simulator.py)。
 
-Creating new standard library components
+创建新的标准库组件
 -----------------------------------------
 
-The gem5 standard library is designed around extension and encapsulation, not parametarization.
-If you want to create a component with different parameters, extend using object-oriented semantics.
+gem5 标准库是围绕扩展和封装设计的，而不是参数化。
+如果您想创建一个具有不同参数的组件，请使用面向对象语义进行扩展。
 
-We will now create a new component. We will specialize/extend the "BaseCPUProcessor" to create an ARM processor with a singular out-of-order core.
+我们现在将创建一个新组件。我们将特化/扩展 "BaseCPUProcessor" 以创建一个具有单个乱序核心的 ARM 处理器。
 
-First, let's add our imports:
+首先，让我们添加导入：
 
 ```python
 from gem5.components.boards.simple_board import SimpleBoard
@@ -434,7 +437,7 @@ from m5.objects import ArmO3CPU
 from m5.objects import TournamentBP
 ```
 
-Next, let's make a new subclass to specialize the core's parameters:
+接下来，让我们创建一个新的子类来特化核心的参数：
 
 ```python
 class MyOutOfOrderCore(BaseCPUCore):
@@ -458,7 +461,7 @@ class MyOutOfOrderCore(BaseCPUCore):
         self.core.SQEntries = 128
 ```
 
-Next, let's make a processor using this core. The `BaseCPUProcessor` assumes a list of cores that are `BaseCPUCores`. We'll just make one core and pass the parameters to it:
+接下来，让我们使用此核心创建一个处理器。`BaseCPUProcessor` 假设有一个是 `BaseCPUCores` 的核心列表。我们将只制作一个核心并将参数传递给它：
 
 ```python
 class MyOutOfOrderProcessor(BaseCPUProcessor):
@@ -467,7 +470,7 @@ class MyOutOfOrderProcessor(BaseCPUProcessor):
         super().__init__(cores)
 ```
 
-Next, let's use these components to set up a processor for the simulation:
+接下来，让我们使用这些组件为模拟设置处理器：
 
 ```python
 my_ooo_processor = MyOutOfOrderProcessor(
@@ -475,7 +478,7 @@ my_ooo_processor = MyOutOfOrderProcessor(
 )
 ```
 
-Finally, let's set up the rest of the simulation:
+最后，让我们设置模拟的其余部分：
 
 ```python
 main_memory = SingleChannelDDR4_2400(size="2GB")
@@ -502,96 +505,56 @@ simulator = Simulator(board)
 simulator.run()
 ```
 
-You can now run this simulation with the following command, assuming that your configuration script is named `config.py`:
+您现在可以使用以下命令运行此模拟，假设您的配置脚本名为 `config.py`：
 
 ```bash
 ./build/ALL/gem5.opt config.py
 ```
 
-If you have a pre-built binary, you can simply use the following command:
+如果您有预构建的二进制文件，只需使用以下命令：
 
 ```bash
 gem5 config.py
 ```
 
-gem5 v21.0: Adding cache to the configuration script
+gem5 v21.0: 向配置脚本添加缓存
 ====================================================
 
-Using the [previous configuration script as a starting point](http://www.gem5.org/documentation/learning_gem5/part1/simple_config/),
-this chapter will walk through a more complex configuration. We will add
-a cache hierarchy to the system as shown in
-the figure below. Additionally, this chapter
-will cover understanding the gem5 statistics output and adding command
-line parameters to your scripts.
+以 [以前的配置脚本为起点](http://www.gem5.org/documentation/learning_gem5/part1/simple_config/)，本章将演练一个更复杂的配置。我们将向系统添加一个缓存层次结构，如下图所示。此外，本章还将涵盖了解 gem5 统计输出并将命令行参数添加到您的脚本。
 
-![A system configuration with a two-level cache
-hierarchy.](/pages/static/figures/advanced_config.png)
+![具有两级缓存层次结构的系统配置。](/pages/static/figures/advanced_config.png)
 
-Creating cache objects
+创建缓存对象
 ----------------------
 
-We are going to use the classic caches, instead of ruby-intro-chapter,
-since we are modeling a single CPU system and we don't care about
-modeling cache coherence. We will extend the Cache SimObject and
-configure it for our system. First, we must understand the parameters
-that are used to configure Cache objects.
+我们将使用经典缓存 (classic caches)，而不是 ruby-intro-chapter，因为我们正在模拟单 CPU 系统，并且我们不关心模拟缓存一致性。我们将扩展 Cache SimObject 并为我们的系统配置它。首先，我们必须了解用于配置 Cache 对象的参数。
 
-> **Classic caches and Ruby**
+> **经典缓存和 Ruby**
 >
-> gem5 currently has two completely distinct subsystems to model the
-> on-chip caches in a system, the "Classic caches" and "Ruby". The
-> historical reason for this is that gem5 is a combination of m5 from
-> Michigan and GEMS from Wisconsin. GEMS used Ruby as its cache model,
-> whereas the classic caches came from the m5 codebase (hence
-> "classic"). The difference between these two models is that Ruby is
-> designed to model cache coherence in detail. Part of Ruby is SLICC, a
-> language for defining cache coherence protocols. On the other hand,
-> the classic caches implement a simplified and inflexible MOESI
-> coherence protocol.
+> gem5 目前有两个完全不同的子系统来模拟系统中的片上缓存，“经典缓存”和“Ruby”。历史原因是 gem5 是来自密歇根州的 m5 和来自威斯康星州的 GEMS 的组合。GEMS 使用 Ruby 作为其缓存模型，而经典缓存来自 m5 代码库（因此称为“经典”）。这两个模型之间的区别在于 Ruby 旨在详细模拟缓存一致性。Ruby 的一部分是 SLICC，一种用于定义缓存一致性协议的语言。另一方面，经典缓存实现了简化且不灵活的 MOESI 一致性协议。
 >
-> To choose which model to use, you should ask yourself what you are
-> trying to model. If you are modeling changes to the cache coherence
-> protocol or the coherence protocol could have a first-order impact on
-> your results, use Ruby. Otherwise, if the coherence protocol isn't
-> important to you, use the classic caches.
+> 要选择使用哪个模型，您应该问自己要模拟什么。如果您正在模拟对缓存一致性协议的更改，或者一致性协议可能会对您的结果产生一阶影响，请使用 Ruby。否则，如果一致性协议对您不重要，请使用经典缓存。
 >
-> A long-term goal of gem5 is to unify these two cache models into a
-> single holistic model.
+> gem5 的一个长期目标是将这两个缓存模型统一为一个整体模型。
 
-### Cache
+### 缓存 (Cache)
 
-The Cache SimObject declaration can be found in src/mem/cache/Cache.py.
-This Python file defines the parameters which you can set of the
-SimObject. Under the hood, when the SimObject is instantiated these
-parameters are passed to the C++ implementation of the object. The
-`Cache` SimObject inherits from the `BaseCache` object shown below.
+Cache SimObject 声明可以在 src/mem/cache/Cache.py 中找到。
+此 Python 文件定义了您可以设置的 SimObject 参数。在底层，当实例化 SimObject 时，这些参数将传递给对象的 C++ 实现。`Cache` SimObject 继承自如下所示的 `BaseCache` 对象。
 
-Within the `BaseCache` class, there are a number of *parameters*. For
-instance, `assoc` is an integer parameter. Some parameters, like
-`write_buffers` have a default value, 8 in this case. The default
-parameter is the first argument to `Param.*`, unless the first argument
-is a string. The string argument of each of the parameters is a
-description of what the parameter is (e.g.,
-`tag_latency = Param.Cycles("Tag lookup latency")` means that the
-`` tag_latency `` controls "The hit latency for this cache").
+在 `BaseCache` 类中，有许多 *参数*。例如，`assoc` 是一个整数参数。某些参数，如 `write_buffers` 具有默认值，在这种情况下为 8。默认参数是 `Param.*` 的第一个参数，除非第一个参数是字符串。每个参数的字符串参数是对该参数是什么的描述（例如，`tag_latency = Param.Cycles("Tag lookup latency")` 意味着 `` tag_latency `` 控制“此缓存的命中延迟”）。
 
-Many of these parameters do not have defaults, so we are required to set
-these parameters before calling `m5.instantiate()`.
+许多这些参数没有默认值，因此我们必须在调用 `m5.instantiate()` 之前设置这些参数。
 
 * * * * *
 
-Now, to create caches with specific parameters, we are first going to
-create a new file, `caches.py`, in the same directory as simple.py,
-`configs/tutorial/part1`. The first step is to import the SimObject(s)
-we are going to extend in this file.
+现在，要创建具有特定参数的缓存，我们首先要在与 simple.py 相同的目录 `configs/tutorial/part1` 中创建一个名为 `caches.py` 的新文件。第一步是导入我们将在此文件中扩展的 SimObject。
 
 ```
 from m5.objects import Cache
 ```
 
-Next, we can treat the BaseCache object just like any other Python class
-and extend it. We can name the new cache anything we want. Let's start
-by making an L1 cache.
+接下来，我们可以像对待任何其他 Python 类一样对待 BaseCache 对象并扩展它。我们可以将新缓存命名为任何我们想要的名称。让我们从制作 L1 缓存开始。
 
 ```
 class L1Cache(Cache):
@@ -603,15 +566,9 @@ class L1Cache(Cache):
     tgts_per_mshr = 20
 ```
 
-Here, we are setting some of the parameters of the BaseCache that do not
-have default values. To see all of the possible configuration options,
-and to find which are required and which are optional, you have to look
-at the source code of the SimObject. In this case, we are using
-BaseCache.
+在这里，我们设置了一些没有默认值的 BaseCache 参数。要查看所有可能的配置选项，并查找哪些是必需的，哪些是可选的，您必须查看 SimObject 的源代码。在这种情况下，我们使用的是 BaseCache。
 
-We have extended `BaseCache` and set most of the parameters that do not
-have default values in the `BaseCache` SimObject. Next, let's two more
-sub-classes of L1Cache, an L1DCache and L1ICache
+我们已经扩展了 `BaseCache` 并设置了 `BaseCache` SimObject 中没有默认值的大多数参数。接下来，让我们再创建两个 L1Cache 的子类，L1DCache 和 L1ICache
 
 ```
 class L1ICache(L1Cache):
@@ -621,7 +578,7 @@ class L1DCache(L1Cache):
     size = '64kB'
 ```
 
-Let's also create an L2 cache with some reasonable parameters.
+让我们也创建一个具有一些合理参数的 L2 缓存。
 
 ```
 class L2Cache(Cache):
@@ -634,31 +591,20 @@ class L2Cache(Cache):
     tgts_per_mshr = 12
 ```
 
-Now that we have specified all of the necessary parameters required for
-`BaseCache`, all we have to do is instantiate our sub-classes and
-connect the caches to the interconnect. However, connecting lots of
-objects up to complex interconnects can make configuration files quickly
-grow and become unreadable. Therefore, let's first add some helper
-functions to our sub-classes of `Cache`. Remember, these are just Python
-classes, so we can do anything with them that you can do with a Python
-class.
+既然我们已经指定了 `BaseCache` 所需的所有必要参数，我们所要做的就是实例化我们的子类并将缓存连接到互连。但是，将大量对象连接到复杂的互连会使配置文件迅速增长并变得不可读。因此，让我们首先向我们的 `Cache` 子类添加一些辅助函数。请记住，这些只是 Python 类，所以我们可以对它们做任何你可以用 Python 类做的事情。
 
-To the L1 cache let's add two functions, `connectCPU` to connect a CPU
-to the cache and `connectBus` to connect the cache to a bus. We need to
-add the following code to the `L1Cache` class.
+对于 L1 缓存，让我们添加两个函数，`connectCPU` 用于将 CPU 连接到缓存，`connectBus` 用于将缓存连接到总线。我们需要将以下代码添加到 `L1Cache` 类中。
 
 ```
 def connectCPU(self, cpu):
-    # need to define this in a base class!
+    # 需要在基类中定义这个！
     raise NotImplementedError
 
 def connectBus(self, bus):
     self.mem_side = bus.cpu_side_ports
 ```
 
-Next, we have to define a separate `connectCPU` function for the
-instruction and data caches, since the I-cache and D-cache ports have a
-different names. Our `L1ICache` and `L1DCache` classes now become:
+接下来，我们要为指令和数据缓存定义单独的 `connectCPU` 函数，因为 I-cache 和 D-cache 端口有不同的名称。我们的 `L1ICache` 和 `L1DCache` 类现在变成：
 
 ```
 class L1ICache(L1Cache):
@@ -674,8 +620,7 @@ class L1DCache(L1Cache):
         self.cpu_side = cpu.dcache_port
 ```
 
-Finally, let's add functions to the `L2Cache` to connect to the
-memory-side and CPU-side bus, respectively.
+最后，让我们向 `L2Cache` 添加函数以分别连接到内存侧和 CPU 侧总线。
 
 ```
 def connectCPUSideBus(self, bus):
@@ -685,56 +630,47 @@ def connectMemSideBus(self, bus):
     self.mem_side = bus.cpu_side_ports
 ```
 
-The full file can be found in the gem5 source at
-[`configs/learning_gem5/part1/caches.py`](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part1/caches.py).
+完整文件可以在 gem5 源代码中的 [`configs/learning_gem5/part1/caches.py`](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part1/caches.py) 找到。
 
-Adding caches to the simple config file
+将缓存添加到简单的配置文件
 ------------------------------------
 
-Now, let's add the caches we just created to the configuration script we
-created in the [last chapter](http://www.gem5.org/documentation/learning_gem5/part1/simple_config/).
+现在，让我们将刚创建的缓存添加到我们在 [上一章](http://www.gem5.org/documentation/learning_gem5/part1/simple_config/) 中创建的配置脚本中。
 
-First, let's copy the script to a new name.
+首先，让我们将脚本复制到一个新名称。
 
 ```
 cp ./configs/tutorial/part1/simple.py ./configs/tutorial/part1/two_level.py
 ```
 
-First, we need to import the names from the `caches.py` file into the
-namespace. We can add the following to the top of the file (after the
-m5.objects import), as you would with any Python source.
+首先，我们需要将 `caches.py` 文件中的名称导入到命名空间中。我们可以将以下内容添加到文件顶部（在 m5.objects 导入之后），就像使用任何 Python 源文件一样。
 
 ```
 from caches import *
 ```
 
-Now, after creating the CPU, let's create the L1 caches:
+现在，在创建 CPU 之后，让我们创建 L1 缓存：
 
 ```
 system.cpu.icache = L1ICache()
 system.cpu.dcache = L1DCache()
 ```
 
-And connect the caches to the CPU ports with the helper function we
-created.
+并使用我们创建的辅助函数将缓存连接到 CPU 端口。
 
 ```
 system.cpu.icache.connectCPU(system.cpu)
 system.cpu.dcache.connectCPU(system.cpu)
 ```
 
-You need to *remove* the following two lines which connected the cache
-ports directly to the memory bus.
+您需要 *删除* 以下两行将缓存端口直接连接到内存总线的代码。
 
 ```
 system.cpu.icache_port = system.membus.cpu_side_ports
 system.cpu.dcache_port = system.membus.cpu_side_ports
 ```
 
-We can't directly connect the L1 caches to the L2 cache since the L2
-cache only expects a single port to connect to it. Therefore, we need to
-create an L2 bus to connect our L1 caches to the L2 cache. The, we can
-use our helper function to connect the L1 caches to the L2 bus.
+我们不能直接将 L1 缓存连接到 L2 缓存，因为 L2 缓存只期望单个端口连接到它。因此，我们需要创建一个 L2 总线将 L1 缓存连接到 L2 缓存。然后，我们可以使用我们的辅助函数将 L1 缓存连接到 L2 总线。
 
 ```
 system.l2bus = L2XBar()
@@ -743,8 +679,7 @@ system.cpu.icache.connectBus(system.l2bus)
 system.cpu.dcache.connectBus(system.l2bus)
 ```
 
-Next, we can create our L2 cache and connect it to the L2 bus and the
-memory bus.
+接下来，我们可以创建 L2 缓存并将其连接到 L2 总线和内存总线。
 
 ```
 system.l2cache = L2Cache()
@@ -753,33 +688,14 @@ system.membus = SystemXBar()
 system.l2cache.connectMemSideBus(system.membus)
 ```
 
-Note that `system.membus = SystemXBar()` has been defined before
-`system.l2cache.connectMemSideBus` so we can pass it to
-`system.l2cache.connectMemSideBus`. Everything else in the file
-stays the same! Now we have a complete configuration with a
-two-level cache hierarchy. If you run the current file, `hello`
-should now finish in 57467000 ticks. The full script can
-be found in the gem5 source at
-[`configs/learning_gem5/part1/two_level.py`](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part1/two_level.py).
+请注意，`system.membus = SystemXBar()` 已在 `system.l2cache.connectMemSideBus` 之前定义，以便我们可以将其传递给 `system.l2cache.connectMemSideBus`。文件中的其他所有内容都保持不变！现在我们有了一个具有两级缓存层次结构的完整配置。如果您运行当前文件，`hello` 现在应该在 57467000 个 tick 完成。完整脚本可以在 gem5 源代码中的 [`configs/learning_gem5/part1/two_level.py`](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part1/two_level.py) 找到。
 
-Adding parameters to your script
+向您的脚本添加参数
 --------------------------------
 
-When performing experiments with gem5, you don't want to edit your
-configuration script every time you want to test the system with
-different parameters. To get around this, you can add command-line
-parameters to your gem5 configuration script. Again, because the
-configuration script is just Python, you can use the Python libraries
-that support argument parsing. Although pyoptparse is officially
-deprecated, many of the configuration scripts that ship with gem5 use it
-instead of pyargparse since gem5's minimum Python version used to be
-2.5. The minimum Python version is now 3.6, so Python's argparse is a better
-option when writing new scripts that don't need to interact with the
-current gem5 scripts. To get started using :pyoptparse, you can consult
-the online Python documentation.
+在执行 gem5 实验时，您不想每次想用不同参数测试系统时都编辑配置脚本。为了解决这个问题，您可以向 gem5 配置脚本添加命令行参数。同样，因为配置脚本只是 Python，您可以使用支持参数解析的 Python 库。虽然 pyoptparse 已正式弃用，但许多随 gem5 提供的配置脚本使用它而不是 pyargparse，因为 gem5 的最低 Python 版本以前是 2.5。现在的最低 Python 版本是 3.6，因此在编写不需要与当前 gem5 脚本交互的新脚本时，Python 的 argparse 是更好的选择。要开始使用 :pyoptparse，您可以查阅在线 Python 文档。
 
-To add options to our two-level cache configuration, after importing our
-caches, let's add some options.
+要向我们的两级缓存配置添加选项，在导入缓存后，让我们添加一些选项。
 
 ```
 import argparse
@@ -796,22 +712,17 @@ parser.add_argument("--l2_size",
 
 options = parser.parse_args()
 ```
-Note that if you wanted to pass the binary file's path the way shown above
-and use it through options, you should specify it as `options.binary`.
-For example:
+请注意，如果您想像上面那样传递二进制文件的路径并通过选项使用它，您应该将其指定为 `options.binary`。
+例如：
 
 ```
 system.workload = SEWorkload.init_compatible(options.binary)
 ```
 
-Now, you can run
-`build/ALL/gem5.opt configs/tutorial/part1/two_level.py --help` which
-will display the options you just added.
+现在，您可以运行
+`build/ALL/gem5.opt configs/tutorial/part1/two_level.py --help`，它将显示您刚添加的选项。
 
-Next, we need to pass these options onto the caches that we create in
-the configuration script. To do this, we'll simply change two\_level\_opts.py
-to pass the options into the caches as a parameter to their constructor
-and add an appropriate constructor, next.
+接下来，我们需要将这些选项传递给我们在配置脚本中创建的缓存。为此，我们将简单地更改 two\_level\_opts.py 以将选项作为参数传递给缓存的构造函数，并添加适当的构造函数，如下所示。
 
 ```
 system.cpu.icache = L1ICache(options)
@@ -820,16 +731,7 @@ system.cpu.dcache = L1DCache(options)
 system.l2cache = L2Cache(options)
 ```
 
-In caches.py, we need to add constructors (`__init__` functions in
-Python) to each of our classes. Starting with our base L1 cache, we'll
-just add an empty constructor since we don't have any parameters which
-apply to the base L1 cache. However, we can't forget to call the super
-class's constructor in this case. If the call to the super class
-constructor is skipped, gem5's SimObject attribute finding function will
-fail and the result will be
-"`RuntimeError: maximum recursion depth exceeded`" when you try to
-instantiate the cache object. So, in `L1Cache` we need to add the
-following after the static class members.
+在 caches.py 中，我们需要向每个类添加构造函数（Python 中的 `__init__` 函数）。从我们的基本 L1 缓存开始，我们将只添加一个空构造函数，因为我们没有任何适用于基本 L1 缓存的参数。但是，这种情况下我们不能忘记调用父类的构造函数。如果跳过对父类构造函数的调用，gem5 的 SimObject 属性查找函数将失败，并且当您尝试实例化缓存对象时结果将是 "`RuntimeError: maximum recursion depth exceeded`"。所以，在 `L1Cache` 中，我们需要在静态类成员之后添加以下内容。
 
 ```
 def __init__(self, options=None):
@@ -837,11 +739,7 @@ def __init__(self, options=None):
     pass
 ```
 
-Next, in the `L1ICache`, we need to use the option that we created
-(`l1i_size`) to set the size. In the following code, there is guards for
-if `options` is not passed to the `L1ICache` constructor and if no
-option was specified on the command line. In these cases, we'll just use
-the default we've already specified for the size.
+接下来，在 `L1ICache` 中，我们需要使用我们创建的选项 (`l1i_size`) 来设置大小。在下面的代码中，有针对未将 `options` 传递给 `L1ICache` 构造函数以及未在命令行上指定选项的保护措施。在这些情况下，我们将只使用我们已经为大小指定的默认值。
 
 ```
 def __init__(self, options=None):
@@ -851,7 +749,7 @@ def __init__(self, options=None):
     self.size = options.l1i_size
 ```
 
-We can use the same code for the `L1DCache`:
+我们可以对 `L1DCache` 使用相同的代码：
 
 ```
 def __init__(self, options=None):
@@ -861,7 +759,7 @@ def __init__(self, options=None):
     self.size = options.l1d_size
 ```
 
-And the unified `L2Cache`:
+以及统一的 `L2Cache`：
 
 ```
 def __init__(self, options=None):
@@ -871,8 +769,7 @@ def __init__(self, options=None):
     self.size = options.l2_size
 ```
 
-With these changes, you can now pass the cache sizes into your script
-from the command line like below.
+有了这些更改，您现在可以从命令行将缓存大小传递到您的脚本中，如下所示。
 
 ```
 build/ALL/gem5.opt configs/tutorial/part1/two_level.py --l2_size='1MB' --l1d_size='128kB'
@@ -896,6 +793,4 @@ build/ALL/gem5.opt configs/tutorial/part1/two_level.py --l2_size='1MB' --l1d_siz
     Hello world!
     Exiting @ tick 57467000 because exiting with last active thread context
 
-The full scripts can be found in the gem5 source at
-[`configs/learning_gem5/part1/caches.py`](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part1/caches.py) and
-[`configs/learning_gem5/part1/two_level.py`](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part1/two_level.py).
+完整脚本可以在 gem5 源代码中的 [`configs/learning_gem5/part1/caches.py`](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part1/caches.py) 和 [`configs/learning_gem5/part1/two_level.py`](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part1/two_level.py) 找到。

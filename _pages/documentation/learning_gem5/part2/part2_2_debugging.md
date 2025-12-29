@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Debugging gem5
+title: 调试 gem5
 doc: Learning gem5
 parent: part2
 permalink: /documentation/learning_gem5/part2/debugging/
@@ -8,26 +8,17 @@ author: Jason Lowe-Power
 ---
 
 
-Debugging gem5
+调试 gem5
 ==============
 
-In the [previous chapters](../helloobject) we covered how to
-create a very simple SimObject. In this chapter, we will replace the
-simple print to `stdout` with gem5's debugging support.
+在 [前几章](../helloobject) 中，我们介绍了如何创建一个非常简单的 SimObject。在本章中，我们将用 gem5 的调试支持替换简单的 `stdout` 打印。
 
-gem5 provides support for `printf`-style tracing/debugging of your code
-via *debug flags*. These flags allow every component to have many
-debug-print statements, without all of them enabled at the same time.
-When running gem5, you can specify which debug flags to enable from the
-command line.
+gem5 通过 *调试标志 (debug flags)* 为您的代码提供 `printf` 风格的跟踪/调试支持。这些标志允许每个组件拥有许多调试打印语句，而不必同时启用所有这些语句。运行 gem5 时，您可以从命令行指定要启用的调试标志。
 
-Using debug flags
+使用调试标志
 -----------------
 
-For instance, when running the first simple.py script from
-simple-config-chapter, if you enable the `DRAM` debug flag, you get the
-following output. Note that this generates *a lot* of output to the
-console (about 7 MB).
+例如，当从 simple-config-chapter 运行第一个 simple.py 脚本时，如果启用 `DRAM` 调试标志，您会得到以下输出。请注意，这会向控制台生成 *大量* 输出（约 7 MB）。
 
 ```
     build/ALL/gem5.opt --debug-flags=DRAM configs/learning_gem5/part1/simple.py | head -n 50
@@ -85,10 +76,7 @@ console (about 7 MB).
      156750: system.mem_ctrl: processRespondEvent(): Some req has reached its readyTime
      156750: system.mem_ctrl: number of read entries for rank 0 is 0
 
-Or, you may want to debug based on the exact instruction the CPU is
-executing. For this, the `Exec` debug flag may be useful. This debug
-flags shows details of how each instruction is executed by the simulated
-CPU.
+或者，您可能希望基于 CPU 正在执行的确切指令进行调试。为此，`Exec` 调试标志可能很有用。此调试标志显示模拟 CPU 执行每条指令的详细信息。
 
 ```
     build/ALL/gem5.opt --debug-flags=Exec configs/learning_gem5/part1/simple.py | head -n 50
@@ -147,9 +135,7 @@ CPU.
     1173000: system.cpu T0 : @__libc_start_main+5.0  :   MOV_R_R : mov   r15, r15, r9 : IntAlu :  D=0x0000000000000000
     1228000: system.cpu T0 : @__libc_start_main+8    : push r14
 
-In fact, the `Exec` flag is actually an agglomeration of multiple debug
-flags. You can see this, and all of the available debug flags, by
-running gem5 with the `--debug-help` parameter.
+实际上，`Exec` 标志实际上是多个调试标志的集合。您可以通过使用 `--debug-help` 参数运行 gem5 来查看它以及所有可用的调试标志。
 
 ```
     build/ALL/gem5.opt --debug-help
@@ -189,54 +175,37 @@ running gem5 with the `--debug-help` parameter.
     XBar: None
         BaseXBar, CoherentXBar, NoncoherentXBar, SnoopFilter
 
-Adding a new debug flag
+添加新的调试标志
 -----------------------
 
-In the [previous chapters](../helloobject), we used a simple
-`std::cout` to print from our SimObject. While it is possible to use the
-normal C/C++ I/O in gem5, it is highly discouraged. So, we are now going
-to replace this and use gem5's debugging facilities instead.
+在 [前几章](../helloobject) 中，我们使用了简单的 `std::cout` 从我们的 SimObject 打印。虽然可以在 gem5 中使用普通的 C/C++ I/O，但这非常不鼓励。所以，我们现在要替换它，改用 gem5 的调试工具。
 
-When creating a new debug flag, we first have to declare it in a
-SConscript file. Add the following to the SConscript file in the
-directory with your hello object code (`src/learning_gem5/SConscript`).
+创建新的调试标志时，我们首先要在 SConscript 文件中声明它。将以下内容添加到包含 hello object 代码的目录 (`src/learning_gem5/SConscript`) 中的 SConscript 文件中。
 
 ```python
 DebugFlag('HelloExample')
 ```
 
-This declares a debug flag of "HelloExample". Now, we can use this in debug
-statements in our SimObject.
+这声明了一个 "HelloExample" 的调试标志。现在，我们可以在 SimObject 的调试语句中使用它。
 
-By declaring the flag in the SConscript file, a debug header is
-automatically generated that allows us to use the debug flag. The header
-file is in the `debug` directory and has the same name (and
-capitalization) as what we declare in the SConscript file. Therefore, we
-need to include the automatically generated header file in any files
-where we plan to use the debug flag.
+通过在 SConscript 文件中声明该标志，会自动生成一个调试头文件，允许我们使用该调试标志。头文件位于 `debug` 目录中，其名称（和大小写）与我们在 SConscript 文件中声明的名称相同。因此，我们需要在任何计划使用调试标志的文件中包含自动生成的头文件。
 
-In the `hello_object.cc` file, we need to include the header file.
+在 `hello_object.cc` 文件中，我们需要包含头文件。
 
 ```cpp
 #include "base/trace.hh"
 #include "debug/HelloExample.hh"
 ```
 
-Now that we have included the necessary header file, let's replace the
-`std::cout` call with a debug statement like so.
+现在我们已经包含了必要的头文件，让我们像这样用调试语句替换 `std::cout` 调用。
 
 ```cpp
 DPRINTF(HelloExample, "Created the hello object\n");
 ```
 
-`DPRINTF` is a C++ macro. The first parameter is a *debug flag* that has
-been declared in a SConscript file. We can use the flag `HelloExample` since we
-declared it in the `src/learning_gem5/SConscript` file. The rest of the
-arguments are variable and can be anything you would pass to a `printf`
-statement.
+`DPRINTF` 是一个 C++ 宏。第一个参数是在 SConscript 文件中声明的 *调试标志*。我们可以使用标志 `HelloExample`，因为我们在 `src/learning_gem5/SConscript` 文件中声明了它。其余参数是可变的，可以是任何传递给 `printf` 语句的内容。
 
-Now, if you recompile gem5 and run it with the "HelloExample" debug flag, you
-get the following result.
+现在，如果您重新编译 gem5 并使用 "HelloExample" 调试标志运行它，您将获得以下结果。
 
 ```
 scons build/ALL/gem5.opt
@@ -257,41 +226,24 @@ build/ALL/gem5.opt --debug-flags=HelloExample configs/learning_gem5/part2/run_he
     info: Entering event queue @ 0.  Starting simulation...
     Exiting @ tick 18446744073709551615 because simulate() limit reached
 
-You can find the updated SConcript file
-[here](https://gem5.googlesource.com/public/gem5/+/refs/heads/stable/src/learning_gem5/part2/SConscript)
-and the updated hello object code
-[here](https://gem5.googlesource.com/public/gem5/+/refs/heads/stable/src/learning_gem5/part2/hello_object.cc).
+您可以找到更新的 SConcript 文件
+[这里](https://gem5.googlesource.com/public/gem5/+/refs/heads/stable/src/learning_gem5/part2/SConscript)
+以及更新的 hello object 代码
+[这里](https://gem5.googlesource.com/public/gem5/+/refs/heads/stable/src/learning_gem5/part2/hello_object.cc)。
 
-Debug output
+调试输出
 ------------
 
-For each dynamic `DPRINTF` execution, three things are printed to
-`stdout`. First, the current tick when the `DPRINTF` is executed.
-Second, the *name of the SimObject* that called `DPRINTF`. This name is
-usually the Python variable name from the Python config file. However,
-the name is whatever the SimObject `name()` function returns. Finally,
-you see whatever format string you passed to the `DPRINTF` function.
+对于每个动态 `DPRINTF` 执行，会有三样东西打印到 `stdout`。首先，执行 `DPRINTF` 时的当前 tick。
+其次，调用 `DPRINTF` 的 *SimObject 的名称*。此名称通常是 Python 配置文件中的 Python 变量名称。但是，该名称是 SimObject `name()` 函数返回的任何内容。最后，您会看到传递给 `DPRINTF` 函数的任何格式字符串。
 
-You can control where the debug output goes with the `--debug-file`
-parameter. By default, all of the debugging output is printed to
-`stdout`. However, you can redirect the output to any file. The file is
-stored relative to the main gem5 output directory, not the current
-working directory.
+您可以使用 `--debug-file` 参数控制调试输出的去向。默认情况下，所有调试输出都打印到 `stdout`。但是，您可以将输出重定向到任何文件。该文件相对于主 gem5 输出目录存储，而不是当前工作目录。
 
-Using functions other than DPRINTF
+使用 DPRINTF 以外的函数
 ----------------------------------
 
-`DPRINTF` is the most commonly used debugging function in gem5. However,
-gem5 provides a number of other functions that are useful in specific
-circumstances. All debugging functions are available in the
-[reference documentation](http://doxygen.gem5.org/release/current/base_2trace_8hh.html).
+`DPRINTF` 是 gem5 中最常用的调试函数。但是，gem5 提供了许多其他在特定情况下有用的函数。所有调试函数都可在 [参考文档](http://doxygen.gem5.org/release/current/base_2trace_8hh.html) 中找到。
 
-> These functions are like the previous functions `:cppDDUMP`,
-> `:cppDPRINTF`, and `:cppDPRINTFR` except they do not take a flag as a
-> parameter. Therefore, these statements will *always* print whenever
-> debugging is enabled.
+> 这些函数类似于以前的函数 `:cppDDUMP`、`:cppDPRINTF` 和 `:cppDPRINTFR`，只是它们不将标志作为参数。因此，只要启用了调试，这些语句将 *始终* 打印。
 
-All of these functions are only enabled if you compile gem5 in "opt" or
-"debug" mode. All other modes use empty placeholder macros for the above
-functions. Therefore, if you want to use debug flags, you must use
-either "gem5.opt" or "gem5.debug".
+只有在以 "opt" 或 "debug" 模式编译 gem5 时，才会启用所有这些函数。所有其他模式都为上述函数使用空的占位符宏。因此，如果您想使用调试标志，则必须使用 "gem5.opt" 或 "gem5.debug"。

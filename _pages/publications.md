@@ -1,17 +1,17 @@
 ---
 layout: tabs
-title: Publications
+title: 发表刊物
 parent: about
 permalink: /publications/
 
 tabs:
-  - name: Main papers
+  - name: 主要论文
     id: main-papers
     active: true
     content: |
-      If you use gem5 for your research, **please cite the following papers**.
+      如果您在研究中使用了 gem5，**请引用以下论文**。
 
-      For your specific case, you can access a list of papers used by your project in the `citations.bib` file located in the `m5out` folder, which is generated during the build process of gem5.
+      针对您的具体情况，您可以在 `m5out` 文件夹中的 `citations.bib` 文件中访问项目使用的论文列表，该文件是在 gem5 构建过程中生成的。
 
       * [**The gem5 Simulator: Version 20.0+**](https://arxiv.org/abs/2007.03152). Jason Lowe-Power, Abdul Mutaal Ahmad, Ayaz Akram, Mohammad Alian, Rico Amslinger, Matteo Andreozzi, Adrià Armejach, Nils Asmussen, Brad Beckmann, Srikant Bharadwaj, Gabe Black, Gedare Bloom, Bobby R. Bruce, Daniel Rodrigues Carvalho, Jeronimo Castrillon, Lizhong Chen, Nicolas Derumigny, Stephan Diestelhorst, Wendy Elsasser, Carlos Escuin, Marjan Fariborz, Amin Farmahini-Farahani, Pouya Fotouhi, Ryan Gambord, Jayneel Gandhi, Dibakar Gope, Thomas Grass, Anthony Gutierrez, Bagus Hanindhito, Andreas Hansson, Swapnil Haria, Austin Harris, Timothy Hayes, Adrian Herrera, Matthew Horsnell, Syed Ali Raza Jafri, Radhika Jagtap, Hanhwi Jang, Reiley Jeyapaul, Timothy M. Jones, Matthias Jung, Subash Kannoth, Hamidreza Khaleghzadeh, Yuetsu Kodama, Tushar Krishna, Tommaso Marinelli, Christian Menard, Andrea Mondelli, Miquel Moreto, Tiago Mück, Omar Naji, Krishnendra Nathella, Hoa Nguyen, Nikos Nikoleris, Lena E. Olson, Marc Orr, Binh Pham, Pablo Prieto, Trivikram Reddy, Alec Roelke, Mahyar Samani, Andreas Sandberg, Javier Setoain, Boris Shingarov, Matthew D. Sinclair, Tuan Ta, Rahul Thakur, Giacomo Travaglini, Michael Upton, Nilay Vaish, Ilias Vougioukas, William Wang, Zhengrong Wang, Norbert Wehn, Christian Weis, David A. Wood, Hongil Yoon, Éder F. Zulian. CoRR, 2020. [ arXiv: [2007.03152](https://arxiv.org/abs/2007.03152) ] [ [pdf](https://arxiv.org/pdf/2007.03152.pdf) ]
 
@@ -19,12 +19,12 @@ tabs:
 
 
 
-  - name: Special Features of gem5
+  - name: gem5 的特性
     id: special-features
     content: |
-      Additionally, we would appreciate it if you could also acknowledge the special features of gem5 that have been developed and contributed to the main line since the publication of the original paper in 2011. In simpler terms, if you use a specific feature X, please cite the corresponding paper Y from the list below.
+      此外，如果您也能认可 gem5 自 2011 年原始论文发表以来开发并贡献给主线的特性，我们将不胜感激。简单来说，如果您使用了特定功能 X，请引用下表中相应的论文 Y。
 
-      ### gem5art and gem5resources
+      ### gem5art 和 gem5resources
       * [**Enabling Reproducible and Agile Full-System Simulation**](https://ieeexplore.ieee.org/document/9408198). Bobby R. Bruce, Hoa Nguyen, Kyle Roarty, Mahyar Samani, Marjan Friborz, Trivikram Reddy, Matthew D. Sinclair, and Jason Lowe-Power. In Proceedings of the IEEE International Symposium on Performance Analysis of Software (ISPASS), March 2021. [ doi: [10.1109/ISPASS51385.2021.00035](https://dx.doi.org/10.1109/ISPASS51385.2021.00035) ] [ [pdf](/assets/files/papers/enabling2021ispass.pdf) ]
 
       ### GPUs
@@ -45,41 +45,32 @@ tabs:
       ### SystemC Coupling
       * [**System Simulation with gem5 and SystemC: The Keystone for Full Interoperability**](https://ieeexplore.ieee.org/document/8344612). C. Menard, M. Jung, J. Castrillon, N. Wehn. IEEE International Conference on Embedded Computer Systems Architectures Modeling and Simulation (SAMOS), July, 2017. [ doi: [10.1109/SAMOS.2017.8344612](https://dx.doi.org/10.1109/SAMOS.2017.8344612) ] [ [pdf](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8344612) ]
 
-  - name: Abandoned Derivative projects
+  - name: 已废弃的衍生项目
     id: derivative-projects
     content: |
-      Below is a list of projects that are based on gem5, are extensions of gem5, or use gem5.
+      以下是基于 gem5、gem5 的扩展或使用 gem5 的项目列表。
 
       ### gem5-gpu
 
-        - Merges 2 popular simulators: gem5 and GPGPU-Sim
-        - Simulates CPUs, GPUs, and the interactions between them
-        - Models a flexible memory system with support for heterogeneous
-          processors and coherence
-        - Supports full-system simulation through GPU driver emulation
-        - [Home Page](https://gem5-gpu.cs.wisc.edu)
-        - [Overview slides](http://old.gem5.org/wiki/images/7/7d/2012_12_gem5_gpu.pdf)
+        - 合并了 2 个流行的模拟器：gem5 和 GPGPU-Sim
+        - 模拟 CPU、GPU 及其相互作用
+        - 对支持异构处理器和一致性的灵活内存系统进行建模
+        - 通过 GPU 驱动程序仿真支持全系统模拟
+        - [主页](https://gem5-gpu.cs.wisc.edu)
+        - [概览幻灯片](http://old.gem5.org/wiki/images/7/7d/2012_12_gem5_gpu.pdf)
 
       ### MV5
 
-        - MV5 is a reconfigurable simulator for heterogeneous multicore
-          architectures. It is based on M5v2.0 beta 4.
-        - Typical usage: simulating data-parallel applications on SIMT cores
-          that operate over directory-based cache hierarchies. You can also
-          add out-of-order cores to have a heterogeneous system, and all
-          different types of cores can operate under the same address space
-          through the same cache hierarchy.
-        - Research projects based on MV5 have been published in ISCA'10,
-          ICCD'09, and IPDPS'10.
-        - Features
-        - - Single-Instruction, Multiple-Threads (SIMT) cores
-        - - Directory-based Coherence Cache: MESI/MSI. (Not based on gems/ruby)
-        - - Interconnect: Fully connected and 2D Mesh. (Not based on gems/ruby)
-        - - Threading API/library in system emulation mode (No support for
-          full-system simulation. A benchmark suite using the thread API is
-          provided)
+        - MV5 是用于异构多核架构的可重构模拟器。它基于 M5v2.0 beta 4。
+        - 典型用法：在通过基于目录的缓存层次结构运行的 SIMT 核心上模拟数据并行应用程序。您还可以添加乱序核心以拥有异构系统，所有不同类型的核心都可以通过相同的缓存层次结构在相同的地址空间下运行。
+        - 基于 MV5 的研究项目已发表在 ISCA'10, ICCD'09 和 IPDPS'10。
+        - 特性
+        - - 单指令多线程 (SIMT) 核心
+        - - 基于目录的一致性缓存：MESI/MSI。（不基于 gems/ruby）
+        - - 互连：全连接和 2D Mesh。（不基于 gems/ruby）
+        - - 系统仿真模式下的线程 API/库（不支持全系统模拟。提供了使用线程 API 的基准测试套件）
 
-  - name: Related to gem5
+  - name: gem5 相关
     id: related-to-gem5
     content: |
       * [**Enabling Realistic Logical Device Interface and Driver for NVM Express Enabled Full System Simulations**](https://link.springer.com/article/10.1007%2Fs10766-017-0530-1). Donghyun Gouk, Jie Zhang and Myoungsoo Jung. IFIP International Conference on Network and Parallel Computing (NPC) and Invited for International Journal of Parallel Programming (IJPP), 2017. [ doi: [10.1007/s10766-017-0530-1](https://dx.doi.org/10.1007/s10766-017-0530-1) ] [ [pdf](https://link.springer.com/content/pdf/10.1007/s10766-017-0530-1.pdf) ]
@@ -102,8 +93,8 @@ tabs:
 
       * [**Multifacet’s General Execution-driven Multiprocessor Simulator (GEMS) Toolset**](https://dl.acm.org/doi/10.1145/1105734.1105747). Milo M.K. Martin, Daniel J. Sorin, Bradford M. Beckmann, Michael R. Marty, Min Xu, Alaa R. Alameldeen, Kevin E. Moore, Mark D. Hill, and David A. Wood. Computer Architecture News (CAN), September 2005. [ doi: [10.1145/1105734.1105747](http://dx.doi.org/10.1145/1105734.1105747) ] [ [pdf](https://dl.acm.org/doi/pdf/10.1145/1105734.1105747) ]
 
-  - name: Using gem5
+  - name: 使用 gem5 的论文
     id: using-gem5
     content: |
-      Please visit [Google Scholar](https://scholar.google.com/scholar?q=gem5) page for a list of all papers that use gem5.
+      请访问 [Google Scholar](https://scholar.google.com/scholar?q=gem5) 页面查看所有使用 gem5 的论文列表。
 ---

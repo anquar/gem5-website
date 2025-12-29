@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Join Slack
+title: 加入 Slack
 permalink: /join-slack/
 ---
 
@@ -9,6 +9,6 @@ permalink: /join-slack/
     <meta http-equiv="refresh" content="0; url='https://join.slack.com/t/gem5-workspace/shared_invite/zt-2e2nfln38-xsIkN1aRmofRlAHOIkZaEA'" />
   </head>
   <body>
-    <p>You will be redirected to the gem5 Slack invite soon!</p>
+    <p>您很快将被重定向到 gem5 Slack 邀请！</p>
   </body>
 </html>

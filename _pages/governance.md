@@ -1,129 +1,129 @@
 ---
 layout: page
-title: Governance
+title: 项目治理
 parent: about
 permalink: /governance/
 ---
 
 
-gem5 is a meritocratic, consensus-based community project. 
-Anyone interested in the project is welcome to join the community, contribute to its design, and participate in the decision-making process. Historically, gem5 has been developed within both industry and academia. 
-This document outlines how community participation takes place and how individuals can earn merit within the project.
+gem5 是一个精英制、基于共识的社区项目。
+欢迎任何对该项目感兴趣的人加入社区，为其设计做出贡献，并参与决策过程。从历史上看，gem5 是在工业界和学术界共同开发的。
+本文档概述了社区参与是如何进行的，以及个人如何在项目中获得荣誉。
 
-The document is organized into several sections. 
-[Philosophy](#philosophy) outlines the core principles of the gem5 community. 
-[GitHub Issues](#gem5-github-issue-tracker) directs users to our GitHub issue tracker for gem5 development. 
-[Roles and Responsibilities](#roles-and-responsibilities) defines the different classes of gem5 users, types of contributors, and their responsibilities. 
-[Support](#support) explains how the community assists users, while [Contribution Process](#contribution-process) details how to make contributions. 
-Finally, [Decision Making Process](#decision-making-process) describes how decisions are made.
-
----
-## Philosophy
-
-The goal of gem5 is to provide a tool to further the state of the art in computer architecture. gem5 can be used for (but is not limited to) computer-architecture research, advanced development, system-level performance analysis and design-space exploration, hardware-software co-design, and low-level software performance analysis. Another goal of gem5 is to be a common framework for computer architecture. A common framework in the academic community makes it easier for other researchers to share workloads as well as models and to compare and contrast with other architectural techniques.
-
-The gem5 community strives to balance the needs of its three user types (academic researchers, industry researchers, and students, detailed below). For instance, gem5 strives to balance adding new features (important to researchers) and a stable code base (important for students). Specific user needs important to the community are enumerated below:
-
-*   Effectively and efficiently emulate the behavior of modern processors in a way that balances simulation performance and accuracy
-*   Serve as a malleable baseline infrastructure that can easily be adapted to emulate the desired behaviors
-*   Provide a core set of APIs and features that remain relatively stable
-*   Incorporate features that make it easy for companies and research groups to stay up to date with the tip and continue contributing to the project
-
-Additionally, the gem5 community is committed to openness, transparency, and inclusiveness. Participants in the gem5 community of all backgrounds should feel welcome and encouraged to contribute.
+本文档分为几个部分。
+[理念](#philosophy) 概述了 gem5 社区的核心原则。
+[GitHub Issues](#gem5-github-issue-tracker) 引导用户使用我们的 GitHub Issue 跟踪器进行 gem5 开发。
+[角色与责任](#roles-and-responsibilities) 定义了不同类别的 gem5 用户、贡献者类型及其职责。
+[支持](#support) 解释了社区如何协助用户，而 [贡献流程](#contribution-process) 详细说明了如何进行贡献。
+最后，[决策过程](#decision-making-process) 描述了决策是如何制定的。
 
 ---
-## gem5 GitHub issue tracker 
+## 理念
 
-The [gem5 GitHub issue tracker](https://github.com/gem5/gem5/issues) lists known bugs, feature and improvement suggestions.
-Those wishing to work on gem5 may browse issues and request assignment to the tasks they believe they can undertake.
-Users of all types are encouraged to open their own bug reports or put forward improvement suggestions.
-While contributions to gem5 may be made without first being logged in our GitHub issue tracker, that remains the project's primary method of prioritizing and managing work items for upcoming releases.
+gem5 的目标是提供一种工具来推动计算机架构的最新技术发展。gem5 可用于（但不限于）计算机架构研究、高级开发、系统级性能分析和设计空间探索、软硬件协同设计以及低级软件性能分析。gem5 的另一个目标是成为计算机架构的通用框架。学术界的通用框架使其他研究人员更容易共享工作负载和模型，并与其他架构技术进行比较和对比。
+
+gem5 社区努力平衡其三种用户类型（学术研究人员、行业研究人员和学生，详见下文）的需求。例如，gem5 努力平衡添加新功能（对研究人员很重要）和稳定的代码库（对学生很重要）。对社区很重要的特定用户需求列举如下：
+
+*   以平衡模拟性能和准确性的方式，有效且高效地模拟现代处理器的行为
+*   作为一个可塑的基准基础设施，可以轻松调整以模拟所需的行为
+*   提供一组相对稳定的核心 API 和功能
+*   包含使公司和研究小组能够轻松跟上最新进展并继续为项目做出贡献的功能
+
+此外，gem5 社区致力于开放、透明和包容。gem5 社区中所有背景的参与者都应该感到受欢迎并受到鼓励做出贡献。
 
 ---
-## Roles And Responsibilities
+## gem5 GitHub Issue 跟踪器
 
-### Users
+[gem5 GitHub Issue 跟踪器](https://github.com/gem5/gem5/issues) 列出了已知的错误、功能和改进建议。
+那些希望致力于 gem5 的人可以浏览 issue 并请求分配他们认为可以承担的任务。
+鼓励所有类型的用户打开自己的错误报告或提出改进建议。
+虽然可以在未先记录在我们的 GitHub Issue 跟踪器中的情况下向 gem5 做出贡献，但这仍然是项目对即将发布的版本的工作项进行优先级排序和管理的主要方法。
 
-Users are community members who have a need for the project. They are the most important members of the community and without them the project would have no purpose. Anyone can be a user; there are no special requirements. There are currently three main categories of gem5 users: academic researchers, industry researchers, and students. Individuals may transition between categories, e.g., when a graduate student takes an industry internship, then returns to school; or when a student graduates and takes a job in industry. These three users are described below.
+---
+## 角色与责任
 
-#### - Academic Researchers
+### 用户 (Users)
 
-This type of user primarily includes individuals who use gem5 for academic research.
-Examples include, but are not limited to, graduate students, research scientists, and post-graduates. This user often uses gem5 as a tool to discover and invent new computer architecture mechanisms. Academic Researchers often are first exposed to gem5 as [Students](#--students) and transition from Students to Academic Researchers over time.
+用户是有项目需求的社区成员。他们是社区中最重要的成员，没有他们，项目就没有目标。任何人都可以成为用户；没有特殊要求。目前 gem5 用户主要分为三类：学术研究人员、行业研究人员和学生。个人可以在类别之间转换，例如，当研究生去企业实习，然后返回学校；或者当学生毕业并在企业找到工作时。这三类用户描述如下。
 
-Because of these users' goals, they primarily add new features to gem5. It is important to the gem5 community to encourage these users to contribute their work to the mainline gem5 repository. By encouraging these users to commit their research contributions, gem5 will make it much easier for other researchers to compare and contrast with other architectural techniques (see [Philosophy](#philosophy) section).
+#### - 学术研究人员 (Academic Researchers)
 
-#### - Industry Researchers
+此类用户主要包括将 gem5 用于学术研究的个人。
+示例包括但不限于研究生、研究科学家和博士后。该用户经常使用 gem5 作为发现和发明新计算机架构机制的工具。学术研究人员通常作为 [学生](#--students) 首次接触 gem5，并随着时间的推移从学生过渡到学术研究人员。
 
-This type of user primarily includes individuals working for companies that use gem5\. These users are distinguished from academic researchers in two ways. First, industry researchers are often part of a larger team, rather than working individually on gem5\. Second, industry researchers often want to incorporate proprietary information into private branches of gem5\. Therefore, industry researchers tend to have rather sophisticated software infrastructures built around gem5\. For these users, the stability of gem5 features and baseline source code is important. Another key consideration is the fidelity of the models, and their ability to accurately reflect realistic implementations. To enable industry participation, it is critical to maintain licensing terms that do not restrict or burden the use of gem5 in conjunction with proprietary IP.
+由于这些用户的目标，他们主要向 gem5 添加新功能。鼓励这些用户将其工作贡献给主线 gem5 仓库对 gem5 社区非常重要。通过鼓励这些用户提交他们的研究贡献，gem5 将使其他研究人员更容易与其他架构技术进行比较和对比（参见 [理念](#philosophy) 部分）。
 
-#### - Students
+#### - 行业研究人员 (Industry Researchers)
 
-This type of user primarily includes individuals that are using gem5 in a classroom setting. These users typically have some foundation in computer architecture, but they have little or no background using simulation tools. Additionally, these users may not use gem5 for an extended period of time, after finishing their short-term goals (e.g., a semester-long class).
+此类用户主要包括在使用 gem5 的公司工作的个人。这些用户在两个方面与学术研究人员不同。首先，行业研究人员通常是更大团队的一部分，而不是单独研究 gem5。其次，行业研究人员经常希望将专有信息整合到 gem5 的私有分支中。因此，行业研究人员倾向于围绕 gem5 构建相当复杂的软件基础设施。对于这些用户来说，gem5 功能和基线源代码的稳定性非常重要。另一个关键考虑因素是模型的保真度，以及它们准确反映现实实现的能力。为了促进行业参与，至关重要的是维持不限制或不加重 gem5 与专有 IP 结合使用的许可条款。
 
-The project asks its users to participate in the project and community as much as possible. User contributions enable the project team to ensure that they are satisfying the needs of those users. Common user contributions include (but are not limited to):
+#### - 学生 (Students)
 
-*   evangelising about the project (e.g., a link on a website and word-of-mouth awareness raising)
-*   informing developers of strengths and weaknesses from a new user perspective
-*   providing moral support (a ‘thank you' goes a long way)
-*   providing financial support (the software is open source, but its developers need to eat)
+此类用户主要包括在课堂环境中使用 gem5 的个人。这些用户通常具有一定的计算机架构基础，但他们几乎没有使用模拟工具的背景。此外，在完成短期目标（例如，一个学期的课程）后，这些用户可能不会长时间使用 gem5。
 
-Users who continue to engage with the project and its community will often become more and more involved. Such users may find themselves becoming contributors, as described in the next section.
+该项目要求其用户尽可能多地参与项目和社区。用户贡献使项目团队能够确保他们满足这些用户的需求。常见的用户贡献包括（但不限于）：
 
-### Contributors
+*   宣传项目（例如，网站上的链接和口口相传以提高知名度）
+*   从新用户的角度告知开发人员优点和缺点
+*   提供精神支持（一句“谢谢”大有帮助）
+*   提供财政支持（软件是开源的，但开发人员需要吃饭）
 
-Contributors are community members who contribute in concrete ways to the project. Anyone can become a contributor, and contributions can take many forms. There are no specific skill requirements and no selection process.
+继续参与项目及其社区的用户通常会变得越来越投入。此类用户可能会发现自己成为贡献者，如下一节所述。
 
-There is only one expectation of commitment to the project: **contributors must be respectful to each other during the review process and work together to reach compromises**. See the [Reviewing Patches](#reviewing-patches) section for more on the process of contributing.
+### 贡献者 (Contributors)
 
-In addition to their actions as users, contributors may also find themselves doing one or more of the following:
+贡献者是以具体方式为项目做出贡献的社区成员。任何人都可以成为贡献者，贡献可以采取多种形式。没有具体的技能要求，也没有筛选过程。
 
-*   answering questions on the mailing lists, particularly the "easy" questions from new users (existing users are often the best people to support new users), or those that relate to the particular contributor's experiences
-*   reporting bugs
-*   identifying requirements
-*   providing graphics and web design
-*   programming
-*   assisting with project infrastructure
-*   writing documentation
-*   fixing bugs
-*   adding features
-*   acting as an ambassador and helping to promote the project
+对项目的承诺只有一个期望：**贡献者在审查过程中必须相互尊重，并共同努力达成妥协**。有关贡献过程的更多信息，请参阅 [审查补丁](#reviewing-patches) 部分。
 
-Contributors engage with the project primarily through the GitHub. They submit changes to the project source code via patches submitted to GitHub, which will be considered for inclusion in the project by existing maintainers (see next section). The developer mailing list is the most appropriate place to ask for help when making that first contribution.
+除了作为用户的行为外，贡献者还可能会发现自己正在做以下一项或多项工作：
 
-As contributors gain experience and familiarity with the project, their profile within, and commitment to, the community will increase. At some stage, they may find themselves being nominated for maintainership.
+*   回答邮件列表上的问题，特别是来自新用户的“简单”问题（现有用户通常是支持新用户的最佳人选），或者是与特定贡献者的经验相关的问题
+*   报告错误
+*   确定需求
+*   提供图形和网页设计
+*   编程
+*   协助项目基础设施
+*   编写文档
+*   修复错误
+*   添加功能
+*   充当大使并帮助推广项目
 
-### Maintainers
+贡献者主要通过 GitHub 与项目互动。他们通过提交给 GitHub 的补丁向项目源代码提交更改，现有维护者将考虑将其包含在项目中（见下一节）。开发者邮件列表是进行第一次贡献时寻求帮助的最合适的地方。
 
-Maintainers are community members who have shown that they are committed to the continued development of the project through ongoing engagement with the community. Maintainership allows contributors to more easily carry on with their project related activities by giving them direct access to the project's resources. That is, they can make changes directly to project outputs, although they still have to submit code changes via GitHub. Additionally, maintainers are expected to have an ongoing record of contributions in terms of code, reviews, and/or discussion.
+随着贡献者获得经验并熟悉项目，他们在社区内的形象和承诺将会增加。在某个阶段，他们可能会发现自己被提名担任维护者。
 
-Maintainers have no more authority over the project than contributors. While maintainership indicates a valued member of the community who has demonstrated a healthy respect for the project's aims and objectives, their work continues to be reviewed by the community. The key difference between a maintainer and a contributor is maintainers have the extra responsibility of merging pull requests to the mainline. Additionally, maintainers are expected to contribute to discussions review patches.
+### 维护者 (Maintainers)
 
-Anyone can become a maintainer. The only expectation is that a maintainer has demonstrated an ability to participate in the project as a team player. Specifically, refer to the 2nd paragraph of the [Contributors](#contributors) section.
+维护者是通过持续参与社区表明他们致力于项目持续发展的社区成员。维护者身份允许贡献者通过直接访问项目资源，更轻松地进行与项目相关的活动。也就是说，他们可以直接对项目输出进行更改，尽管他们仍然必须通过 GitHub 提交代码更改。此外，维护者应在代码、审查和/或讨论方面拥有持续的贡献记录。
 
-Typically, a potential maintainer will need to show that they have an understanding of the project, its objectives and its strategy (see [Philosophy](#philosophy) section). They will also have provided valuable contributions to the project over a period of time.
+维护者对项目的权力并不比贡献者大。虽然维护者身份表明他是社区中受重视的成员，表现出对项目目标和宗旨的健康尊重，但他们的工作仍然受到社区的审查。维护者和贡献者之间的主要区别在于，维护者有额外的责任将 Pull Request 合并到主线。此外，维护者应参与讨论和审查补丁。
 
-New maintainers can be nominated by any existing maintainer. Once they have been nominated, there will be a vote by the project management committee (PMC; see below). Maintainer nomination and voting is one of the few activities that takes place on the project's private management list. This is to allow PMC members to freely express their opinions about a nominee without causing embarrassment. Once the vote has been held, the nominee is notified of the result. The nominee is entitled to request an explanation of any ‘no' votes against them, regardless of the outcome of the vote. This explanation will be provided by the [PMC Chair](#pmc-chair) and will be anonymous and constructive in nature.
+任何人都可以成为维护者。唯一的期望是维护者已经表现出作为团队成员参与项目的能力。具体请参阅 [贡献者](#contributors) 部分的第 2 段。
 
-Nominees may decline their appointment as a maintainer. However, this is unusual, as the project does not expect any specific time or resource commitment from its community members. The intention behind the role of maintainer is to allow people to contribute to the project more easily, not to tie them into the project in any formal way.
+通常，潜在的维护者需要表明他们了解项目、其目标和策略（参见 [理念](#philosophy) 部分）。他们也将在一段时间内为项目提供有价值的贡献。
 
-It is important to recognise that maintainership is a privilege, not a right. That privilege must be earned and once earned it can be removed by the [PMC](#project-management-committee) in extreme circumstances. However, under normal circumstances Maintainership exists for as long as the maintainer continues engaging with the project.
+新维护者可以由任何现有维护者提名。一旦获得提名，项目管理委员会 (PMC; 见下文) 将进行投票。维护者提名和投票是在项目的私人管理列表上进行的少数活动之一。这是为了让 PMC 成员能够自由表达对被提名人的看法，而不会造成尴尬。投票结束后，被提名人将收到结果通知。无论投票结果如何，被提名人都有权要求解释任何针对他们的“反对”票。此解释将由 [PMC 主席](#pmc-chair) 提供，并且本质上是匿名的和建设性的。
 
-A maintainer who shows an above-average level of contribution to the project, particularly with respect to its strategic direction and long-term health, may be nominated to become a member of the PMC. This role is described below.
+被提名人可以拒绝被任命为维护者。但这很不寻常，因为项目并不期望其社区成员做出任何特定的时间或资源承诺。维护者角色的意图是让人们更容易为项目做出贡献，而不是以任何正式方式将他们束缚在项目中。
 
-Note: The definitive list of maintainers is kept via a GitHub Team which is not publicly visible due to GitHub limitations. Lists on the website, etc. may be out of date.
+重要的是要认识到，维护者身份是一种特权，而不是权利。这种特权必须通过努力获得，一旦获得，在极端情况下可以由 [PMC](#project-management-committee) 移除。但是，在正常情况下，只要维护者继续参与项目，维护者身份就会存在。
 
-### Project management committee
+表现出高于平均水平的项目贡献（特别是在战略方向和长期健康方面）的维护者可能会被提名为 PMC 成员。此角色如下所述。
 
-The project management committee consists of those individuals identified as "project owners" on the development site. The PMC has additional responsibilities over and above those of a maintainer. These responsibilities ensure the smooth running of the project. PMC members are expected to review code contributions, participate in strategic planning, approve changes to the governance model and manage how the software is distributed and licensed.
+注意：维护者的最终名单通过 GitHub Team 保存，由于 GitHub 的限制，该团队不公开可见。网站等上的列表可能已过时。
 
-Some PMC members are responsible for specific components of the gem5 project. This includes gem5 source modules (e.g., classic caches, O3CPU model, etc.) and project assets (e.g., the website). A list of the current components and the responsible members can be found within the [MAINTAINERS](https://github.com/gem5/gem5/blob/stable/MAINTAINERS.yaml) document.
+### 项目管理委员会 (Project management committee)
 
-Members of the PMC do not have significant authority over other members of the community, although it is the PMC that votes on new maintainers. It also makes decisions when community consensus cannot be reached. In addition, the PMC has access to the project's private mailing list. This list is used for sensitive issues, such as votes for new maintainers and legal matters that cannot be discussed in public. It is never used for project management or planning.
+项目管理委员会由在开发网站上被确定为“项目所有者”的个人组成。PMC 拥有超出维护者的额外责任。这些责任确保项目的顺利运行。PMC 成员应审查代码贡献，参与战略规划，批准对治理模型的更改，并管理软件的分发和许可方式。
 
-Membership of the PMC is by invitation from the existing PMC members. A nomination will result in discussion and then a vote by the existing PMC members. PMC membership votes are subject to consensus approval of the current PMC members. Additions to the PMC require unanimous agreement of the PMC members. Removing someone from the PMC requires N-1 positive votes, where N is the number of PMC members not including the individual who is being voted out.
+一些 PMC 成员负责 gem5 项目的特定组件。这包括 gem5 源模块（例如，经典缓存、O3CPU 模型等）和项目资产（例如，网站）。当前组件和负责成员的列表可以在 [MAINTAINERS](https://github.com/gem5/gem5/blob/stable/MAINTAINERS.yaml) 文档中找到。
 
-#### - Members
+PMC 成员对社区的其他成员没有显着的权威，尽管是 PMC 投票决定新的维护者。当社区无法达成共识时，它也会做出决定。此外，PMC 可以访问项目的私人邮件列表。此列表用于处理敏感问题，例如新维护者的投票和无法公开讨论的法律事务。它从不用于项目管理或规划。
+
+PMC 的成员资格由现有 PMC 成员邀请。提名将导致讨论，然后由现有 PMC 成员投票。PMC 成员资格投票须经现任 PMC 成员协商一致批准。增加 PMC 成员需要 PMC 成员的一致同意。将某人从 PMC 中除名需要 N-1 票赞成，其中 N 是不包括被投票除名的个人在内的 PMC 成员人数。
+
+#### - 成员 (Members)
 
 *   Ali Saidi
 *   Andreas Sandberg
@@ -136,66 +136,66 @@ Membership of the PMC is by invitation from the existing PMC members. A nominati
 *   Tony Gutierrez
 *   Steve Reinhardt
 
-### PMC Chair
+### PMC 主席 (PMC Chair)
 
-The PMC Chair is a single individual, voted for by the PMC members. Once someone has been appointed Chair, they remain in that role until they choose to retire, or the PMC casts a two-thirds majority vote to remove them.
+PMC 主席是由 PMC 成员投票选出的单一个人。一旦某人被任命为主席，他们将一直担任该角色，直到他们选择退休，或者 PMC 以三分之二多数票将其罢免。
 
-The PMC Chair has no additional authority over other members of the PMC: the role is one of coordinator and facilitator. The Chair is also expected to ensure that all governance processes are adhered to, and has the casting vote when any project decision fails to reach consensus.
-
----
-## Support
-
-All participants in the community are encouraged to provide support for new users within the project management infrastructure. This support is provided as a way of growing the community. Those seeking support should recognise that all support activity within the project is voluntary and is therefore provided as and when time allows.
+PMC 主席对 PMC 的其他成员没有额外的权力：该角色是协调员和促进者。主席还应确保遵守所有治理流程，并在任何项目决策未能达成共识时拥有决定性投票权。
 
 ---
-## Contribution Process
+## 支持
 
-Anyone, capable of showing respect to others, can contribute to the project, regardless of their skills, as there are many ways to contribute. For instance, a contributor might be active on the project mailing list and issue tracker, or might supply patches. The various ways of contributing are described in more detail in a separate document [Submitting Contributions](/contributing).
-
-[GitHub discsussions](https://github.com/orgs/gem5/discussions) or [GitHub issues](https://github.com/gem5/gem5/issues) are the most appropriate place for a contributor to ask for help when making their first contribution. See the [Submitting Contributions](/contributing) page on the gem5 website or the [CONTRIBUTING.md](CONTRIBUTING.md) for details of the gem5 contribution process. Each new contribution should be submitted as a patch to our GitHub site. Then, other gem5 developers will review your patch, possibly asking for changes. After the patch has received consensus (see [Decision Making Process](#decision-making-process)), the patch is ready to be committed to the gem5 tree. For contributors, a maintainer should approve and merge the changeset for you. If a maintainer does not merge the changeset within a reasonable window (a couple of days), send a friendly reminder email to the gem5-dev list. Before a patch is committed to gem5, it must receive at least 2 approvals. If there are no reviews on a patch, users should send follow up notes asking for reviews.
-
-#### Reviewing Patches
-
-An important part of the contribution process is providing feedback on patches that other developers submit. The purpose of reviewing patches is to weed out obvious bugs and to ensure that the code in gem5 is of sufficient quality.
-
-All users are encouraged to review the contributions that are posted on GitHub. If you are an active gem5 user, it's a good idea to keep your eye on the contributions that are posted there (typically by subscribing to the gem5-dev mailing list) so you can speak up when you see a contribution that could impact your use of gem5\. It is far more effective to contribute your opinion in a review before a patch gets committed than to complain after the patch is committed, you update your repository, and you find that your simulations no longer work.
-
-We greatly value the efforts of reviewers to maintain gem5's code quality and consistency. However, it is important that reviews balance the desire to maintain the quality of the code in gem5 with the need to be open to accepting contributions from a broader community. People will base their desire to contribute (or continue contributing) on how they and other contributors are received. With that in mind, here are some guidelines for reviewers:
-
-1.  Remember that submitting a contribution is a generous act, and is very rarely a requirement for the person submitting it. It's always a good idea to start a review with something like "thank you for submitting this contribution". A thank-you is particularly important for new or occasional submitters.
-2.  Overall, the attitude of a reviewer should be "how can we take this contribution and put it to good use", not "what shortcomings in this work must the submitter address before the contribution can be considered worthy".
-3.  As the saying goes, "the perfect is the enemy of the good". While we don't want gem5 to deteriorate, we also don't want to bypass useful functionality or improvements simply because they are not optimal. If the optimal solution is not likely to happen, then accepting a suboptimal solution may be preferable to having no solution. A suboptimal solution can always be replaced by the optimal solution later. Perhaps the suboptimal solution can be incrementally improved to reach that point.
-4.  When asking a submitter for additional changes, consider the cost-benefit ratio of those changes. In particular, reviewers should not discount the costs of requested changes just because the cost to the reviewer is near zero. Asking for extensive changes, particularly from someone who is not a long-time gem5 developer, may be imposing a significant burden on someone who is just trying to be helpful by submitting their code. If you as a reviewer really feel that some extensive reworking of a patch is necessary, consider volunteering to make the changes yourself.
-5.  Not everyone uses gem5 in the same way or has the same needs. It's easy to reject a solution due to its flaws when it solves a problem you don't have—so there's no loss to you if we end up with no solution. That's probably not an acceptable result for the person submitting the patch though. Another way to look at this point is as the flip side of the previous item: just as your cost-benefit analysis should not discount the costs to the submitter of making changes, just because the costs to you are low, it should also not discount the benefits to the submitter of accepting the submission, just because the benefits to you are low.
-6.  Be independent and unbiased while commenting on review requests. Do not support a patch just because you or your organization will benefit from it or oppose it because you will need to do more work. Whether you are an individual or someone working with an organization, think about the patch from community's perspective.
-7.  Try to keep the arguments technical and the language simple. If you make some claim about a patch, substantiate it.
+鼓励社区的所有参与者在项目管理基础设施内为新用户提供支持。这种支持是作为发展社区的一种方式提供的。寻求支持的人应该认识到，项目内的所有支持活动都是自愿的，因此是在时间允许的情况下提供的。
 
 ---
-## Decision Making Process
+## 贡献流程
 
-Decisions about the future of the project are made through discussion with all members of the community, from the newest user to the most experienced PMC member. All non-sensitive project management discussion takes place on the gem5-dev mailing list. Occasionally, sensitive discussion occurs on a private list.
+任何人，只要能够尊重他人，都可以为项目做出贡献，无论他们的技能如何，因为有很多贡献方式。例如，贡献者可能会活跃在项目邮件列表和 Issue 跟踪器上，或者可能会提供补丁。各种贡献方式在单独的文档 [提交贡献](/contributing) 中有更详细的描述。
 
-In order to ensure that the project is not bogged down by endless discussion and continual voting, the project operates a policy of lazy consensus. This allows the majority of decisions to be made without resorting to a formal vote.
+[GitHub discussions](https://github.com/orgs/gem5/discussions) 或 [GitHub issues](https://github.com/gem5/gem5/issues) 是贡献者在进行第一次贡献时寻求帮助的最合适的地方。有关 gem5 贡献过程的详细信息，请参阅 gem5 网站上的 [提交贡献](/contributing) 页面或 [CONTRIBUTING.md](CONTRIBUTING.md)。每个新贡献都应作为补丁提交到我们的 GitHub 站点。然后，其他 gem5 开发人员将审查你的补丁，可能会要求更改。在补丁获得共识（参见 [决策过程](#decision-making-process)）后，补丁就可以提交到 gem5 树了。对于贡献者，维护者应该为你批准并合并变更集。如果维护者没有在合理的窗口内（几天）合并变更集，请向 gem5-dev 列表发送一封友好的提醒电子邮件。在补丁提交到 gem5 之前，它必须获得至少 2 个批准。如果补丁上没有审查，用户应发送后续说明要求审查。
 
-#### Lazy consensus
+#### 审查补丁 (Reviewing Patches)
 
-Decision making typically involves the following steps:
+贡献过程的一个重要部分是对其他开发人员提交的补丁提供反馈。审查补丁的目的是清除明显的错误，并确保 gem5 中的代码具有足够的质量。
 
-*   Proposal
-*   Discussion
-*   Vote (if consensus is not reached through discussion)
-*   Decision
+鼓励所有用户审查 GitHub 上发布的贡献。如果你是一个活跃的 gem5 用户，最好关注那里发布的贡献（通常通过订阅 gem5-dev 邮件列表），这样当你看到可能影响你使用 gem5 的贡献时，你可以发表意见。在补丁提交之前在审查中发表你的意见，比在补丁提交、你更新仓库并发现模拟不再工作后抱怨要有效得多。
 
-Any community member can make a proposal for consideration by the community. In order to initiate a discussion about a new idea, they should create a post on GitHub discussions or submit a patch implementing the idea to GitHub. This will prompt a review and, if necessary, a discussion of the idea. The goal of this review and discussion is to gain approval for the contribution. Since most people in the project community have a shared vision, there is often little need for discussion in order to reach consensus.
+我们非常重视审查者为保持 gem5 代码质量和一致性所做的努力。然而，重要的是，审查要在保持 gem5 代码质量的愿望与接受更广泛社区贡献的需求之间取得平衡。人们是否愿意贡献（或继续贡献）将取决于他们和其他贡献者受到的接待方式。考虑到这一点，以下是针对审查者的一些准则：
 
-In general, as long as nobody explicitly opposes a proposal, it is recognised as having the support of the community. This is called lazy consensus—that is, those who have not stated their opinion explicitly have implicitly agreed to the implementation of the proposal.
+1.  请记住，提交贡献是一种慷慨的行为，很少是提交者的要求。以诸如“感谢你提交此贡献”之类的话开始审查总是一个好主意。对于新的或偶尔的提交者来说，感谢尤其重要。
+2.  总的来说，审查者的态度应该是“我们如何利用这一贡献并将其用于好的用途”，而不是“提交者必须解决这项工作中的哪些缺点，贡献才能被认为是有价值的”。
+3.  俗话说，“完美是优秀的敌人”。虽然我们不希望 gem5 恶化，但我们也不希望仅仅因为它们不是最佳的就绕过有用的功能或改进。如果最佳解决方案不太可能发生，那么接受次优解决方案可能比没有解决方案要好。次优解决方案以后总是可以被最佳解决方案取代。也许次优解决方案可以逐步改进以达到该点。
+4.  当要求提交者进行额外的更改时，请考虑这些更改的成本效益比。特别是，审查者不应仅仅因为审查者的成本接近于零就低估所请求更改的成本。要求进行广泛的更改，特别是对于不是长期 gem5 开发人员的人来说，可能会给那些只是想通过提交代码来提供帮助的人带来沉重的负担。如果你作为审查者真的觉得有必要对补丁进行一些广泛的返工，请考虑自愿自己进行更改。
+5.  并非每个人都以相同的方式使用 gem5 或具有相同的需求。当解决方案解决了你没有的问题时，很容易因为它的缺陷而拒绝它——所以如果我们就这样没有解决方案，对你来说没有损失。但这对于提交补丁的人来说可能不是一个可接受的结果。看待这一点的另一种方式是作为前一项的反面：正如你的成本效益分析不应仅仅因为你的成本低就低估提交者进行更改的成本一样，它也不应仅仅因为你的收益低就低估接受提交对提交者的好处。
+6.  在评论审查请求时要保持独立和公正。不要仅仅因为你或你的组织将从中受益而支持补丁，或者因为你需要做更多工作而反对它。无论你是个人还是与组织合作的人，都要从社区的角度考虑补丁。
+7.  尽量保持论点技术化，语言简单。如果你对补丁提出某种主张，请证实它。
 
-Lazy consensus is a very important concept within the project. It is this process that allows a large group of people to efficiently reach consensus, as someone with no objections to a proposal need not spend time stating their position, and others need not spend time reading such mails.
+---
+## 决策过程
 
-For lazy consensus to be effective, it is necessary to allow at least two weeks before assuming that there are no objections to the proposal. This requirement ensures that everyone is given enough time to read, digest and respond to the proposal. This time period is chosen so as to be as inclusive as possible of all participants, regardless of their location and time commitments. For GitHub pull requests, if there are no reviews after two weeks, the submitter should send a reminder. Reviewers may ask patch submitters to delay submitting a patch when they have a desire to review a patch and need more time to do so. As discussed in the Contributing Section, each patch should have at least two approvals before it is committed.
+有关项目未来的决定是通过与社区所有成员（从最新用户到最有经验的 PMC 成员）讨论做出的。所有非敏感的项目管理讨论都在 gem5-dev 邮件列表上进行。偶尔，敏感讨论会在私人列表中进行。
 
-#### Voting
+为了确保项目不会因无休止的讨论和持续的投票而陷入困境，项目实行懒惰共识政策。这允许大多数决定无需诉诸正式投票即可做出。
 
-Not all decisions can be made using lazy consensus. Issues such as those affecting the strategic direction or legal standing of the project must gain explicit approval in the form of a vote. Every member of the community is encouraged to express their opinions in all discussion and all votes. However, only project maintainers and/or PMC members (as defined above) have binding votes for the purposes of decision making. A separate document on the voting within a meritocratic governance model ([http://oss-watch.ac.uk/resources/meritocraticgovernancevoting](http://oss-watch.ac.uk/resources/meritocraticgovernancevoting)) describes in more detail how voting is conducted in projects following the practice established within the Apache Software Foundation.
+#### 懒惰共识 (Lazy consensus)
 
-This document is based on the example ([http://oss-watch.ac.uk/resources/meritocraticgovernancemodel](http://oss-watch.ac.uk/resources/meritocraticgovernancemodel)) by Ross Gardler and Gabriel Hanganu and is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License
+决策通常涉及以下步骤：
+
+*   提案
+*   讨论
+*   投票（如果通过讨论未达成共识）
+*   决定
+
+任何社区成员都可以提出提案供社区审议。为了发起关于新想法的讨论，他们应该在 GitHub discussions 上创建一个帖子或向 GitHub 提交实现该想法的补丁。这将提示审查，并在必要时讨论该想法。此审查和讨论的目的是获得对贡献的批准。由于项目社区中的大多数人都有共同的愿景，因此通常不需要太多讨论即可达成共识。
+
+一般来说，只要没有人明确反对提案，它就被认为得到了社区的支持。这被称为懒惰共识——也就是说，那些没有明确陈述意见的人已经默认同意实施该提案。
+
+懒惰共识是项目中的一个非常重要的概念。正是这个过程允许一大群人有效地达成共识，因为对提案没有异议的人不需要花时间陈述立场，其他人也不需要花时间阅读此类邮件。
+
+为了使懒惰共识有效，必须在假设对提案没有异议之前至少预留两周时间。这一要求确保每个人都有足够的时间阅读、消化和回应提案。选择这个时间段是为了尽可能包容所有参与者，无论他们的地点和时间安排如何。对于 GitHub Pull Request，如果两周后没有审查，提交者应发送提醒。当审查者希望审查补丁并需要更多时间时，他们可能会要求补丁提交者延迟提交补丁。如贡献部分所述，每个补丁在提交之前应获得至少两个批准。
+
+#### 投票
+
+并非所有决定都可以使用懒惰共识做出。诸如影响项目战略方向或法律地位的问题必须以投票的形式获得明确批准。鼓励社区的每个成员在所有讨论和所有投票中表达自己的意见。但是，只有项目维护者和/或 PMC 成员（如上定义）拥有用于决策目的的约束性投票。关于精英治理模型内投票的单独文件 ([http://oss-watch.ac.uk/resources/meritocraticgovernancevoting](http://oss-watch.ac.uk/resources/meritocraticgovernancevoting)) 更详细地描述了在遵循 Apache 软件基金会建立的实践的项目中如何进行投票。
+
+本文档基于 Ross Gardler 和 Gabriel Hanganu 的示例 ([http://oss-watch.ac.uk/resources/meritocraticgovernancemodel](http://oss-watch.ac.uk/resources/meritocraticgovernancemodel))，并根据知识共享署名-相同方式共享 4.0 国际许可协议获得许可

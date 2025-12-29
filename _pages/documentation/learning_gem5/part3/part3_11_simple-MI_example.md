@@ -1,28 +1,19 @@
 ---
 layout: documentation
-title: Configuring for a standard protocol
+title: 配置标准协议
 doc: Learning gem5
 parent: part3
 permalink: /documentation/learning_gem5/part3/simple-MI_example/
 author: Jason Lowe-Power
 ---
 
-You can easily adapt the simple example configurations from this part to
-the other SLICC protocols in gem5. In this chapter, we will briefly look
-at an example with `MI_example`, though this can be easily extended to
-other protocols.
 
-However, these simple configuration files will only work in syscall
-emulation mode. Full system mode adds some complications such as DMA
-controllers. These scripts can be extended to full system.
+您可以轻松地将本部分中的简单示例配置调整为 gem5 中的其他 SLICC 协议。在本章中，我们将简要介绍一个带有 `MI_example` 的示例，但这可以很容易地扩展到其他协议。
 
-For `MI_example`, we can use exactly the same runscript as before
-(`simple_ruby.py`), we just need to implement a different
-`MyCacheSystem` (and import that file in `simple_ruby.py`). Below, is
-the classes needed for `MI_example`. There are only a couple of changes
-from `MSI`, mostly due to different naming schemes. You can download the
-file
-[here](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part3/ruby_caches_MI_example.py).
+但是，这些简单的配置文件仅在系统调用仿真模式下工作。全系统模式增加了一些复杂性，例如 DMA 控制器。这些脚本可以扩展到全系统。
+
+对于 `MI_example`，我们可以使用与以前完全相同的运行脚本 (`simple_ruby.py`)，我们只需要实现不同的 `MyCacheSystem`（并在 `simple_ruby.py` 中导入该文件）。下面是 `MI_example` 所需的类。与 `MSI` 只有几处更改，主要是由于命名方案不同。您可以下载文件
+[这里](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part3/ruby_caches_MI_example.py)。
 
 ```python
 class MyCacheSystem(RubySystem):
@@ -39,27 +30,25 @@ class MyCacheSystem(RubySystem):
            ruby system (self). This causes infinite recursion in initialize()
            if we do this in the __init__.
         """
-        # Ruby's global network.
+        # Ruby 的全局网络。
         self.network = MyNetwork(self)
 
-        # MI example uses 5 virtual networks
+        # MI example 使用 5 个虚拟网络
         self.number_of_virtual_networks = 5
         self.network.number_of_virtual_networks = 5
 
-        # There is a single global list of all of the controllers to make it
-        # easier to connect everything to the global network. This can be
-        # customized depending on the topology/network requirements.
-        # Create one controller for each L1 cache (and the cache mem obj.)
-        # Create a single directory controller (Really the memory cntrl)
+        # 有一个包含所有控制器的全局列表，以便更容易将所有东西连接到全局网络。
+        # 这可以根据拓扑/网络要求进行定制。
+        # 为每个 L1 缓存（和缓存内存对象）创建一个控制器
+        # 创建一个目录控制器（实际上是内存控制器）
         self.controllers = \
             [L1Cache(system, self, cpu) for cpu in cpus] + \
             [DirController(self, system.mem_ranges, mem_ctrls)]
 
-        # Create one sequencer per CPU. In many systems this is more
-        # complicated since you have to create sequencers for DMA controllers
-        # and other controllers, too.
+        # 为每个 CPU 创建一个定序器。在许多系统中，这更复杂
+        # 因为您还必须为 DMA 控制器和其他控制器创建定序器。
         self.sequencers = [RubySequencer(version = i,
-                                # I/D cache is combined and grab from ctrl
+                                # I/D 缓存合并并从 ctrl 获取
                                 icache = self.controllers[i].cacheMemory,
                                 dcache = self.controllers[i].cacheMemory,
                                 clk_domain = self.controllers[i].clk_domain,
@@ -70,17 +59,16 @@ class MyCacheSystem(RubySystem):
 
         self.num_of_sequencers = len(self.sequencers)
 
-        # Create the network and connect the controllers.
-        # NOTE: This is quite different if using Garnet!
+        # 创建网络并连接控制器。
+        # 注意：如果使用 Garnet，这会有很大不同！
         self.network.connectControllers(self.controllers)
         self.network.setup_buffers()
 
-        # Set up a proxy port for the system_port. Used for load binaries and
-        # other functional-only things.
+        # 为 system_port 设置代理端口。用于加载二进制文件和其他仅功能性的东西。
         self.sys_port_proxy = RubyPortProxy()
         system.system_port = self.sys_port_proxy.slave
 
-        # Connect the cpu's cache, interrupt, and TLB ports to Ruby
+        # 将 cpu 的缓存、中断和 TLB 端口连接到 Ruby
         for i,cpu in enumerate(cpus):
             cpu.icache_port = self.sequencers[i].slave
             cpu.dcache_port = self.sequencers[i].slave
@@ -98,17 +86,17 @@ class L1Cache(L1Cache_Controller):
     _version = 0
     @classmethod
     def versionCount(cls):
-        cls._version += 1 # Use count for this particular type
+        cls._version += 1 # 使用此特定类型的计数
         return cls._version - 1
 
     def __init__(self, system, ruby_system, cpu):
-        """CPUs are needed to grab the clock domain and system is needed for
+        """CPUs needed to grab the clock domain and system is needed for
            the cache block size.
         """
         super(L1Cache, self).__init__()
 
         self.version = self.versionCount()
-        # This is the cache memory object that stores the cache data and tags
+        # 这是存储缓存数据和标签的缓存内存对象
         self.cacheMemory = RubyCache(size = '16kB',
                                assoc = 8,
                                start_index_bit = self.getBlockSizeBits(system))

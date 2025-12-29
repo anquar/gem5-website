@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Creating SimObjects in the memory system
+title: 在内存系统中创建 SimObject
 doc: Learning gem5
 parent: part2
 permalink: /documentation/learning_gem5/part2/memoryobject/
@@ -8,177 +8,78 @@ author: Jason Lowe-Power
 ---
 
 
-Creating SimObjects in the memory system
+在内存系统中创建 SimObject
 ========================================
 
-In this chapter, we will create a simple memory object that sits between
-the CPU and the memory bus. In the [next chapter](../simplecache)
-we will take this simple memory object and add some logic to it to make
-it a very simple blocking uniprocessor cache.
+在本章中，我们将创建一个简单的内存对象，它位于 CPU 和内存总线之间。在 [下一章](../simplecache) 中，我们将采用这个简单的内存对象并向其添加一些逻辑，使其成为一个非常简单的阻塞式单处理器缓存。
 
-gem5 request and response ports
+gem5 请求和响应端口
 ---------------------------
 
-Before diving into the implementation of a memory object, we should
-first understand gem5's request and response port interface. As previously
-discussed in [simple-config-chapter](../../part1/simple_config), all memory objects are connected
-together via ports. These ports provide a rigid interface between these
-memory objects.
+在深入研究内存对象的实现之前，我们应该首先了解 gem5 的请求和响应端口接口。如 [simple-config-chapter](../../part1/simple_config) 中先前讨论的那样，所有内存对象都通过端口连接在一起。这些端口在这些内存对象之间提供了严格的接口。
 
-These ports implement three different memory system *modes*: timing,
-atomic, and functional. The most important mode is *timing mode*. Timing
-mode is the only mode that produces correct simulation results. The
-other modes are only used in special circumstances.
+这些端口实现了三种不同的内存系统 *模式*：timing、atomic 和 functional。最重要的模式是 *timing 模式*。Timing 模式是唯一产生正确模拟结果的模式。其他模式仅在特殊情况下使用。
 
-*Atomic mode* is useful for fastforwarding simulation to a region of
-interest and warming up the simulator. This mode assumes that no events
-will be generated in the memory system. Instead, all of the memory
-requests execute through a single long callchain. It is not required to
-implement atomic accesses for a memory object unless it will be used
-during fastforward or during simulator warmup.
+*Atomic 模式* 对于将模拟快进到感兴趣的区域和预热模拟器非常有用。此模式假设在内存系统中不会生成任何事件。相反，所有内存请求都通过单个长调用链执行。除非内存对象将在快进期间或模拟器预热期间使用，否则不需要实现原子访问。
 
-*Functional mode* is better described as *debugging mode*. Functional
-mode is used for things like reading data from the host into the
-simulator memory. It is used heavily in syscall emulation mode. For
-instance, functional mode is used to load the binary in the
-`process.cmd` from the host into the simulated system's memory so the
-simulated system can access it. Functional accesses should return the
-most up-to-date data on a read, no matter where the data is, and should
-update all possible valid data on a write (e.g., in a system with caches
-there may be multiple valid cache blocks with the same address).
+*Functional 模式* 最好描述为 *调试模式*。Functional 模式用于诸如将数据从主机读取到模拟器内存中之类的事情。它在系统调用仿真模式中被大量使用。例如，functional 模式用于将 `process.cmd` 中的二进制文件从主机加载到模拟系统的内存中，以便模拟系统可以访问它。Functional 访问应在读取时返回最新数据，无论数据在哪里，并且应在写入时更新所有可能的有效数据（例如，在具有缓存的系统中，可能存在多个具有相同地址的有效缓存块）。
 
-### Packets
+### 包 (Packets)
 
-In gem5, `Packets` are sent across ports. A `Packet` is made up of a
-`MemReq` which is the memory request object. The `MemReq` holds
-information about the original request that initiated the packet such as
-the requestor, the address, and the type of request (read, write, etc.).
+在 gem5 中，`Packets` 通过端口发送。`Packet` 由 `MemReq`（内存请求对象）组成。`MemReq` 保存有关发起数据包的原始请求的信息，例如请求者、地址和请求类型（读取、写入等）。
 
-Packets also have a `MemCmd`, which is the *current* command of the
-packet. This command can change throughout the life of the packet (e.g.,
-requests turn into responses once the memory command is satisfied). The
-most common `MemCmd` are `ReadReq` (read request), `ReadResp` (read
-response), `WriteReq` (write request), `WriteResp` (write response).
-There are also writeback requests (`WritebackDirty`, `WritebackClean`)
-for caches and many other command types.
+Packets 还有一个 `MemCmd`，它是数据包的 *当前* 命令。此命令可以在数据包的生命周期内更改（例如，一旦满足内存命令，请求就会变成响应）。最常见的 `MemCmd` 是 `ReadReq`（读请求）、`ReadResp`（读响应）、`WriteReq`（写请求）、`WriteResp`（写响应）。还有用于缓存的写回请求 (`WritebackDirty`, `WritebackClean`) 和许多其他命令类型。
 
-Packets also either keep the data for the request, or a pointer to the
-data. There are options when creating the packet whether the data is
-dynamic (explicitly allocated and deallocated), or static (allocated and
-deallocated by the packet object).
+Packets 也可以保存请求的数据，或指向数据的指针。在创建数据包时有选项决定数据是动态的（显式分配和释放），还是静态的（由数据包对象分配和释放）。
 
-Finally, packets are used in the classic caches as the unit to track
-coherency. Therefore, much of the packet code is specific to the classic
-cache coherence protocol. However, packets are used for all
-communication between memory objects in gem5, even if they are not
-directly involved in coherence (e.g., DRAM controllers and the CPU
-models).
+最后，packets 在经典缓存中用作跟踪一致性的单位。因此，大部分 packet 代码特定于经典缓存一致性协议。但是，packets 用于 gem5 中内存对象之间的所有通信，即使它们不直接参与一致性（例如，DRAM 控制器和 CPU 模型）。
 
-All of the port interface functions accept a `Packet` pointer as a
-parameter. Since this pointer is so common, gem5 includes a typedef for
-it: `PacketPtr`.
+所有端口接口函数都接受一个 `Packet` 指针作为参数。由于此指针非常常见，gem5 包含了一个 typedef：`PacketPtr`。
 
-### Port interface
+### 端口接口
 
-There are two types of ports in gem5: request ports and response ports.
-Whenever you implement a memory object, you will implement at least one
-of these types of ports. To do this, you create a new class that
-inherits from either `RequestPort` or `ResponsePort` for request and response
-ports, respectively. Request ports send requests (and receive response),
-and response ports receive requests (and send responses).
+gem5 中有两种类型的端口：请求端口 (request ports) 和响应端口 (response ports)。
+每当您实现一个内存对象时，您将实现至少一种类型的端口。为此，您创建一个新类，分别继承自 `RequestPort` 或 `ResponsePort`。请求端口发送请求（并接收响应），响应端口接收请求（并发送响应）。
 
-The figure below outlines the simplest interaction between a request
-and response port. This figure shows the interaction in timing mode. The
-other modes are much simpler and use a simple callchain between the
-requestor and the responder.
+下图概述了请求端口和响应端口之间最简单的交互。此图显示了 timing 模式下的交互。其他模式要简单得多，并且在请求者和响应者之间使用简单的调用链。
 
-![Simple request-response interaction when both can accept the request and
-the response.](/_pages/static/figures/requestor_responder_1.png)
+![请求者和响应者都可以接受请求和响应时的简单请求-响应交互。](/_pages/static/figures/requestor_responder_1.png)
 
-As mentioned above, all of the port interfaces require a `PacketPtr` as
-a parameter. Each of these functions (`sendTimingReq`, `recvTimingReq`,
-etc.), accepts a single parameter, a `PacketPtr`. This packet is the
-request or response to send or receive.
+如上所述，所有端口接口都需要一个 `PacketPtr` 作为参数。每个这些函数 (`sendTimingReq`, `recvTimingReq` 等) 接受单个参数，即 `PacketPtr`。此数据包是要发送或接收的请求或响应。
 
-To send a request packet, the requestor calls `sendTimingReq`. In turn,
-(and in the same callchain), the function `recvTimingReq` is called on
-the responder with the same `PacketPtr` as its sole parameter.
+要发送请求数据包，请求者调用 `sendTimingReq`。反过来（并且在同一个调用链中），响应者上会调用 `recvTimingReq` 函数，并将相同的 `PacketPtr` 作为其唯一参数。
 
-The `recvTimingReq` has a return type of `bool`. This boolean return
-value is directly returned to the calling requestor. A return value of
-`true` signifies that the packet was accepted by the responder. A return
-value of `false`, on the other hand, means that the responder was unable to
-accept and the request must be retried sometime in the future.
+`recvTimingReq` 的返回类型为 `bool`。此布尔返回值直接返回给调用的请求者。返回值 `true` 表示数据包已被响应者接受。另一方面，返回值 `false` 意味着响应者无法接受，并且必须在将来的某个时间重试请求。
 
-In the figure above, first, the requestor sends a timing request by
-calling `sendTimingReq`, which in turn calls `recvTimingResp`. The
-responder, returns true from `recvTimingReq`, which is returned from the
-call to `sendTimingReq`. The requestor continue executing, and the responder
-does whatever is necessary to complete the request (e.g., if it is a
-cache, it looks up the tags to see if there is a match to the address in
-the request).
+在上图中，首先，请求者通过调用 `sendTimingReq` 发送时序请求，该函数反过来调用 `recvTimingReq`。响应者从 `recvTimingReq` 返回 true，该值从 `sendTimingReq` 调用中返回。请求者继续执行，响应者执行完成请求所需的任何操作（例如，如果是缓存，它会查找标签以查看是否与请求中的地址匹配）。
 
-Once the responder completes the request, it can send a response to the
-requestor. The responder calls `sendTimingResp` with the response packet (this
-should be the same `PacketPtr` as the request, but it should now be a
-response packet). In turn, the request function `recvTimingResp` is
-called. The requestor's `recvTimingResp` function returns `true`, which is
-the return value of `sendTimingResp` in the responder. Thus, the interaction
-for that request is complete.
+一旦响应者完成了请求，它可以向请求者发送响应。响应者调用带有响应数据包的 `sendTimingResp`（这应该与请求是同一个 `PacketPtr`，但它现在应该是一个响应数据包）。反过来，调用请求函数 `recvTimingResp`。请求者的 `recvTimingResp` 函数返回 `true`，这是响应者中 `sendTimingResp` 的返回值。因此，该请求的交互完成。
 
-Later, in the example section we will show the example code for
-these functions.
+稍后，在示例部分，我们将展示这些函数的示例代码。
 
-It is possible that the requestor or responder is busy when they receive a
-request or a response. The figure below shows the case where the responder
-is busy when the original request was sent.
+当请求者或响应者收到请求或响应时，它们可能正忙。下图显示了发送原始请求时响应者正忙的情况。
 
-![Simple requestor-responder interaction when the responder is
-busy](/_pages/static/figures/requestor_responder_2.png)
+![当响应者忙碌时的简单请求者-响应者交互](/_pages/static/figures/requestor_responder_2.png)
 
-In this case, the responder returns `false` from the `recvTimingReq`
-function. When a requestor receives false after calling `sendTimingReq`, it
-must wait until the its function `recvReqRetry` is executed. Only when
-this function is called is the requestor allowed to retry calling
-`sendTimingRequest`. The above figure shows the timing request failing
-once, but it could fail any number of times. Note: it is up to the
-requestor to track the packet that fails, not the responder. The responder *does
-not* keep the pointer to the packet that fails.
+在这种情况下，响应者从 `recvTimingReq` 函数返回 `false`。当请求者在调用 `sendTimingReq` 后收到 false 时，它必须等待直到其函数 `recvReqRetry` 被执行。只有当此函数被调用时，请求者才允许重试调用 `sendTimingRequest`。上图显示了时序请求失败一次，但它可能会失败任意次。注意：由请求者负责跟踪失败的数据包，而不是响应者。响应者 *不* 保留指向失败数据包的指针。
 
-Similarly, this figure shows the case when the requestor is busy at
-the time the responder tries to send a response. In this case, the responder
-cannot call `sendTimingResp` until it receives a `recvRespRetry`.
+同样，下图显示了当响应者尝试发送响应时请求者正忙的情况。在这种情况下，响应者在收到 `recvRespRetry` 之前无法调用 `sendTimingResp`。
 
-![Simple requestor-responder interaction when the requestor is
-busy](/_pages/static/figures/requestor_responder_3.png)
+![当请求者忙碌时的简单请求者-响应者交互](/_pages/static/figures/requestor_responder_3.png)
 
-Importantly, in both of these cases, the retry codepath can be a single
-call stack. For instance, when the requestor calls `sendRespRetry`,
-`recvTimingReq` can also be called in the same call stack. Therefore, it
-is easy to incorrectly create an infinite recursion bug, or other bugs.
-It is important that before a memory object sends a retry, that it is
-ready *at that instant* to accept another packet.
+重要的是，在这两种情况下，重试代码路径可以是单个调用堆栈。例如，当请求者调用 `sendRespRetry` 时，`recvTimingReq`也可以在同一个调用堆栈中被调用。因此，很容易错误地创建无限递归错误或其他错误。重要的是，在内存对象发送重试之前，它 *在那一瞬间* 准备好接受另一个数据包。
 
-Simple memory object example
+简单的内存对象示例
 ----------------------------
 
-In this section, we will build a simple memory object. Initially, it
-will simply pass requests through from the CPU-side (a simple CPU) to
-the memory-side (a simple memory bus). See the figure below.
-It will have a single memory-side requestor port, to send requests to the memory bus,
-and two cpu-side ports for the instruction and data cache ports of the
-CPU. In the next chapter [simplecache-chapter](../simplecache), we will add the logic
-to make this object a cache.
+在本节中，我们将构建一个简单的内存对象。最初，它将简单地将请求从 CPU 侧（一个简单的 CPU）传递到内存侧（一个简单的内存总线）。见下图。
+它将有一个内存侧请求者端口，用于向内存总线发送请求，以及两个 CPU 侧端口，用于 CPU 的指令和数据缓存端口。在下一章 [simplecache-chapter](../simplecache) 中，我们将添加逻辑使此对象成为缓存。
 
-![System with a simple memory object which sits between a CPU and the
-memory bus.](/pages/static/figures/simple_memobj.png)
+![具有位于 CPU 和内存总线之间的简单内存对象的系统。](/pages/static/figures/simple_memobj.png)
 
-### Declare the SimObject
+### 声明 SimObject
 
-Just like when we were creating the simple SimObject in
-[hello-simobject-chapter](../helloobject), the first step is to create a SimObject Python
-file. We will call this simple memory object `SimpleMemobj` and create
-the SimObject Python file in `src/learning_gem5/simple_memobj`.
+就像我们在 [hello-simobject-chapter](../helloobject) 中创建简单的 SimObject 一样，第一步是创建 SimObject Python 文件。我们将这个简单的内存对象称为 `SimpleMemobj`，并在 `src/learning_gem5/simple_memobj` 中创建 SimObject Python 文件。
 
 ```python
 from m5.params import *
@@ -194,30 +95,21 @@ class SimpleMemobj(SimObject):
     mem_side = RequestPort("Memory side port, sends requests")
 ```
 
-For this object, we inherit from `SimObject`. The
-`SimObject` class has a pure virtual functions that we will have to
-define in our C++ implementation, `getPort`.
+对于此对象，我们继承自 `SimObject`。`SimObject` 类有一个纯虚函数，我们必须在 C++ 实现中定义它，即 `getPort`。
 
-This object's parameters are three ports. Two ports for the CPU to
-connect the instruction and data ports and a port to connect to the
-memory bus. These ports do not have a default value, and they have a
-simple description.
+此对象的参数是三个端口。两个端口供 CPU 连接指令和数据端口，一个端口连接到内存总线。这些端口没有默认值，并且它们有一个简单的描述。
 
-It is important to remember the names of these ports. We will explicitly
-use these names when implementing `SimpleMemobj` and defining the
-`getPort` function.
+记住这些端口的名称很重要。在实现 `SimpleMemobj` 和定义 `getPort` 函数时，我们将显式使用这些名称。
 
-You can download the SimObject file
-[here](/_pages/static/scripts/part2/memoryobject/SimpleMemobj.py).
+您可以下载 SimObject 文件
+[这里](/_pages/static/scripts/part2/memoryobject/SimpleMemobj.py)。
 
-Of course, you also need to create a SConscript file in the new
-directory as well that declares the SimObject Python file. You can
-download the SConscript file
-[here](/_pages/static/scripts/part2/memoryobject/SConscript).
+当然，您还需要在新目录中创建一个 SConscript 文件，该文件声明 SimObject Python 文件。您可以下载 SConscript 文件
+[这里](/_pages/static/scripts/part2/memoryobject/SConscript)。
 
-### Define the SimpleMemobj class
+### 定义 SimpleMemobj 类
 
-Now, we create a header file for `SimpleMemobj`.
+现在，我们为 `SimpleMemobj` 创建一个头文件。
 
 ```cpp
 #include "mem/port.hh"
@@ -236,16 +128,11 @@ class SimpleMemobj : public SimObject
 };
 ```
 
-### Define a response port type
+### 定义响应端口类型
 
-Now, we need to define classes for our two kinds of ports: the CPU-side
-and the memory-side ports. For this, we will declare these classes
-inside the `SimpleMemobj` class since no other object will ever use
-these classes.
+现在，我们需要为我们的两种端口定义类：CPU 侧和内存侧端口。为此，我们将在 `SimpleMemobj` 类内部声明这些类，因为没有其他对象会使用这些类。
 
-Let's start with the response port, or the CPU-side port. We are going to
-inherit from the `ResponsePort` class. The following is the required code
-to override all of the pure virtual functions in the `ResponsePort` class.
+让我们从响应端口（即 CPU 侧端口）开始。我们将继承 `ResponsePort` 类。以下是覆盖 `ResponsePort` 类中所有纯虚函数所需的代码。
 
 ```cpp
 class CPUSidePort : public ResponsePort
@@ -268,16 +155,13 @@ class CPUSidePort : public ResponsePort
 };
 ```
 
-This object requires five functions to be defined.
+此对象需要定义五个函数。
 
-This object also has a single member variable, its owner, so it can call
-functions on that object.
+此对象还有一个成员变量，即其所有者，因此它可以调用该对象上的函数。
 
-### Define a request port type
+### 定义请求端口类型
 
-Next, we need to define a request port type. This will be the memory-side
-port which will forward request from the CPU-side to the rest of the
-memory system.
+接下来，我们需要定义一个请求端口类型。这将是内存侧端口，它将请求从 CPU 侧转发到内存系统的其余部分。
 
 ```cpp
 class MemSidePort : public RequestPort
@@ -297,16 +181,11 @@ class MemSidePort : public RequestPort
 };
 ```
 
-This class only has three pure virtual functions that we must override.
+此类只有三个我们必须覆盖的纯虚函数。
 
-### Defining the SimObject interface
+### 定义 SimObject 接口
 
-Now that we have defined these two new types `CPUSidePort` and
-`MemSidePort`, we can declare our three ports as part of `SimpleMemobj`.
-We also need to declare the pure virtual function in the
-`SimObject` class, `getPort`. The
-function is used by gem5 during the initialization phase to connect
-memory objects together via ports.
+现在我们已经定义了这两个新类型 `CPUSidePort` 和 `MemSidePort`，我们可以将我们的三个端口声明为 `SimpleMemobj` 的一部分。我们还需要在 `SimObject` 类中声明纯虚函数 `getPort`。该函数在初始化阶段由 gem5 使用，通过端口将内存对象连接在一起。
 
 ```cpp
 class SimpleMemobj : public SimObject
@@ -329,16 +208,12 @@ class SimpleMemobj : public SimObject
 };
 ```
 
-You can download the header file for the `SimpleMemobj`
-[here](/_pages/static/scripts/part2/memoryobject/simple_memobj.hh).
+您可以下载 `SimpleMemobj` 的头文件
+[这里](/_pages/static/scripts/part2/memoryobject/simple_memobj.hh)。
 
-### Implementing basic SimObject functions
+### 实现基本 SimObject 函数
 
-For the constructor of `SimpleMemobj`, we will simply call the
-`SimObject` constructor. We also need to initialize all of the ports.
-Each port's constructor takes two parameters: the name and a pointer to
-its owner, as we defined in the header file. The name can be any string,
-but by convention, it is the same name as in the Python SimObject file. We also initialize blocked to be false.
+对于 `SimpleMemobj` 的构造函数，我们将简单地调用 `SimObject` 构造函数。我们还需要初始化所有端口。每个端口的构造函数接受两个参数：名称和指向其所有者的指针，正如我们在头文件中定义的那样。名称可以是任何字符串，但按照惯例，它是 Python SimObject 文件中的相同名称。我们还将 blocked 初始化为 false。
 
 ```cpp
 #include "learning_gem5/part2/simple_memobj.hh"
@@ -353,15 +228,10 @@ SimpleMemobj::SimpleMemobj(SimpleMemobjParams *params) :
 }
 ```
 
-Next, we need to implement the interfaces to get the ports. This
-interface is made of the function `getPort`.
-The function takes two parameters. The `if_name` is the Python
-variable name of the interface for *this* object. 
+接下来，我们需要实现获取端口的接口。该接口由函数 `getPort` 组成。
+该函数接受两个参数。`if_name` 是 *此* 对象接口的 Python 变量名。
 
-To implement `getPort`, we compare the `if_name` and check to see
-if it is `mem_side` as specified in our Python SimObject file. If it is,
-then we return the `memPort` object. If the name is `"inst_port"`, then we return the
-instPort, and if the name is `data_port` we return the data port. If not, then we pass the request name to our parent. 
+为了实现 `getPort`，我们比较 `if_name` 并检查它是否如我们的 Python SimObject 文件中所指定的那样为 `mem_side`。如果是，则返回 `memPort` 对象。如果名称是 `"inst_port"`，则返回 instPort，如果名称是 `data_port`，则返回 data port。如果不是，则将请求名称传递给我们的父级。
 
 ```cpp
 Port &
@@ -369,7 +239,7 @@ SimpleMemobj::getPort(const std::string &if_name, PortID idx)
 {
     panic_if(idx != InvalidPortID, "This object doesn't support vector ports");
 
-    // This is the name from the Python SimObject declaration (SimpleMemobj.py)
+    // 这是来自 Python SimObject 声明 (SimpleMemobj.py) 的名称
     if (if_name == "mem_side") {
         return memPort;
     } else if (if_name == "inst_port") {
@@ -377,21 +247,18 @@ SimpleMemobj::getPort(const std::string &if_name, PortID idx)
     } else if (if_name == "data_port") {
         return dataPort;
     } else {
-        // pass it along to our super class
+        // 把它传递给我们的超类
         return SimObject::getPort(if_name, idx);
     }
 }
 ```
 
 
-### Implementing request and response port functions
+### 实现请求和响应端口函数
 
-The implementation of both the request and response port is relatively
-simple. For the most part, each of the port functions just forwards the
-information to the main memory object (`SimpleMemobj`).
+请求和响应端口的实现都相对简单。在大多数情况下，每个端口函数只是将信息转发到主内存对象 (`SimpleMemobj`)。
 
-Starting with two simple functions, `getAddrRanges` and `recvFunctional`
-simply call into the `SimpleMemobj`.
+从两个简单的函数开始，`getAddrRanges` 和 `recvFunctional` 只是调用 `SimpleMemobj`。
 
 ```cpp
 AddrRangeList
@@ -407,10 +274,7 @@ SimpleMemobj::CPUSidePort::recvFunctional(PacketPtr pkt)
 }
 ```
 
-The implementation of these functions in the `SimpleMemobj` are equally
-simple. These implementations just pass through the request to the
-memory side. We can use `DPRINTF` calls here to track what is happening
-for debug purposes as well.
+这些函数在 `SimpleMemobj` 中的实现同样简单。这些实现只是将请求传递给内存侧。我们也可以在这里使用 `DPRINTF` 调用来跟踪发生的事情以进行调试。
 
 ```cpp
 void
@@ -427,8 +291,7 @@ SimpleMemobj::getAddrRanges() const
 }
 ```
 
-Similarly for the `MemSidePort`, we need to implement `recvRangeChange`
-and forward the request through the `SimpleMemobj` to the response port.
+同样对于 `MemSidePort`，我们需要实现 `recvRangeChange` 并通过 `SimpleMemobj` 将请求转发到响应端口。
 
 ```cpp
 void
@@ -447,21 +310,11 @@ SimpleMemobj::sendRangeChange()
 }
 ```
 
-### Implementing receiving requests
+### 实现接收请求
 
-The implementation of `recvTimingReq` is slightly more complicated. We
-need to check to see if the `SimpleMemobj` can accept the request. The
-`SimpleMemobj` is a very simple blocking structure; we only allow a
-single request outstanding at a time. Therefore, if we get a request
-while another request is outstanding, the `SimpleMemobj` will block the
-second request.
+`recvTimingReq` 的实现稍微复杂一些。我们需要检查 `SimpleMemobj` 是否可以接受请求。`SimpleMemobj` 是一个非常简单的阻塞结构；我们一次只允许一个未完成的请求。因此，如果在另一个请求未完成时收到请求，`SimpleMemobj` 将阻止第二个请求。
 
-To simplify the implementation, the `CPUSidePort` stores all of the
-flow-control information for the port interface. Thus, we need to add an
-extra member variable, `needRetry`, to the `CPUSidePort`, a boolean that
-stores whether we need to send a retry whenever the `SimpleMemobj`
-becomes free. Then, if the `SimpleMemobj` is blocked on a request, we
-set that we need to send a retry sometime in the future.
+为了简化实现，`CPUSidePort` 存储端口接口的所有流控制信息。因此，我们需要向 `CPUSidePort` 添加一个额外的成员变量 `needRetry`，这是一个布尔值，用于存储每当 `SimpleMemobj` 变为空闲时我们是否需要发送重试。然后，如果 `SimpleMemobj` 在请求上被阻止，我们设置我们需要在将来的某个时间发送重试。
 
 ```cpp
 bool
@@ -476,16 +329,7 @@ SimpleMemobj::CPUSidePort::recvTimingReq(PacketPtr pkt)
 }
 ```
 
-To handle the request for the `SimpleMemobj`, we first check if the
-`SimpleMemobj` is already blocked waiting for a response to another
-request. If it is blocked, then we return `false` to signal the calling
-request port that we cannot accept the request right now. Otherwise, we
-mark the port as blocked and send the packet out of the memory port. For
-this, we can define a helper function in the `MemSidePort` object to
-hide the flow control from the `SimpleMemobj` implementation. We will
-assume the `memPort` handles all of the flow control and always return
-`true` from `handleRequest` since we were successful in consuming the
-request.
+为了处理 `SimpleMemobj` 的请求，我们首先检查 `SimpleMemobj` 是否已经被阻止等待对另一个请求的响应。如果它被阻止，那么我们返回 `false` 以向调用请求端口发出信号，表明我们现在无法接受请求。否则，我们将端口标记为已阻止并从内存端口发送数据包。为此，我们可以在 `MemSidePort` 对象中定义一个辅助函数，以向 `SimpleMemobj` 实现隐藏流控制。我们将假设 `memPort` 处理所有流控制，并且始终从 `handleRequest` 返回 `true`，因为我们成功地使用了请求。
 
 ```cpp
 bool
@@ -501,19 +345,9 @@ SimpleMemobj::handleRequest(PacketPtr pkt)
 }
 ```
 
-Next, we need to implement the `sendPacket` function in the
-`MemSidePort`. This function will handle the flow control in case its
-peer response port cannot accept the request. For this, we need to add a
-member to the `MemSidePort` to store the packet in case it is blocked.
-It is the responsibility of the sender to store the packet if the
-receiver cannot receive the request (or response).
+接下来，我们需要在 `MemSidePort` 中实现 `sendPacket` 函数。此函数将处理流控制，以防其对等响应端口无法接受请求。为此，我们需要向 `MemSidePort` 添加一个成员来存储数据包，以防它被阻止。如果接收者无法接收请求（或响应），发送者有责任存储数据包。
 
-This function simply sends the packet by calling the function
-`sendTimingReq`. If the send fails, then this object stores the packet in
-the `blockedPacket` member function so it can send the packet later
-(when it receives a `recvReqRetry`). This function also contains some
-defensive code to make sure there is not a bug and we never try to
-overwrite the `blockedPacket` variable incorrectly.
+此函数只需调用函数 `sendTimingReq` 即可发送数据包。如果发送失败，则此对象将数据包存储在 `blockedPacket` 成员函数中，以便以后（当它收到 `recvReqRetry` 时）发送数据包。此函数还包含一些防御性代码，以确保没有错误，并且我们永远不会尝试错误地覆盖 `blockedPacket` 变量。
 
 ```cpp
 void
@@ -526,9 +360,7 @@ SimpleMemobj::MemSidePort::sendPacket(PacketPtr pkt)
 }
 ```
 
-Next, we need to implement the code to resend the packet. In this
-function, we try to resend the packet by calling the `sendPacket`
-function we wrote above.
+接下来，我们需要实现重新发送数据包的代码。在这个函数中，我们尝试通过调用我们在上面编写的 `sendPacket` 函数来重新发送数据包。
 
 ```cpp
 void
@@ -543,11 +375,9 @@ SimpleMemobj::MemSidePort::recvReqRetry()
 }
 ```
 
-### Implementing receiving responses
+### 实现接收响应
 
-The response codepath is similar to the receiving codepath. When the
-`MemSidePort` gets a response, we forward the response through the
-`SimpleMemobj` to the appropriate `CPUSidePort`.
+响应代码路径类似于接收代码路径。当 `MemSidePort` 收到响应时，我们通过 `SimpleMemobj` 将响应转发到相应的 `CPUSidePort`。
 
 ```cpp
 bool
@@ -557,18 +387,9 @@ SimpleMemobj::MemSidePort::recvTimingResp(PacketPtr pkt)
 }
 ```
 
-In the `SimpleMemobj`, first, it should always be blocked when we
-receive a response since the object should be waiting for the response.
-Before sending the packet back to the CPU side, we need to mark that the
-object is no longer blocked. This must be done *before calling
-`sendTimingResp`*. Otherwise, it is possible to get stuck in an infinite
-loop as it is possible that the request port has a single callchain between
-receiving a response and sending another request.
+在 `SimpleMemobj` 中，首先，当我们收到响应时它应该总是被阻止，因为对象应该正在等待响应。在将数据包发送回 CPU 侧之前，我们需要标记对象不再被阻止。这必须在 *调用 `sendTimingResp` 之前* 完成。否则，可能会陷入无限循环，因为请求端口可能在接收响应和发送另一个请求之间具有单个调用链。
 
-After unblocking the `SimpleMemobj`, we check to see if the packet is an
-instruction or data packet and send it back across the appropriate port.
-Finally, since the object is now unblocked, we may need to notify the
-CPU side ports that they can now retry their requests that failed.
+在解锁 `SimpleMemobj` 之后，我们检查数据包是指令数据包还是数据数据包，并通过相应的端口将其发回。最后，由于对象现在已解除阻止，我们可能需要通知 CPU 侧端口它们现在可以重试失败的请求。
 
 ```cpp
 bool
@@ -593,12 +414,7 @@ SimpleMemobj::handleResponse(PacketPtr pkt)
 }
 ```
 
-Similar to how we implemented a convenience function for sending packets
-in the `MemSidePort`, we can implement a `sendPacket` function in the
-`CPUSidePort` to send the responses to the CPU side. This function calls
-`sendTimingResp` which will in turn call `recvTimingResp` on the peer
-request port. If this call fails and the peer port is currently blocked,
-then we store the packet to be sent later.
+类似于我们在 `MemSidePort` 中实现发送数据包的便利函数，我们可以在 `CPUSidePort` 中实现 `sendPacket` 函数以将响应发送到 CPU 侧。此函数调用 `sendTimingResp`，这将反过来调用对等请求端口上的 `recvTimingResp`。如果此调用失败并且对等端口当前被阻止，那么我们将存储数据包以便稍后发送。
 
 ```cpp
 void
@@ -612,9 +428,7 @@ SimpleMemobj::CPUSidePort::sendPacket(PacketPtr pkt)
 }
 ```
 
-We will send this blocked packet later when we receive a
-`recvRespRetry`. This function is exactly the same as the `recvReqRetry`
-above and simply tries to resend the packet, which may be blocked again.
+当我们收到 `recvRespRetry` 时，我们将稍后发送此被阻止的数据包。此函数与上面的 `recvReqRetry` 完全相同，只是尝试重新发送数据包，该数据包可能会再次被阻止。
 
 ```cpp
 void
@@ -629,13 +443,7 @@ SimpleMemobj::CPUSidePort::recvRespRetry()
 }
 ```
 
-Finally, we need to implement the extra function `trySendRetry` for the
-`CPUSidePort`. This function is called by the `SimpleMemobj` whenever
-the `SimpleMemobj` may be unblocked. `trySendRetry` checks to see if a
-retry is needed which we marked in `recvTimingReq` whenever the
-`SimpleMemobj` was blocked on a new request. Then, if the retry is
-needed, this function calls `sendRetryReq`, which in turn calls
-`recvReqRetry` on the peer request port (the CPU in this case). 
+最后，我们需要为 `CPUSidePort` 实现额外的函数 `trySendRetry`。每当 `SimpleMemobj` 可能被解锁时，`SimpleMemobj` 都会调用此函数。`trySendRetry` 检查是否需要重试，我们在 `recvTimingReq` 中每当 `SimpleMemobj` 在新请求上被阻止时就标记它。然后，如果需要重试，此函数调用 `sendRetryReq`，这反过来调用对等请求端口（在本例中为 CPU）上的 `recvReqRetry`。
 
 ```cpp
 void
@@ -648,7 +456,7 @@ SimpleMemobj::CPUSidePort::trySendRetry()
     }
 }
 ```
-In addition to this function, to finish the file add the create function for SimpleMemobj.
+除了此函数之外，要完成该文件，请为 SimpleMemobj 添加 create 函数。
 ```cpp
 SimpleMemobj*
 SimpleMemobjParams::create()
@@ -656,36 +464,20 @@ SimpleMemobjParams::create()
     return new SimpleMemobj(this);
 }
 ```
-You can download the implementation for the `SimpleMemobj`
-[here](/_pages/static/scripts/part2/memoryobject/simple_memobj.cc).
+您可以下载 `SimpleMemobj` 的实现
+[这里](/_pages/static/scripts/part2/memoryobject/simple_memobj.cc)。
 
-The following figure shows the relationships between
-the `CPUSidePort`, `MemSidePort`, and `SimpleMemobj`. This figure shows
-how the peer ports interact with the implementation of the
-`SimpleMemobj`. Each bold function is one that we had to implement, and
-the non-bold functions are the port interfaces to the peer ports. The
-colors highlight one API path through the object (e.g., receiving a
-request or updating the memory ranges).
+下图显示了 `CPUSidePort`、`MemSidePort` 和 `SimpleMemobj` 之间的关系。此图显示了对等端口如何与 `SimpleMemobj` 的实现进行交互。每个粗体函数都是我们必须实现的函数，非粗体函数是对等端口的端口接口。颜色突出了通过对象的一条 API 路径（例如，接收请求或更新内存范围）。
 
-![Interaction between SimpleMemobj and its ports](/_pages/static/figures/memobj_api.png)
+![SimpleMemobj 及其端口之间的交互](/_pages/static/figures/memobj_api.png)
 
-For this simple memory object, packets are just forwarded from the
-CPU-side to the memory side. However, by modifying `handleRequest` and
-`handleResponse`, we can create rich featureful objects, like a cache in
-the [next chapter](../simplecache).
+对于这个简单的内存对象，数据包只是从 CPU 侧转发到内存侧。但是，通过修改 `handleRequest` 和 `handleResponse`，我们可以创建功能丰富的对象，例如在 [下一章](../simplecache) 中的缓存。
 
-### Create a config file
+### 创建配置文件
 
-This is all of the code needed to implement a simple memory object! In
-the [next chapter](../simplecache), we will take this framework
-and add some caching logic to make this memory object into a simple
-cache. However, before that, let's look at the config file to add the
-SimpleMemobj to your system.
+这是实现简单内存对象所需的全部代码！在 [下一章](../simplecache) 中，我们将采用此框架并添加一些缓存逻辑，使此内存对象成为一个简单的缓存。但是，在此之前，让我们看一下将 SimpleMemobj 添加到您的系统的配置文件。
 
-This config file builds off of the simple config file in
-[simple-config-chapter](../../part1/simple_config). However, instead of connecting the CPU directly
-to the memory bus, we are going to instantiate a `SimpleMemobj` and
-place it between the CPU and the memory bus.
+此配置文件基于 [simple-config-chapter](../../part1/simple_config) 中的简单配置文件。但是，我们不是将 CPU 直接连接到内存总线，而是要实例化一个 `SimpleMemobj` 并将其放置在 CPU 和内存总线之间。
 
 ```python
 import m5
@@ -733,10 +525,10 @@ exit_event = m5.simulate()
 print('Exiting @ tick %i because %s' % (m5.curTick(), exit_event.getCause()))
 ```
 
-You can download this config script
-[here](/_pages/static/scripts/part2/memoryobject/simple_memobj.py).
+您可以下载此配置脚本
+[这里](/_pages/static/scripts/part2/memoryobject/simple_memobj.py)。
 
-Now, when you run this config file you get the following output.
+现在，当您运行此配置文件时，您会得到以下输出。
 
     gem5 Simulator System.  http://gem5.org
     gem5 is copyrighted software; use the --copyright option for details.
@@ -756,8 +548,7 @@ Now, when you run this config file you get the following output.
     Hello world!
     Exiting @ tick 507841000 because target called exit()
 
-If you run with the `SimpleMemobj` debug flag, you can see all of the
-memory requests and responses from and to the CPU.
+如果您使用 `SimpleMemobj` 调试标志运行，您可以看到所有来自和发往 CPU 的内存请求和响应。
 
     gem5 Simulator System.  http://gem5.org
     gem5 is copyrighted software; use the --copyright option for details.
@@ -781,8 +572,4 @@ memory requests and responses from and to the CPU.
      250000: system.memobj: Got request for addr 0x190
      ...
 
-You may also want to change the CPU model to the out-of-order model
-(`X86O3CPU`). When using the out-of-order CPU you will potentially see
-a different address stream since it allows multiple memory requests
-outstanding at a once. When using the out-of-order CPU, there will now
-be many stalls because the `SimpleMemobj` is blocking.
+您还可以将 CPU 模型更改为乱序模型 (`X86O3CPU`)。当使用乱序 CPU 时，您可能会看到不同的地址流，因为它允许一次有多个未完成的内存请求。当使用乱序 CPU 时，现在会有许多停顿，因为 `SimpleMemobj` 是阻塞的。

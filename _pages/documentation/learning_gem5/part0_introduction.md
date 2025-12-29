@@ -1,63 +1,47 @@
 ---
 layout: documentation
-title: Learning gem5
+title: 学习 gem5
 doc: Learning gem5
 parent: learning_gem5
 permalink: /documentation/learning_gem5/introduction/
 author: Jason Lowe-Power
 ---
 
-# Introduction
+# 简介
 
-The goal of this document is to give you a thorough
-introduction on how to use gem5 and the gem5 codebase. The purpose of
-this document is not to provide a detailed description of every feature
-in gem5. After reading this document, you should feel comfortable using
-gem5 in the classroom and for computer architecture research.
-Additionally, you should be able to modify and extend gem5 and then
-contribute your improvements to the main gem5 repository.
+本文档的目标是为您提供关于如何使用 gem5 和 gem5 代码库的详尽介绍。本文档的目的不是提供 gem5 中每个功能的详细描述。阅读本文档后，您应该能够在课堂上和计算机架构研究中自如地使用 gem5。此外，您应该能够修改和扩展 gem5，然后将您的改进贡献给主 gem5 仓库。
 
-This document is colored by my personal experiences with gem5 over the
-past six years as a graduate student at the University of
-Wisconsin-Madison. The examples presented are just one way to do it.
-Unlike Python, whose mantra is "There should be one-- and preferably
-only one --obvious way to do it." (from The Zen of Python. See
-[The Zen of Python](https://www.python.org/dev/peps/pep-0020/#the-zen-of-python){:target="_blank"}), in gem5 there are a number of different ways to
-accomplish the same thing. Thus, many of the examples presented in this
-book are my opinion of the best way to do things.
+本文档带有我过去六年在威斯康星大学麦迪逊分校作为研究生使用 gem5 的个人经验色彩。所提供的示例只是一种方法。不像 Python，其信条是“应该有一种——最好只有一种——显而易见的方法来做这件事。”（来自 Python 之禅。见 [Python 之禅](https://www.python.org/dev/peps/pep-0020/#the-zen-of-python){:target="_blank"}），在 gem5 中，有许多不同的方法可以完成同样的事情。因此，本书中介绍的许多示例都是我认为做事的最佳方式。
 
-One important lesson I have learned (the hard way) is when using complex
-tools like gem5, it is important to actually understand how it works
-before using it.
+我学到的一个重要教训（惨痛的教训）是，在使用像 gem5 这样复杂的工具时，在使用它之前真正了解它的工作原理非常重要。
 
-You can find the source for this book at
-<https://github.com/gem5/website/tree/stable/_pages/documentation/learning_gem5/>.
+您可以在 <https://github.com/gem5/website/tree/stable/_pages/documentation/learning_gem5/> 找到本书的源代码。
 
-## What is gem5?
+## 什么是 gem5？
 
-gem5 is a modular discrete event driven computer system simulator platform. That means that:
+gem5 是一个模块化的离散事件驱动计算机系统模拟器平台。这意味着：
 
-1. gem5's components can be rearranged, parameterized, extended or replaced easily to suit your needs.
-2. It simulates the passing of time as a series of discrete events.
-3. Its intended use is to simulate one or more computer systems in various ways.
-4. It's more than just a simulator; it's a simulator platform that lets you use as many of its premade components as you want to build up your own simulation system.
+1. gem5 的组件可以轻松地重新排列、参数化、扩展或替换，以满足您的需求。
+2. 它将时间的流逝模拟为一系列离散事件。
+3. 其预期用途是以各种方式模拟一个或多个计算机系统。
+4. 它不仅仅是一个模拟器；它是一个模拟器平台，让您可以根据需要使用尽可能多的预制组件来构建自己的模拟系统。
 
-gem5 is written primarily in C++ and python and most components are provided under a BSD style license.
-It can simulate a complete system with devices and an operating system in full system mode (FS mode), or user space only programs where system services are provided directly by the simulator in syscall emulation mode (SE mode).
-There are varying levels of support for executing Alpha, ARM, MIPS, Power, SPARC, RISC-V, and 64 bit x86 binaries on CPU models including two simple single CPI models, an out of order model, and an in order pipelined model.
-A memory system can be flexibly built out of caches and crossbars or the Ruby simulator which provides even more flexible memory system modeling.
+gem5 主要用 C++ 和 Python 编写，大多数组件都在 BSD 风格的许可证下提供。
+它可以模拟具有设备和操作系统的完整系统（全系统模式，FS 模式），或者仅模拟用户空间程序，其中系统服务由模拟器直接提供（系统调用仿真模式，SE 模式）。
+支持执行 Alpha、ARM、MIPS、Power、SPARC、RISC-V 和 64 位 x86 二进制文件，CPU 模型包括两个简单的单 CPI 模型、一个乱序模型和一个按序流水线模型。
+内存系统可以灵活地由缓存和交叉开关构建，或者使用 Ruby 模拟器，它提供了更灵活的内存系统建模。
 
-There are many components and features not mentioned here, but from just this partial list it should be obvious that gem5 is a sophisticated and capable simulation platform.
-Even with all gem5 can do today, active development continues through the support of individuals and some companies, and new features are added and existing features improved on a regular basis.
+这里还有许多组件和功能没有提到，但仅从这个部分列表就可以明显看出，gem5 是一个复杂且功能强大的模拟平台。
+即使 gem5 今天已经能做很多事情，但通过个人和一些公司的支持，积极的开发仍在继续，并且定期添加新功能并改进现有功能。
 
-## Capabilities out of the box
-gem5 is designed for use in computer architecture research, but if you're trying to research something new and novel it probably won't be able to evaluate your idea out of the box. If it could, that probably means someone has already evaluated a similar idea and published about it.
+## 开箱即用的能力
+gem5 专为计算机架构研究而设计，但如果您试图研究一些新颖的东西，它可能无法开箱即用地评估您的想法。如果它可以，那可能意味着有人已经评估了类似的想法并发表了相关文章。
 
-To get the most out of gem5, you'll most likely need to add new capabilities specific to your project's goals. gem5's modular design should help you make modifications without having to understand every part of the simulator.
+为了充分利用 gem5，您很可能需要添加特定于您项目目标的新功能。gem5 的模块化设计应该可以帮助您进行修改，而无需了解模拟器的每个部分。
 
-As you add the new features you need, please consider contributing your changes back to gem5. That way others can take advantage of your hard work, and gem5 can become an even better simulator.
+当您添加所需的新功能时，请考虑将您的更改贡献回 gem5。这样其他人就可以利用您的辛勤工作，gem5 也可以成为一个更好的模拟器。
 
-## Asking for help
-Please visit our [Ask a question](/ask-a-question) page.
+## 寻求帮助
+请访问我们的 [提问](/ask-a-question) 页面。
 
-Before reporting a problem, please read [Reporting Problems](/documentation/reporting_problems).
+在报告问题之前，请阅读 [报告问题](/documentation/reporting_problems)。

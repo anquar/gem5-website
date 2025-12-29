@@ -1,35 +1,33 @@
 ---
 layout: documentation
-title: Homework 4 for CS 752
+title: CS 752 作业 4
 doc: Learning gem5
 parent: gem5_101
 permalink: /documentation/learning_gem5/gem5_101/homework-4
 authors:
 ---
 
-# Homework 4 for CS 752: Advanced Computer Architecture I (Fall 2015 Section 1 of 1)
+# CS 752: 高级计算机体系结构 I 作业 4 (2015 年秋季 1 组)
 
 
-** Due Monday, 10/7**
+**截止日期：10/7 星期一**
 
-**You should do this assignment on your own. No late assignments.**
+**您应该独自完成此作业。不接受逾期作业。**
 
-Person of contact for this assignment: **Nilay Vaish** <nilay@cs.wisc.edu>.
+此作业的联系人：**Nilay Vaish** <nilay@cs.wisc.edu>。
 
 
-This homework is experimental in nature since I thought of this only
-yesterday (28 September, 2015).  It deals with two different methods of
-exploiting instruction level parallelism: "branch prediction" and "predication".
+本作业本质上是实验性的，因为我昨天（2015 年 9 月 28 日）才想到这个。它涉及利用指令级并行的两种不同方法：“分支预测”和“推断 (predication)”。
 
-Consider the following piece of code:
+考虑以下代码段：
 ```cpp
   if (x < y)
      x = y;
 ```
 
-There at least two ways in which we can generate the assembly code for this.
+我们至少有两种方法可以为此生成汇编代码。
 
-1. using branches:
+1. 使用分支：
 
 ```
     compare x, y
@@ -38,68 +36,42 @@ There at least two ways in which we can generate the assembly code for this.
   L:
 ```
 
-2. using conditional move:
+2. 使用条件移动：
 
 ```
   compare x, y
   conditionally move x to y.
 ```
 
-Which version should one prefer?  We will try to get some understanding of
-this question in this homework.
+应该首选哪个版本？我们将在这个作业中尝试对这个问题有一些了解。
 
 
-1. Here are some [posts](http://yarchive.net/comp/linux/cmov.html) on cmov from
-Linus Torvalds, the creator and maintainer of the Linux operating system.
-Linus has provided a short piece of C code for measuring the performance
-of branches and conditional moves.  Run the code on your x86 favorite
-processor and report the timing numbers for the two versions `choose()`
-function.  You should run each version at least 10 times.  Report both the average
-execution time and the standard deviation in the run times.
-If you see too much variation in the run times,  run for more iterations.  This
-should typically stabilize the performance.
+1. 这里有一些来自 Linux 操作系统创建者和维护者 Linus Torvalds 关于 cmov 的 [帖子](http://yarchive.net/comp/linux/cmov.html)。
+Linus 提供了一小段 C 代码来测量分支和条件移动的性能。在您最喜欢的 x86 处理器上运行代码，并报告两个版本的 `choose()` 函数的计时数字。您应该运行每个版本至少 10 次。报告平均执行时间和运行时间的标准差。
+如果您看到运行时间变化太大，请运行更多迭代。这通常应该能稳定性能。
 
 
-2. Now simulate the same two versions with gem5 using the out-of-order
-(default configuration) processor.  Lower the number of iterations to
-1,000,000 since 100,000,000 is lot of iterations for gem5.  Again report
-which option performs the best.  Also report the total number of
-branches predicted and the number of branches predicted incorrectly.
+2. 现在使用 gem5 模拟相同的两个版本，使用乱序（默认配置）处理器。将迭代次数降低到 1,000,000，因为 100,000,000 对于 gem5 来说是很多迭代。再次报告哪个选项表现最好。还要报告预测的分支总数和预测错误的分支数。
 
 ----
 
-3. A paper on [branch avoiding algorithms](http://dl.acm.org/citation.cfm?id=2755580)
-was published at SPAA 2015.  The authors suggest that graph algorithms that avoid branches
-may perform better than algorithms that use branches.  Let's try to verify this claim.
+3. SPAA 2015 发表了一篇关于 [避免分支算法](http://dl.acm.org/citation.cfm?id=2755580) 的论文。作者建议避免分支的图算法可能比使用分支的算法性能更好。让我们尝试验证这一说法。
 
-The paper provides two versions of an algorithm for computing the
-connected components in an undirected graph.  The first version uses
-branching and the second one uses conditional moves.  I implemented
-both the versions, but there is a slight problem.  The first version can
-be implemented in C++ directly, but the second one requires use of CMOV
-instruction.  I was not able to get this instruction working with inline
-assembly, but with raw assembly things work.  So along with the [C++1 source code](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/connected-components.cpp), I am providing you the GCC generated-[assembly code](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/connected-components.s) and the [statically compiled executable](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/connected-components).  Note that
-you would not be able to generate exactly the same assembly code and the executable
-by compiling the C++11 source.  This is because I modified the generated assembly
-code to get cmov working.  I am also providing three graphs [small](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/small.graph), [medium](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/medium.graph) and [large](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/large.graph.gz) that you will use for your experiments.  Read the C++ source to understand how to supply
-options to the executable.
+该论文提供了两种版本的计算无向图中连通分量的算法。第一个版本使用分支，第二个版本使用条件移动。我实现了这两个版本，但是有一个小问题。第一个版本可以直接在 C++ 中实现，但是第二个版本需要使用 CMOV 指令。我无法使用内联汇编使该指令工作，但是使用原始汇编可以工作。因此，除了 [C++11 源代码](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/connected-components.cpp) 之外，我还为您提供了 GCC 生成的 [汇编代码](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/connected-components.s) 和 [静态编译的可执行文件](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/connected-components)。注意
+您将无法通过编译 C++11 源代码生成完全相同的汇编代码和可执行文件。这是因为我修改了生成的汇编代码以使 cmov 工作。我还提供了三个图 [small](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/small.graph)、[medium](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/medium.graph) 和 [large](http://pages.cs.wisc.edu/~david/courses/cs752/Fall2015/html/hw4/large.graph.gz)，您将用于实验。阅读 C++ 源代码以了解如何向可执行文件提供选项。
 
-a. Run both the versions (with branches and with cmov) on an x86 processor and report
-the run time performance for the provided input files.  Do this exercise only for large graph.
-Provide data as asked in part 1.
+a. 在 x86 处理器上运行这两个版本（带分支和带 cmov），并报告提供的输入文件的运行时间性能。仅对大型图进行此练习。
+提供第 1 部分中要求的数据。
 
-b. Run both the versions with gem5, report the performance of the two
-versions for the annotated portion of the code, the number of predicted
-branches, % of incorrectly predicted branches.  You need to do this only for small and medium graphs, not for the large one.
-Provide data asked in part 2 again.
+b. 使用 gem5 运行这两个版本，报告代码注释部分的两个版本的性能、预测的分支数、预测错误的分支百分比。您只需要对小型和中型图执行此操作，不需要对大型图执行此操作。
+再次提供第 2 部分中要求的数据。
 
-## What to Hand In
-Turn in your assignment by sending an email message to Nilay Vaish <nilay@cs.wisc.edu>
-and Prof. David Wood <david@cs.wisc.edu> with the subject line:"
-[CS752 Homework4]"
+## 提交内容
+通过发送电子邮件给 Nilay Vaish <nilay@cs.wisc.edu> 和 David Wood 教授 <david@cs.wisc.edu> 提交您的作业，主题行：
+"[CS752 Homework4]"
 
-**Please turn in your homework in the form of a PDF file.**
+**请以 PDF 文件形式提交您的作业。**
 
-* Answers for questions in step 1
-* Answers for questions in step 2
-* Answers for questions in step 3
+* 第 1 步问题的答案
+* 第 2 步问题的答案
+* 第 3 步问题的答案

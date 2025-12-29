@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Debugging SLICC Protocols
+title: 调试 SLICC 协议
 doc: Learning gem5
 parent: part3
 permalink: /documentation/learning_gem5/part3/MSIdebugging/
@@ -9,97 +9,40 @@ author: Jason Lowe-Power
 
 
 
-In this section, I present the steps that I took while debugging the MSI
-protocol implemented earlier in this chapter. Learning to debug
-coherence protocols is a challenge. The best way is by working with
-others who have written SLICC protocols in the past. However, since you,
-the reader, cannot look over my shoulder while I am debugging a
-protocol, I am trying to present the next-best thing.
+在本节中，我将介绍我在调试本章前面实现的 MSI 协议时采取的步骤。学习调试一致性协议是一项挑战。最好的方法是与过去编写过 SLICC 协议的其他人一起工作。但是，由于您（读者）无法在我调试协议时看着我，所以我试图展示第二好的东西。
 
-Here, I first present some high-level suggestions to tackling protocol
-errors. Next, I discuss some details about deadlocks, and how to
-understand protocol traces that can be used to fix them. Then, I present
-my experience debugging the MSI protocol in this chapter in a
-stream-of-consciousness style. I will show the error that was generated,
-then the solution to the error, sometimes with some commentary of the
-different tactics I tried to solve the error.
+在这里，我首先提出一些解决协议错误的高级建议。接下来，我讨论有关死锁的一些细节，以及如何理解可用于修复它们的协议跟踪。然后，我以意识流的风格介绍我在本章中调试 MSI 协议的经历。我将显示生成的错误，然后是错误的解决方案，有时还会附带一些对此尝试解决错误的各种策略的评论。
 
-## General debugging tips
+## 一般调试技巧
 
-Ruby has many useful debug flags. However, the most useful, by far, is
-`ProtocolTrace`. Below, you will see several examples of using the
-protocol trace to debug a protocol. The protocol trace prints every
-transition for all controllers. Thus, you can simply trace the entire
-execution of the cache system.
+Ruby 有许多有用的调试标志。但是，到目前为止最有用的一个是 `ProtocolTrace`。下面，您将看到几个使用协议跟踪来调试协议的示例。协议跟踪打印所有控制器的每个转换。因此，您可以简单地跟踪缓存系统的整个执行过程。
 
-Other useful debug flags include:
+其他有用的调试标志包括：
 
 RubyGenerated
-:   Prints a bunch of stuff from the ruby generated code.
+:   打印一堆来自 ruby 生成代码的东西。
 
 RubyPort/RubySequencer
-:   See the details of sending/receiving messages into/out of ruby.
+:   查看向 ruby 发送/接收消息的详细信息。
 
 RubyNetwork
-:   Prints entire network messages including the sender/receiver and the
-    data within the message for all messages. This flag is useful when
-    there is a data mismatch.
+:   打印整个网络消息，包括所有消息的发送者/接收者和消息内的数据。当出现数据不匹配时，此标志很有用。
 
-The first step to debugging a Ruby protocol is to run it with the Ruby
-random tester. The random tester issues semi-random requests into the
-Ruby system and checks to make sure the returned data is correct. To
-make debugging faster, the random tester issues read requests from one
-controller for a block and a write request for the same cache block (but
-a different byte) from a different controller. Thus, the Ruby random
-tester does a good job exercising the transient states and race
-conditions in the protocol.
+调试 Ruby 协议的第一步是使用 Ruby 随机测试器运行它。随机测试器向 Ruby 系统发出半随机请求，并检查返回的数据是否正确。为了加快调试速度，随机测试器从一个控制器发出对一个块的读取请求，并从另一个控制器发出对同一缓存块（但不同字节）的写入请求。因此，Ruby 随机测试器很好地运用了协议中的瞬态和竞争条件。
 
-Unfortunately, the random tester's configuration is slightly different
-than when using normal CPUs. Thus, we need to use a different
-`MyCacheSystem` than before. You can download this different cache
-system file
-[here](/_pages/static/scripts/part3/configs/test_caches.py) and you
-can download the modified run script
-[here](/_pages/static/scripts/part3/configs/ruby_test.py). The test
-run script is mostly the same as the simple run script, but creates the
-`RubyRandomTester` instead of CPUs.
+不幸的是，随机测试器的配置与使用普通 CPU 时略有不同。因此，我们需要使用与以前不同的 `MyCacheSystem`。您可以下载此不同的缓存系统文件
+[这里](/_pages/static/scripts/part3/configs/test_caches.py)，您可以下载修改后的运行脚本
+[这里](/_pages/static/scripts/part3/configs/ruby_test.py)。测试运行脚本与简单的运行脚本大致相同，但创建的是 `RubyRandomTester` 而不是 CPU。
 
-It is often a good idea to first run the random tester with a single
-"CPU". Then, increase the number of loads from the default of 100 to
-something that takes a few minutes to execute on your host system. Next,
-if there are no errors, then increase the number of "CPUs" to two and
-reduce the number of loads to 100 again. Then, start increasing the
-number of loads. Finally, you can increase the number of CPUs to
-something reasonable for the system you are trying to simulate. If you
-can run the random tester for 10-15 minutes, you can be slightly
-confident that the random tester isn't going to find any other bugs.
+通常最好先使用单个“CPU”运行随机测试器。然后，将加载数从默认的 100 增加到在您的主机系统上执行几分钟的数量。接下来，如果没有错误，则将“CPU”的数量增加到两个，并再次将加载数减少到 100。然后，开始增加加载数。最后，您可以将 CPU 数量增加到对于您尝试模拟的系统来说合理的数量。如果您可以运行随机测试器 10-15 分钟，您可以稍微确信随机测试器不会发现任何其他错误。
 
-Once you have your protocol working with the random tester, you can move
-on to using real applications. It is likely that real applications will
-expose even more bugs in the protocol. If at all possible, it is much
-easier to debug your protocol with the random tester than with real
-applications!
+一旦您的协议与随机测试器一起工作，您就可以继续使用实际应用程序。实际应用程序可能会暴露协议中更多的错误。如果可能的话，使用随机测试器调试协议比使用实际应用程序容易得多！
 
-## Understanding Protocol Traces
+## 理解协议跟踪
 
-Unfortunately, despite extensive effort to catch bugs in them, coherence
-protocols (even heavily tested ones) will have bugs. Sometimes these
-bugs are relatively simple fixes, while other times the bugs will be
-very insidious and difficult to track down. In the worst case, the bugs
-will manifest themselves as deadlocks: bugs that literally prevent the
-application from making progress. Another similar problem is livelocks:
-where the program runs forever due to a cycle somewhere in the system.
-Whenever livelocks or deadlocks occur, the next thing to do is generate
-a protocol trace. Traces print a running list of every transition that
-is happening in the memory system: memory requests starting and
-completing, L1 and directory transitions, etc. You can then use these
-traces to identify why the deadlock is occurring. However, as we will
-discuss in more detail below, debugging deadlocks in protocol traces is
-often extremely challenging.
+不幸的是，尽管为了捕获其中的错误付出了巨大的努力，一致性协议（甚至是经过严格测试的协议）也会有错误。有时这些错误是相对简单的修复，而有时这些错误会非常隐蔽且难以追踪。在最坏的情况下，错误将表现为死锁：从字面上阻止应用程序取得进展的错误。另一个类似的问题是活锁：由于系统某处的循环，程序永远运行。每当发生活锁或死锁时，接下来要做的是生成协议跟踪。跟踪打印内存系统中发生的每个转换的运行列表：内存请求开始和完成，L1 和目录转换等。然后，您可以使用这些跟踪来识别发生死锁的原因。但是，正如我们将在下面更详细地讨论的那样，调试协议跟踪中的死锁通常极具挑战性。
 
-Here, we discuss what appears in the protocol trace to help explain what
-is happening. To start with, lets look at a small snippet of a protocol
-trace (we will discuss the details of this trace further below):
+在这里，我们讨论协议跟踪中出现的内容，以帮助解释正在发生的事情。首先，让我们看一小段协议跟踪（我们将在下面进一步讨论此跟踪的细节）：
 
 ```protocoltrace
     ...
@@ -117,116 +60,60 @@ trace (we will discuss the details of this trace further below):
     5327   0  Directory                GetM      S>M_M    [0x4ac0, line 0x4ac0]
 ```
 
-Every line in this trace has a set pattern in terms of what information
-appears on that line. Specifically, the fields are:
+此跟踪中的每一行都有关于该行显示什么信息的固定模式。具体来说，字段是：
 
-1. Current Tick: the tick the print is occurs in
-2. Machine Version: The number of the machine where this request is
-   coming from. For example, if there are 4 L1 caches, then the numbers
-   would be 0-3. Assuming you have 1 L1 Cache per core, you can think
-   of this as representing the core the request is coming from.
-3. Component: which part of the system is doing the print. Generally,
-   `Seq` is shorthand for Sequencer, `L1Cache` represents the L1 Cache,
-   "Directory" represents the directory, and so on. For L1 caches and
-   the directory, this represents the name of the machine type (i.e.,
-   what is after "MachineType:" in the `machine()` definition).
-4. Action: what the component is doing. For example, "Begin" means the
-   Sequencer has received a new request, "Done" means that the
-   Sequencer is completing a previous request, and "DataDirNoAcks"
-   means that our DataDirNoAcks event is being triggered.
-5. Transition (e.g., MI\_A\>MI\_A): what state transition this action
-   is doing (format: "currentState\>nextState"). If no transition is
-   happening, this is denoted with "\>".
-6. Address (e.g., [0x4ac0, line 0x4ac0]): the physical address of the
-   request (format: [wordAddress, lineAddress]). This address will
-   always be cache-block aligned except for requests from the
-   `Sequencer` and `mandatoryQueue`.
-7. (Optional) Comments: optionally, there is one additional field to
-   pass comments. For example, the "LD" , "ST", and "33 cycles" lines
-   use this extra field to pass additional information to the trace --
-   such as identifying the request as a load or store. For SLICC
-   transitions, `APPEND_TRANSITION_COMMENT` often use this, as we
-   [discussed previously](../cache-actions/).
+1. 当前 Tick：打印发生的 tick
+2. 机器版本：此请求来自的机器编号。例如，如果有 4 个 L1 缓存，则数字将是 0-3。假设每个核心有 1 个 L1 缓存，您可以将其视为代表请求来自的核心。
+3. 组件：系统的哪个部分正在进行打印。通常，`Seq` 是 Sequencer 的简写，`L1Cache` 代表 L1 缓存，“Directory”代表目录，依此类推。对于 L1 缓存和目录，这代表机器类型的名称（即 `machine()` 定义中“MachineType:”之后的内容）。
+4. 动作：组件正在做什么。例如，“Begin”表示 Sequencer 收到了新请求，“Done”表示 Sequencer 正在完成之前的请求，“DataDirNoAcks”表示我们的 DataDirNoAcks 事件正在被触发。
+5. 转换（例如，MI\_A\>MI\_A）：此动作正在进行什么状态转换（格式："currentState\>nextState"）。如果没有发生转换，则用 "\>" 表示。
+6. 地址（例如，[0x4ac0, line 0x4ac0]）：请求的物理地址（格式：[wordAddress, lineAddress]）。此地址将始终与缓存块对齐，来自 `Sequencer` 和 `mandatoryQueue` 的请求除外。
+7. （可选）注释：可选地，还有一个额外的字段用于传递注释。例如，“LD”、“ST”和“33 cycles”行使用此额外字段向跟踪传递附加信息——例如将请求标识为加载或存储。对于 SLICC 转换，`APPEND_TRANSITION_COMMENT` 通常使用此字段，正如我们 [之前讨论的](../cache-actions/)。
 
-Generally, spaces are used to separate each of these fields (the space
-between the fields are added implicitly, you do not need to add them).
-However, sometimes if a field is very long, there may be no spaces or
-the line may be shifted compared to other lines.
+通常，使用空格分隔每个字段（字段之间的空格是隐式添加的，您不需要添加它们）。但是，有时如果字段很长，可能会没有空格，或者该行可能与其他行相比发生偏移。
 
-Using this information, let's analyze the above snippet. The first
-(tick) field tells us that this trace snippet is showing what was
-happening in the memory system between ticks 4541 and 5327. In this
-snippet, all of the requests are coming from L1Cache-0 (core 0) and
-going to Directory-0 (the first bank of the directory). During this
-time, we see several memory requests and state transitions for the cache
-line 0x4ac0, both at the L1 caches and the directory. For example, in
-tick 5322, the core executes a store to 0x4ac0. However, it currently
-does not have that line in Modified in its cache (it is in Shared after
-the core loaded it from ticks 4641-4674), so it needs to request
-ownership for that line from the directory (which receives this request
-in tick 5327). While waiting for ownership, L1Cache-0 transitions from S
-(Shared) to SM\_AD (a transient state -- was in S, going to M, waiting
-for Ack and Data).
+利用这些信息，让我们分析上面的片段。第一个（tick）字段告诉我们，此跟踪片段显示了在 tick 4541 和 5327 之间内存系统中发生的事情。在这个片段中，所有的请求都来自 L1Cache-0（核心 0）并去往 Directory-0（目录的第一个 bank）。在此期间，我们看到针对缓存行 0x4ac0 的几个内存请求和状态转换，都在 L1 缓存和目录处。例如，在 tick 5322，核心对 0x4ac0 执行存储。但是，目前它的缓存中没有处于 Modified 状态的该行（在核心从 tick 4641-4674 加载它之后，它处于 Shared 状态），因此它需要向目录请求该行的所有权（目录在 tick 5327 收到此请求）。在等待所有权期间，L1Cache-0 从 S (Shared) 转换到 SM\_AD（瞬态——曾处于 S，去往 M，等待 Ack 和 Data）。
 
-To add a print to the protocol trace, you will need to add a print with
-these fields with the ProtocolTrace flag. For example, if you look at
-`src/mem/ruby/system/Sequencer.cc`, you can see where the
-`Seq               Begin` and `Seq                Done` trace prints
-come from (search for ProtocolTrace).
+要向协议跟踪添加打印，您需要使用 ProtocolTrace 标志添加带有这些字段的打印。例如，如果您查看 `src/mem/ruby/system/Sequencer.cc`，您可以看到 `Seq               Begin` 和 `Seq                Done` 跟踪打印来自何处（搜索 ProtocolTrace）。
 
-## Errors I ran into debugging MSI
+## 我在调试 MSI 时遇到的错误
 
 ```termout
     gem5.opt: build/MSI/mem/ruby/system/Sequencer.cc:423: void Sequencer::readCallback(Addr, DataBlock&, bool, MachineType, Cycles, Cycles, Cycles): Assertion `m_readRequestTable.count(makeLineAddress(address))' failed.
 ```
 
-I'm made a silly mistake. It was that I called readCallback in externalStoreHit
-instead of writeCallback. It's good to start simple!
+我犯了一个愚蠢的错误。那就是我在 externalStoreHit 中调用了 readCallback 而不是 writeCallback。从简单的开始很好！
 
 ```termout
     gem5.opt: build/MSI/mem/ruby/network/MessageBuffer.cc:220: Tick MessageBuffer::dequeue(Tick, bool): Assertion `isReady(current_time)' failed.
 ```
 
-I ran gem5 in GDB to get more information. Look at
-L1Cache\_Controller::doTransitionWorker. The current transition is:
+我在 GDB 中运行 gem5 以获取更多信息。查看
+L1Cache\_Controller::doTransitionWorker。当前转换为：
 event=L1Cache\_Event\_PutAck, state=L1Cache\_State\_MI\_A,
-<next_state=@0x7fffffffd0a0>: L1Cache\_State\_FIRST This is more simply
-MI\_A-\>I on a PutAck See it's in popResponseQueue.
+<next_state=@0x7fffffffd0a0>: L1Cache\_State\_FIRST 简而言之就是 PutAck 上的 MI\_A-\>I。看到它在 popResponseQueue 中。
 
-The problem is that the PutAck is on the forward network, not the
-response network.
+问题是 PutAck 在转发网络上，而不是响应网络上。
 
 ```termout
     panic: Invalid transition
     system.caches.controllers0 time: 3594 addr: 3264 event: DataDirAcks state: IS_D
 ```
 
-Hmm. I think this shouldn't have happened. The needed acks should always
-be 0 or you get data from the owner. Ah. So I implemented sendDataToReq
-at the directory to always send the number of sharers. If we get this
-response in IS\_D we don't care whether or not there are sharers. Thus,
-to make things more simple, I'm just going to transition to S on
-DataDirAcks. This is a slight difference from the original
-implementation in Sorin et al.
+嗯。我认为这不应该发生。所需的 acks 应该始终为 0，或者您从所有者那里获取数据。啊。所以我实现了 sendDataToReq 在目录处始终发送共享者数量。如果我们在 IS\_D 中收到此响应，我们不在乎是否有共享者。因此，为了使事情更简单，我将在 DataDirAcks 上转换到 S。这与 Sorin 等人的原始实现略有不同。
 
-Well, actually, I think it's that we send the request after we add
-ourselves to the sharer list. The above is *incorrect*. Sorin et al.
-were not wrong! Let's try not doing that!
+嗯，实际上，我认为这是我们在将自己添加到共享者列表之后发送请求。上面的说法是 *不正确* 的。Sorin 等人没有错！让我们试着不要那样做！
 
-So, I fixed this by checking to see if the requestor is the *owner*
-before sending the data to the requestor at the directory. Only if the
-requestor is the owner do we include the number of sharers. Otherwise,
-it doesn't matter at all and we just set the sharers to 0.
+所以，我通过在目录处向请求者发送数据之前检查请求者是否为 *所有者* 来解决了这个问题。只有当请求者是所有者时，我们才包括共享者的数量。否则，这根本无关紧要，我们只需将共享者设置为 0。
 
 ```termout
     panic: Invalid transition system.caches.controllers0 time: 5332
     addr: 0x4ac0 event: Inv state: SM\_AD
 ```
 
-First, let's look at where Inv is triggered. If you get an invalidate...
-only then. Maybe it's that we are on the sharer list and shouldn't be?
+首先，让我们看看在哪里触发 Inv。如果您收到一个 invalidate... 只有那样。也许我们在共享者列表中而不应该在？
 
-We can use protocol trace and grep to find what's going on.
+我们可以使用协议跟踪和 grep 来查找发生了什么。
 
 ```sh
 build/MSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part6/ruby_test.py | grep 0x4ac0
@@ -248,8 +135,7 @@ build/MSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part6/ruby_
     5327   0  Directory                GetM      S>M_M    [0x4ac0, line 0x4ac0]
 ```
 
-Maybe there is a sharer in the sharers list when there shouldn't be? We
-can add a defensive assert in clearOwner and setOwner.
+也许当不应该有共享者时，共享者列表中有一个共享者？我们可以在 clearOwner 和 setOwner 中添加防御性 assert。
 
 ```cpp
 action(setOwner, "sO", desc="Set the owner") {
@@ -265,40 +151,27 @@ action(clearOwner, "cO", desc="Clear the owner") {
 }
 ```
 
-Now, I get the following error:
+现在，我得到以下错误：
 
 ```termout
     panic: Runtime Error at MSI-dir.sm:301: assert failure.
 ```
 
-This is in setOwner. Well, actually this is OK since we need to have the
-sharers still set until we count them to send the ack count to the
-requestor. Let's remove that assert and see what happens. Nothing. That
-didn't help anything.
+这是在 setOwner 中。嗯，实际上这没问题，因为我们需要仍然设置共享者，直到我们计算它们以向请求者发送 ack 计数。让我们删除该 assert 看看会发生什么。什么也没有。那并没有帮助。
 
-When are invalidations sent from the directory? Only on S-\>M\_M. So,
-here, we need to remove ourselves from the invalidation list. I think we
-need to keep ourselves in the sharer list since we subtract one when
-sending the number of acks.
+目录何时发送 invalidations？仅在 S-\>M\_M 上。所以，在这里，我们需要将自己从 invalidation 列表中删除。我想我们需要将自己保留在共享者列表中，因为我们在发送 ack 数量时减去了一个。
 
-Note: I'm coming back to this a little later. It turns out that both of
-these asserts are wrong. I found this out when running with more than
-one CPU below. The sharers are set before clearing the Owner in M-\>S\_D
-on a GetS.
+注意：我稍后再回来讨论这个问题。事实证明，这两个 assert 都是错误的。我在下面使用多个 CPU 运行时发现了这一点。在 M-\>S\_D 上进行 GetS 时，在清除 Owner 之前设置了共享者。
 
-So, onto the next problem!
+所以，到下一个问题！
 
 ```termout
     panic: Deadlock detected: current_time: 56091 last_progress_time: 6090 difference:  50001 processor: 0
 ```
 
-Deadlocks are the worst kind of error. Whatever caused the deadlock is
-ancient history (i.e., likely happened many cycles earlier), and often
-very hard to track down.
+死锁是最糟糕的错误类型。导致死锁的任何原因都是古代历史（即可能发生在许多周期之前），通常很难追踪。
 
-Looking at the tail of the protocol trace (note: sometimes you must put
-the protocol trace into a file because it grows *very* big) I see that
-there is an address that is trying to be replaced. Let's start there.
+查看协议跟踪的尾部（注意：有时您必须将协议跟踪放入文件中，因为它增长得 *非常* 大），我看到有一个地址正试图被替换。让我们从这里开始。
 
 ```protocoltrace
     56091   0    L1Cache         Replacement   SM_A>SM_A   [0x5ac0, line 0x5ac0]
@@ -313,8 +186,7 @@ there is an address that is trying to be replaced. Let's start there.
     56091   0    L1Cache         Replacement   SM_A>SM_A   [0x5ac0, line 0x5ac0]
 ```
 
-Before this replacement got stuck I see the following in the protocol
-trace. Note: this is 50000 cycles in the past!
+在这个替换卡住之前，我在协议跟踪中看到以下内容。注意：这是在 50000 个周期以前！
 
 ```protocoltrace
     ...
@@ -326,21 +198,13 @@ trace. Note: this is 50000 cycles in the past!
     5646   0    L1Cache         DataDirAcks  SM_AD>SM_A   [0x5ac0, line 0x5ac0]
 ```
 
-Ah! This clearly should not be DataDirAcks since we only have a single
-CPU! So, we seem to not be subtracting properly. Going back to the
-previous error, I was wrong about needing to keep ourselves in the list.
-I forgot that we no longer had the -1 thing. So, let's remove ourselves
-from the sharing list before sending the invalidations when we
-originally get the S-\>M request.
+啊！这显然不应该是 DataDirAcks，因为我们只有一个 CPU！所以，我们似乎没有正确减法。回到上一个错误，关于需要将自己保留在列表中，我错了。我忘了我们不再有 -1 的东西了。所以，让我们在最初获得 S-\>M 请求时发送 invalidations 之前将自己从共享列表中删除。
 
-So! With those changes the Ruby tester completes with a single core.
-Now, to make it harder we need to increase the number of loads we do and
-then the number of cores.
+所以！通过这些更改，Ruby 测试器可以用单个核心完成。现在，为了增加难度，我们需要增加加载数，然后增加核心数。
 
-And, of course, when I increase it to 10,000 loads there is a deadlock.
-Fun!
+当然，当我将其增加到 10,000 个加载时，出现了死锁。有趣！
 
-What I'm seeing at the end of the protocol trace is the following.
+我在协议跟踪的末尾看到以下内容。
 
 ```protocoltrace
     144684   0    L1Cache         Replacement   MI_A>MI_A   [0x5bc0, line 0x5bc0]
@@ -357,21 +221,13 @@ What I'm seeing at the end of the protocol trace is the following.
     ...
 ```
 
-This is repeated for a long time.
+这重复了很长时间。
 
-It seems that there is a circular dependence or something like that
-causing this deadlock.
+似乎存在循环依赖或类似的东西导致此死锁。
 
-Well, it seems that I was correct. The order of the in\_ports really
-matters! In the directory, I previously had the order: request,
-response, memory. However, there was a memory packet that was blocked
-because the request queue was blocked, which caused the circular
-dependence and the deadlock. The order *should* be memory, response, and
-request. I believe the memory/response order doesn't matter since no
-responses depend on memory and vice versa.
+嗯，看来我是对的。in\_ports 的顺序真的很重要！在目录中，我之前的顺序是：request, response, memory。但是，有一个内存数据包被阻塞，因为请求队列被阻塞，这导致了循环依赖和死锁。顺序 *应该* 是 memory, response 和 request。我相信 memory/response 的顺序无关紧要，因为没有响应依赖于内存，反之亦然。
 
-Now, let's try with two CPUs. First thing I run into is an assert
-failure. I'm seeing the first assert in setState fail.
+现在，让我们尝试两个 CPU。我遇到的第一件事是 assert 失败。我看到 setState 中的第一个 assert 失败了。
 
 ```cpp
 void setState(Addr addr, State state) {
@@ -389,17 +245,13 @@ void setState(Addr addr, State state) {
 }
 ```
 
-To track this problem down, let's add a debug statement (DPRINTF) and
-run with protocol trace. First I added the following line just before
-the assert. Note that you are required to use the RubySlicc debug flag.
-This is the only debug flag included in the generated SLICC files.
+为了追踪此问题，让我们添加一个调试语句 (DPRINTF) 并使用协议跟踪运行。首先，我在 assert 之前添加了以下行。请注意，您必须使用 RubySlicc 调试标志。这是生成的 SLICC 文件中包含的唯一调试标志。
 
 ```cpp
 DPRINTF(RubySlicc, "Owner %s\n", getDirectoryEntry(addr).Owner);
 ```
 
-Then, I see the following output when running with ProtocolTrace and
-RubySlicc.
+然后，在使用 ProtocolTrace 和 RubySlicc 运行时，我看到以下输出。
 
 ```gem5trace
     118   0  Directory             MemData    M_M>M      [0x400, line 0x400]
@@ -408,70 +260,42 @@ RubySlicc.
     118: system.caches.controllers2: MSI-dir.sm:160: Owner [NetDest (16) 1 1  -  -  - 0  -  -  -  -  -  -  -  -  -  -  -  -  - ]
 ```
 
-It looks like when we process the GetM when in state M we need to first
-clear the owner before adding the new owner. The other options is in
-setOwner we could have Set the Owner specifically instead of adding it
-to the NetDest.
+看起来当我们在状态 M 处理 GetM 时，我们需要先清除所有者，然后再添加新所有者。另一个选项是在 setOwner 中我们可以专门设置 Owner 而不是将其添加到 NetDest。
 
-Oooo! This is a new error!
+噢！这是一个新错误！
 
 ```termout
     panic: Runtime Error at MSI-dir.sm:229: Unexpected message type..
 ```
 
-What is this message that fails? Let's use the RubyNetwork debug flag to
-try to track down what message is causing this error. A few lines above
-the error I see the following message whose destination is the
-directory.
+这个失败的消息是什么？让我们使用 RubyNetwork 调试标志来试图追踪导致此错误的消息。在错误上方的几行，我看到以下消息，其目的地是目录。
 
-The destination is a NetDest which is a bitvector of MachineIDs. These
-are split into multiple sections. I know I'm running with two CPUs, so
-the first two 0's are for the CPUs, and the other 1 must be fore the
-directory.
+目的地是一个 NetDest，它是 MachineID 的位向量。这些被分成多个部分。我知道我是用两个 CPU 运行的，所以前两个 0 是给 CPU 的，另一个 1 必须是给目录的。
 
 ```gem5trace
-    2285: PerfectSwitch-2: Message: [ResponseMsg: addr = [0x8c0, line 0x8c0] Type = InvAck Sender = L1Cache-1 Destination = [NetDest (16) 0 0  -  -  - 1  -  -  -  -  -  -  -  -  -  -  -  -  - ] DataBlk = [ 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0xb1 0xb2 0xb3 0xb4 0xca 0xcb 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 ] MessageSize = Control Acks = 0 ]
+    2285: PerfectSwitch-2: Message: [ResponseMsg: addr = [0x8c0, line 0x8c0] Type = InvAck Sender = L1Cache-1 Destination = [NetDest (16) 0 0  -  -  - 1  -  -  -  -  -  -  -  -  -  -  -  -  - ] DataBlk = [ 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0xb1 0xb2 0xb3 0xb4 0xca 0xcb 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 ] MessageSize = Control Acks = 0 ]
 ```
 
-This message has the type InvAck, which is clearly wrong! It seems that
-we are setting the requestor wrong when we send the invalidate (Inv)
-message to the L1 caches from the directory.
+此消息的类型是 InvAck，这显然是错误的！看起来当我们从目录向 L1 缓存发送 invalidate (Inv) 消息时，我们设置请求者错误了。
 
-Yes. This is the problem. We need to make the requestor the original
-requestor. This was already correct for the FwdGetS/M, but I missed the
-invalidate somehow. On to the next error!
+是的。这就是问题所在。我们需要将请求者设为原始请求者。对于 FwdGetS/M 这已经是正确的，但我不知何故错过了 invalidate。下一个错误！
 
 ```termout
     panic: Invalid transition
     system.caches.controllers0 time: 2287 addr: 0x8c0 event: LastInvAck state: SM_AD
 ```
 
-This seems to be that I am not counting the acks correctly. It could
-also be that the directory is much slower than the other caches at
-responding since it has to get the data from memory.
+这似乎是我没有正确计算 acks。这也可能是因为目录响应比其他缓存慢得多，因为它必须从内存中获取数据。
 
-If it's the latter (which I should be sure to verify), what we could do
-is include an ack requirement for the directory, too. Then, when the
-directory sends the data (and the owner, too) decrement the needed acks
-and trigger the event based on the new ack count.
+如果是后者（我应该确信验证这一点），我们可以做的是为目录也包括一个 ack 要求。然后，当目录发送数据（以及所有者）时，减少所需的 acks 并根据新的 ack 计数触发事件。
 
-Actually, that first hypothesis was not quite right. I printed out the
-number of acks whenever we receive an InvAck and what's happening is
-that the other cache is responding with an InvAck before the directory
-has told it how many acks to expect.
+实际上，第一个假设并不完全正确。我在收到 InvAck 时打印出了 acks 的数量，发生的事情是，在目录告诉它预期多少个 acks 之前，另一个缓存就用 InvAck 响应了。
 
-So, what we need to do is something like what I was talking about above.
-First of all, we will need to let the acks drop below 0 and add the
-total acks to it from the directory message. Then, we are going to have
-to complicate the logic for triggering last ack, etc.
+所以，我们需要做一些类似于我在上面谈论的事情。首先，我们需要让 acks 降至 0 以下，并从中添加来自目录消息的总 acks。然后，我们将不得不使触发最后一个 ack 等的逻辑复杂化。
 
-Ok. So now we're letting the tbe.Acks drop below 0 and then adding the
-directory acks whenever they show up.
+好的。所以现在我们让 tbe.Acks 降至 0 以下，然后在目录 acks 出现时添加它们。
 
-Next error: This is a tough one. The error is now that the data doesn't
-match as it should. Kind of like the deadlock, the data could have been
-corrupted in the ancient past. I believe the address is the last one in
-the protocol trace.
+下一个错误：这是一个棘手的问题。现在的错误是数据不匹配。有点像死锁，数据可能在古代就被破坏了。我相信地址是协议跟踪中的最后一个。
 
 ```termout
     panic: Action/check failure: proc: 0 address: 19688 data: 0x779e6d0
@@ -480,10 +304,7 @@ the protocol trace.
     5843
 ```
 
-So, it could be something to do with ack counts, though I don't think
-this is the issue. Either way, it's a good idea to annotate the protocol
-trace with the ack information. To do this, we can add comments to the
-transition with APPEND\_TRANSITION\_COMMENT.
+所以，这可能与 ack 计数有关，虽然我不认为是这个问题。无论哪种方式，用 ack 信息注释协议跟踪是一个好主意。为此，我们可以使用 APPEND\_TRANSITION\_COMMENT 向转换添加注释。
 
 ```cpp
 action(decrAcks, "da", desc="Decrement the number of acks") {
@@ -498,12 +319,7 @@ action(decrAcks, "da", desc="Decrement the number of acks") {
     5737   1    L1Cache              InvAck  SM_AD>SM_AD  [0x400, line 0x400] Acks: -1
 ```
 
-For these data issues, the debug flag RubyNetwork is useful because it
-prints the value of the data blocks at every point it is in the network.
-For instance, for the address in question above, it looks like the data
-block is all 0's after loading from main-memory. I believe this should
-have valid data. In fact, if we go back in time some we see that there
-was some non-zero elements.
+对于这些数据问题，调试标志 RubyNetwork 很有用，因为它打印数据块在网络中每个点的值。例如，对于上面有问题的地址，看起来从主内存加载后数据块全为 0。我相信这应该有有效数据。事实上，如果我们回溯一段时间，我们会看到有一些非零元素。
 
 ```protocoltrace
     5382   1    L1Cache                 Inv      S>I      [0x4cc0, line 0x4cc0]
@@ -513,8 +329,8 @@ was some non-zero elements.
     5383: PerfectSwitch-1: Message: [ResponseMsg: addr = [0x4cc0, line
     0x4cc0] Type = InvAck Sender = L1Cache-1 Destination = [NetDest (16) 1
     0 - - - 0 - - - - - - - - - - - - - ] DataBlk = [ 0x0 0x0 0x0 0x0 0x0
-    0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
-    0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
+    0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
+    0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
     0x0 0x35 0x36 0x37 0x61 0x6d 0x6e 0x6f 0x70 0x0 0x0 0x0 0x0 0x0 0x0
     0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 ] MessageSize = Control Acks =
     0 ] ... ... ... 5389 0 Directory MemData M\_M\    >M [0x4cc0, line 0x4cc0]
@@ -522,26 +338,17 @@ was some non-zero elements.
     [ResponseMsg: addr = [0x4cc0, line 0x4cc0] Type = Data Sender =
     Directory-0 Destination = [NetDest (16) 1 0 - - - 0 - - - - - - - - -
     - - - - ] DataBlk = [ 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
-    0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
-    0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
-    0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
+    0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
+    0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
+    0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0
     0x0 ] MessageSize = Data Acks = 1 ]
 ```
 
-It seems that memory is not being updated correctly on the M-\>S
-transition. After lots of digging and using the MemoryAccess debug flag
-to see exactly what was being read and written to main memory, I found
-that in sendDataToMem I was using the request\_in. This is right for
-PutM, but not right for Data. We need to have another action to send
-data from response queue!
+看来内存在 M-\>S 转换时没有正确更新。经过大量挖掘并使用 MemoryAccess 调试标志查看主内存的确切读写内容，我发现在 sendDataToMem 中我使用的是 request\_in。这对于 PutM 是正确的，但对于 Data 不正确。我们需要另一个动作来从响应队列发送数据！
 
 ```termout
     panic: Invalid transition
     system.caches.controllers0 time: 44381 addr: 0x7c0 event: Inv state: SM_AD
 ```
 
-Invalid transition is my personal favorite kind of SLICC error. For this
-error, you know exactly what address caused it, and it's very easy to
-trace through the protocol trace to find what went wrong. However, in
-this case, nothing went wrong, I just forgot to put this transition in!
-Easy fix!
+无效转换是我个人最喜欢的 SLICC 错误类型。对于此错误，您确切知道导致该错误的地址，并且很容易通过协议跟踪来查找出了什么问题。但是，在这种情况下，没有任何问题，我只是忘了把这个转换放进去！简单的修复！

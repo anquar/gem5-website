@@ -1,57 +1,56 @@
 ---
 layout: documentation
-title: Homework 2 for CS 752
+title: CS 752 作业 2
 doc: Learning gem5
 parent: gem5_101
 permalink: /documentation/learning_gem5/gem5_101/homework-2
 authors:
 ---
 
-# Homework 2 for CS 752: Advanced Computer Architecture I (Fall 2015 Section 1 of 1)
+# CS 752: 高级计算机体系结构 I 作业 2 (2015 年秋季 1 组)
 
-**Due 1pm, Monday, 9/21**
+**截止日期：9/21 星期一 下午 1 点**
 
-**You should do this assignment alone. No late assignments.**
-
-
-## Purpose
-The purpose of this assignment is to help you become familiar with gem5's language for describing instruction sets. You will go through the ISA files in `src/arch/x86/isa` and understand how instructions are decoded and broken down into micro-ops which are ultimately executed.  To get a better understanding, you will implement a missing x87 instruction (FSUBR). Note that x87 is a subset of the x86 ISA. This subset was originally added to provide the floating point support, but is not used much now. To test your implementation of the instruction, you will write a small program that will use this particular through inline assembly feature of GCC.  The program then would be simulated using gem5.
-
-As you might already know, the x86 instructions typically do a lot of work. While one can implement the functionality of each instruction individually, since a lot of work is common across many instructions, typically, each instruction is implemented as a combination of several smaller parts.  The entire instruction is typically referred to as a macro-op, while the smaller parts are referred to as micro-ops.  To implement an instruction in gem5, we first provide the ISA decoder with the information on the macro-op, then we provide an implementation of the macro-op in terms of micro-ops.  Finally, we implement the micro-ops that are not already implemented.  We will carry out these steps for the FSUBR instruction.  Our implementation of FSUBR will mirror that of FSUB, whose implementation is already available in gem5.
+**您应该独自完成此作业。不接受逾期作业。**
 
 
-1. There are many ways in which instructions are encoded in the x86 ISA. We would focus on the x87 subset.  You can read more about instruction encoding in a [manual](http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2008/10/24594_APM_v3.pdf) provided by AMD. Let's go through the file `src/arch/x86/isa/decoder/one_byte_opcodes.isa` to understand how gem5 decodes instructions from the x86 ISA. The file is written in a language designed specifically to express instruction sets. The contents of the file are ultimately converted to a C++ switch case. We first decode the top 5 bits of the opcode byte. There are 32 possible ways in which we can construct binary numbers using 5 bits.  The switch case lists all the possible cases.
+## 目的
+本作业的目的是帮助您熟悉 gem5 用于描述指令集的语言。您将浏览 `src/arch/x86/isa` 中的 ISA 文件，了解指令如何解码并分解为最终执行的微操作。为了更好地理解，您将实现一个缺失的 x87 指令 (FSUBR)。请注意，x87 是 x86 ISA 的子集。此子集最初是为了提供浮点支持而添加的，但现在已不再多用。为了测试指令的实现，您将编写一个小程序，该程序将通过 GCC 的内联汇编功能使用此特定指令。然后将使用 gem5 模拟该程序。
 
-All x87 instructions begin with an opcode byte in the range 0xD8 to 0xDF. Therefore the topmost 5 bits always are 0x1B.  For this case, we include the file `src/arch/x86/isa/decoder/x87.isa`. Let's jump to that file.  In this file, we start with decoding the bottom 3 bits.  You can take a look at Table A-15 (page 443) in the manual mentioned above for the instructions represented by different cases for the bottom three bits. For example, FSUB and FSUBR are represented by opcodes 0xD8 and 0xDC, ie. the cases 0x0 and 0x4.  To distinguish between the functionality provided by these different opcodes for the same instruction, you will have to understand the meaning of the ModRM field of the instruction.  Read about it in the manual linked to. In the file x87.isa, you can check that we have FSUB appearing the cases statements for 0x0 and 0x4.  You can also observe that FSUBR's implementation is missing.
-
-As a first step, understand the difference between the two implementations for FSUBR instruction: one with opcode byte D8h and the one with opcode byte DCh.  For this, you should read the description of FSUBR provided in the
-[manual](http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2012/10/26569_APM_v51.pdf) on x87 instructions.
+您可能已经知道，x86 指令通常做很多工作。虽然可以单独实现每条指令的功能，但由于许多指令有很多共同的工作，因此通常每条指令都实现为几个较小部分的组合。整个指令通常称为宏操作 (macro-op)，而较小的部分称为微操作 (micro-ops)。要在 gem5 中实现一条指令，我们首先向 ISA 解码器提供有关宏操作的信息，然后我们根据微操作提供宏操作的实现。最后，我们实现尚未实现的微操作。我们将对 FSUBR 指令执行这些步骤。我们要实现的 FSUBR 将镜像 FSUB，后者的实现已在 gem5 中可用。
 
 
-2. Now, figure the three places in which fsubr appears in the file x87.isa. Replace the currently appearing statements with ones similar to those specified for FSUB in the same file.  By mentioning something like Inst::FSUBR, you are asking for that instruction to be used, instead of the default one, which simply prints a warning that the instruction is not implemented.
+1. x86 ISA 中有许多编码指令的方法。我们将专注于 x87 子集。您可以从 AMD 提供的 [手册](http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2008/10/24594_APM_v3.pdf) 中阅读有关指令编码的更多信息。让我们浏览文件 `src/arch/x86/isa/decoder/one_byte_opcodes.isa` 以了解 gem5 如何解码 x86 ISA 中的指令。该文件是用一种专为表达指令集而设计的语言编写的。文件的内容最终转换为 C++ switch case。我们首先解码操作码字节的前 5 位。我们可以用 5 位构造 32 种可能的二进制数。switch case 列出了所有可能的情况。
 
-3. Now, we need to provide an implementation of the FSUBR macro-op in terms of some micro-ops.  Again we will mirror the implementation of the FSUB instruction.  Go to the directory `src/arch/x86/isa/insts/x87/arithmetic/`. This directory holds the definition of different x87 arithmetic instructions in terms of micro-ops.  Take a look at how the FSUB instruction has been implemented using micro-ops.  FSUB1 and FSUB2 correspond to the two different opcodes that we mentioned before.  For each type, we have to provide three different implementations:  one that only uses registers, one that reads one of the operands from the memory using the address provided in the instruction and the last one uses the address of the instruction pointer to read the operand. The micro-ops used for the three implementations should be straight forward to understand.
+所有 x87 指令均以 0xD8 到 0xDF 范围内的操作码字节开头。因此，最高 5 位始终为 0x1B。对于这种情况，我们包含文件 `src/arch/x86/isa/decoder/x87.isa`。让我们跳转到那个文件。在这个文件中，我们从解码底部的 3 位开始。您可以查看上述手册中的表 A-15（第 443 页），了解底部三位不同情况所代表的指令。例如，FSUB 和 FSUBR由操作码 0xD8 和 0xDC 表示，即情况 0x0 和 0x4。为了区分同一指令的不同操作码提供的功能，您必须了解指令的 ModRM 字段的含义。在链接的手册中阅读相关内容。在文件 x87.isa 中，您可以检查我们是否在 0x0 和 0x4 的 case 语句中出现了 FSUB。您还可以观察到缺少 FSUBR 的实现。
 
-They way gem5's instruction parser works requires us to define all the three implentations for the FSUBR instruction.  In all you should have six separate code blocks for FSUBR, like those specified for FSUB.
-
-
-4. Lastly, we need to provide an implementation of the micro-op subfp.  You can check that the implementation is already  available in the file: `src/arch/x86/isa/micro-ops/fpop.isa`.  So, you would not need to do anything for this step.
+作为第一步，了解 FSUBR 指令的两种实现之间的区别：一种带有操作码字节 D8h，另一种带有操作码字节 DCh。为此，您应该阅读 [手册](http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2012/10/26569_APM_v51.pdf) 中关于 x87 指令的 FSUBR 描述。
 
 
-5. Compile gem5 for x86 ISA to test that you did not make any mistakes in the implementation.
+2. 现在，找出 fsubr 在文件 x87.isa 中出现的三个位置。将当前出现的语句替换为与同一文件中为 FSUB 指定的语句类似的语句。通过提及诸如 Inst::FSUBR 之类的内容，您要求使用该指令，而不是默认指令，默认指令只是打印一条警告，指出该指令未实现。
 
-There are many aspects of gem5's ISA language that we have not discussed at all.  Most of these aspects are not documented at all and one needs to figure them out by going over the code in relevant files.
+3. 现在，我们需要根据一些微操作提供 FSUBR 宏操作的实现。我们将再次镜像 FSUB 指令的实现。转到目录 `src/arch/x86/isa/insts/x87/arithmetic/`。该目录包含根据微操作定义的不同 x87 算术指令。看看 FSUB 指令是如何使用微操作实现的。FSUB1 和 FSUB2 对应于我们之前提到的两种不同的操作码。对于每种类型，我们必须提供三种不同的实现：一种只使用寄存器，一种使用指令中提供的地址从内存中读取一个操作数，最后一种使用指令指针的地址读取操作数。用于这三种实现的微操作应该很容易理解。
+
+gem5 指令解析器的工作方式要求我们定义 FSUBR 指令的所有三种实现。总之，您应该有六个用于 FSUBR 的单独代码块，就像为 FSUB 指定的那样。
 
 
-6. Now, we will test the implementation of the FSUBR instruction.  For this purpose, we will first write a short C program that reads a file with two floating point numbers, subtracts them and prints the output.  To make sure that FSUBR is used for subtraction, we will explicitly use it using the inline assembly feature of GCC.
+4. 最后，我们需要提供微操作 subfp 的实现。您可以检查该实现是否已在文件 `src/arch/x86/isa/micro-ops/fpop.isa` 中可用。所以，这一步你不需要做任何事情。
 
-Assembly instructions are written inline with the rest of the code using the 'asm' code block.  This code block contains two portions: the instruction portion, and the constraint portion.  In instruction portion is a string containing the assembly instructions.  The GNU C compiler does not check this string for correctness, so anything is allowed. The constraint portion specifies what GCC can or cannot do with the input and output operands, what registers or memory are affected by the instruction portion. There is documentation available from GCC and other sources.  I recommend reading:
+
+5. 为 x86 ISA 编译 gem5 以测试您在实现中没有犯任何错误。
+
+gem5 的 ISA 语言还有很多方面我们根本没有讨论过。这些方面中的大多数根本没有记录，需要通过查看相关文件中的代码来弄清楚。
+
+
+6. 现在，我们将测试 FSUBR 指令的实现。为此，我们将首先编写一个简短的 C 程序，该程序读取包含两个浮点数的文件，将它们相减并打印输出。为了确保使用 FSUBR 进行减法，我们将使用 GCC 的内联汇编功能显式使用它。
+
+汇编指令使用 'asm' 代码块与其余代码内联编写。此代码块包含两个部分：指令部分和约束部分。在指令部分是包含汇编指令的字符串。GNU C 编译器不检查此字符串的正确性，因此允许任何内容。约束部分指定 GCC 可以或不能对输入和输出操作数做什么，哪些寄存器或内存受指令部分影响。GCC 和其他来源提供了文档。我建议阅读：
 
 * http://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html
 * http://locklessinc.com/articles/gcc_asm/
 
 
-It is likely that most of you would have never used this feature of GCC. Since it is sort of hard to understand how to correctly all the constraints related to assembly instructions, we are providing an implementation with some explanation.
+你们中的大多数人很可能从未使用过 GCC 的此功能。由于很难理解如何正确处理与汇编指令相关的所有约束，我们提供了一个带有一些解释的实现。
 
 ```cpp
   float subtract(float in1, float in2)
@@ -62,31 +61,26 @@ It is likely that most of you would have never used this feature of GCC. Since i
   }
 ```
 
-The aim of the function is to subtract the two floating point input values and return the result.  To do so, we use FSUBR in the 'asm' code block. In our case the instruction string is "fsubr %2, %0".  After that we specify constraints on the output operand, which we ask to be the variable ret. We then specify the two input operands: in1 and in2.  The letters 't' and 'u' specify the top and the second to top register of the x87 stack.
+该函数的目的是减去两个浮点输入值并返回结果。为此，我们在 'asm' 代码块中使用 FSUBR。在我们的例子中，指令字符串是 "fsubr %2, %0"。之后，我们指定对输出操作数的约束，我们要求它是变量 ret。然后我们指定两个输入操作数：in1 和 in2。字母 't' 和 'u' 指定 x87 堆栈的顶部和倒数第二个寄存器。
 
 
-Ok, getting back to our main purpose.  Use the function provided above in a C
-program that takes as input a file name, reads two floating point numbers from
-the file, uses FSUBR to subtract the numbers and prints the result to stdout.
-Compile the program statically to generate a binary.  You may also look at
-the assembly code generated by the compiler using the -S flag.
+好的，回到我们的主要目的。在一个 C 程序中使用上面提供的函数，该程序将文件名作为输入，从文件中读取两个浮点数，使用 FSUBR 减去这些数字并将结果打印到标准输出。静态编译程序以生成二进制文件。您还可以使用 -S 标志查看编译器生成的汇编代码。
 
 
-7. Now simulate this program using gem5.  You will need to figure out how to supply command line arguments to programs in gem5. You can either use the example script supplied with gem5 in configs/examples/se.py or the script you created in Homework 1. Take a look at the file configs/examples/se.py and the file configs/common/Options.py to figure out how input arguments are to be supplied.
+7. 现在使用 gem5 模拟该程序。您需要弄清楚如何向 gem5 中的程序提供命令行参数。您可以使用 gem5 自带的 configs/examples/se.py 中的示例脚本，也可以使用您在作业 1 中创建的脚本。查看文件 configs/examples/se.py 和文件 configs/common/Options.py 以弄清楚如何提供输入参数。
 
 
-## What to Hand In
+## 提交内容
 
-Turn in your assignment by sending an email message to Prof. David Wood <david@cs.wisc.edu> and Nilay Vaish <nilay@cs.wisc.edu>  with the subject line: "[CS752 Homework2]".
+通过发送电子邮件给 David Wood 教授 <david@cs.wisc.edu> 和 Nilay Vaish <nilay@cs.wisc.edu> 提交您的作业，主题行："[CS752 Homework2]"。
 
-1. The email should contain the name and ID numbers of the student submitting
-the assignment. The files below should be attached as a zip file to the email.
+1. 电子邮件应包含提交作业的学生的姓名和 ID 号。以下文件应作为 zip 文件附加到电子邮件中。
 
-2. A file named fsubr.c which is used for testing the implementation of FSUBR.
+2. 一个名为 fsubr.c 的文件，用于测试 FSUBR 的实现。
 
-3. A patch file containing the changes made to `src/arch/x86/isa/insts/x87/arithmetic/` and `src/arch/x86/isa/decoder/x87.isa`.
-You can generate the patch using the mercurial command `hg diff src/arch/x86/isa > /tmp/changes.patch`.
+3. 一个补丁文件，包含对 `src/arch/x86/isa/insts/x87/arithmetic/` 和 `src/arch/x86/isa/decoder/x87.isa` 所做的更改。
+您可以使用 mercurial 命令 `hg diff src/arch/x86/isa > /tmp/changes.patch` 生成补丁。
 
-4. stats.txt file for two different simulations of the program: one using the TimingSimpleCPU and the other using the MinorCPU.
+4. 程序的两个不同模拟的 stats.txt 文件：一个使用 TimingSimpleCPU，另一个使用 MinorCPU。
 
-5. A short report (200 words) on your experience with the language / method used by gem5 for implementing different ISAs.
+5. 一份关于您对 gem5 用于实现不同 ISA 的语言/方法的体验的简短报告（200 字）。

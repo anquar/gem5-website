@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Creating a simple cache object
+title: 创建一个简单的缓存对象
 doc: Learning gem5
 parent: part2
 permalink: /documentation/learning_gem5/part2/simplecache/
@@ -8,21 +8,16 @@ author: Jason Lowe-Power
 ---
 
 
-Creating a simple cache object
+创建一个简单的缓存对象
 ==============================
 
-In this chapter, we will take the framework for a memory object we
-created in the [last chapter](../memoryobject) and add caching
-logic to it.
+在本章中，我们将采用我们在 [上一章](../memoryobject) 中创建的内存对象框架，并向其添加缓存逻辑。
 
 SimpleCache SimObject
 ---------------------
 
-After creating the SConscript file, that you can download
-[here](/_pages/static/scripts/part2/simplecache/SConscript), we can create
-the SimObject Python file. We will call this simple memory object
-`SimpleCache` and create the SimObject Python file in
-`src/learning_gem5/simple_cache`.
+创建您可以下载的 SConscript 文件
+[这里](/_pages/static/scripts/part2/simplecache/SConscript) 之后，我们可以创建 SimObject Python 文件。我们将这个简单的内存对象称为 `SimpleCache`，并在 `src/learning_gem5/simple_cache` 中创建 SimObject Python 文件。
 
 ```python
 from m5.params import *
@@ -43,45 +38,20 @@ class SimpleCache(MemObject):
     system = Param.System(Parent.any, "The system this cache is part of")
 ```
 
-There are a couple of differences between this SimObject file and the
-one from the [previous chapter](../memoryobject). First, we have a
-couple of extra parameters. Namely, a latency for cache accesses and the
-size of the cache. parameters-chapter goes into more detail about these
-kinds of SimObject parameters.
+这个 SimObject 文件与 [上一章](../memoryobject) 中的文件有一些区别。首先，我们有几个额外的参数。即缓存访问的延迟和缓存的大小。parameters-chapter 更详细地介绍了这类 SimObject 参数。
 
-Next, we include a `System` parameter, which is a pointer to the main
-system this cache is connected to. This is needed so we can get the
-cache block size from the system object when we are initializing the
-cache. To reference the system object this cache is connected to, we use
-a special *proxy parameter*. In this case, we use `Parent.any`.
+接下来，我们包含一个 `System` 参数，这是指向此缓存连接的主系统的指针。这是需要的，以便我们在初始化缓存时可以从系统对象获取缓存块大小。要引用此缓存连接的系统对象，我们使用一个特殊的 *代理参数*。在这种情况下，我们使用 `Parent.any`。
 
-In the Python config file, when a `SimpleCache` is instantiated, this
-proxy parameter searches through all of the parents of the `SimpleCache`
-instance to find a SimObject that matches the `System` type. Since we
-often use a `System` as the root SimObject, you will often see a
-`system` parameter resolved with this proxy parameter.
+在 Python 配置文件中，当实例化 `SimpleCache` 时，此代理参数会搜索 `SimpleCache` 实例的所有父级，以找到与 `System` 类型匹配的 SimObject。由于我们经常使用 `System` 作为根 SimObject，因此您经常会看到使用此代理参数解析的 `system` 参数。
 
-The third and final difference between the `SimpleCache` and the
-`SimpleMemobj` is that instead of having two named CPU ports
-(`inst_port` and `data_port`), the `SimpleCache` use another special
-parameter: the `VectorPort`. `VectorPorts` behave similarly to regular
-ports (e.g., they are resolved via `getPort`),
-but they allow this object to connect to multiple peers. Then, in the
-resolution functions the parameter we ignored before (`PortID idx`) is
-used to differentiate between the different ports. By using a vector
-port, this cache can be connected into the system more flexibly than the
-`SimpleMemobj`.
+`SimpleCache` 和 `SimpleMemobj` 之间的第三个也是最后一个区别是，`SimpleCache` 使用另一个特殊参数：`VectorPort`，而不是拥有两个命名的 CPU 端口（`inst_port` 和 `data_port`）。`VectorPorts` 的行为类似于常规端口（例如，它们通过 `getPort` 解析），但它们允许此对象连接到多个对等点。然后，在解析函数中，我们之前忽略的参数（`PortID idx`）用于区分不同的端口。通过使用向量端口，此缓存可以比 `SimpleMemobj` 更灵活地连接到系统中。
 
-Implementing the SimpleCache
+实现 SimpleCache
 ----------------------------
 
-Most of the code for the `SimpleCache` is the same as the
-`SimpleMemobj`. There are a couple of changes in the constructor and the
-key memory object functions.
+`SimpleCache` 的大部分代码与 `SimpleMemobj` 相同。构造函数和关键内存对象函数中有一些更改。
 
-First, we need to create the CPU side ports dynamically in the
-constructor and initialize the extra member functions based on the
-SimObject parameters.
+首先，我们需要在构造函数中动态创建 CPU 侧端口，并根据 SimObject 参数初始化额外的成员函数。
 
 ```cpp
 SimpleCache::SimpleCache(SimpleCacheParams *params) :
@@ -98,23 +68,11 @@ SimpleCache::SimpleCache(SimpleCacheParams *params) :
 }
 ```
 
-In this function, we use the `cacheLineSize` from the system parameters
-to set the `blockSize` for this cache. We also initialize the capacity
-based on the block size and the parameter and initialize other member
-variables we will need below. Finally, we must create a number of
-`CPUSidePorts` based on the number of connections to this object. Since
-the `cpu_side` port was declared as a `VectorResponsePort` in the SimObject
-Python file, the parameter automatically has a variable
-`port_cpu_side_connection_count`. This is based on the Python name of
-the parameter. For each of these connections we add a new `CPUSidePort`
-to a `cpuPorts` vector declared in the `SimpleCache` class.
+在此函数中，我们使用系统参数中的 `cacheLineSize` 来设置此缓存的 `blockSize`。我们还根据块大小和参数初始化容量，并初始化我们将在下面需要的其他成员变量。最后，我们必须根据与此对象的连接数创建一定数量的 `CPUSidePorts`。由于 `cpu_side` 端口在 SimObject Python 文件中声明为 `VectorResponsePort`，因此参数会自动具有变量 `port_cpu_side_connection_count`。这是基于参数的 Python 名称。对于每一个连接，我们在 `SimpleCache` 类中声明的 `cpuPorts` 向量中添加一个新的 `CPUSidePort`。
 
-We also add one extra member variable to the `CPUSidePort` to save its
-id, and we add this as a parameter to its constructor.
+我们还向 `CPUSidePort` 添加了一个额外的成员变量来保存其 id，并将其作为参数添加到其构造函数中。
 
-Next, we need to implement the `getPort` function. On the memory side, 
-this is straightforward as there is only one port. However, on the CPU side,
-we now need to return the port corresponding to the requested ID.
+接下来，我们需要实现 `getPort` 函数。在内存方面，这很简单，因为只有一个端口。但是，在 CPU 方面，我们现在需要返回对应于请求 ID 的端口。
 
 ```cpp
 Port &
@@ -132,28 +90,11 @@ SimpleCache::getPort(const std::string &if_name, PortID idx)
 }
 ```
 
-The implementation of the `CPUSidePort` and the `MemSidePort` is almost
-the same as in the `SimpleMemobj`. The only difference is we need to add
-an extra parameter to `handleRequest` that is the id of the port which
-the request originated. Without this id, we would not be able to forward
-the response to the correct port. The `SimpleMemobj` knew which port to
-send replies based on whether the original request was an instruction or
-data accesses. However, this information is not useful to the
-`SimpleCache` since it uses a vector of ports and not named ports.
+`CPUSidePort` 和 `MemSidePort` 的实现几乎与 `SimpleMemobj` 中的相同。唯一的区别是我们需要向 `handleRequest` 添加一个额外的参数，即请求发起的端口 ID。没有这个 ID，我们将无法将响应转发到正确的端口。`SimpleMemobj` 知道将回复发送到哪个端口是基于原始请求是指令还是数据访问。然而，这些信息对 `SimpleCache` 没有用，因为它使用的是端口向量而不是命名端口。
 
-The new `handleRequest` function does two different things than the
-`handleRequest` function in the `SimpleMemobj`. First, it stores the
-port id of the request as discussed above. Since the `SimpleCache` is
-blocking and only allows a single request outstanding at a time, we only
-need to save a single port id.
+新的 `handleRequest` 函数做了两件与 `SimpleMemobj` 中的 `handleRequest` 函数不同的事情。首先，如上所述，它存储请求的端口 ID。由于 `SimpleCache` 是阻塞的并且一次只允许一个请求未完成，我们只需要保存一个端口 ID。
 
-Second, it takes time to access a cache. Therefore, we need to take into
-account the latency to access the cache tags and the cache data for a
-request. We added an extra parameter to the cache object for this, and
-in `handleRequest` we now use an event to stall the request for the
-needed amount of time. We schedule a new event for `latency` cycles in
-the future. The `clockEdge` function returns the *tick* that the *nth*
-cycle in the future occurs on.
+其次，访问缓存需要时间。因此，我们需要考虑访问缓存标签和缓存数据请求的延迟。我们为此向缓存对象添加了一个额外参数，并且在 `handleRequest` 中，我们现在使用事件将请求暂停所需的时间量。我们为将来的 `latency` 周期调度一个新事件。`clockEdge` 函数返回未来第 *n* 个周期发生的 *tick*。
 
 ```cpp
 bool
@@ -173,17 +114,7 @@ SimpleCache::handleRequest(PacketPtr pkt, int port_id)
 }
 ```
 
-The `AccessEvent` is a little more complicated than the `EventWrapper`
-we used in events-chapter. Instead of using an `EventWrapper`, in the
-`SimpleCache` we will use a new class. The reason we cannot use an
-`EventWrapper`, is that we need to pass the packet (`pkt`) from
-`handleRequest` to the event handler function. The following code is the
-`AccessEvent` class. We only need to implement the `process` function,
-that calls the function we want to use as our event handler, in this
-case `accessTming`. We also pass the flag `AutoDelete` to the event
-constructor so we do not need to worry about freeing the memory for the
-dynamically created object. The event code will automatically delete the
-object after the `process` function has executed.
+`AccessEvent` 比我们在 events-chapter 中使用的 `EventWrapper` 稍微复杂一些。在 `SimpleCache` 中，我们将使用一个新类，而不是使用 `EventWrapper`。我们不能使用 `EventWrapper` 的原因是，我们需要将数据包 (`pkt`) 从 `handleRequest` 传递给事件处理函数。以下代码是 `AccessEvent` 类。我们只需要实现 `process` 函数，该函数调用我们要用作事件处理程序的函数，在本例中为 `accessTming`。我们还将标志 `AutoDelete` 传递给事件构造函数，这样我们就不用担心释放动态创建对象的内存了。事件代码将在 `process` 函数执行后自动删除对象。
 
 ```cpp
 class AccessEvent : public Event
@@ -201,7 +132,7 @@ class AccessEvent : public Event
 };
 ```
 
-Now, we need to implement the event handler, `accessTiming`.
+现在，我们需要实现事件处理程序 `accessTiming`。
 
 ```cpp
 void
@@ -217,25 +148,11 @@ SimpleCache::accessTiming(PacketPtr pkt)
 }
 ```
 
-This function first *functionally* accesses the cache. This function
-`accessFunctional` (described below) performs the functional access of
-the cache and either reads or writes the cache on a hit or returns that
-the access was a miss.
+此函数首先 *功能性地* 访问缓存。此函数 `accessFunctional`（如下所述）执行缓存的功能访问，并在命中时读取或写入缓存，或返回访问未命中。
 
-If the access is a hit, we simply need to respond to the packet. To
-respond, you first must call the function `makeResponse` on the packet.
-This converts the packet from a request packet to a response packet. For
-instance, if the memory command in the packet was a `ReadReq` this gets
-converted into a `ReadResp`. Writes behave similarly. Then, we can send
-the response back to the CPU.
+如果访问命中，我们只需响应数据包。要响应，您首先必须在数据包上调用函数 `makeResponse`。这会将数据包从请求数据包转换为响应数据包。例如，如果数据包中的内存命令是 `ReadReq`，这将被转换为 `ReadResp`。写入行为类似。然后，我们可以将响应发送回 CPU。
 
-The `sendResponse` function does the same things as the `handleResponse`
-function in the `SimpleMemobj` except that it uses the `waitingPortId`
-to send the packet to the right port. In this function, we need to mark
-the `SimpleCache` unblocked before calling `sendPacket` in case the peer
-on the CPU side immediately calls `sendTimingReq`. Then, we try to send
-retries to the CPU side ports if the `SimpleCache` can now receive
-requests and the ports need to be sent retries.
+`sendResponse` 函数执行与 `SimpleMemobj` 中的 `handleResponse` 函数相同的操作，除了它使用 `waitingPortId` 将数据包发送到正确的端口。在此函数中，我们需要在调用 `sendPacket` 之前标记 `SimpleCache` 未被阻止，以防 CPU 端的对等点立即调用 `sendTimingReq`。然后，如果 `SimpleCache` 现在可以接收请求并且端口需要发送重试，我们会尝试向 CPU 侧端口发送重试。
 
 ```cpp
 void SimpleCache::sendResponse(PacketPtr pkt)
@@ -254,30 +171,13 @@ void SimpleCache::sendResponse(PacketPtr pkt)
 
 * * * * *
 
-Back to the `accessTiming` function, we now need to handle the cache
-miss case. On a miss, we first have to check to see if the missing
-packet is to an entire cache block. If the packet is aligned and the
-size of the request is the size of a cache block, then we can simply
-forward the request to memory, just like in the `SimpleMemobj`.
+回到 `accessTiming` 函数，我们现在需要处理缓存未命中的情况。在未命中时，我们首先必须检查丢失的数据包是否是针对整个缓存块的。如果数据包是对齐的，并且请求的大小是缓存块的大小，那么我们可以简单地将请求转发到内存，就像在 `SimpleMemobj` 中一样。
 
-However, if the packet is smaller than a cache block, then we need to
-create a new packet to read the entire cache block from memory. Here,
-whether the packet is a read or a write request, we send a read request
-to memory to load the data for the cache block into the cache. In the
-case of a write, it will occur in the cache after we have loaded the
-data from memory.
+但是，如果数据包小于缓存块，那么我们需要创建一个新数据包以从内存中读取整个缓存块。在这里，无论数据包是读取还是写入请求，我们都会向内存发送读取请求，以将缓存块的数据加载到缓存中。在写入的情况下，在我们从内存加载数据后，它将发生在缓存中。
 
-Then, we create a new packet, that is `blockSize` in size and we call
-the `allocate` function to allocate memory in the `Packet` object for
-the data that we will read from memory. Note: this memory is freed when
-we free the packet. We use the original request object in the packet so
-the memory-side objects know the original requestor and the original
-request type for statistics.
+然后，我们创建一个大小为 `blockSize` 的新数据包，并调用 `allocate` 函数在 `Packet` 对象中为我们将从内存读取的数据分配内存。注意：当我们释放数据包时，此内存将被释放。我们在数据包中使用原始请求对象，以便内存端对象知道原始请求者和用于统计的原始请求类型。
 
-Finally, we save the original packet pointer (`pkt`) in a member
-variable `outstandingPacket` so we can recover it when the `SimpleCache`
-receives a response. Then, we send the new packet across the memory side
-port.
+最后，我们将原始数据包指针 (`pkt`) 保存在成员变量 `outstandingPacket` 中，以便我们在 `SimpleCache` 收到响应时可以恢复它。然后，我们通过内存侧端口发送新数据包。
 
 ```cpp
 void
@@ -318,19 +218,12 @@ SimpleCache::accessTiming(PacketPtr pkt)
 }
 ```
 
-On a response from memory, we know that this was caused by a cache miss.
-The first step is to insert the responding packet into the cache.
+在来自内存的响应上，我们知道这是由缓存未命中引起的。
+第一步是将响应数据包插入缓存。
 
-Then, either there is an `outstandingPacket`, in which case we need to
-forward that packet to the original requestor, or there is no
-`outstandingPacket` which means we should forward the `pkt` in the
-response to the original requestor.
+然后，要么有一个 `outstandingPacket`，在这种情况下我们需要将该数据包转发给原始请求者，要么没有 `outstandingPacket`，这意味着我们应该将响应中的 `pkt` 转发给原始请求者。
 
-If the packet we are receiving as a response was an upgrade packet
-because the original request was smaller than a cache line, then we need
-to copy the new data to the outstandingPacket packet or write to the
-cache on a write. Then, we need to delete the new packet that we made in
-the miss handling logic.
+如果我们作为响应接收的数据包是升级数据包，因为原始请求小于缓存行，那么我们需要将新数据复制到 outstandingPacket 数据包或在写入时写入缓存。然后，我们需要删除我们在未命中处理逻辑中创建的新数据包。
 
 ```cpp
 bool
@@ -354,40 +247,21 @@ SimpleCache::handleResponse(PacketPtr pkt)
 }
 ```
 
-### Functional cache logic
+### 功能缓存逻辑
 
-Now, we need to implement two more functions: `accessFunctional` and
-`insert`. These two functions make up the key components of the cache
-logic.
+现在，我们需要实现另外两个函数：`accessFunctional` 和 `insert`。这两个函数构成了缓存逻辑的关键组件。
 
-First, to functionally update the cache, we first need storage for the
-cache contents. The simplest possible cache storage is a map (hashtable)
-that maps from addresses to data. Thus, we will add the following member
-to the `SimpleCache`.
+首先，要在功能上更新缓存，我们首先需要存储缓存内容。最简单的缓存存储是从地址到数据的映射（哈希表）。因此，我们将向 `SimpleCache` 添加以下成员。
 
 ```cpp
 std::unordered_map<Addr, uint8_t*> cacheStore;
 ```
 
-To access the cache, we first check to see if there is an entry in the
-map which matches the address in the packet. We use the `getBlockAddr`
-function of the `Packet` type to get the block-aligned address. Then, we
-simply search for that address in the map. If we do not find the
-address, then this function returns `false`, the data is not in the
-cache, and it is a miss.
+要访问缓存，我们首先检查映射中是否存在与数据包中的地址匹配的条目。我们使用 `Packet` 类型的 `getBlockAddr` 函数来获取块对齐地址。然后，我们只需在映射中搜索该地址。如果我们没有找到该地址，则此函数返回 `false`，数据不在缓存中，并且未命中。
 
-Otherwise, if the packet is a write request, we need to update the data
-in the cache. To do this, we write the data from the packet to the
-cache. We use the `writeDataToBlock` function which writes the data in
-the packet to the write offset into a potentially larger block of data.
-This function takes the cache block offset and the block size (as a
-parameter) and writes the correct offset into the pointer passed as the
-first parameter.
+否则，如果数据包是写入请求，我们需要更新缓存中的数据。为此，我们将数据包中的数据写入缓存。我们使用 `writeDataToBlock` 函数，该函数将数据包中的数据写入可能更大的数据块的写入偏移量。此函数接受缓存块偏移量和块大小（作为参数），并将正确的偏移量写入作为第一个参数传递的指针。
 
-If the packet is a read request, we need to update the packet's data
-with the data from the cache. The `setDataFromBlock` function performs
-the same offset calculation as the `writeDataToBlock` function, but
-writes the packet with the data from the pointer in the first parameter.
+如果数据包是读取请求，我们需要使用缓存中的数据更新数据包的数据。`setDataFromBlock` 函数执行与 `writeDataToBlock` 函数相同的偏移量计算，但使用第一个参数中指针的数据写入数据包。
 
 ```cpp
 bool
@@ -409,35 +283,21 @@ SimpleCache::accessFunctional(PacketPtr pkt)
 }
 ```
 
-Finally, we also need to implement the `insert` function. This function
-is called every time the memory side port responds to a request.
+最后，我们还需要实现 `insert` 函数。每次内存侧端口响应请求时都会调用此函数。
 
-The first step is to check if the cache is currently full. If the cache
-has more entries (blocks) than the capacity of the cache as set by the
-SimObject parameter, then we need to evict something. The following code
-evicts a random entry by leveraging the hashtable implementation of the
-C++ `unordered_map`.
+第一步是检查缓存当前是否已满。如果缓存的条目（块）多于 SimObject 参数设置的缓存容量，那么我们需要驱逐一些东西。以下代码利用 C++ `unordered_map` 的哈希表实现来驱逐随机条目。
 
-On an eviction, we need to write the data back to the backing memory in
-case it has been updated. For this, we create a new `Request`-`Packet`
-pair. The packet uses a new memory command: `MemCmd::WritebackDirty`.
-Then, we send the packet across the memory side port (`memPort`) and
-erase the entry in the cache storage map.
+驱逐时，我们需要将数据写回后备内存，以防它已更新。为此，我们创建一个新的 `Request`-`Packet` 对。数据包使用新的内存命令：`MemCmd::WritebackDirty`。然后，我们通过内存侧端口 (`memPort`) 发送数据包并擦除缓存存储映射中的条目。
 
-Then, after a block has potentially been evicted, we add the new address
-to the cache. For this we simply allocate space for the block and add an
-entry to the map. Finally, we write the data from the response packet in
-to the newly allocated block. This data is guaranteed to be the size of
-the cache block since we made sure to make a new packet in the cache
-miss logic if the packet was smaller than a cache block.
+然后，在块可能被驱逐后，我们将新地址添加到缓存中。为此，我们只需为块分配空间并将条目添加到映射中。最后，我们将响应数据包中的数据写入新分配的块中。如果数据包小于缓存块，我们确保在缓存未命中逻辑中创建一个新数据包，因此保证此数据是缓存块的大小。
 
 ```cpp
 void
 SimpleCache::insert(PacketPtr pkt)
 {
     if (cacheStore.size() >= capacity) {
-        // Select random thing to evict. This is a little convoluted since we
-        // are using a std::unordered_map. See http://bit.ly/2hrnLP2
+        // 选择随机的东西驱逐。这有点复杂，因为我们使用的是 std::unordered_map。
+        // 参见 http://bit.ly/2hrnLP2
         int bucket, bucket_size;
         do {
             bucket = random_mt.random(0, (int)cacheStore.bucket_count() - 1);
@@ -447,7 +307,7 @@ SimpleCache::insert(PacketPtr pkt)
 
         RequestPtr req = new Request(block->first, blockSize, 0, 0);
         PacketPtr new_pkt = new Packet(req, MemCmd::WritebackDirty, blockSize);
-        new_pkt->dataDynamic(block->second); // This will be deleted later
+        new_pkt->dataDynamic(block->second); // 这将在稍后被删除
 
         DPRINTF(SimpleCache, "Writing packet back %s\n", pkt->print());
         memPort.sendTimingReq(new_pkt);
@@ -461,17 +321,10 @@ SimpleCache::insert(PacketPtr pkt)
 }
 ```
 
-Creating a config file for the cache
+为缓存创建配置文件
 ------------------------------------
 
-The last step in our implementation is to create a new Python config
-script that uses our cache. We can use the outline from the
-[last chapter](../memoryobject) as a starting point. The only
-difference is we may want to set the parameters of this cache (e.g., set
-the size of the cache to `1kB`) and instead of using the named ports
-(`data_port` and `inst_port`), we just use the `cpu_side` port twice.
-Since `cpu_side` is a `VectorPort`, it will automatically create
-multiple port connections.
+实现的最后一步是创建一个使用我们的缓存的新 Python 配置脚本。我们可以使用 [上一章](../memoryobject) 中的大纲作为起点。唯一的区别是我们可能想要设置此缓存的参数（例如，将缓存的大小设置为 `1kB`），并且我们不再使用命名端口（`data_port` 和 `inst_port`），而是使用 `cpu_side` 端口两次。由于 `cpu_side` 是一个 `VectorPort`，它将自动创建多个端口连接。
 
 ```python
 import m5
@@ -491,11 +344,10 @@ system.cache.mem_side = system.membus.cpu_side_ports
 ...
 ```
 
-The Python config file can be downloaded
-[here](/_pages/static/scripts/part2/simplecache/simple_cache.py).
+可以下载 Python 配置文件
+[这里](/_pages/static/scripts/part2/simplecache/simple_cache.py)。
 
-Running this script should produce the expected output from the hello
-binary.
+运行此脚本应生成 hello 二进制文件的预期输出。
 
     gem5 Simulator System.  http://gem5.org
     gem5 is copyrighted software; use the --copyright option for details.
@@ -515,8 +367,7 @@ binary.
     Hello world!
     Exiting @ tick 56082000 because target called exit()
 
-Modifying the size of the cache, for instance to 128 KB, should improve
-the performance of the system.
+修改缓存的大小，例如修改为 128 KB，应该会提高系统的性能。
 
     gem5 Simulator System.  http://gem5.org
     gem5 is copyrighted software; use the --copyright option for details.
@@ -536,21 +387,12 @@ the performance of the system.
     Hello world!
     Exiting @ tick 32685000 because target called exit()
 
-Adding statistics to the cache
+向缓存添加统计信息
 ------------------------------
 
-Knowing the overall execution time of the system is one important
-metric. However, you may want to include other statistics as well, such
-as the hit and miss rates of the cache. To do this, we need to add some
-statistics to the `SimpleCache` object.
+了解系统的整体执行时间是一个重要的指标。但是，您可能还需要包括其他统计信息，例如缓存的命中率和未命中率。为此，我们需要向 `SimpleCache` 对象添加一些统计信息。
 
-First, we need to declare the statistics in the `SimpleCache` object.
-They are part of the `Stats` namespace. In this case, we'll make four
-statistics. The number of `hits` and the number of `misses` are just
-simple `Scalar` counts. We will also add a `missLatency` which is a
-histogram of the time it takes to satisfy a miss. Finally, we'll add a
-special statistic called a `Formula` for the `hitRatio` that is a
-combination of other statistics (the number of hits and misses).
+首先，我们需要在 `SimpleCache` 对象中声明统计信息。它们是 `Stats` 命名空间的一部分。在这种情况下，我们将制作四个统计信息。`hits` 和 `misses` 的数量只是简单的 `Scalar` 计数。我们还将添加一个 `missLatency`，它是满足未命中所需时间的直方图。最后，我们将为 `hitRatio` 添加一个称为 `Formula` 的特殊统计信息，它是其他统计信息的组合（命中数和未命中数）。
 
 ```cpp
 class SimpleCache : public MemObject
@@ -558,7 +400,7 @@ class SimpleCache : public MemObject
   private:
     ...
 
-    Tick missTime; // To track the miss latency
+    Tick missTime; // 跟踪未命中延迟
 
     Stats::Scalar hits;
     Stats::Scalar misses;
@@ -572,19 +414,13 @@ class SimpleCache : public MemObject
 };
 ```
 
-Next, we have to define the function to override the `regStats` function
-so the statistics are registered with gem5's statistics infrastructure.
-Here, for each statistic, we give it a name based on the "parent"
-SimObject name and a description. For the histogram statistic, we also
-need to initialize it with how many buckets we want in the histogram.
-Finally, for the formula, we simply need to write the formula down in
-code.
+接下来，我们必须定义覆盖 `regStats` 函数的函数，以便将统计信息注册到 gem5 的统计基础设施。在这里，对于每个统计信息，我们根据“父”SimObject 名称给它一个名称和一个描述。对于直方图统计信息，我们还需要初始化我们在直方图中想要的桶数。最后，对于公式，我们只需要在代码中写下公式。
 
 ```cpp
 void
 SimpleCache::regStats()
 {
-    // If you don't do this you get errors about uninitialized stats.
+    // 如果不这样做，你会得到关于未初始化统计信息的错误。
     MemObject::regStats();
 
     hits.name(name() + ".hits")
@@ -597,7 +433,7 @@ SimpleCache::regStats()
 
     missLatency.name(name() + ".missLatency")
         .desc("Ticks for misses to the cache")
-        .init(16) // number of buckets
+        .init(16) // 桶的数量
         ;
 
     hitRatio.name(name() + ".hitRatio")
@@ -609,10 +445,7 @@ SimpleCache::regStats()
 }
 ```
 
-Finally, we need to use update the statistics in our code. In the
-`accessTiming` class, we can increment the `hits` and `misses` on a hit
-and miss respectively. Additionally, on a miss, we save the current time
-so we can measure the latency.
+最后，我们需要在我们的代码中更新统计信息。在 `accessTiming` 类中，我们可以在命中和未命中时分别增加 `hits` 和 `misses`。此外，在未命中时，我们保存当前时间，以便我们可以测量延迟。
 
 ```cpp
 void
@@ -620,19 +453,16 @@ SimpleCache::accessTiming(PacketPtr pkt)
 {
     bool hit = accessFunctional(pkt);
     if (hit) {
-        hits++; // update stats
+        hits++; // 更新统计信息
         pkt->makeResponse();
         sendResponse(pkt);
     } else {
-        misses++; // update stats
+        misses++; // 更新统计信息
         missTime = curTick();
         ...
 ```
 
-Then, when we get a response, we need to add the measured latency to our
-histogram. For this, we use the `sample` function. This adds a single
-point to the histogram. This histogram automatically resizes the buckets
-to fit the data it receives.
+然后，当我们收到响应时，我们需要将测量的延迟添加到我们的直方图中。为此，我们使用 `sample` 函数。这向直方图添加一个点。此直方图会自动调整桶的大小以适应它接收的数据。
 
 ```cpp
 bool
@@ -644,16 +474,11 @@ SimpleCache::handleResponse(PacketPtr pkt)
     ...
 ```
 
-The complete code for the `SimpleCache` header file can be downloaded
-[here](/_pages/static/scripts/part2/simplecache/simple_cache.hh), and the
-complete code for the implementation of the `SimpleCache` can be
-downloaded
-[here](/_pages/static/scripts/part2/simplecache/simple_cache.cc).
+`SimpleCache` 头文件的完整代码可以下载
+[这里](/_pages/static/scripts/part2/simplecache/simple_cache.hh)，`SimpleCache` 实现的完整代码可以下载
+[这里](/_pages/static/scripts/part2/simplecache/simple_cache.cc)。
 
-Now, if we run the above config file, we can check on the statistics in
-the `stats.txt` file. For the 1 KB case, we get the following
-statistics. 91% of the accesses are hits and the average miss latency is
-53334 ticks (or 53 ns).
+现在，如果我们运行上面的配置文件，我们可以在 `stats.txt` 文件中查看统计信息。对于 1 KB 的情况，我们得到以下统计信息。91% 的访问是命中，平均未命中延迟为 53334 ticks（或 53 ns）。
 
     system.cache.hits                                8431                       # Number of hits
     system.cache.misses                               877                       # Number of misses
@@ -680,8 +505,7 @@ statistics. 91% of the accesses are hits and the average miss latency is
     system.cache.missLatency::total                   877                       # Ticks for misses to the cache
     system.cache.hitRatio                        0.905780                       # The ratio of hits to the total access
 
-And when using a 128 KB cache, we get a slightly higher hit ratio. It
-seems like our cache is working as expected!
+当使用 128 KB 缓存时，我们得到稍高的命中率。看起来我们的缓存按预期工作！
 
     system.cache.hits                                8944                       # Number of hits
     system.cache.misses                               364                       # Number of misses

@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Running the simple Ruby system
+title: 运行简单的 Ruby 系统
 doc: Learning gem5
 parent: part3
 permalink: /documentation/learning_gem5/part3/running/
@@ -8,13 +8,11 @@ author: Jason Lowe-Power
 ---
 
 
-## Running the simple Ruby system
+## 运行简单的 Ruby 系统
 
-Now, we can run our system with the MSI protocol!
+现在，我们可以使用 MSI 协议运行我们的系统了！
 
-As something interesting, below is a simple multithreaded program (note:
-as of this writing there is a bug in gem5 preventing this code from
-executing).
+作为有趣的内容，下面是一个简单的多线程程序（注意：截至撰写本文时，gem5 中存在一个错误，阻止了此代码的执行）。
 
 ```cpp
 #include <iostream>
@@ -72,11 +70,11 @@ int main(int argc, char *argv[])
 
     thread **threads = new thread*[cpus];
 
-    // NOTE: -1 is required for this to work in SE mode.
+    // 注意：在 SE 模式下工作需要 -1。
     for (int i = 0; i < cpus - 1; i++) {
         threads[i] = new thread(array_add, a, b, c, i, cpus, num_values);
     }
-    // Execute the last thread with this thread context to appease SE mode
+    // 使用此线程上下文执行最后一个线程以安抚 SE 模式
     array_add(a, b, c, cpus - 1, cpus, num_values);
 
     cout << "Waiting for other threads to complete" << endl;
@@ -109,15 +107,13 @@ int main(int argc, char *argv[])
 }
 ```
 
-With the above code compiled as `threads`, we can run gem5!
+将上面的代码编译为 `threads` 后，我们可以运行 gem5！
 
 ```sh
 build/MSI/gem5.opt configs/learning_gem5/part6/simple_ruby.py
 ```
 
-The output should be something like the following. Most of the warnings
-are unimplemented syscalls in SE mode due to using pthreads and can be
-safely ignored for this simple example.
+输出应该类似于以下内容。大多数警告是由于使用 pthreads 而导致的 SE 模式下未实现的系统调用，对于这个简单的示例，可以安全地忽略。
 
 ```termout
     gem5 Simulator System.  http://gem5.org

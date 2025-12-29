@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: MSI Directory implementation
+title: MSI 目录实现
 doc: Learning gem5
 parent: part3
 permalink: /documentation/learning_gem5/part3/directory/
@@ -8,13 +8,7 @@ author: Jason Lowe-Power
 ---
 
 
-Implementing a directory controller is very similar to the L1 cache
-controller, except using a different state machine table. The state
-machine fore the directory can be found in Table 8.2 in Sorin et al.
-Since things are mostly similar to the L1 cache, this section mostly
-just discusses a few more SLICC details and a few differences between
-directory controllers and cache controllers. Let's dive straight in and
-start modifying a new file `MSI-dir.sm`.
+实现目录控制器与 L1 缓存控制器非常相似，只是使用不同的状态机表。目录的状态机可以在 Sorin 等人的表 8.2 中找到。由于事情与 L1 缓存大多相似，因此本节主要讨论一些更多的 SLICC 细节以及目录控制器和缓存控制器之间的一些差异。让我们直接深入并开始修改新文件 `MSI-dir.sm`。
 
 ```cpp
 machine(MachineType:Directory, "Directory protocol")
@@ -42,73 +36,53 @@ MessageBuffer *responseFromMemory;
 }
 ```
 
-First, there are two parameter to this directory controller,
-`DirectoryMemory` and a `toMemLatency`. The `DirectoryMemory` is a
-little weird. It is allocated at initialization time such that it can
-cover *all* of physical memory, like a complete directory *not a
-directory cache*. I.e., there are pointers in the `DirectoryMemory`
-object for every 64-byte block in physical memory. However, the actual
-entries (as defined below) are lazily created via `getDirEntry()`. We'll
-see more details about `DirectoryMemory` below.
+首先，此目录控制器有两个参数，`DirectoryMemory` 和 `toMemLatency`。`DirectoryMemory` 有点奇怪。它在初始化时分配，以便它可以覆盖 *所有* 物理内存，就像一个完整的目录 *而不是目录缓存*。即，`DirectoryMemory` 对象中有指向物理内存中每个 64 字节块的指针。但是，实际条目（如下定义）是通过 `getDirEntry()` 延迟创建的。我们将在下面看到有关 `DirectoryMemory` 的更多详细信息。
 
-Next, is the `toMemLatency` parameter. This will be used in the
-`enqueue` function when enqueuing requests to model the directory
-latency. We didn't use a parameter for this in the L1 cache, but it is
-simple to make the controller latency parameterized. This parameter
-defaults to 1 cycle. It is not required to set a default here. The
-default is propagated to the generated SimObject description file as the
-default to the SimObject parameter.
+接下来是 `toMemLatency` 参数。这将在排队请求时用于 `enqueue` 函数中，以模拟目录延迟。我们在 L1 缓存中没有为此使用参数，但使控制器延迟参数化很简单。此参数默认为 1 个周期。不需要在此处设置默认值。默认值传播到生成的 SimObject 描述文件，作为 SimObject 参数的默认值。
 
-Next, we have the message buffers for the directory. Importantly, *these
-need to have the same virtual network numbers* as the message buffers in
-the L1 cache. These virtual network numbers are how the Ruby network
-directs messages between controllers.
+接下来，我们有目录的消息缓冲区。重要的是，*这些必须具有与 L1 缓存中的消息缓冲区相同的虚拟网络号*。这些虚拟网络号是 Ruby 网络在控制器之间引导消息的方式。
 
-There is also two more special message buffers: `requestToMemory` and `responseFromMemory`.
-This is similar to the `mandatoryQueue`, except instead of being like a
-responder port for CPUs it is like a requestor port. The `responseFromMemory` and `requestToMemory`
-buffers will deliver responses sent across the the memory port and send requests across the memory port, as we will see below in the action section.
+还有两个特殊的消息缓冲区：`requestToMemory` 和 `responseFromMemory`。这类似于 `mandatoryQueue`，只是它是像请求者端口，而不像 CPU 的响应者端口。`responseFromMemory` 和 `requestToMemory` 缓冲区将传递通过内存端口发送的响应，并通过内存端口发送请求，正如我们将在下面的动作部分看到的那样。
 
-After the parameters and message buffers, we need to declare all of the
-states, events, and other local structures.
+在参数和消息缓冲区之后，我们需要声明所有状态、事件和其他本地结构。
 
 ```cpp
 state_declaration(State, desc="Directory states",
                   default="Directory_State_I") {
-    // Stable states.
-    // NOTE: These are "cache-centric" states like in Sorin et al.
-    // However, The access permissions are memory-centric.
+    // 稳定状态。
+    // 注意：这些是像 Sorin 等人那样的“以缓存为中心”的状态。
+    // 但是，访问权限是以内存为中心的。
     I, AccessPermission:Read_Write,  desc="Invalid in the caches.";
     S, AccessPermission:Read_Only,   desc="At least one cache has the blk";
     M, AccessPermission:Invalid,     desc="A cache has the block in M";
 
-    // Transient states
+    // 瞬态
     S_D, AccessPermission:Busy,      desc="Moving to S, but need data";
 
-    // Waiting for data from memory
+    // 等待来自内存的数据
     S_m, AccessPermission:Read_Write, desc="In S waiting for mem";
     M_m, AccessPermission:Read_Write, desc="Moving to M waiting for mem";
 
-    // Waiting for write-ack from memory
+    // 等待来自内存的写确认
     MI_m, AccessPermission:Busy,       desc="Moving to I waiting for ack";
     SS_m, AccessPermission:Busy,       desc="Moving to I waiting for ack";
 }
 
 enumeration(Event, desc="Directory events") {
-    // Data requests from the cache
+    // 来自缓存的数据请求
     GetS,         desc="Request for read-only data from cache";
     GetM,         desc="Request for read-write data from cache";
 
-    // Writeback requests from the cache
+    // 来自缓存的写回请求
     PutSNotLast,  desc="PutS and the block has other sharers";
     PutSLast,     desc="PutS and the block has no other sharers";
     PutMOwner,    desc="Dirty data writeback from the owner";
     PutMNonOwner, desc="Dirty data writeback from non-owner";
 
-    // Cache responses
+    // 缓存响应
     Data,         desc="Response to fwd request with data";
 
-    // From Memory
+    // 来自内存
     MemData,      desc="Data from memory";
     MemAck,       desc="Ack from memory that write is complete";
 }
@@ -120,37 +94,18 @@ structure(Entry, desc="...", interface="AbstractCacheEntry", main="false") {
 }
 ```
 
-In the `state_declaration` we define a default. For many things in SLICC
-you can specify a default. However, this default must use the C++ name
-(mangled SLICC name). For the state below you have to use the controller
-name and the name we use for states. In this case, since the name of the
-machine is "Directory" the name for "I" is "Directory"+"State" (for the
-name of the structure)+"I".
+在 `state_declaration` 中，我们定义了一个默认值。对于 SLICC 中的许多事物，您可以指定默认值。但是，此默认值必须使用 C++ 名称（修饰后的 SLICC 名称）。对于下面的状态，您必须使用控制器名称和我们用于状态的名称。在这种情况下，由于机器的名称是 "Directory"，因此 "I" 的名称是 "Directory"+"State"（对于结构的名称）+"I"。
 
-Note that the permissions in the directory are "memory-centric".
-Whereas, all of the states are cache centric as in Sorin et al.
+请注意，目录中的权限是“以内存为中心的”。鉴于，所有状态都是以缓存为中心的，如 Sorin 等人所述。
 
-In the `Entry` definition for the directory, we use a NetDest for both
-the sharers and the owner. This makes sense for the sharers, since we
-want a full bitvector for all L1 caches that may be sharing the block.
-The reason we also use a `NetDest` for the owner is to simply copy the
-structure into the message we send as a response as shown below.D
-Note that we add one extra parameter to the `Entry` declaration: `main="false"`.
-This extra parameter tells the replacement policy that this `Entry` is special and should be ignored.
-In the `DirectoryMemory` we are tracking *all* of the backing memory locations, so there is no need for a replacement policy.
+在目录的 `Entry` 定义中，我们对共享者和所有者都使用 NetDest。这对共享者有意义，因为我们想要一个用于所有可能共享块的 L1 缓存的完整位向量。我们也对所有者使用 `NetDest` 的原因是简单地将结构复制到我们作为响应发送的消息中，如下所示。
+请注意，我们向 `Entry` 声明添加了一个额外的参数：`main="false"`。
+此额外参数告诉替换策略此 `Entry` 是特殊的，应被忽略。
+在 `DirectoryMemory` 中，我们正在跟踪 *所有* 后备内存位置，因此不需要替换策略。
 
-In this implementation, we use a few more transient states than in Table
-8.2 in Sorin et al. to deal with the fact that the memory latency in
-unknown. In Sorin et al., the authors assume that the directory state
-and memory data is stored together in main-memory to simplify the
-protocol. Similarly, we also include new actions: the responses from
-memory.
+在此实现中，我们使用的瞬态比 Sorin 等人的表 8.2 多一些，以处理内存延迟未知的事实。在 Sorin 等人中，作者假设目录状态和内存数据一起存储在主内存中以简化协议。同样，我们还包括新的动作：来自内存的响应。
 
-Next, we have the functions that need to overridden and declared. The
-function `getDirectoryEntry` either returns the valid directory entry,
-or, if it hasn't been allocated yet, this allocates the entry.
-Implementing it this way may save some host memory since this is lazily
-populated.
+接下来，我们有需要覆盖和声明的函数。函数 `getDirectoryEntry` 要么返回有效的目录条目，要么如果尚未分配，则分配该条目。以这种方式实现可能会节省一些主机内存，因为这是延迟填充的。
 
 ```cpp
 Tick clockEdge();
@@ -158,7 +113,7 @@ Tick clockEdge();
 Entry getDirectoryEntry(Addr addr), return_by_pointer = "yes" {
     Entry dir_entry := static_cast(Entry, "pointer", directory[addr]);
     if (is_invalid(dir_entry)) {
-        // This first time we see this address allocate an entry for it.
+        // 我们第一次看到这个地址时为其分配一个条目。
         dir_entry := static_cast(Entry, "pointer",
                                  directory.allocate(addr, new Entry));
     }
@@ -215,11 +170,7 @@ int functionalWrite(Addr addr, Packet *pkt) {
     }
 ```
 
-Next, we need to implement the ports for the cache. First we specify the
-`out_port` and then the `in_port` code blocks. The only difference
-between the `in_port` in the directory and in the L1 cache is that the
-directory does not have a TBE or cache entry. Thus, we do not pass
-either into the `trigger` function.
+接下来，我们需要实现缓存的端口。首先我们指定 `out_port`，然后是 `in_port` 代码块。目录中的 `in_port` 与 L1 缓存中的唯一区别在于目录没有 TBE 或缓存条目。因此，我们不将这两者传递给 `trigger` 函数。
 
 ```cpp
 out_port(forward_out, RequestMsg, forwardToCache);
@@ -262,7 +213,7 @@ in_port(request_in, RequestMsg, requestFromCache) {
                 trigger(Event:GetM, in_msg.addr);
             } else if (in_msg.Type == CoherenceRequestType:PutS) {
                 assert(is_valid(e));
-                // If there is only a single sharer (i.e., the requestor)
+                // 如果只有一个共享者（即请求者）
                 if (e.Sharers.count() == 1) {
                     assert(e.Sharers.isElement(in_msg.Requestor));
                     trigger(Event:PutSLast, in_msg.addr);
@@ -284,15 +235,11 @@ in_port(request_in, RequestMsg, requestFromCache) {
 }
 ```
 
-The next part of the state machine file is the actions.
-First, we define actions for sending memory reads and writes.
-For this, we will use the special `memQueue_out` port that we defined above.
-If we `enqueue` messages on this port, they will be translated into "normal" gem5 `PacketPtr`s and sent across the memory port defined in the configuration.
-We will see how to connect this port in the
-configuration section \<MSI-config-section\>. Note that we need two
-different actions to send data to memory for both requests and responses
-since there are two different message buffers (virtual networks) that
-data might arrive on.
+状态机文件的下一部分是动作。
+首先，我们定义发送内存读取和写入的动作。
+为此，我们将使用上面定义的特殊 `memQueue_out` 端口。
+如果我们在该端口上 `enqueue` 消息，它们将被转换为“正常”的 gem5 `PacketPtr` 并通过配置中定义的内存端口发送。
+我们将在配置部分 \<MSI-config-section\> 中看到如何连接此端口。请注意，我们需要两个不同的动作来向内存发送数据以进行请求和响应，因为数据可能到达两个不同的消息缓冲区（虚拟网络）。
 
 ```cpp
 action(sendMemRead, "r", desc="Send a memory read request") {
@@ -337,12 +284,9 @@ action(sendRespDataToMem, "rw", desc="Write data to memory from resp") {
 }
 ```
 
-In this code, we also see the last way to add debug information to SLICC
-protocols: `DPRINTF`. This is exactly the same as a `DPRINTF` in gem5,
-except in SLICC only the `RubySlicc` debug flag is available.
+在这段代码中，我们还看到了向 SLICC 协议添加调试信息的最后一种方式：`DPRINTF`。这与 gem5 中的 `DPRINTF` 完全相同，只是在 SLICC 中只有 `RubySlicc` 调试标志可用。
 
-Next, we specify actions to update the sharers and owner of a particular
-block.
+接下来，我们指定更新特定块的共享者和所有者的动作。
 
 ```cpp
 action(addReqToSharers, "aS", desc="Add requestor to sharer list") {
@@ -378,8 +322,7 @@ action(clearOwner, "cO", desc="Clear the owner") {
 }
 ```
 
-The next set of actions send invalidates and forward requests to caches
-that the directory cannot deal with alone.
+下一组动作将无效和转发请求发送到目录无法单独处理的缓存。
 
 ```cpp
 action(sendInvToSharers, "i", desc="Send invalidate to all sharers") {
@@ -421,9 +364,7 @@ action(sendFwdGetM, "fM", desc="Send forward getM to owner") {
 }
 ```
 
-Now we have responses from the directory. Here we are peeking into the
-special buffer `responseFromMemory`. You can find the definition of
-`MemoryMsg` in `src/mem/protocol/RubySlicc_MemControl.sm`.
+现在我们有来自目录的响应。在这里，我们正在查看特殊的缓冲区 `responseFromMemory`。您可以在 `src/mem/protocol/RubySlicc_MemControl.sm` 中找到 `MemoryMsg` 的定义。
 
 ```cpp
 action(sendDataToReq, "d", desc="Send data from memory to requestor. May need to send sharer number, too") {
@@ -436,7 +377,7 @@ action(sendDataToReq, "d", desc="Send data from memory to requestor. May need to
             out_msg.DataBlk := in_msg.DataBlk;
             out_msg.MessageSize := MessageSizeType:Data;
             Entry e := getDirectoryEntry(address);
-            // Only need to include acks if we are the owner.
+            // 只有当我们是所有者时才需要包括 acks。
             if (e.Owner.isElement(in_msg.OriginalRequestorMachId)) {
                 out_msg.Acks := e.Sharers.count();
             } else {
@@ -460,7 +401,7 @@ action(sendPutAck, "a", desc="Send the put ack") {
 }
 ```
 
-Then, we have the queue management and stall actions.
+然后，我们有队列管理和停顿动作。
 
 ```cpp
 action(popResponseQueue, "pR", desc="Pop the response queue") {
@@ -476,13 +417,11 @@ action(popMemQueue, "pM", desc="Pop the memory queue") {
 }
 
 action(stall, "z", desc="Stall the incoming request") {
-    // Do nothing.
+    // 没做啥
 }
 ```
 
-Finally, we have the transition section of the state machine file. These
-mostly come from Table 8.2 in Sorin et al., but there are some extra
-transitions to deal with the unknown memory latency.
+最后，我们有状态机文件的转换部分。这些主要来自 Sorin 等人的表 8.2，但也有一些额外的转换来处理未知的内存延迟。
 
 ```cpp
 transition({I, S}, GetS, S_m) {
@@ -509,7 +448,7 @@ transition(I, GetM, M_m) {
 
 transition(M_m, MemData, M) {
     sendDataToReq;
-    clearSharers; // NOTE: This isn't *required* in some cases.
+    clearSharers; // 注意：这在某些情况下并不 *需要*。
     popMemQueue;
 }
 
@@ -583,12 +522,12 @@ transition(SS_m, MemAck, S) {
     popMemQueue;
 }
 
-// If we get another request for a block that's waiting on memory,
-// stall that request.
+// 如果我们收到对正在等待内存的块的另一个请求，
+// 停顿该请求。
 transition({MI_m, SS_m, S_m, M_m}, {GetS, GetM}) {
     stall;
 }
 ```
 
-You can download the complete `MSI-dir.sm` file
-[here](https://gem5.googlesource.com/public/gem5/+/refs/heads/stable/src/learning_gem5/part3/MSI-dir.sm).
+您可以下载完整的 `MSI-dir.sm` 文件
+[这里](https://gem5.googlesource.com/public/gem5/+/refs/heads/stable/src/learning_gem5/part3/MSI-dir.sm)。

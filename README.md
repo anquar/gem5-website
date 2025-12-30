@@ -1,5 +1,6 @@
 # gem5 website
 
+
 ## 中文翻译版
 
 本仓库维护 **gem5 官网/文档的中文翻译**，并部署到 **Cloudflare Pages**：
@@ -24,9 +25,9 @@ git remote -v
 
 ### Cloudflare Pages 推荐配置
 
-- **Production branch**: `main`
-- **Build command**: `bundle exec jekyll build --config _config.yml`
-- **Build output directory**: `_site`
+- **生产分支（Production branch）**: `main`
+- **构建命令（Build command）**: `bundle exec jekyll build --config _config.yml`
+- **构建输出目录（Build output directory）**: `_site`
 
 > 仓库已在 `.gitignore` 中忽略 `_site/`，建议不要提交构建产物。
 
@@ -37,157 +38,94 @@ git remote -v
   - 定时把 `upstream-main` 镜像到上游最新
   - 若检测到更新，会自动创建一个带 `sync` 标签的 Issue，提醒你开 `sync/YYYYMMDD` PR 进行人工同步与冲突处理
 
-## Development
 
-You may clone the repository, and run a local instance of the website
-using:
+## 开发
+
+你可以克隆本仓库，并通过以下命令在本地运行网站：
 
 ```
-git clone https://github.com/gem5/website
+git clone https://github.com/anquar/gem5-website
 cd website
 bundle
 jekyll serve --config _config.yml,_config_dev.yml
 ```
 
-The jekyll server may also be run using:
+也可以使用 `bundle exec` 的方式启动 Jekyll 服务器：
 
 ```
 bundle exec jekyll serve --config _config.yml,_config_dev.yml
 ```
 
-Changes may be made and committed using:
+修改完成后，可用以下命令提交：
 
 ```
 git add <changed files>
 git commit
 ```
 
-The commit message must adhere to our style. The first line of the commit
-is the "header". **The header line must not exceed 65 characters and adequately
-describe the change**. To be consistent with commits made to the gem5 repository,
-the header should start with a `website` tag followed by a colon.
+提交信息（commit message）必须遵循我们的格式规范。提交信息第一行是“标题（header）”。
+**标题行不得超过 65 个字符，并应准确描述本次变更**。为与 gem5 仓库的提交风格保持一致，
+标题应以 `website` 标签开头，后跟冒号。
 
-After this, a more detailed description of the commit can be included. This is
-inserted below the header, separated by an empty line. Including a description
-is optional but strongly recommended for complex changes. The description may
-span multiple lines, and multiple paragraphs. **No line in the description
-may exceed 72 characters**. We also recommend adding reference to any relevant
-GitHub issue so the context of a change can be more easily understood.
+在标题之后，你可以添加更详细的说明：与标题之间用一个空行分隔。详细说明是可选的，
+但对于复杂改动强烈建议填写。说明可以跨多行、甚至多段。**说明中的任意一行不得超过
+72 个字符**。我们也建议关联相关的 GitHub Issue，方便读者理解改动背景。
 
-Below is an example of how a gem5 website commit message should be formatted:
+下面是 gem5 网站仓库提交信息的示例格式：
 
 ```
-website: This is an example header
+这是一个示例标题
 
-This is a more detailed description of the commit. This can be as long as
-is necessary to adequately describe the change.
+这里是更详细的提交说明。你可以写到足够长，以便充分描述本次改动。
 
-A description may spawn multiple paragraphs if desired.
-
-Issue: https://github.com/gem5/gem5/issues/123
+如有需要，说明也可以分成多段。
 ```
 
-## Submitting a contribution
-
-We utilize GitHub to review changes made to the website. To make
-changes, follow the steps below.
-
-1. Fork the gem5 repository on GitHub from https://github.com/gem5/website/.
-2. Create a new branch in your forked repository for your changes.
-3. Commit your changes to the new branch.
-4. Push the branch to your forked repository.
-5. Open a pull request from your branch in your forked repository to the main gem5 website repository.
-
-
-If you have not signed up for an account on the github
-(https://github.com/), you first have to create an account.
-
- 1. Go to https://github.com/
- 2. Click "Sign up" in the upper right corner.
-
-Changes are required to have a `Change-ID`, which can be added using the pre-commit
-hook.  This can be installed via the following:
-
-``` bash
-pip install pre-commit
-pre-commit install
-```
-
-### Stable vs. Develop branch
-
-The rule for when to work on the stable vs. develop branch is as follows:
-
-* If the change applies to the current gem5 stable, then the change should be on the stable branch of the gem5 website.
-
-* If the change cannot work on gem5 stable and requires updates to gem5 that are only found on gem5 develop, then the change should be on the develop branch of the website.
-
-When a new version of gem5 is released, the develop branch is merged into the stable branch. When the website's stable and develop branches diverge, we merge stable into develop.
-
-### Code Review
-
-Once a change has been submitted to GitHub, you may view the change at
-<https://github.com/gem5/website/pulls>.
-
-Through the GitHub pull request we strongly advise you add reviewers to your change.
-GitHub will automatically notify those you assign. We recommend you add both
-**Bobby R. Bruce <bbruce@ucdavis.edu>** (@BobbyRBruce) and **Jason Lowe-Power
-<jason@lowepower.com>** (@powerjg) as reviewers.
-
-Reviewers will review the change. For non-trivial edits, it is not unusual
-for a change to receive feedback from reviewers that they want incorporated
-before flagging as acceptable for merging into the gem5 website repository.
-**All communications between reviewers and contributors should be done in a
-polite manner. Rude and/or dismissive remarks will not be tolerated**.
-
-Once your change has been accepted by reviewers a maintainer will squash and merge your pull request into the gem5 website repository.
-into the gem5 website repository. The website will be automatically updated
-with your changes within 30 minutes.
-
-## Directory Structure
+## 目录结构
 
 #### _data
 
-Yaml files, for easily editing navigation.
+YAML 文件，用于便捷地编辑导航。
 
 #### _includes
 
-Page <head> section and main navigation bar are here.
+页面的 `<head>` 区段和主导航栏在这里。
 
 #### _layouts
 
-Different layout templates used on the site.
-* default: base layout
-* page: any regular page
-* toc: a page that requires table of contents
-* post: blog post page
-* documentation: documentation page
+网站使用的不同布局模板：
+* default：基础布局
+* page：普通页面
+* toc：需要目录（Table of Contents）的页面
+* post：博客文章页面
+* documentation：文档页面
 
 #### _pages
 
-All pages (other than the index.html home page) should be placed in this folder. There is a subfolder /documentation where pages meant for the documentation part of the site can be kept. This is purely for organization and ease of finding things. Reorganizing the _pages folder should not affect the site.
+所有页面（除首页 `index.html` 之外）都应放在此目录。这里有一个子目录 `/documentation`，用于存放网站文档部分的页面。这只是为了组织结构清晰、便于查找。重新组织 `_pages` 目录一般不应影响网站。
 
 #### _posts
 
-Holds blog posts.
+存放博客文章。
 
 #### _sass
 
-All custom css is kept in `_layout.scss`.
+所有自定义 CSS 都放在 `_layout.scss` 中。
 
 #### assets
 
-Images and javascript files.
+图片与 JavaScript 文件。
 
 #### blog
 
-Holds index.html of blog page.
+存放博客列表页的 `index.html`。
 
 
-## Navigation
+## 导航栏
 
-To edit the navigation bar:
-Go to `_includes/header.html`
-* Navigation element without submenu:
+要编辑导航栏：
+打开 `_includes/header.html`
+* 不带子菜单的导航项：
 
 ```
 <li class="nav-item {% if page.title == "Home" %}active{% endif %}">
@@ -195,12 +133,12 @@ Go to `_includes/header.html`
 </li>
 ```
 
-Replace `Home` in `{% if page.title == "Home" %}` to your page's title.
-Replace `/` in `href="{{ "/" | prepend: site.baseurl }}"` to the page's permalink.
-Replace `Home` in `>Home</a>` with what you want the navbar to show.
+将 `{% if page.title == "Home" %}` 中的 `Home` 替换为你的页面标题。
+将 `href="{{ "/" | prepend: site.baseurl }}"` 中的 `/` 替换为页面的 permalink。
+将 `>Home</a>` 中的 `Home` 替换为你希望导航栏显示的文本。
 
 
-* Navigation element with submenu:
+* 带子菜单的导航项：
 
 ```
 <li class="nav-item dropdown {% if page.parent == "about" %}active{% endif %}">
@@ -215,42 +153,41 @@ Replace `Home` in `>Home</a>` with what you want the navbar to show.
 </li>
 ```
 
-Replace `about` in `{% if page.parent == "about" %}` with a word that will represent the parent of all pages in the submenu. Make sure the frontmatter in those pages includes parent: [your_parent_identifier].
-Replace the permalink and title in all the `<a></a>` submenu items.
+将 `{% if page.parent == "about" %}` 中的 `about` 替换为一个标识符，用来表示该子菜单下所有页面的“父级”。并确保这些页面的 frontmatter 中包含 `parent: [你的父级标识符]`。
+将子菜单中所有 `<a></a>` 的 permalink 与显示标题按需替换。
 
 
+## 文档
 
-## Documentation
+#### 编辑文档导航
 
-#### Edit Documentation Navigation
+##### 结构：
 
-##### Structure:
-
-Parent Topic:
-- subtopic
-- subtopic
+父级主题：
+- 子主题
+- 子主题
 - ...
 
-Parent Topic:
-- subtopic
+父级主题：
+- 子主题
 - ...
 
-To edit the documentation navigation, simply edit the `documentation.yml` file in the `_data` folder. `docs` lists the parent topics, and within it `subitems` lists its subtopics. This is an example of how it should be formatted:
+要编辑文档导航，只需编辑 `_data` 目录下的 `documentation.yml` 文件。`docs` 列出父级主题，而每个主题中的 `subitems` 列出其子主题。下面是格式示例：
 
 ```
 title: Documentation
 
 docs:
-  - title: Getting Started     # Parent Topic
-    id: gettingstarted     # see below
-    url: /gettingstarted     # see below
+  - title: Getting Started     # 父级主题
+    id: gettingstarted     # 见下文
+    url: /gettingstarted     # 见下文
     subitems:
-      - page: Introduction     # Name that will appear in navigation
-        url: /introduction     # url
+      - page: Introduction     # 导航中显示的名称
+        url: /introduction     # 链接
       - page: Dependencies
         url: /dependencies
-  - title: Debugging     # Parent Topic
-    id: debugging     # see below
+  - title: Debugging     # 父级主题
+    id: debugging     # 见下文
     subitems:
       - page: Piece 1
         url: /piece1
@@ -259,55 +196,55 @@ docs:
 
 ```
 
-Notes:
-`id` is an identifier that links subtopics to its parent. It is required and must not contain any spaces. The subtopic pages must include in the frontmatter `parent: id` with `id` being the parent's `id`.
+说明：
+`id` 是用于把子主题关联到父主题的标识符。它是必填项，且不得包含空格。子主题页面的 frontmatter 必须包含 `parent: id`，其中 `id` 为其父主题的 `id`。
 
-`url` is optional for parent topics, if a parent topic has its own a page. If no `url` is provided, it will automatically link to the first subtopic.
+如果父主题本身也有页面，则父主题的 `url` 可选；若未提供 `url`，父主题会自动链接到第一个子主题。
 
-#### Add New Page
+#### 添加新页面
 
-To add a new documentation page, first add frontmatter at the top of either the markdown or html file to be added.
+要添加新的文档页面，先在将要新增的 Markdown 或 HTML 文件顶部添加 frontmatter。
 
 ```
 ---
-layout: documentation     // specify page layout
-title: Getting Started     // title of the page
-parent: gettingstarted     // see below
+layout: documentation     // 指定页面布局
+title: Getting Started     // 页面标题
+parent: gettingstarted     // 见下文
 permalink: /gettingstarted/     // url
 ---
 ```
 
-Notes:
+说明：
 
-`parent` should be the exact same as the `id` of its parent topic that is assigned to it in `_data/documentation.yml` file. (If the page is the parent topic, `parent` is the same as the `id` assigned to it in `_data/documentation.yml` file.)
+`parent` 的值应与 `_data/documentation.yml` 中为其父主题设置的 `id` 完全一致。（若该页面本身是父主题，则 `parent` 与在 `_data/documentation.yml` 中为其设置的 `id` 相同。）
 
-Place the file in `_pages/documentation`. Make sure to add the page to the documentation navigation, explained by the section above.
+将文件放到 `_pages/documentation` 目录，并确保按上文所述将该页面加入文档导航中。
 
-#### Indicating outdated information
+#### 标注过期信息
 
-To flag information in a page as valid, use an outdated notice in the `.md` file of that page:
+要标注某页内容已过期，请在该页的 `.md` 文件中使用 “outdated notice”：
 
 ```
 {: .outdated-notice}
 This page is outdated!
 ```
 
-This will be replaced by a warning element containing the text "**Note: This page is outdated.**", followed by the content succeeding the notice - in this case, "This page is outdated!". In this way, you can add additional information explaining why or how the page is outdated, and general tips on what to do to mitigate this issue.
+这段内容会被替换为一个警告提示元素，包含文本 “**Note: This page is outdated.**”，并在其后附上该提示之后的内容——此处即 “This page is outdated!”。你可以在提示后补充更多说明，例如为什么过期、如何过期，以及缓解或替代方案的通用建议。
 
-Notes:
+说明：
 
-Make sure that the text following `{: .outdated-notice}` is not used as a title, heading, or any other important Markdown element, as it will be incorporated into the outdated notice and break formatting.
+请确保 `{: .outdated-notice}` 之后的文本不要用作标题、段落标题或其它重要的 Markdown 元素，否则它会被并入过期提示中并破坏排版。
 
-## Blog
+## 博客
 
-Add blog page to _posts folder.
-Page must be named in this format:
+将博客文章放到 `_posts` 目录中。
+文件名必须符合以下格式：
 `yyyy-mm-dd-name-of-file.md`
-At the top of the page add:
+并在文件顶部添加：
 
 ```
 ---
-layout: post     // specify page layout
+layout: post     // 指定页面布局
 title: How to Debug
 author: John
 date: yyyy-mm-dd

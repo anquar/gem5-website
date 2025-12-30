@@ -9,58 +9,52 @@ author: Jason Lowe-Power
 
 # MOESI CMP token
 
-### Protocol Overview
+### 协议概述
 
-  - This protocol also models a 2-level cache hierarchy.
-  - It maintains coherence permission by explicitly exchanging and
-    counting tokens.
-  - A fix number of token are assigned to each cache block in the
-    beginning, the number of token remains unchanged.
-  - To write a block, the processor must have all the token for that
-    block. For reading at least one token is required.
-  - The protocol also has a persistent message support to avoid
-    starvation.
+  - 该协议还建模了 2 级缓存层次结构。
+  - 它通过显式交换和计数 token 来维护一致性权限。
+  - 在开始时为每个缓存块分配固定数量的 token，token 数量保持不变。
+  - 要写入块，处理器必须拥有该块的所有 token。读取至少需要一个 token。
+  - 该协议还具有持久消息支持以避免饥饿。
 
-### Related Files
+### 相关文件
 
   - **src/mem/protocols**
-      - **MOESI_CMP_token-L1cache.sm**: L1 cache controller
-        specification
-      - **MOESI_CMP_token-L2cache.sm**: L2 cache controller
-        specification
-      - **MOESI_CMP_token-dir.sm**: directory controller specification
-      - **MOESI_CMP_token-dma.sm**: dma controller specification
-      - **MOESI_CMP_token-msg.sm**: message type specification
-      - **MOESI_CMP_token.slicc**: container file
+      - **MOESI_CMP_token-L1cache.sm**: L1 缓存控制器规范
+      - **MOESI_CMP_token-L2cache.sm**: L2 缓存控制器规范
+      - **MOESI_CMP_token-dir.sm**: 目录控制器规范
+      - **MOESI_CMP_token-dma.sm**: DMA 控制器规范
+      - **MOESI_CMP_token-msg.sm**: 消息类型规范
+      - **MOESI_CMP_token.slicc**: 容器文件
 
-### Controller Description
+### 控制器描述
 
-### **L1 Cache**
+### **L1 缓存**
 
-| States    | Invariants                                                                                                                                                                                                                                                                                                                                                   |
+| 状态    | 不变式                                                                                                                                                                                                                                                                                                                                                   |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **MM**    | The cache block is held exclusively by this node and is potentially modified (similar to conventional "M" state).                                                                                                                                                                                                                                            |
-| **MM_W** | The cache block is held exclusively by this node and is potentially modified (similar to conventional "M" state). Replacements and DMA accesses are not allowed in this state. The block automatically transitions to MM state after a timeout.                                                                                                              |
-| **O**     | The cache block is owned by this node. It has not been modified by this node. No other node holds this block in exclusive mode, but sharers potentially exist.                                                                                                                                                                                               |
-| **M**     | The cache block is held in exclusive mode, but not written to (similar to conventional "E" state). No other node holds a copy of this block. Stores are not allowed in this state.                                                                                                                                                                           |
-| **M_W**  | The cache block is held in exclusive mode, but not written to (similar to conventional "E" state). No other node holds a copy of this block. Only loads and stores are allowed. Silent upgrade happens to MM_W state on store. Replacements and DMA accesses are not allowed in this state. The block automatically transitions to M state after a timeout. |
-| **S**     | The cache block is held in shared state by 1 or more nodes. Stores are not allowed in this state.                                                                                                                                                                                                                                                            |
-| **I**     | The cache block is invalid.                                                                                                                                                                                                                                                                                                                                  |
+| **MM**    | 缓存块由该节点独占持有，并且可能已被修改（类似于传统的 "M" 状态）。                                                                                                                                                                                                                                            |
+| **MM_W** | 缓存块由该节点独占持有，并且可能已被修改（类似于传统的 "M" 状态）。在此状态下不允许替换和 DMA 访问。块在超时后自动转换到 MM 状态。                                                                                                              |
+| **O**     | 缓存块由该节点拥有。它尚未被该节点修改。没有其他节点以独占模式持有此块，但可能存在共享者。                                                                                                                                                                                               |
+| **M**     | 缓存块以独占模式持有，但尚未写入（类似于传统的 "E" 状态）。没有其他节点持有此块的副本。在此状态下不允许存储。                                                                                                                                                                           |
+| **M_W**  | 缓存块以独占模式持有，但尚未写入（类似于传统的 "E" 状态）。没有其他节点持有此块的副本。仅允许加载和存储。在存储时静默升级到 MM_W 状态。在此状态下不允许替换和 DMA 访问。块在超时后自动转换到 M 状态。 |
+| **S**     | 缓存块由 1 个或多个节点在共享状态下持有。在此状态下不允许存储。                                                                                                                                                                                                                                                            |
+| **I**     | 缓存块无效。                                                                                                                                                                                                                                                                                                                                  |
 
-### **L2 cache**
+### **L2 缓存**
 
-| States | Invariants                                                                                                                                                                                                          |
+| 状态 | 不变式                                                                                                                                                                                                          |
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **NP** | The cache block is held exclusively by this node and is potentially locally modified (similar to conventional "M" state).                                                                                           |
-| **O**  | The cache block is owned by this node. It has not been modified by this node. No other node holds this block in exclusive mode, but sharers potentially exist.                                                      |
-| **M**  | The cache block is held in exclusive mode, but not written to (similar to conventional "E" state). No other node holds a copy of this block. Stores are not allowed in this state.                                  |
-| **S**  | The cache line holds the most recent, correct copy of the data. Other processors in the system may hold copies of the data in the shared state, as well. The cache line can be read, but not written in this state. |
-| **I**  | The cache line is invalid and does not hold a valid copy of the data.                                                                                                                                               |
+| **NP** | 缓存块由该节点独占持有，并且可能已被本地修改（类似于传统的 "M" 状态）。                                                                                           |
+| **O**  | 缓存块由该节点拥有。它尚未被该节点修改。没有其他节点以独占模式持有此块，但可能存在共享者。                                                      |
+| **M**  | 缓存块以独占模式持有，但尚未写入（类似于传统的 "E" 状态）。没有其他节点持有此块的副本。在此状态下不允许存储。                                  |
+| **S**  | 缓存行保存数据的最新、正确副本。系统中的其他处理器也可能在共享状态下保存数据的副本。在此状态下可以读取缓存行，但不能写入。 |
+| **I**  | 缓存行无效，不保存数据的有效副本。                                                                                                                                               |
 
-### **Directory controller**
+### **目录控制器**
 
-| States | Invariants |
+| 状态 | 不变式 |
 | ------ | ---------- |
-| **O**  | Owner .    |
-| **NO** | Not Owner. |
-| **L**  | Locked.    |
+| **O**  | 所有者。    |
+| **NO** | 非所有者。 |
+| **L**  | 已锁定。    |

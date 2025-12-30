@@ -9,76 +9,59 @@ author: Jason Lowe-Power
 
 # MOESI Hammer
 
-This is an implementation of AMD's Hammer protocol, which is used in
-AMD's Hammer chip (also know as the Opteron or Athlon 64). The protocol
-implements both the original a HyperTransport protocol, as well as the
-more recent ProbeFilter protocol. The protocol also includes a full-bit
-directory mode.
+这是 AMD 的 Hammer 协议的实现，用于 AMD 的 Hammer 芯片（也称为 Opteron 或 Athlon 64）。该协议实现了原始的 HyperTransport 协议以及更新的 ProbeFilter 协议。该协议还包括全位目录模式。
 
-### Related Files
+### 相关文件
 
   - **src/mem/protocols**
-      - **MOESI_hammer-cache.sm**: cache controller specification
-      - **MOESI_hammer-dir.sm**: directory controller specification
-      - **MOESI_hammer-dma.sm**: dma controller specification
-      - **MOESI_hammer-msg.sm**: message type specification
-      - **MOESI_hammer.slicc**: container file
+      - **MOESI_hammer-cache.sm**: 缓存控制器规范
+      - **MOESI_hammer-dir.sm**: 目录控制器规范
+      - **MOESI_hammer-dma.sm**: DMA 控制器规范
+      - **MOESI_hammer-msg.sm**: 消息类型规范
+      - **MOESI_hammer.slicc**: 容器文件
 
-### Cache Hierarchy
+### 缓存层次结构
 
-This protocol implements a 2-level private cache hierarchy. It assigns
-separate Instruction and Data L1 caches, and a unified L2 cache to each
-core. These caches are private to each core and are controlled with one
-shared cache controller. This protocol enforce exclusion between L1 and
-L2
-caches.
+该协议实现了 2 级私有缓存层次结构。它为每个核心分配独立的指令和数据 L1 缓存，以及统一的 L2 缓存。这些缓存对每个核心都是私有的，并由一个共享缓存控制器控制。该协议强制 L1 和 L2 缓存之间的排他性。
 
-### Stable States and Invariants
+### 稳定状态和不变式
 
-| States | Invariants                                                                                                                                                                                                          |
+| 状态 | 不变式                                                                                                                                                                                                          |
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **MM** | The cache block is held exclusively by this node and is potentially locally modified (similar to conventional "M" state).                                                                                           |
-| **O**  | The cache block is owned by this node. It has not been modified by this node. No other node holds this block in exclusive mode, but sharers potentially exist.                                                      |
-| **M**  | The cache block is held in exclusive mode, but not written to (similar to conventional "E" state). No other node holds a copy of this block. Stores are not allowed in this state.                                  |
-| **S**  | The cache line holds the most recent, correct copy of the data. Other processors in the system may hold copies of the data in the shared state, as well. The cache line can be read, but not written in this state. |
-| **I**  | The cache line is invalid and does not hold a valid copy of the data.                                                                                                                                               |
+| **MM** | 缓存块由该节点独占持有，并且可能已被本地修改（类似于传统的 "M" 状态）。                                                                                           |
+| **O**  | 缓存块由该节点拥有。它尚未被该节点修改。没有其他节点以独占模式持有此块，但可能存在共享者。                                                      |
+| **M**  | 缓存块以独占模式持有，但尚未写入（类似于传统的 "E" 状态）。没有其他节点持有此块的副本。在此状态下不允许存储。                                  |
+| **S**  | 缓存行保存数据的最新、正确副本。系统中的其他处理器也可能在共享状态下保存数据的副本。在此状态下可以读取缓存行，但不能写入。 |
+| **I**  | 缓存行无效，不保存数据的有效副本。                                                                                                                                               |
 
-### Cache controller
+### 缓存控制器
 
-**The notation used in the controller FSM diagrams is described
-[here](#Coherence_controller_FSM_Diagrams "wikilink").**
+**控制器 FSM 图中使用的符号在[此处](#Coherence_controller_FSM_Diagrams "wikilink")描述。**
 
-MOESI_hammer supports cache flushing. To flush a cache line, the cache
-controller first issues a GETF request to the directory to block the
-line until the flushing is completed. It then issues a PUTF and writes
-back the cache line.
+MOESI_hammer 支持缓存刷新。要刷新缓存行，缓存控制器首先向目录发出 GETF 请求以阻塞该行，直到刷新完成。然后它发出 PUTF 并写回缓存行。
 
 ![MOESI_hammer_cache_FSM.jpg](/assets/img/MOESI_hammer_cache_FSM.jpg
 "MOESI_hammer_cache_FSM.jpg")
 
-### Directory controller
+### 目录控制器
 
-MOESI_hammer memory module, unlike a typical directory protocol, does
-not contain any directory state and instead broadcasts requests to all
-the processors in the system. In parallel, it fetches the data from the
-DRAM and forward the response to the requesters.
+MOESI_hammer 内存模块与典型的目录协议不同，不包含任何目录状态，而是向系统中的所有处理器广播请求。同时，它从 DRAM 获取数据并将响应转发给请求者。
 
 probe filter: TODO
 
-#### **Stable States and Invariants**
+#### **稳定状态和不变式**
 
-| States | Invariants                                                           |
+| 状态 | 不变式                                                           |
 | ------ | -------------------------------------------------------------------- |
-| **NX** | Not Owner, probe filter entry exists, block in O at Owner.           |
-| **NO** | Not Owner, probe filter entry exists, block in E/M at Owner.         |
-| **S**  | Data clean, probe filter entry exists pointing to the current owner. |
-| **O**  | Data clean, probe filter entry exists.                               |
-| **E**  | Exclusive Owner, no probe filter entry.                              |
+| **NX** | 非所有者，probe filter 条目存在，块在所有者处为 O。           |
+| **NO** | 非所有者，probe filter 条目存在，块在所有者处为 E/M。         |
+| **S**  | 数据干净，probe filter 条目存在，指向当前所有者。 |
+| **O**  | 数据干净，probe filter 条目存在。                               |
+| **E**  | 独占所有者，无 probe filter 条目。                              |
 
-#### **Controller**
+#### **控制器**
 
-**The notation used in the controller FSM diagrams is described
-[here](#Coherence_controller_FSM_Diagrams "wikilink").**
+**控制器 FSM 图中使用的符号在[此处](#Coherence_controller_FSM_Diagrams "wikilink")描述。**
 
 ![MOESI_hammer_dir_FSM.jpg](/assets/img/MOESI_hammer_dir_FSM.jpg
 "MOESI_hammer_dir_FSM.jpg")

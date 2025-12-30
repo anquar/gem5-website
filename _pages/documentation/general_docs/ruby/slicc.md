@@ -9,45 +9,22 @@ author: Jason Lowe-Power
 
 # SLICC
 
-SLICC is a domain specific language for specifying cache coherence
-protocols. The SLICC compiler generates C++ code for different
-controllers, which can work in tandem with other parts of Ruby. The
-compiler also generates an HTML specification of the protocol. HTML
-generation is turned off by default. To enable HTML output, pass the
-option "SLICC_HTML=True" to scons when compiling.
+SLICC 是一种用于指定缓存一致性协议的领域特定语言。SLICC 编译器为不同的控制器生成 C++ 代码，这些代码可以与 Ruby 的其他部分协同工作。
+编译器还会生成协议的 HTML 规范。HTML 生成默认关闭。要启用 HTML 输出，请在编译时向 scons 传递选项 "SLICC_HTML=True"。
 
-### Input To the Compiler
+### 编译器输入
 
-The SLICC compiler takes, as input, files that specify the controllers
-involved in the protocol. The .slicc file specifies the different files
-used by the particular protocol under consideration. For example, if
-trying to specify the MI protocol using SLICC, then we may use MI.slicc
-as the file that specifies all the files necessary for the protocol. The
-files necessary for specifying a protocol include the definitions of the
-state machines for different controllers, and of the network messages
-that are passed on between these controllers.
+SLICC 编译器将指定协议中涉及的控制器的文件作为输入。.slicc 文件指定所考虑的特定协议使用的不同文件。例如，如果尝试使用 SLICC 指定 MI 协议，则可以使用 MI.slicc 作为指定协议所需的所有文件的文件。指定协议所需的文件包括不同控制器的状态机定义，以及在这些控制器之间传递的网络消息定义。
 
-The files have a syntax similar to that of C++. The compiler, written
-using [PLY (Python Lex-Yacc)](http://www.dabeaz.com/ply/), parses these
-files to create an Abstract Syntax Tree (AST). The AST is then traversed
-to build some of the internal data structures. Finally the compiler
-outputs the C++ code by traversing the tree again. The AST represents
-the hierarchy of different structures present with in a state machine.
-We describe these structures next.
+这些文件的语法类似于 C++。编译器使用 [PLY (Python Lex-Yacc)](http://www.dabeaz.com/ply/) 编写，解析这些文件以创建抽象语法树 (AST)。然后遍历 AST 以构建一些内部数据结构。最后，编译器通过再次遍历树来输出 C++ 代码。AST 表示状态机中存在的不同结构的层次结构。接下来我们描述这些结构。
 
-### Protocol State Machines
+### 协议状态机
 
-In this section we take a closer look at what goes in to a file
-containing specification of a state machine.
+在本节中，我们更仔细地了解包含状态机规范的文件中的内容。
 
-#### Specifying Data Members
+#### 指定数据成员
 
-Each state machine is described using SLICC's **machine** datatype. Each
-machine has several different types of members. Machines for cache and
-directory controllers include cache memory and directory memory data
-members respectively. We will use the MI protocol available in
-src/mem/protocol as our running example. So here is how you might want
-to start writing a state machine
+每个状态机都使用 SLICC 的 **machine** 数据类型来描述。每个机器都有几种不同类型的成员。缓存和目录控制器的机器分别包括缓存内存和目录内存数据成员。我们将使用 src/mem/protocol 中可用的 MI 协议作为运行示例。因此，以下是如何开始编写状态机的方法
 
 ```
 machine(MachineType:L1Cache, "MI Example L1 Cache")
@@ -58,37 +35,21 @@ machine(MachineType:L1Cache, "MI Example L1 Cache")
       // Add rest of the stuff
     }
 ```
-In order to let the controller receive messages from different
-entities in the system, the machine has a number of **Message
-Buffers**. These act as input and output ports for the machine. Here
-is an example specifying the output ports.
+为了让控制器从系统中的不同实体接收消息，机器有多个**消息缓冲区**。这些充当机器的输入和输出端口。以下是指定输出端口的示例。
 
 ```
- MessageBuffer requestFromCache, network="To", virtual_network="2", ordered="true";
- MessageBuffer responseFromCache, network="To", virtual_network="4", ordered="true";
+ MessageBuffer requestFromCache, network="To", virtual_network="2", ordered="true";
+ MessageBuffer responseFromCache, network="To", virtual_network="4", ordered="true";
 ```
 
-Note that Message Buffers have some attributes that need to be specified
-correctly. Another example, this time for specifying the input
-ports.
+请注意，消息缓冲区有一些需要正确指定的属性。另一个示例，这次是指定输入端口。
 
 ```
  MessageBuffer forwardToCache, network="From", virtual_network="3", ordered="true";
  MessageBuffer responseToCache, network="From", virtual_network="4", ordered="true";
 ```
 
-Next the machine includes a declaration of the **states** that
-machine can possibly reach. In cache coherence protocol, states can
-be of two types -- stable and transient. A cache block is said to be
-in a stable state if in the absence of any activity (in coming
-request for the block from another controller, for example), the
-cache block would remain in that state for ever. Transient states
-are required for transitioning between stable states. They are
-needed when ever the transition between two stable states can not be
-done in an atomic fashion. Next is an example that shows how states
-are declared. SLICC has a keyword **state_declaration** that has to
-be used for declaring
-states.
+接下来，机器包括机器可能达到的**状态**声明。在缓存一致性协议中，状态可以是两种类型——稳定状态和瞬态。如果在没有任何活动的情况下（例如，来自另一个控制器的块请求），缓存块将永远保持在该状态，则称缓存块处于稳定状态。瞬态是在稳定状态之间转换所需的。当两个稳定状态之间的转换不能以原子方式完成时，就需要它们。接下来是一个显示如何声明状态的示例。SLICC 有一个关键字 **state_declaration**，必须用于声明状态。
 
 ```
 state_declaration(State, desc="Cache states") {
@@ -102,13 +63,9 @@ state_declaration(State, desc="Cache states") {
 }
 ```
 
-The states I and M are the only stable states in this example. Again
-note that certain attributes have to be specified with the states.
+状态 I 和 M 是此示例中唯一的稳定状态。再次注意，必须为状态指定某些属性。
 
-The state machine needs to specify the **events** it can handle and
-thus transition from one state to another. SLICC provides the
-keyword **enumeration** which can be used for specifying the set of
-possible events. An example to shed more light on this -
+状态机需要指定它可以处理的**事件**，从而从一个状态转换到另一个状态。SLICC 提供了关键字 **enumeration**，可用于指定可能的事件集。一个示例以进一步说明这一点 -
 
 ```
 enumeration(Event, desc="Cache events") {
@@ -125,11 +82,8 @@ enumeration(Event, desc="Cache events") {
 }
 ```
 
-While developing a protocol machine, we may need to define
-structures that represent different entities in a memory system.
-SLICC provides the keyword **structure** for this purpose. An
-example
-follows
+在开发协议机器时，我们可能需要定义表示内存系统中不同实体的结构。
+SLICC 为此目的提供了关键字 **structure**。以下是一个示例
 
 ```
 structure(Entry, desc="...", interface="AbstractCacheEntry") {
@@ -139,12 +93,7 @@ structure(Entry, desc="...", interface="AbstractCacheEntry") {
 }
 ```
 
-The cool thing about using SLICC's structure is that it automatically
-generates for you the get and set functions on different fields. It also
-writes a nice print function and overloads the \<\< operator. But in
-case you would prefer do everything on your own, you can make use of the
-keyword **external** in the declaration of the structure. This would
-prevent SLICC from generating C++ code for this structure.
+使用 SLICC 结构的一个好处是，它会自动为您生成不同字段的 get 和 set 函数。它还会编写一个很好的 print 函数并重载 \<\< 运算符。但是，如果您希望自己完成所有工作，可以在结构声明中使用关键字 **external**。这将阻止 SLICC 为此结构生成 C++ 代码。
 
 ```
 structure(TBETable, external="yes") {
@@ -155,27 +104,15 @@ structure(TBETable, external="yes") {
 }
 ```
 
-In fact many predefined types exist in src/mem/protocol/RubySlicc_\*.sm
-files. You can make use of them, or if you need new types, you can
-define new ones as well. You can also use the keyword **interface** to
-make use of inheritance features available in C++. Note that currently
-SLICC supports public inheritance only.
+实际上，src/mem/protocol/RubySlicc_\*.sm 文件中存在许多预定义类型。您可以使用它们，或者如果需要新类型，也可以定义新类型。您还可以使用关键字 **interface** 来利用 C++ 中可用的继承功能。请注意，目前 SLICC 仅支持公共继承。
 
-We can also declare and define functions as we do in C++. There are
-certain functions that the compiler expects would always be defined
-by the controller. These include
+我们也可以像在 C++ 中一样声明和定义函数。编译器期望控制器始终定义某些函数。这些包括
 - getState()
 - setState()
 
-#### Input for the Machine
+#### 机器的输入
 
-Since protocol is state machine, we need to specify how to machine
-transitions from one state to another on receiving inputs. As mentioned
-before, each machine has several input and output ports. For each input
-port, the **in_port** keyword is used for specifying the behavior of
-the machine, when a message is received on that input port. An example
-follows that shows the syntax for declaring an input
-port.
+由于协议是状态机，我们需要指定机器在接收输入时如何从一个状态转换到另一个状态。如前所述，每个机器都有多个输入和输出端口。对于每个输入端口，使用 **in_port** 关键字来指定机器在该输入端口上接收到消息时的行为。以下是一个显示声明输入端口语法的示例。
 
 ```
 in_port(mandatoryQueue_in, RubyRequest, mandatoryQueue, desc="...") {
@@ -198,47 +135,17 @@ in_port(mandatoryQueue_in, RubyRequest, mandatoryQueue, desc="...") {
 }
 ```
 
-As you can see, in_port takes in multiple arguments. The first
-argument, mandatoryQueue_in, is the identifier for the in_port
-that is used in the file. The next argument, RubyRequest, is the
-type of the messages that this input port receives. Each input port
-uses a queue to store the messages, the name of the queue is the
-third argument.
+如您所见，in_port 接受多个参数。第一个参数 mandatoryQueue_in 是文件中使用的 in_port 的标识符。下一个参数 RubyRequest 是此输入端口接收的消息类型。每个输入端口使用队列来存储消息，队列的名称是第三个参数。
 
-The keyword **peek** is used to extract messages from the queue of
-the input port. The use of this keyword implicitly declares a
-variable **in_msg** which is of the same type as specified in the
-input port's declaration. This variable points to the message at the
-head of the queue. It can be used for accessing the fields of the
-message as shown in the code above.
+关键字 **peek** 用于从输入端口的队列中提取消息。使用此关键字会隐式声明一个变量 **in_msg**，其类型与输入端口声明中指定的类型相同。此变量指向队列头部的消息。它可以用于访问消息的字段，如上面的代码所示。
 
-Once the incoming message has been analyzed, it is time for using
-this message for taking some appropriate action and changing the
-state of the machine. This done using the keyword **trigger**. The
-trigger function is actually used only in SLICC code and is not
-present in the generated code. Instead this call is converted in to
-a call to the **doTransition()** function which appears in the
-generated code. The doTransition() function is automatically
-generated by SLICC for each of the state machines. The number of
-arguments to trigger depend on the machine itself. In general, the
-input arguments for trigger are the type of the message that needs
-to processed, the address for which this message is meant for, the
-cache and the transaction buffer entries for that address.
+一旦分析了传入消息，就该使用此消息采取适当的操作并更改机器的状态。这是使用关键字 **trigger** 完成的。trigger 函数实际上仅在 SLICC 代码中使用，在生成的代码中不存在。相反，此调用被转换为对生成的代码中出现的 **doTransition()** 函数的调用。doTransition() 函数由 SLICC 为每个状态机自动生成。trigger 的参数数量取决于机器本身。通常，trigger 的输入参数是需要处理的消息类型、此消息针对的地址、该地址的缓存和事务缓冲区条目。
 
-**trigger** also increments a counter that is checked before a
-transition is made. In one ruby cycle, there is a limit on the
-number of transitions that can be carried out. This is done to
-resemble more closely to a hardware based state machine. **@TODO:
-What happens if there are no more transitions left? Does the wakeup
-abort?**
+**trigger** 还会增加一个计数器，在转换之前检查该计数器。在一个 ruby 周期中，可以执行的转换数量有限制。这样做是为了更接近基于硬件的状态机。**@TODO：如果没有更多转换了会发生什么？唤醒会中止吗？**
 
-#### Actions
+#### 动作
 
-In this section we will go over how the actions that a state machine can
-carry out are defined. These actions will be called in to action when
-the state machine receives some input message which is then used to make
-a transition. Let's go over an example on how the key word **action**
-can be made use of.
+在本节中，我们将介绍如何定义状态机可以执行的动作。当状态机接收到某个输入消息（然后用于进行转换）时，将调用这些动作。让我们看一个如何使用关键字 **action** 的示例。
 
 ```
 action(a_issueRequest, "a", desc="Issue a request") {
@@ -252,55 +159,28 @@ action(a_issueRequest, "a", desc="Issue a request") {
 }
 ```
 
-The first input argument is the name of the action, the next
-argument is the abbreviation used for generating the documentation
-and last one is the description of the action which used in the HTML
-documentation and as a comment in the C++ code.
+第一个输入参数是动作的名称，下一个参数是用于生成文档的缩写，最后一个是动作的描述，用于 HTML 文档和 C++ 代码中的注释。
 
-Each action is converted in to a C++ function of that name. The
-generated C++ code implicitly includes up to three input parameters
-in the function header, again depending on the machine. These
-arguments are the memory address on which the action is being taken,
-the cache and transaction buffer entries pertaining to this address.
+每个动作都被转换为具有该名称的 C++ 函数。生成的 C++ 代码在函数头中隐式包含最多三个输入参数，这再次取决于机器。这些参数是正在执行动作的内存地址、与此地址相关的缓存和事务缓冲区条目。
 
-Next useful thing to look at is the **enqueue** keyword. This
-keyword is used for queuing a message, generated as a result of the
-action, to an output port. The keyword takes three input arguments,
-namely, the name of the output port, the type of the message to be
-queued and the latency after which this message can be dequeued.
-Note that in case randomization is enabled, the specified latency is
-ignored. The use of the keyword implicitly declares a variable
-out_msg which is populated by the follow on statements.
+接下来要看的有用内容是 **enqueue** 关键字。此关键字用于将作为动作结果生成的消息排队到输出端口。关键字接受三个输入参数，即输出端口的名称、要排队的消息类型以及可以出队此消息的延迟。请注意，如果启用了随机化，则忽略指定的延迟。使用关键字会隐式声明一个变量 out_msg，该变量由后续语句填充。
 
-#### Transitions
+#### 转换
 
-A transition function is a mapping from the cross product of set of
-states and set of events to the set of states. SLICC provides the
-keyword **transition** for specifying the transition function for state
-machines. An example follows --
+转换函数是从状态集和事件集的叉积到状态集的映射。SLICC 提供了关键字 **transition** 来指定状态机的转换函数。以下是一个示例 --
 
 ```
-transition(IM, Data, M) {
-   u_writeDataToCache;
-   sx_store_hit;
-   w_deallocateTBE;
-   n_popResponseQueue;
+transition(IM, Data, M) {
+   u_writeDataToCache;
+   sx_store_hit;
+   w_deallocateTBE;
+   n_popResponseQueue;
 }
 ```
 
-In this example, the initial state is *IM*. If an event of type *Data*
-occurs in that state, then final state would be *M*. Before making the
-transition, the state machine can perform certain actions on the
-structures that it maintains. In the given example,
-*u_writeDataToCache* is an action. All these operations are performed
-in an atomic fashion, i.e. no other event can occur before the set of
-actions specified with the transition has been completed.
+在此示例中，初始状态是 *IM*。如果在该状态下发生类型为 *Data* 的事件，则最终状态将是 *M*。在进行转换之前，状态机可以对其维护的结构执行某些动作。在给定的示例中，*u_writeDataToCache* 是一个动作。所有这些操作都以原子方式执行，即在与转换指定的动作集完成之前，不能发生其他事件。
 
-For ease of use, sets of events and states can be provided as input
-to transition. The cross product of these sets will map to the same
-final state. Note that the final state cannot be a set. If for a
-particular event, the final state is same as the initial state, then
-the final state can be omitted.
+为便于使用，可以将事件集和状态集作为输入提供给转换。这些集的叉积将映射到相同的最终状态。请注意，最终状态不能是集合。如果对于特定事件，最终状态与初始状态相同，则可以省略最终状态。
 
 ```
 transition({IS, IM, MI, II}, {Load, Ifetch, Store, Replacement}) {
@@ -308,164 +188,118 @@ transition({IS, IM, MI, II}, {Load, Ifetch, Store, Replacement}) {
 }
 ```
 
-### Special Functions
+### 特殊函数
 
-#### Stalling/Recycling/Waiting input ports
+#### 阻塞/回收/等待输入端口
 
-One of the more complicated internal features of SLICC and the resulting
-state machines is how the deal with the situation when events cannot be
-process due to the cache block being in a transient state. There are
-several possible ways to deal with this situation and each solution has
-different tradeoffs. This sub-section attempts to explain the
-differences. Please email the gem5-user list for further follow-up.
+SLICC 和生成的状态机的一个更复杂的内部特性是如何处理由于缓存块处于瞬态而无法处理事件的情况。有几种可能的方法来处理这种情况，每种解决方案都有不同的权衡。本小节试图解释这些差异。如需进一步跟进，请发送电子邮件至 gem5-user 列表。
 
-##### Stalling the input port
+##### 阻塞输入端口
 
-The simplest way to handle events that can't be processed is to simply
-stall the input port. The correct way to do this is to include the
-"z_stall" action within the transition statement:
+处理无法处理的事件的最简单方法是简单地阻塞输入端口。正确的方法是在转换语句中包含 "z_stall" 动作：
 
 ```
-transition({IS, IM, MI, II}, {Load, Ifetch, Store, Replacement}) {
-   z_stall;
+transition({IS, IM, MI, II}, {Load, Ifetch, Store, Replacement}) {
+   z_stall;
 }
 ```
 
-Internally SLICC will return a ProtocolStall for this transition and no
-subsequent messages from the associated input port will be processed
-until the stalled message is processed. However, the other input ports
-will be analyzed for ready messages and processed in parallel. While
-this is a relatively simple solution, one may notice that stalling
-unrelated messages on the same input port will cause excessive and
-unnecessary stalls.
+在内部，SLICC 将为此转换返回 ProtocolStall，并且在处理被阻塞的消息之前，不会处理来自关联输入端口的后续消息。但是，将分析其他输入端口以查找就绪消息并并行处理。虽然这是一个相对简单的解决方案，但可能会注意到，在同一输入端口上阻塞不相关的消息将导致过度和不必要的阻塞。
 
-One thing to note is **Do Not** leave the transition statement blank
-like so:
+需要注意的一件事是**不要**将转换语句留空，如下所示：
 
 ```
-transition({IS, IM, MI, II}, {Load, Ifetch, Store, Replacement}) {
-   // stall the input port by simply not popping the message
+transition({IS, IM, MI, II}, {Load, Ifetch, Store, Replacement}) {
+   // 通过简单地不弹出消息来阻塞输入端口
 }
 ```
 
-This will cause SLICC to return success for this transition and SLICC
-will continue to repeatedly analyze the same input port. The result is
-eventual deadlock.
+这将导致 SLICC 为此转换返回成功，并且 SLICC 将继续重复分析同一输入端口。结果是最终死锁。
 
-##### Recycling the input port
+##### 回收输入端口
 
-The better performance but more unrealistic solution is to recycle the
-stalled message on the input port. The way to do this is to use the
-"zz_recycleMandatoryQueue"
-action:
+性能更好但更不现实的解决方案是回收输入端口上被阻塞的消息。这样做的方法是使用 "zz_recycleMandatoryQueue" 动作：
 
 ```
-action(zz_recycleMandatoryQueue, "\z", desc="Send the head of the mandatory queue to the back of the queue.") {
-   mandatoryQueue_in.recycle();
+action(zz_recycleMandatoryQueue, "\z", desc="Send the head of the mandatory queue to the back of the queue.") {
+   mandatoryQueue_in.recycle();
 }
 ```
 ```
-transition({IS, IM, MI, II}, {Load, Ifetch, Store, Replacement}) {
-   zz_recycleMandatoryQueue;
+transition({IS, IM, MI, II}, {Load, Ifetch, Store, Replacement}) {
+   zz_recycleMandatoryQueue;
 }
 ```
 
-The result of this action is that the transition returns a Protocol
-Stall and the offending message moved to the back of the FIFO input
-port. Therefore, other unrelated messages on the same input port can be
-processed. The problem with this solution is that recycled messages may
-be analyzed and reanalyzed every cycle until an address changes state.
+此动作的结果是转换返回 Protocol Stall，并且违规消息移动到 FIFO 输入端口的后面。因此，可以处理同一输入端口上的其他不相关消息。此解决方案的问题是，回收的消息可能会在每个周期中被分析和重新分析，直到地址改变状态。
 
-##### Stall and wait the input port
+##### 阻塞并等待输入端口
 
-An even better, but more complicated solution is to "stall and wait" the
-offending input message. The way to do this is to use the
-"z_stallAndWaitMandatoryQueue"
-action:
+更好但更复杂的解决方案是"阻塞并等待"违规的输入消息。这样做的方法是使用 "z_stallAndWaitMandatoryQueue" 动作：
 
 ```
-action(z_stallAndWaitMandatoryQueue, "\z", desc="recycle L1 request queue") {
-   stall_and_wait(mandatoryQueue_in, address);
+action(z_stallAndWaitMandatoryQueue, "\z", desc="recycle L1 request queue") {
+   stall_and_wait(mandatoryQueue_in, address);
 }
 ```
 ```
-transition({IS, IM, IS_I, M_I, SM, SINK_WB_ACK}, {Load, Ifetch, Store, L1_Replacement}) {
-   z_stallAndWaitMandatoryQueue;
+transition({IS, IM, IS_I, M_I, SM, SINK_WB_ACK}, {Load, Ifetch, Store, L1_Replacement}) {
+   z_stallAndWaitMandatoryQueue;
 }
 ```
 
-The result of this action is that the transition returns success, which
-is ok because stall_and_wait moves the offending message off the input
-port and to a side table associated with the input port. The message
-will not be analyzed again until it is woken up. In the meantime, other
-unrelated messages will be processed.
+此动作的结果是转换返回成功，这是可以的，因为 stall_and_wait 将违规消息移出输入端口并移到与输入端口关联的侧表中。消息在被唤醒之前不会再次被分析。同时，将处理其他不相关的消息。
 
-The complicated part of stall and wait is that stalled messages must be
-explicitly woken up by other messages/transitions. In particular,
-transitions that move an address to a base state should wake up
-potentially stalled messages waiting for that address:
+阻塞和等待的复杂部分是，被阻塞的消息必须由其他消息/转换显式唤醒。特别是，将地址移动到基本状态的转换应该唤醒可能正在等待该地址的被阻塞消息：
 
 ```
-action(kd_wakeUpDependents, "kd", desc="wake-up dependents") {
-   wakeUpBuffers(address);
+action(kd_wakeUpDependents, "kd", desc="wake-up dependents") {
+   wakeUpBuffers(address);
 }
 ```
 
 ```
-transition(M_I, WB_Ack, I) {
-   s_deallocateTBE;
-   o_popIncomingResponseQueue;
-   kd_wakeUpDependents;
+transition(M_I, WB_Ack, I) {
+   s_deallocateTBE;
+   o_popIncomingResponseQueue;
+   kd_wakeUpDependents;
 }
 ```
 
-Replacements are particularly complicated since stalled addresses are
-not associated with the same address they are actually waiting to
-change. In those situations all waiting messages must be woken
-up:
+替换特别复杂，因为被阻塞的地址与它们实际等待更改的地址不关联。在这些情况下，必须唤醒所有等待的消息：
 
 ```
-action(ka_wakeUpAllDependents, "ka", desc="wake-up all dependents") {
-   wakeUpAllBuffers();
+action(ka_wakeUpAllDependents, "ka", desc="wake-up all dependents") {
+   wakeUpAllBuffers();
 }
 ```
 
 ```
-transition(I, L2_Replacement) {
-   rr_deallocateL2CacheBlock;
-   ka_wakeUpAllDependents;
+transition(I, L2_Replacement) {
+   rr_deallocateL2CacheBlock;
+   ka_wakeUpAllDependents;
 }
 ```
 
-### Other Compiler Features
+### 其他编译器功能
 
-- SLICC supports conditional statements in form of **if** and
-**else**. Note that SLICC does not support **else if**.
+- SLICC 支持 **if** 和 **else** 形式的条件语句。请注意，SLICC 不支持 **else if**。
 
-- Each function has return type which can be void as well. Returned
-values cannot be ignored.
+- 每个函数都有一个返回类型，也可以是 void。不能忽略返回值。
 
-- SLICC has limited support for pointer variables. is_valid() and
-is_invalid() operations are supported for testing whether a given
-pointer 'is not NULL' and 'is NULL' respectively. The keyword
-**OOD**, which stands for Out of Domain, plays the role of keyword
-NULL used in C++.
+- SLICC 对指针变量的支持有限。支持 is_valid() 和 is_invalid() 操作来测试给定指针是否"不是 NULL"和"是 NULL"。关键字 **OOD**（代表 Out of Domain）扮演 C++ 中使用的关键字 NULL 的角色。
 
-- SLICC does not support **\!** (the not operator).
+- SLICC 不支持 **\!**（非运算符）。
 
-- Static type casting is supported in SLICC. The keyword
-**static_cast** has been provided for this purpose. For example, in
-the following piece of code, a variable of type AbstractCacheEntry
-is being casted in to a variable of type Entry.
+- SLICC 支持静态类型转换。为此目的提供了关键字 **static_cast**。例如，在以下代码片段中，类型为 AbstractCacheEntry 的变量被转换为类型为 Entry 的变量。
 
 ```
-   Entry L1Dcache_entry := static_cast(Entry, "pointer", L1DcacheMemory[addr]);
+   Entry L1Dcache_entry := static_cast(Entry, "pointer", L1DcacheMemory[addr]);
 ```
 
-### SLICC Internals
+### SLICC 内部
 
-**C++ to Slicc Interface - @note: What do each of these files
-do/define???**
+**C++ 到 Slicc 接口 - @note：这些文件各自做什么/定义什么？？？**
 
 - src/mem/protocol/RubySlicc_interaces.sm
     - RubySlicc_Exports.sm
@@ -475,9 +309,7 @@ do/define???**
     - RubySlicc_MemControl.sm
     - RubySlicc_ComponentMapping.sm
 
-**Variable Assignments**
+**变量赋值**
 
-- Use the `:=` operator to assign members in class (e.g. a member
-defined in RubySlicc_Types.sm):
-    - an automatic `m_` is added to the name mentioned in the SLICC
-    file.
+- 使用 `:=` 运算符在类中分配成员（例如，在 RubySlicc_Types.sm 中定义的成员）：
+    - 在 SLICC 文件中提到的名称会自动添加 `m_`。

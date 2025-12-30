@@ -9,37 +9,37 @@ permalink: /documentation/general_docs/development/coding_style/
 
 我们努力在 gem5 C/C++ 源代码中保持一致的编码风格，以使源代码更具可读性和可维护性。这必然涉及处理此代码的多个开发人员之间的妥协。我们觉得我们已经成功地找到了这样的妥协，因为每个主要的 M5 开发人员都对下面的至少一条规则感到恼火。如果您开发想要贡献回 M5 的代码，我们要求您也遵守这些准则。在源代码树中的 util/emacs/m5-c-style.el 处提供了体现缩进规则的 Emacs c++-mode 样式。
 
-## Indentation and Line Breaks
+## 缩进和换行
 
-Indentation will be 4 spaces per level, though namespaces should not increase the indentation.
+缩进将为每级 4 个空格，但命名空间不应增加缩进。
 
-* Exception: labels followed by colons (case and goto labels and public/private/protected modifiers) are indented two spaces from the enclosing context.
+* 例外：后跟冒号的标签（case 和 goto 标签以及 public/private/protected 修饰符）从包含上下文缩进两个空格。
 
-Indentation should use spaces only (no tabs), as tab widths are not always set consistently, and tabs make output harder to read when used with tools such as diff.
+缩进应仅使用空格（不使用制表符），因为制表符宽度并不总是一致设置，并且制表符在使用 diff 等工具时使输出更难阅读。
 
-Lines must be a maximum of 79 characters long.
+行长度最多为 79 个字符。
 
-## Braces
+## 大括号
 
-For control blocks (if, while, etc.), opening braces must be on the same line as the control keyword with a space between the closing parenthesis and the opening brace.
+对于控制块（if、while 等），左大括号必须与控制关键字在同一行，右括号和左大括号之间有一个空格。
 
-* Exception: for multi-line expressions, the opening brace may be placed on a separate line to distinguish the control block from the statements inside the block.
+* 例外：对于多行表达式，左大括号可以放在单独的行上，以区分控制块和块内的语句。
 
 ```c++
 if (...) {
     ...
 }
 
-// exception case
+// 例外情况
 for (...;
      ...;
-     ...) // brace could be up here
-{ // but this is optionally OK *only* when the 'for' spans multiple lines
+     ...) // 大括号可以在这里
+{ // 但这仅在 'for' 跨越多行时可选地允许
     ...
 }
 ```
 
-'Else' keywords should follow the closing 'if' brace on the same line, as follows:
+'Else' 关键字应跟在右 'if' 大括号的同一行，如下所示：
 
 ```c++
 if (...) {
@@ -51,14 +51,14 @@ if (...) {
 }
 ```
 
-Blocks that consist of a single statement that fits on a single line may optionally omit the braces. Braces are still required if the single statement spans multiple lines, or if the block is part of an else/if chain where other blocks have braces.
+由适合单行的单个语句组成的块可以选择省略大括号。如果单个语句跨越多行，或者如果块是 else/if 链的一部分，其中其他块有大括号，则仍需要大括号。
 
 ```c++
-// This is OK with or without braces
+// 有或没有大括号都可以
 if (a > 0)
     --a;
 
-// In the following cases, braces are still required
+// 在以下情况下，仍需要大括号
 if (a > 0) {
     obnoxiously_named_function_with_lots_of_args(verbose_arg1,
                                                  verbose_arg2,
@@ -73,11 +73,11 @@ if (a > 0) {
 }
 ```
 
-For function definitions or class declarations, the opening brace must be in the first column of the following line.
+对于函数定义或类声明，左大括号必须在下一行的第一列。
 
-In function definitions, the return type should be on one line, followed by the function name, left-justified, on the next line. As mentioned above, the opening brace should also be on a separate line following the function name.
+在函数定义中，返回类型应在一行上，函数名在下一行左对齐。如上所述，左大括号也应在函数名之后的单独行上。
 
-See examples below:
+请参见下面的示例：
 
 ```c++
 int
@@ -93,43 +93,43 @@ class ExampleClass
 };
 ```
 
-Functions should be preceded by a block comment describing the function.
+函数前面应该有一个描述函数的块注释。
 
-Inline function declarations longer than one line should not be placed inside class declarations. Most functions longer than one line should not be inline anyway.
+超过一行的内联函数声明不应放在类声明内。大多数超过一行的函数无论如何都不应该是内联的。
 
-## Spacing
+## 间距
 
-There should be:
+应该有：
 
-* one space between keywords (if, for, while, etc.) and opening parentheses
-* one space around binary operators (+, -, <, >, etc.) including assignment operators (=, +=, etc.)
-* no space around '=' when used in parameter/argument lists, either to bind default parameter values (in Python or C++) or to bind keyword arguments (in Python)
-* no space between function names and opening parentheses for arguments
-* no space immediately inside parentheses, except for very complex expressions. Complex expressions are preferentially broken into multiple simpler expressions using temporary variables.
+* 关键字（if、for、while 等）和左括号之间有一个空格
+* 二元运算符（+、-、<、> 等）周围有一个空格，包括赋值运算符（=、+= 等）
+* 在参数/参数列表中使用 '=' 时周围没有空格，无论是绑定默认参数值（在 Python 或 C++ 中）还是绑定关键字参数（在 Python 中）
+* 函数名和参数的左括号之间没有空格
+* 括号内紧邻没有空格，除非是非常复杂的表达式。复杂表达式优先使用临时变量分解为多个更简单的表达式。
 
 
-For pointer and reference argument declarations, either of the following are acceptable:
+对于指针和引用参数声明，以下两种方式都可以接受：
 
 ```c++
 FooType *fooPtr;
 FooType &fooRef;
 ```
 
-or
+或
 
 ```c++
 FooType* fooPtr;
 FooType& fooRef;
 ```
-However, style should be kept consistent within a file. If you are editing an existing file, please keep consistent with the existing code. If you are writing new code in a new file, feel free to choose the style of your preference.
+但是，样式应在文件内保持一致。如果您正在编辑现有文件，请与现有代码保持一致。如果您在新文件中编写新代码，可以自由选择您喜欢的样式。
 
-## Naming
+## 命名
 
-Class and type names are mixed case, start with an uppercase letter, and do not contain underscores (e.g., ClassName). Exception: names that are acronyms should be all upper case (e.g., CPU). Class member names (method and variables, including const variables) are mixed case, start with a lowercase letter, and do not contain underscores (e.g., aMemberVariable). Class members that have accessor methods should have a leading underscore to indicate that the user should be using an accessor. The accessor functions themselves should have the same name as the variable without the leading underscore.
+类和类型名称是混合大小写，以大写字母开头，不包含下划线（例如，ClassName）。例外：缩写名称应全部大写（例如，CPU）。类成员名称（方法和变量，包括 const 变量）是混合大小写，以小写字母开头，不包含下划线（例如，aMemberVariable）。具有访问器方法的类成员应具有前导下划线，以指示用户应使用访问器。访问器函数本身应与变量同名，但没有前导下划线。
 
-Local variables are lower case, with underscores separating words (e.g., local_variable). Function parameters should use underscores and be lower case.
+局部变量是小写，用下划线分隔单词（例如，local_variable）。函数参数应使用下划线且为小写。
 
-C preprocessor symbols (constants and macros) should be all caps with underscores. However, these are deprecated, and should be replaced with const variables and inline functions, respectively, wherever possible.
+C 预处理器符号（常量和宏）应全部大写并带下划线。但是，这些已弃用，应尽可能分别替换为 const 变量和内联函数。
 
 ```c++
 class FooBarCPU
@@ -156,11 +156,11 @@ class FooBarCPU
 
 ## #includes
 
-Whenever possible favor C++ includes over C include. E.g. choose cstdio, not stdio.h.
+尽可能优先使用 C++ 包含而不是 C 包含。例如，选择 cstdio，而不是 stdio.h。
 
-The block of #includes at the top of the file should be organized. We keep several sorted groups. This makes it easy to find #include and to avoid duplicate #includes.
+文件顶部的 #includes 块应该组织好。我们保持几个排序的组。这使得查找 #include 和避免重复的 #includes 变得容易。
 
-Always include Python.h first if you need that header. This is mandated by the integration guide. The next header file should be your main header file (e.g., for foo.cc you'd include foo.hh first). Having this header first ensures that it is independent and can be included in other places without missing dependencies.
+如果需要该头文件，请始终首先包含 Python.h。这是集成指南要求的。下一个头文件应该是您的主头文件（例如，对于 foo.cc，您应该首先包含 foo.hh）。首先包含此头文件可确保它是独立的，并且可以在其他地方包含而不会缺少依赖项。
 
 ```c++
 // Include Python.h first if you need it.
@@ -189,53 +189,53 @@ Always include Python.h first if you need that header. This is mandated by the i
 #include "sim/system.hh"
 ```
 
-## File structure and modularity
+## 文件结构和模块化
 
-Source files (.cc files) should never contain extern declarations; instead, include the header file associated with the .cc file in which the object is defined. This header file should contain extern declarations for all objects exported from that .cc file. This header should also be included in the defining .cc file. The key here is that we have a single external declaration in the .hh file that the compiler will automatically check for consistency with the .cc file. (This isn't as important in C++ as it was in C, since linker name mangling will now catch these errors, but it's still a good idea.)
+源文件（.cc 文件）不应包含 extern 声明；相反，应包含定义对象的 .cc 文件关联的头文件。此头文件应包含从该 .cc 文件导出的所有对象的 extern 声明。此头文件也应包含在定义它的 .cc 文件中。这里的关键是我们在 .hh 文件中有一个单一的外部声明，编译器将自动检查其与 .cc 文件的一致性。（这在 C++ 中不如在 C 中重要，因为链接器名称修饰现在会捕获这些错误，但这仍然是一个好主意。）
 
-When sufficient (i.e., when declaring only pointers or references to a class), header files should use forward class declarations instead of including full header files.
+当足够时（即，仅声明指向类的指针或引用时），头文件应使用前向类声明而不是包含完整的头文件。
 
-Header files should never contain using namespace declarations at the top level. This forces all the names in that namespace into the global namespace of any source file including that header file, which basically completely defeats the point of using namespaces. It is OK to use using namespace declarations at the top level of a source (.cc) file since the effect is entirely local to that .cc file. It's also OK to use them in _impl.hh files, since for practical purposes these are source (not header) files despite their extension.
+头文件不应在顶层包含 using namespace 声明。这会将该命名空间中的所有名称强制到包含该头文件的任何源文件的全局命名空间中，这基本上完全违背了使用命名空间的初衷。在源（.cc）文件的顶层使用 using namespace 声明是可以的，因为效果完全局限于该 .cc 文件。在 _impl.hh 文件中使用它们也是可以的，因为尽管它们的扩展名，但出于实际目的，这些是源（不是头）文件。
 
-## Documenting the code
+## 代码文档
 
-Each file/class/member should be documented using doxygen style comments.Doxygen allows users to quickly create documentation for our code by extracting the relavent information from the code and comments. It is able to document all the code structures including classes, namespaces, files, members, defines, etc. Most of these are quite simple to document, you only need to place a special documentation block before the declaration. The Doxygen documentation within gem5 is processed every night and the following web pages are generated: [Doxygen](http://doxygen.gem5.org/release/current/index.html)
+每个文件/类/成员都应使用 doxygen 样式的注释进行文档化。Doxygen 允许用户通过从代码和注释中提取相关信息来快速为我们的代码创建文档。它能够文档化所有代码结构，包括类、命名空间、文件、成员、定义等。其中大多数都很简单，您只需要在声明之前放置一个特殊的文档块。gem5 中的 Doxygen 文档每晚都会处理，并生成以下网页：[Doxygen](http://doxygen.gem5.org/release/current/index.html)
 
-### Using Doxygen
+### 使用 Doxygen
 
-The special documentation blocks take the form of a javadoc style comment. A javadoc comment is a C style comment with 2 *'s at the start, like this:
-
-```c++
-/**
- * ...documentation...
- */
-```
-
-The intermediate asterisks are optional, but please use them to clearly delineate the documentation comments.
-
-The documentation within these blocks is made up of at least a brief description of the documented structure, that can be followed by a more detailed description and other documentation. The brief description is the first sentence of the comment. It ends with a period followed by white space or a new line. For example:
+特殊文档块采用 javadoc 样式的注释形式。javadoc 注释是一个 C 样式的注释，开头有 2 个 *，如下所示：
 
 ```c++
 /**
- * This is the brief description. This is the start of the detailed
- * description. Detailed Description continued.
+ * ...文档...
  */
 ```
 
-If you need to have a period in the brief description, follow it with a backslash followed by a space.
+中间的星号是可选的，但请使用它们来清楚地划分文档注释。
+
+这些块中的文档至少包含对所文档化结构的简要描述，后面可以跟更详细的描述和其他文档。简要描述是注释的第一句话。它以句号后跟空格或换行符结束。例如：
 
 ```c++
 /**
- * e.g.\ This is a brief description with an internal period.
+ * 这是简要描述。这是详细
+ * 描述的开始。详细描述继续。
  */
 ```
-Blank lines within these comments are interpreted as paragraph breaks to help you make the documentation more readble.
 
-### Special commands
+如果您需要在简要描述中使用句号，请在它后面跟一个反斜杠和一个空格。
 
-Placing these comments before the declaration works in most cases. For files however, you need to specify that you are documenting the file. To do this you use the @file special command. To document the file that you are currently in you just need to use the command followed by your comments. To comment a separate file (we shouldn't have to do this) you can supply the name directly after the file command. There are some other special commands we will be using quite often. To document functions we will use @param and @return or @retval to document the parameters and the return value. @param takes the name of the paramter and its description. @return just describes the return value, while @retval adds a name to it. To specify pre and post conditions you can use @pre and @post.
+```c++
+/**
+ * 例如。\ 这是一个带有内部句号的简要描述。
+ */
+```
+这些注释中的空行被解释为段落分隔符，以帮助您使文档更具可读性。
 
-Some other useful commands are @todo and @sa. @todo allows you to place reminders of things to fix/implement and associate them with a specific class or member/function. @sa lets you place references to another piece of documentation (class, member, etc.). This can be useful to provide links to code that would be helpful in understanding the code being documented.
+### 特殊命令
+
+在大多数情况下，将这些注释放在声明之前是有效的。但是，对于文件，您需要指定您正在文档化该文件。为此，您使用 @file 特殊命令。要文档化您当前所在的文件，您只需要使用该命令后跟您的注释。要注释单独的文件（我们不应该这样做），您可以在 file 命令后直接提供名称。还有一些其他特殊命令我们将经常使用。要文档化函数，我们将使用 @param 和 @return 或 @retval 来文档化参数和返回值。@param 接受参数名称及其描述。@return 只描述返回值，而 @retval 为其添加名称。要指定前置和后置条件，您可以使用 @pre 和 @post。
+
+其他一些有用的命令是 @todo 和 @sa。@todo 允许您放置要修复/实现的事项提醒，并将它们与特定的类或成员/函数关联。@sa 允许您放置对另一段文档（类、成员等）的引用。这对于提供有助于理解正在文档化的代码的链接很有用。
 
 ### Example of Simple Documentation
 
@@ -287,9 +287,9 @@ class foo
 };
 ```
 
-### Grouping
+### 分组
 
-Doxygen also allows for groups of classes and member (or other groups) to be declared. We can use these to create a listing of all statistics/global variables. Or just to comment about the memory hierarchy as a whole. You define a group using @defgroup and then add to it using @ingroup or @addgroup. For example:
+Doxygen 还允许声明类和成员（或其他组）的组。我们可以使用这些来创建所有统计信息/全局变量的列表。或者只是对整个内存层次结构进行注释。您使用 @defgroup 定义一个组，然后使用 @ingroup 或 @addgroup 添加到其中。例如：
 
 ```c++
 /**
@@ -333,7 +333,7 @@ class foo
 };
 ```
 
-This places stat1-3 in the statistics group and stat4 in the subgroup. There is a shorthand method to place objects in groups. You can use @{ and @} to mark the start and end of group inclusion. The example above can be rewritten as:
+这会将 stat1-3 放在 statistics 组中，将 stat4 放在子组中。有一种将对象放入组的简写方法。您可以使用 @{ 和 @} 来标记组包含的开始和结束。上面的示例可以重写为：
 
 ```c++
 /**
@@ -373,28 +373,28 @@ class foo
 };
 ```
 
-It remains to be seen what groups we can come up with.
+我们还能想出什么组还有待观察。
 
-### Other features
+### 其他功能
 
-Not sure what other doxygen features we want to use.
+不确定我们还想使用哪些其他 doxygen 功能。
 
-## M5 Status Messages
-### Fatal v. Panic
+## M5 状态消息
+### Fatal 与 Panic
 
-There are two error functions defined in `src/base/logging.hh:` `panic()` and `fatal()`. While these two functions have roughly similar effects (printing an error message and terminating the simulation process), they have distinct purposes and use cases. The distinction is documented in the comments in the header file, but is repeated here for convenience because people often get confused and use the wrong one.
+在 `src/base/logging.hh:` 中定义了两个错误函数：`panic()` 和 `fatal()`。虽然这两个函数具有大致相似的效果（打印错误消息并终止模拟过程），但它们有不同的目的和用例。区别在头文件的注释中有记录，但为了方便起见，这里重复说明，因为人们经常混淆并使用错误的函数。
 
-* `panic()` should be called when something happens that should never ever happen regardless of what the user does (i.e., an actual m5 bug). `panic()` calls `abort()` which can dump core or enter the debugger.
-* `fatal()` should be called when the simulation cannot continue due to some condition that is the user's fault (bad configuration, invalid arguments, etc.) and not a simulator bug. `fatal()` calls `exit(1)`, i.e., a "normal" exit with an error code.
+* `panic()` 应该在发生无论用户做什么都不应该发生的事情时调用（即，实际的 m5 bug）。`panic()` 调用 `abort()`，它可以转储核心或进入调试器。
+* `fatal()` 应该在由于用户错误（配置错误、无效参数等）导致模拟无法继续时调用，而不是模拟器 bug。`fatal()` 调用 `exit(1)`，即带有错误代码的"正常"退出。
 
-The reasoning behind these definitions is that there's no need to panic if it's just a silly user error; we only panic if m5 itself is broken. On the other hand, it's not hard for users to make errors that are fatal, that is, errors that are serious enough that the m5 process cannot continue.
-### Inform, Warn and Hack
+这些定义背后的原因是，如果只是用户的小错误，就没有必要 panic；只有当 m5 本身出现问题时我们才会 panic。另一方面，用户犯致命错误并不难，即严重到 m5 进程无法继续的错误。
+### Inform、Warn 和 Hack
 
-The file `src/base/logging.hh` also houses 3 functions that alert the user to various conditions happening within the simulation: `inform()`, `warn()` and `hack()`. The purpose of these functions is strictly to provide simulation status to the user so none of these functions will stop the simulator from running.
+文件 `src/base/logging.hh` 还包含 3 个函数，用于提醒用户模拟中发生的各种情况：`inform()`、`warn()` 和 `hack()`。这些函数的目的是严格向用户提供模拟状态，因此这些函数都不会停止模拟器运行。
 
-* `inform()` and `inform_once()` should be called for informative messages that users should know, but not worry about. `inform_once()` will only display the status message generated by the `inform_once()` function the first time it is called.
+* `inform()` 和 `inform_once()` 应该用于用户应该知道但不必担心的信息性消息。`inform_once()` 只会在第一次调用时显示由 `inform_once()` 函数生成的状态消息。
 
-* `warn()` and `warn_once()` should be called when some functionality isn't necessarily implemented correctly, but it might work well enough. The idea behind a `warn()` is to inform the user that if they see some strange behavior shortly after a `warn()` the description might be a good place to go looking for an error.
+* `warn()` 和 `warn_once()` 应该在某个功能不一定正确实现，但可能足够有效时调用。`warn()` 背后的想法是告知用户，如果他们在 `warn()` 之后不久看到一些奇怪的行为，描述可能是查找错误的好地方。
 
-* `hack()` should be called when some functionality isn't implemented nearly as well as it could or should be but for expediency or history sake hasn't been fixed.
-* `inform()` Provides status messages and normal operating messages to the console for the user to see, without any connotations of incorrect behavior.
+* `hack()` 应该在某个功能的实现远不如它可能或应该的那样好，但为了便利性或历史原因尚未修复时调用。
+* `inform()` 向控制台提供状态消息和正常操作消息供用户查看，没有任何错误行为的含义。

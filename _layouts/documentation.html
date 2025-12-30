@@ -16,7 +16,7 @@ layout: default
 <div class="sidenav">
   <!-- Pull navigation from _data/documentation.yml -->
   {% for doc in site.data.documentation.docs %}
-    {% if doc.id == page.doc or doc.title == page.doc %}
+    {% if doc.title == page.doc %}
     {% for item in doc.items %}
       <a class="item" {% if item.url %}href="{{ item.url | prepend: site.baseurl }}"{% else %}data-toggle="collapse" href="#{{ item.id }}"{% endif %} role="button" aria-expanded="false" aria-controls="collapseExample">
         {{ item.title }}

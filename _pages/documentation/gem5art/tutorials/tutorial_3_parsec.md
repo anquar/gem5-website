@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: PARSEC Tutorial
+title: PARSEC 教程
 doc: gem5art
 parent: tutorial
 permalink: /documentation/gem5art/tutorials/parsec-tutorial
@@ -8,12 +8,12 @@ Authors:
   - Mahyar Samani
 ---
 
-# Tutorial: Run PARSEC Benchmarks with gem5
+# 教程：使用 gem5 运行 PARSEC 基准测试
 
-## Introduction
+## 简介
 
-In this tutorial, we will use gem5art to create a disk image for PARSEC benchmarks ([PARSEC](https://dl.acm.org/doi/10.1145/1454115.1454128)) and then run the benchmarks using gem5.
-PARSEC is mainly designed to represent the applications that require a vast amount of shared-memory.
+在本教程中，我们将使用 gem5art 为 PARSEC 基准测试（[PARSEC](https://dl.acm.org/doi/10.1145/1454115.1454128)）创建磁盘镜像，然后使用 gem5 运行基准测试。
+PARSEC 主要用于表示需要大量共享内存的应用程序。
 
 Following are their details:
 

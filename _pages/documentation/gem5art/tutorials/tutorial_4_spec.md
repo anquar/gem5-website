@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: SPEC Tutorial
+title: SPEC 教程
 doc: gem5art
 parent: tutorial
 permalink: /documentation/gem5art/tutorials/spec-tutorial
@@ -8,24 +8,24 @@ Authors:
   - Hoa Nguyen
 ---
 
-# Tutorial: Run SPEC CPU 2017 / SPEC CPU 2006 Benchmarks in Full System Mode with gem5art
+# 教程：使用 gem5art 在全系统模式下运行 SPEC CPU 2017 / SPEC CPU 2006 基准测试
 
-## Introduction
-In this tutorial, we will demonstrate how to utilize [gem5art](https://github.com/gem5/gem5/tree/stable/util/gem5art) and [gem5-resources](https://github.com/gem5/gem5-resources/tree/stable/) to run [SPEC CPU 2017 benchmarks](https://www.spec.org/cpu2017/) in gem5 full system mode.
-The scripts in this tutorial work with gem5art v1.3.0, gem5 20.1.0.4, and gem5-resources 20.1.0.4.
+## 简介
+在本教程中，我们将演示如何利用 [gem5art](https://github.com/gem5/gem5/tree/stable/util/gem5art) 和 [gem5-resources](https://github.com/gem5/gem5-resources/tree/stable/) 在 gem5 全系统模式下运行 [SPEC CPU 2017 基准测试](https://www.spec.org/cpu2017/)。
+本教程中的脚本适用于 gem5art v1.3.0、gem5 20.1.0.4 和 gem5-resources 20.1.0.4。
 
-The content of this tutorial is mostly for conducting SPEC CPU 2017 experiments.
-However, due to the similarity of SPEC 2006 and SPEC 2017 resources, this tutorial also applies to conducting SPEC 2006 experiment by using `src/spec-2006` folder instead of `src/spec-2017` of gem5-resources.
+本教程的内容主要用于进行 SPEC CPU 2017 实验。
+但是，由于 SPEC 2006 和 SPEC 2017 资源的相似性，本教程也适用于通过使用 `src/spec-2006` 文件夹而不是 gem5-resources 的 `src/spec-2017` 来进行 SPEC 2006 实验。
 
 ### gem5-resources
-[gem5-resources](https://github.com/gem5/gem5-resources/tree/stable/) is an actively maintained collections of gem5-related resources that are commonly used.
-The resources include scripts, binaries and disk images for full system simulation of many commonly used benchmarks.
-This tutorial will offer guidance in utilizing gem5-resources for full system simulation.
+[gem5-resources](https://github.com/gem5/gem5-resources/tree/stable/) 是常用的 gem5 相关资源的积极维护集合。
+资源包括用于许多常用基准测试的全系统模拟的脚本、二进制文件和磁盘镜像。
+本教程将提供利用 gem5-resources 进行全系统模拟的指导。
 
 
-### gem5 Full System Mode
-Different from gem5 SE mode (system emulation mode), the FS mode (full system mode) uses an actual Linux kernel binary instead of emulating the responsibilities of a typical modern OS such as managing page tables and taking care of system calls.
-As a result, gem5 FS simulation would be more realistic compared to gem5 SE simulation, especially when the interactions between the workload and the OS are significant part of the simulation.
+### gem5 全系统模式
+与 gem5 SE 模式（系统仿真模式）不同，FS 模式（全系统模式）使用实际的 Linux 内核二进制文件，而不是模拟典型现代操作系统的职责，例如管理页表和处理系统调用。
+因此，与 gem5 SE 模拟相比，gem5 FS 模拟将更加真实，特别是当工作负载和操作系统之间的交互是模拟的重要部分时。
 
 A typical gem5 full system simulation requires a compiled Linux kernel, a disk image containing compiled benchmarks, and gem5 system configurations.
 gem5-resources typically provides all required all of the mentioned resources for every supported benchmark such that one could download the resources and run the experiment without much modification.
@@ -466,4 +466,3 @@ The working status of SPEC 2017 workloads is available here: [https://www.gem5.o
 `disk-image/spec-2017/runscript.sh`: a script that will be copied to `.bashrc` on the disk image so that the commands in this script will be run immediately after the booting process.
 
 `disk-image/spec-2017/spec-2017.json`: contains a configuration telling Packer how the disk image should be built.
-

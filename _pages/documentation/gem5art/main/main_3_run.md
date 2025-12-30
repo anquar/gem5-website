@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Runs
+title: 运行
 doc: gem5art
 parent: main
 permalink: /documentation/gem5art/main/run
@@ -9,16 +9,16 @@ Authors:
   - Jason Lowe-Power
 ---
 
-# Run
+# 运行
 
-## Introduction
+## 简介
 
-Each gem5 experiment is wrapped inside a run object.
-These run objects contain all of the information required to execute the gem5 experiments and can optionally be executed via the gem5art tasks library (or manually with the `run()` function.). gem5Run interacts with the Artifact class of gem5art to ensure reproducibility of gem5 experiments and also stores the current gem5Run object and the output results in the database for later analysis.
+每个 gem5 实验都包装在一个运行对象中。
+这些运行对象包含执行 gem5 实验所需的所有信息，可以通过 gem5art tasks 库（或使用 `run()` 函数手动）执行。gem5Run 与 gem5art 的 Artifact 类交互，以确保 gem5 实验的可重现性，并将当前的 gem5Run 对象和输出结果存储在数据库中以供以后分析。
 
-## SE and FS mode runs
+## SE 和 FS 模式运行
 
-Next are two methods (for SE (system-emulation) and FS (full-system) modes of gem5) from gem5Run class which give an idea of the required arguments from a user's perspective to create a gem5Run object:
+接下来是 gem5Run 类的两个方法（用于 gem5 的 SE (system-emulation) 和 FS (full-system) 模式），它们从用户的角度给出了创建 gem5Run 对象所需参数的思路：
 
 ```python
 
@@ -55,74 +55,74 @@ def createFSRun(cls,
 
 ```
 
-For the user it is important to understand different arguments passed to run objects:
+对于用户来说，理解传递给运行对象的不同参数很重要：
 
-- `name`: name of the run, can act as a tag to search the database to find the required runs (it is expected that user will use a unique name for different experiments)
-- `gem5_binary`: path to the actual gem5 binary to be used
-- `run_script`: path to the python run script that will be used with gem5 binary
-- `outdir`: path to the directory where gem5 results should be written
-- `gem5_artifact`: gem5 binary git artifact object
-- `gem5_git_artifact`: gem5 source git repo artifact object
-- `run_script_git_artifact`: run script artifact object
-- `linux_binary` (only full-system): path to the actual linux binary to be used (used by run script as well)
-- `disk_image` (only full-system): path to the actual disk image to be used (used by run script as well)
-- `linux_binary_artifact` (only full-system): linux binary artifact object
-- `disk_image_artifact` (only full-system): disk image artifact object
-- `params`: other params to be passed to the run script
-- `timeout`: longest time in seconds for which the current gem5 job is allowed to execute
+- `name`: 运行的名称，可以作为标签来搜索数据库以找到所需的运行（期望用户为不同的实验使用唯一的名称）
+- `gem5_binary`: 要使用的实际 gem5 二进制文件的路径
+- `run_script`: 将与 gem5 二进制文件一起使用的 python 运行脚本的路径
+- `outdir`: gem5 结果应写入的目录路径
+- `gem5_artifact`: gem5 二进制 git 组件对象
+- `gem5_git_artifact`: gem5 源代码 git 仓库组件对象
+- `run_script_git_artifact`: 运行脚本组件对象
+- `linux_binary`（仅全系统）：要使用的实际 linux 二进制文件的路径（也由运行脚本使用）
+- `disk_image`（仅全系统）：要使用的实际磁盘镜像的路径（也由运行脚本使用）
+- `linux_binary_artifact`（仅全系统）：linux 二进制组件对象
+- `disk_image_artifact`（仅全系统）：磁盘镜像组件对象
+- `params`: 传递给运行脚本的其他参数
+- `timeout`: 允许当前 gem5 作业执行的最长时间（以秒为单位）
 
-The artifact parameters (`gem5_artifact`, `gem5_git_artifact`, and `run_script_git_artifact`) are used to ensure this is reproducible run.
-Apart from the above mentioned parameters, gem5Run class also keeps track of other features of a gem5 run e.g., the start time, the end time, the current status of gem5 run, the kill reason (if the run is finished), etc.
+组件参数（`gem5_artifact`、`gem5_git_artifact` 和 `run_script_git_artifact`）用于确保这是可重现的运行。
+除了上述参数外，gem5Run 类还跟踪 gem5 运行的其他特征，例如，开始时间、结束时间、gem5 运行的当前状态、终止原因（如果运行已完成）等。
 
-While the user can write their own run script to use with gem5 (with any command line arguments), currently when a `gem5Run` object is created for a full-system experiment using `createFSRun` method, it is assumed that the path to the `linux_binary` and `disk_image` is passed to the run script on the command line (as arguments of the `createFSRun` method).
+虽然用户可以编写自己的运行脚本与 gem5 一起使用（使用任何命令行参数），但目前当使用 `createFSRun` 方法为全系统实验创建 `gem5Run` 对象时，假设 `linux_binary` 和 `disk_image` 的路径在命令行上传递给运行脚本（作为 `createFSRun` 方法的参数）。
 
-## Running an experiment
+## 运行实验
 
-The `gem5Run` object has everything needed to run one gem5 execution.
-Normally, this will be performed by using the gem5art *tasks* package.
-However, it is also possible to manually execute a gem5 run.
+`gem5Run` 对象具有运行一次 gem5 执行所需的一切。
+通常，这将通过使用 gem5art *tasks* 包来执行。
+但是，也可以手动执行 gem5 运行。
 
-The `run` function executes the gem5 experiment.
-It takes two optional parameters: a task associated with the run for bookkeeping and an optional directory to execute the run in.
+`run` 函数执行 gem5 实验。
+它接受两个可选参数：与运行关联的任务（用于簿记）和用于执行运行的可选目录。
 
-The `run` function executes the gem5 binary by using `Popen`.
-This creates another process to execute gem5.
-The `run` function is *blocking* and does not return until the child process has completed.
+`run` 函数通过使用 `Popen` 执行 gem5 二进制文件。
+这会创建另一个进程来执行 gem5。
+`run` 函数是*阻塞*的，在子进程完成之前不会返回。
 
-While the child process is running, every 5 seconds the parent python process will update the status in the `info.json` file.
+当子进程运行时，父 python 进程每 5 秒更新一次 `info.json` 文件中的状态。
 
-The `info.json` file is the serialized `gem5run` object which contains all of the run information and the current status.
+`info.json` 文件是序列化的 `gem5run` 对象，包含所有运行信息和当前状态。
 
-`gem5Run` objects have 7 possible status states.
-These are currently simple strings stored in the `status` property.
+`gem5Run` 对象有 7 种可能的状态。
+这些目前是存储在 `status` 属性中的简单字符串。
 
-- `Created`: The run has been created. This is set in the constructor when either `createSRRun` or `createFSRun` is called.
-- `Begin run`: When `run()` is called, after the database is checked, we enter the `Begin run` state.
-- `Failed artifact check for ...`: The status is set to this when the artifact check fails.
-- `Spawning`: Next, just before `Popen` is called, the run enters the `Spawning` state.
-- `Running`: Once the parent process begins spinning waiting for the child to finish, the run enters the `Running` state.
-- `Finished`: When the child finished with exit code `0`, the run enters the `Finished` state.
-- `Failed`: When the child finished with a non-zero exit code, the run enters the `Failed` state.
+- `Created`: 运行已创建。在调用 `createSRRun` 或 `createFSRun` 时，在构造函数中设置此状态。
+- `Begin run`: 当调用 `run()` 时，在检查数据库后，我们进入 `Begin run` 状态。
+- `Failed artifact check for ...`: 当组件检查失败时，状态设置为此。
+- `Spawning`: 接下来，就在调用 `Popen` 之前，运行进入 `Spawning` 状态。
+- `Running`: 一旦父进程开始旋转等待子进程完成，运行就进入 `Running` 状态。
+- `Finished`: 当子进程以退出代码 `0` 完成时，运行进入 `Finished` 状态。
+- `Failed`: 当子进程以非零退出代码完成时，运行进入 `Failed` 状态。
 
-## Run Already in the Database
+## 数据库中已存在的运行
 
-When starting a run with gem5art, it might complain that the run already exists in the database.
-Basically, before launching a gem5 job, gem5art checks if this run matches an existing run in the database.
-In order to uniquely identify a run, a single hash is made out of:
+使用 gem5art 启动运行时，它可能会抱怨运行已存在于数据库中。
+基本上，在启动 gem5 作业之前，gem5art 会检查此运行是否与数据库中的现有运行匹配。
+为了唯一标识运行，从以下内容生成单个哈希：
 
-- the runscript
-- the parameters passed to the runscript
-- the artifacts of the run object which, for an SE run, include: gem5 binary artifact, gem5 source git artifact, run script (experiments repo) artifact. For an FS run, the list of artifacts also include linux binary artifact and disk image artifacts in addition to the artifacts of an SE run.
+- 运行脚本
+- 传递给运行脚本的参数
+- 运行对象的组件，对于 SE 运行，包括：gem5 二进制组件、gem5 源代码 git 组件、运行脚本（实验仓库）组件。对于 FS 运行，组件列表还包括 linux 二进制组件和磁盘镜像组件，以及 SE 运行的组件。
 
-If this hash already exists in the database, gem5art will not launch a new job based on this run object as a run with same parameters would have already been executed.
-In case, user still wants to launch this job, the user will have to remove the existing run object from the database.
+如果此哈希已存在于数据库中，gem5art 将不会基于此运行对象启动新作业，因为具有相同参数的运行已经执行。
+如果用户仍然想要启动此作业，用户必须从数据库中删除现有的运行对象。
 
-## Searching the Database to find Runs
+## 搜索数据库以查找运行
 
-### Utility script
+### 实用脚本
 
-gem5art provides the utility `gem5art-getruns` to search the database and retrieve runs.
-Based on the parameters, `gem5art-getruns` will dump the results into a file in the json format.
+gem5art 提供实用程序 `gem5art-getruns` 来搜索数据库并检索运行。
+根据参数，`gem5art-getruns` 将结果转储到 json 格式的文件中。
 
 ```
 usage: gem5art-getruns [-h] [--fs-only] [--limit LIMIT] [--db-uri DB_URI]
@@ -144,10 +144,10 @@ optional arguments:
                         Query for the name field
 ```
 
-### Manually searching the database
+### 手动搜索数据库
 
-Once you start running the experiments with gem5 and want to know the status of those runs, you can look at the gem5Run artifacts in the database.
-For this purpose, gem5art provides a method `getRuns`, which you can use as follows:
+一旦您开始使用 gem5 运行实验并想知道这些运行的状态，您可以查看数据库中的 gem5Run 组件。
+为此，gem5art 提供了一个方法 `getRuns`，您可以按如下方式使用：
 
 ```python
 import gem5art.run
@@ -157,15 +157,14 @@ for i in gem5art.run.getRuns(db, fs_only=False, limit=100):
     print(i)
 ```
 
-## Searching the Database to find Runs with Specific Names
+## 搜索数据库以查找具有特定名称的运行
 
-As discussed above, while creating a FS or SE mode Run object, the user has to pass a name field to recognize
-a particular set of runs (or experiments).
-We expect that the user will take care to use a name string which fully characterizes a set of experiments and can be thought of as a `Nonce`.
-For example, if we are running experiments to test linux kernel boot on gem5, we can use a name field `boot_tests_v1` or `boot_tests_[month_year]` (where month_year correspond to the month and year when the experiments were run).
+如上所述，在创建 FS 或 SE 模式运行对象时，用户必须传递一个 name 字段来识别特定的运行集（或实验）。
+我们期望用户会注意使用完全表征一组实验的名称字符串，可以将其视为 `Nonce`。
+例如，如果我们要运行实验来测试 gem5 上的 linux 内核启动，我们可以使用名称字段 `boot_tests_v1` 或 `boot_tests_[month_year]`（其中 month_year 对应于运行实验的月份和年份）。
 
-Later on, the same name can be used to search for relevant gem5 runs in the database.
-For this purpose, gem5art provides a method `getRunsByName`, which can be used as follow:
+之后，可以使用相同的名称在数据库中搜索相关的 gem5 运行。
+为此，gem5art 提供了一个方法 `getRunsByName`，可以按如下方式使用：
 
 ```python
 import gem5art.run

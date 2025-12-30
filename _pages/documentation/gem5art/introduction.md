@@ -1,45 +1,44 @@
 ---
 layout: documentation
-title: Zen and the art of gem5 experiments
+title: gem5 实验的艺术
 doc: gem5art
 parent: gem5art
 permalink: /documentation/gem5art/introduction
 ---
 
-# Zen and the art of gem5 experiments
+# gem5 实验的艺术
 
 <img src="/assets/img/gem5art/gem5art.svg" alt="gem5art-logo" width="100%" style="max-width:300px;"/>
 <br/>
 
-The gem5art project is a set of Python modules to help make it easier to run experiments with the gem5 simulator.
-gem5art contains libraries for *Artifacts, Reproducibility, and Testing.*
-You can think of gem5art as a structured [protocol](https://en.wikipedia.org/wiki/Protocol_(science)) for running gem5 experiments.
+gem5art 项目是一组 Python 模块，旨在帮助更轻松地运行 gem5 模拟器实验。
+gem5art 包含用于*组件、可重现性和测试*的库。
+您可以将 gem5art 视为运行 gem5 实验的结构化[协议](https://en.wikipedia.org/wiki/Protocol_(science))。
 
-When running an experiment, there are inputs, steps to run the experiment, and outputs.
-gem5art tracks all of these through [Artifacts](main/artifacts).
-An artifact is an object, usually a file, which is used as part of the experiment.
+运行实验时，有输入、运行实验的步骤和输出。
+gem5art 通过[组件](main/artifacts)跟踪所有这些内容。
+组件是一个对象，通常是一个文件，用作实验的一部分。
 
-The gem5art project contains an interface to store all of these artifacts in a [database](main/artifacts.html#artifactdb).
-This database is mainly used to aid reproducibility, for instance, when you want to go back and re-run an experiment.
-However, it can also be used to share artifacts with others doing similar experiments (e.g., a disk image with a shared workload).
+gem5art 项目包含一个接口，用于将所有组件存储在[数据库](main/artifacts.html#artifactdb)中。
+该数据库主要用于帮助可重现性，例如，当您想要返回并重新运行实验时。
+但是，它也可以用于与其他进行类似实验的人共享组件（例如，包含共享工作负载的磁盘镜像）。
 
-The database is also used to store results from [gem5 runs](main/run).
-Given all of the input artifacts, these runs have enough information to reproduce exactly the same experimental output.
-Additionally, there is metadata associated with each gem5 run (e.g., the experiment name, the script name, script parameters, gem5 binary name, etc.) which are useful for aggregating results from many experiments.
+数据库还用于存储 [gem5 运行](main/run)的结果。
+给定所有输入组件，这些运行具有足够的信息来重现完全相同的实验输出。
+此外，每个 gem5 运行都有相关的元数据（例如，实验名称、脚本名称、脚本参数、gem5 二进制文件名等），这对于聚合多个实验的结果很有用。
 
-These experimental aggregates are useful for testing gem5 as well as conducting research.
-We will be using this data by aggregating the data from 100s or 1000s of gem5 experiments to determine the state of gem5's codebase at any particular time.
-For instance, as discussed in the [Linux boot tutorial](tutorials/boot-tutorial), we can use this data to determine which Linux kernels, Ubuntu versions, and boot types are currently functional in gem5.
+这些实验聚合对于测试 gem5 以及进行研究都很有用。
+我们将通过聚合来自数百或数千个 gem5 实验的数据来确定 gem5 代码库在任何特定时间点的状态。
+例如，如[Linux 启动教程](tutorials/boot-tutorial)中所述，我们可以使用这些数据来确定哪些 Linux 内核、Ubuntu 版本和启动类型目前在 gem5 中可用。
 
 ----
 
-One of the underlying themes of gem5art is that you should fully understand each piece of the experiment you're running.
-To this end, gem5art requires that every artifact for a particular experiment is *explicitly* defined.
-Additionally, we encourage the use of Python scripts at every level of experimentation from the workload and disk image creation to running gem5.
-By using Python scripts, you can both automate and document the processes for running your experiments.
+gem5art 的一个基本主题是，您应该充分理解正在运行的实验的每个部分。
+为此，gem5art 要求为特定实验的每个组件都*明确*定义。
+此外，我们鼓励在从工作负载和磁盘镜像创建到运行 gem5 的每个实验级别使用 Python 脚本。
+通过使用 Python 脚本，您可以自动化和记录运行实验的过程。
 
-Many of the ideas used to develop gem5art came from our experience using gem5 and the pain points of running complex experiments.
-Jason Lowe-Power used gem5 extensively during his PhD at University of Wisconsin-Madison.
-Through this experience, he made many mistakes and lost an untold number of days trying to reproduce experiments or re-creating artifacts that were accidentally deleted or moved.
-gem5art was designed to reduce the likelihood that this happens to other researchers.
-
+开发 gem5art 的许多想法来自我们使用 gem5 的经验以及运行复杂实验的痛点。
+Jason Lowe-Power 在威斯康星大学麦迪逊分校攻读博士学位期间广泛使用了 gem5。
+通过这段经历，他犯了很多错误，并花费了无数天的时间试图重现实验或重新创建意外删除或移动的组件。
+gem5art 旨在减少这种情况发生在其他研究人员身上的可能性。

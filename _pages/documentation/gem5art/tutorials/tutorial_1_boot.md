@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Boot Tutorial
+title: 启动教程
 doc: gem5art
 parent: tutorial
 permalink: /documentation/gem5art/tutorials/boot-tutorial
@@ -8,11 +8,11 @@ Authors:
   - Ayaz Akram
 ---
 
-# Tutorial: Run Full System Linux Boot Tests
+# 教程：运行全系统 Linux 启动测试
 
-## Introduction
-This tutorial explains how to use gem5art to run experiments with gem5. The specific experiment we will be doing is to test booting of various linux kernel versions and simulator configurations.
-The main steps to perform such an experiment using gem5art include: setting up the environment, building gem5, creating a disk image, compiling linux kernels, preparing gem5 run script, creating a job launch script (which will also register all of the required artifacts) and finally running this script.
+## 简介
+本教程介绍如何使用 gem5art 运行 gem5 实验。我们将进行的特定实验是测试各种 Linux 内核版本和模拟器配置的启动。
+使用 gem5art 执行此类实验的主要步骤包括：设置环境、构建 gem5、创建磁盘镜像、编译 Linux 内核、准备 gem5 运行脚本、创建作业启动脚本（也将注册所有必需的组件），最后运行此脚本。
 
 We assume the following directory structure to follow in this tutorial:
 
@@ -40,15 +40,15 @@ boot-tests/
   |___ launch_boot_tests.py                    # script to launch jobs and register artifacts
 ```
 
-## Setting up the environment
+## 设置环境
 
-First, we need to create the primary directory **boot-tests** which will contain all the created artifacts to run these tests.
-This directory also needs to be converted into a git repository.
-Through the use of boot-tests git repo, we will try to keep track of changes in those files which are not an artifact themselves or not a part of any other artifact.
-An example of such files is gem5 run and config scripts (config-boot-tests).
-We want to make sure that we can keep record of any changes in these scripts, so that a particular run of gem5 can be associated with a particular snapshot of these files.
-All such files, which are not part of other artifacts, will be a part of the experiments repo artifact (we will show how to register that artifact later in this tutorial).
-We also need to add a git remote to this repository pointing to a remote location where we want this repository to be hosted.
+首先，我们需要创建主目录 **boot-tests**，该目录将包含运行这些测试所需的所有创建的组件。
+此目录还需要转换为 git 仓库。
+通过使用 boot-tests git 仓库，我们将尝试跟踪那些本身不是组件或不是任何其他组件一部分的文件中的更改。
+此类文件的示例是 gem5 运行和配置脚本（config-boot-tests）。
+我们希望确保能够记录这些脚本中的任何更改，以便可以将 gem5 的特定运行与这些文件的特定快照关联起来。
+所有此类文件（不是其他组件的一部分）将成为实验仓库组件的一部分（我们将在本教程后面展示如何注册该组件）。
+我们还需要向此仓库添加一个 git remote，指向我们希望托管此仓库的远程位置。
 
 Create the main directory named boot-tests and turn it into a git repo:
 
@@ -88,10 +88,10 @@ gem5art can be installed (if not already) using pip:
 pip install gem5art-artifact gem5art-run gem5art-tasks
 ```
 
-## Building gem5
+## 构建 gem5
 
-Next, we have to clone gem5 and build it. If you want to use the exact gem5 source that was used at the time of creating this tutorial you will have to checkout the relevant commit. If you want to try with the current version of gem5 at the time of reading this tutorial, you can ignore the git checkout command.
-See the commands below:
+接下来，我们必须克隆 gem5 并构建它。如果您想使用创建本教程时使用的确切 gem5 源代码，则必须检出相关提交。如果您想尝试阅读本教程时的当前版本的 gem5，可以忽略 git checkout 命令。
+请参阅下面的命令：
 
 ```sh
 git clone https://github.com/gem5/gem5
@@ -138,8 +138,8 @@ cd gem5/util/m5/
 scons build/x86/out/m5
 ```
 
-## Creating a disk image
-First create a disk-image folder where we will keep all disk image related files:
+## 创建磁盘镜像
+首先创建一个 disk-image 文件夹，我们将在其中保存所有与磁盘镜像相关的文件：
 
 ```sh
 mkdir disk-image
@@ -170,9 +170,9 @@ Once this process succeeds, the disk image can be found on `boot-exit/boot-exit-
 A similar disk image already created following the above instructions can be found, gzipped, [here](http://dist.gem5.org/dist/v21-2/images/x86/ubuntu-18-04/x86-ubuntu.img.gz).
 
 
-## Compiling the linux kernel
+## 编译 Linux 内核
 
-In this tutorial, we want to experiment with different linux kernels to examine the state of gem5's ability to boot different linux kernels. These tests use following five LTS (long term support) releases of the Linux kernel:
+在本教程中，我们想尝试不同的 Linux 内核，以检查 gem5 启动不同 Linux 内核的能力状态。这些测试使用以下五个 LTS（长期支持）版本的 Linux 内核：
 
 - 4.4.186
 - 4.9.186
@@ -210,12 +210,11 @@ Repeat the above process for other kernel versions that we want to use in this e
 - [vmlinux-5.4.49](http://dist.gem5.org/dist/v21-2/kernels/x86/static/vmlinux-5.4.49)
 
 
-## gem5 run scripts
+## gem5 运行脚本
 
-Next, we need to add gem5 run scripts. We will do that in a folder named configs-boot-tests.
-Get the run script named run_exit.py from [here](https://gem5.googlesource.com/public/gem5-resources/+/refs/heads/stable/src/x86-ubuntu/configs/run_exit.py), and other system configuration files from
-[here](https://gem5.googlesource.com/public/gem5-resources/+/refs/heads/stable/src/x86-ubuntu/configs/system).
-The run script (run_exit.py) takes the following arguments:
+接下来，我们需要添加 gem5 运行脚本。我们将在名为 configs-boot-tests 的文件夹中执行此操作。
+从[此处](https://gem5.googlesource.com/public/gem5-resources/+/refs/heads/stable/src/x86-ubuntu/configs/run_exit.py)获取名为 run_exit.py 的运行脚本，并从[此处](https://gem5.googlesource.com/public/gem5-resources/+/refs/heads/stable/src/x86-ubuntu/configs/system)获取其他系统配置文件。
+运行脚本（run_exit.py）接受以下参数：
 - kernel: compiled kernel to be used for simulation
 - disk: built disk image to be used for simulation
 - cpu_type: gem5 cpu model (KVM, atomic, timing or O3)
@@ -229,9 +228,9 @@ An example use of this script is the following:
 gem5/build/X86/gem5.opt configs/run_exit.py [path to the Linux kernel] [path to the disk image] kvm classic 4 init
 ```
 
-## Database and Celery Server
+## 数据库和 Celery 服务器
 
-If not already running/created, you can create a database using:
+如果尚未运行/创建，您可以使用以下命令创建数据库：
 
 ```sh
 `docker run -p 27017:27017 -v <absolute path to the created directory>:/data/db --name mongo-<some tag> -d mongo`
@@ -252,8 +251,8 @@ celery -E -A gem5art.tasks.celery worker --autoscale=[number of workers],0
 
 **Note:** Celery is not required to run gem5 jobs with gem5art. You can also use python multiprocessing library based function calls (provided by gem5art) to launch these jobs in parallel (we will show how to do that later in our launch script).
 
-## Creating a launch script
-Finally, we will create a launch script with the name **launch_boot_tests.py**, which will be responsible for registering the artifacts to be used for these tests and then launching gem5 jobs.
+## 创建启动脚本
+最后，我们将创建一个名为 **launch_boot_tests.py** 的启动脚本，该脚本将负责注册用于这些测试的组件，然后启动 gem5 作业。
 
 The first thing to do in the launch script is to import required modules and classes:
 
@@ -487,10 +486,10 @@ Finally, make sure you are in python virtual env and then run the script:
 python launch_boot_tests.py
 ```
 
-## Results
+## 结果
 
-Once you start running these experiments, you can access the database to check their status or to find results.
-There are different ways to do this. For example, you can use the getRuns method of gem5art as discussed in the Runs section [previously](../main/run.html#searching-the-database-to-find-runs).
+一旦您开始运行这些实验，就可以访问数据库以检查其状态或查找结果。
+有多种方法可以做到这一点。例如，您可以使用 gem5art 的 getRuns 方法，如运行部分[之前](../main/run.html#searching-the-database-to-find-runs)所述。
 
 You can also directly access the database and access the run artifacts as follows:
 

@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Disk Images
+title: 磁盘镜像
 doc: gem5art
 parent: main
 permalink: /documentation/gem5art/main/disks
@@ -9,27 +9,27 @@ Authors:
   - Ayaz Akram
 ---
 
-# Disk Images
+# 磁盘镜像
 
-## Introduction
-This section discusses an automated way of creating gem5-compatible disk images with Ubuntu server installed. We make use of [Packer](https://www.packer.io/) which uses .json template files to build and configure a disk image. These template files can be configured to build a disk image with specific benchmarks installed.
+## 简介
+本节讨论创建带有 Ubuntu 服务器安装的 gem5 兼容磁盘镜像的自动化方法。我们使用 [Packer](https://www.packer.io/)，它使用 .json 模板文件来构建和配置磁盘镜像。这些模板文件可以配置为构建安装了特定基准测试的磁盘镜像。
 
-## Building a Simple Disk Image with Packer
+## 使用 Packer 构建简单磁盘镜像
 <a name="packerbriefly"></a>
-### a. How It Works, Briefly
-We use [Packer](https://www.packer.io/) and [QEMU](https://www.qemu.org/) to automate the process of disk creation.
-Essentially, QEMU is responsible for setting up a virtual machine and all interactions with the disk image during the building process.
-The interactions include installing Ubuntu Server to the disk image, copying files from your machine to the disk image, and running scripts on the disk image after Ubuntu is installed.
-However, we will not use QEMU directly.
-Packer provides a simpler way to interact with QEMU using a JSON script, which is more expressive than using QEMU from command line.
+### a. 工作原理（简要说明）
+我们使用 [Packer](https://www.packer.io/) 和 [QEMU](https://www.qemu.org/) 来自动化磁盘创建过程。
+本质上，QEMU 负责设置虚拟机以及在构建过程中与磁盘镜像的所有交互。
+交互包括将 Ubuntu Server 安装到磁盘镜像、从您的机器复制文件到磁盘镜像，以及在安装 Ubuntu 后在磁盘镜像上运行脚本。
+但是，我们不会直接使用 QEMU。
+Packer 提供了一种使用 JSON 脚本与 QEMU 交互的更简单方法，这比从命令行使用 QEMU 更具表现力。
 <a name="dependencies"></a>
-### b. Install Required Software/Dependencies
-If not already installed, QEMU can be installed using:
+### b. 安装所需的软件/依赖项
+如果尚未安装，可以使用以下命令安装 QEMU：
 ```shell
 sudo apt-get install qemu
 ```
-The packer binary can be downloaded from [the official website](https://www.packer.io/downloads.html).
-For example, the following command downloads packer version 1.7.2 for Linux platforms,
+packer 二进制文件可以从[官方网站](https://www.packer.io/downloads.html)下载。
+例如，以下命令下载适用于 Linux 平台的 packer 版本 1.7.2，
 
 ```sh
 wget https://releases.hashicorp.com/packer/1.7.2/packer_1.7.2_linux_amd64.zip
@@ -37,9 +37,9 @@ unzip packer_1.7.2_linux_amd64.zip
 ```
 
 <a name="customizing"></a>
-### c. Customize the Packer Script
-The default packer script `template.json` should be modified and adapted according to the required disk image and the available resources for the build process. We will rename the default template to `[disk-name].json`. The variables that should be modified appear at the end of `[disk-name].json` file, in `variables` section.
-The configuration files that we use to build the disk image, and the directory structure is shown below:
+### c. 自定义 Packer 脚本
+默认的 packer 脚本 `template.json` 应根据所需的磁盘镜像和构建过程的可用资源进行修改和调整。我们将默认模板重命名为 `[disk-name].json`。应修改的变量出现在 `[disk-name].json` 文件的末尾，在 `variables` 部分。
+我们用于构建磁盘镜像的配置文件和目录结构如下所示：
 ```shell
 disk-image/
   experiment-specific-folder/
@@ -52,31 +52,31 @@ disk-image/
 ```
 
 <a name="customizingVM"></a>
-#### i. Customizing the VM (Virtual Machine)
-In `[disk-name].json`, following variables are available to customize the VM (to be used for the disk building process):
+#### i. 自定义 VM（虚拟机）
+在 `[disk-name].json` 中，以下变量可用于自定义 VM（用于磁盘构建过程）：
 
-| Variable         | Purpose     | Example  |
+| 变量         | 用途     | 示例  |
 | ---------------- |-------------|----------|
-| [vm_cpus](https://www.packer.io/docs/builders/qemu.html#cpus) **(should be modified)** | number of host CPUs used by VM | "2": 2 CPUs are used by the VM |
-| [vm_memory](https://www.packer.io/docs/builders/qemu.html#memory) **(should be modified)** | amount of memory used by VM, in megabytes | "2048": 2 GB of RAM are used by the VM |
-| [vm_accelerator](https://www.packer.io/docs/builders/qemu.html#accelerator) **(should be modified)** | accelerator used by the VM, e.g. kvm | "kvm": kvm will be used |
+| [vm_cpus](https://www.packer.io/docs/builders/qemu.html#cpus) **（应修改）** | VM 使用的宿主机 CPU 数量 | "2": VM 使用 2 个 CPU |
+| [vm_memory](https://www.packer.io/docs/builders/qemu.html#memory) **（应修改）** | VM 使用的内存量，以兆字节为单位 | "2048": VM 使用 2 GB RAM |
+| [vm_accelerator](https://www.packer.io/docs/builders/qemu.html#accelerator) **（应修改）** | VM 使用的加速器，例如 kvm | "kvm": 将使用 kvm |
 
 <a name="customizingscripts"></a>
-#### ii. Customizing the Disk Image
-In `[disk-name].json`, disk image size can be customized using following variable:
+#### ii. 自定义磁盘镜像
+在 `[disk-name].json` 中，可以使用以下变量自定义磁盘镜像大小：
 
-| Variable        | Purpose     | Example  |
+| 变量        | 用途     | 示例  |
 | ---------------- |-------------|----------|
-| [image_size](https://www.packer.io/docs/builders/qemu.html#disk_size) **(should be modified)** | size of the disk image, in megabytes | "8192": the image has the size of 8 GB  |
-| [image_name] | name of the built disk image | "boot-exit"  |
+| [image_size](https://www.packer.io/docs/builders/qemu.html#disk_size) **（应修改）** | 磁盘镜像的大小，以兆字节为单位 | "8192": 镜像大小为 8 GB  |
+| [image_name] | 构建的磁盘镜像的名称 | "boot-exit"  |
 
 
 
 
 <a name="customizingscripts2"></a>
-#### iii. File Transfer
-While building a disk image, users would need to move their files (benchmarks, data sets etc.) to
-the disk image. In order to do this file transfer, in `[disk-name].json` under `provisioners`, you could add the following:
+#### iii. 文件传输
+在构建磁盘镜像时，用户需要将文件（基准测试、数据集等）移动到磁盘镜像。
+为了进行此文件传输，在 `[disk-name].json` 的 `provisioners` 下，您可以添加以下内容：
 
 ```shell
 {
@@ -86,35 +86,35 @@ the disk image. In order to do this file transfer, in `[disk-name].json` under `
     "direction": "upload"
 }
 ```
-The above example copies the file `shared/post_installation.sh` from the host to `/home/gem5/` in the disk image.
-This method is also capable of copying a folder from host to the disk image and vice versa.
-It is important to note that the trailing slash affects the copying process [(more details)](https://www.packer.io/docs/provisioners/file.html#directory-uploads).
-The following are some notable examples of the effect of using slash at the end of the paths.
+上面的示例将文件 `shared/post_installation.sh` 从宿主机复制到磁盘镜像中的 `/home/gem5/`。
+此方法还能够将文件夹从宿主机复制到磁盘镜像，反之亦然。
+重要的是要注意尾随斜杠会影响复制过程 [（更多详细信息）](https://www.packer.io/docs/provisioners/file.html#directory-uploads)。
+以下是在路径末尾使用斜杠的效果的一些值得注意的示例。
 
 | `source`        | `destination`     | `direction`  |  `Effect`  |
 | ---------------- |-------------|----------|-----|
-| `foo.txt` | `/home/gem5/bar.txt` | `upload` | copy file (host) to file (image) |
-| `foo.txt` | `bar/` | `upload` | copy file (host) to folder (image) |
-| `/foo` | `/tmp` | `upload` | `mkdir /tmp/foo` (image);  `cp -r /foo/* (host) /tmp/foo/ (image)`; |
-| `/foo/` | `/tmp` | `upload` | `cp -r /foo/* (host) /tmp/ (image)` |
+| `foo.txt` | `/home/gem5/bar.txt` | `upload` | 将文件（宿主机）复制到文件（镜像） |
+| `foo.txt` | `bar/` | `upload` | 将文件（宿主机）复制到文件夹（镜像） |
+| `/foo` | `/tmp` | `upload` | `mkdir /tmp/foo` (镜像);  `cp -r /foo/* (宿主机) /tmp/foo/ (镜像)`; |
+| `/foo/` | `/tmp` | `upload` | `cp -r /foo/* (宿主机) /tmp/ (镜像)` |
 
-If `direction` is `download`, the files will be copied from the image to the host.
-**Note**: [This is a way to run script once after installing Ubuntu without copying to the disk image](#customizingscripts3).
+如果 `direction` 是 `download`，文件将从镜像复制到宿主机。
+**注意**：[这是在安装 Ubuntu 后运行脚本而不复制到磁盘镜像的一种方法](#customizingscripts3)。
 
 <a name="customizingscripts3"></a>
-#### iv. Install ing Benchmark Dependencies
-To install the dependencies, we utilize the bash script `shared/post_installation.sh`, which will be run after the Ubuntu installation and file copying is done.
-For example, if we want to install `gfortran`, add the following in `scripts/post_installation.sh`:
+#### iv. 安装基准测试依赖项
+为了安装依赖项，我们使用 bash 脚本 `shared/post_installation.sh`，该脚本将在 Ubuntu 安装和文件复制完成后运行。
+例如，如果我们想安装 `gfortran`，请在 `scripts/post_installation.sh` 中添加以下内容：
 ```shell
 echo '12345' | sudo apt-get install gfortran;
 ```
-In the above example, we assume that the user password is `12345`.
-This is essentially a bash script that is executed on the VM after the file copying is done, you could modify the script as a bash script to fit any purpose.
+在上面的示例中，我们假设用户密码是 `12345`。
+这本质上是一个在文件复制完成后在 VM 上执行的 bash 脚本，您可以修改脚本作为 bash 脚本以适应任何目的。
 <a name="customizingscripts4"></a>
-#### v. Running Other Scripts on Disk Image
-In `[disk-name].json`, we could add more scripts to `provisioners`.
-Note that the files are on the host, but the effects are on the disk image.
-For example, the following example runs `shared/post_installation.sh` after Ubuntu is installed,
+#### v. 在磁盘镜像上运行其他脚本
+在 `[disk-name].json` 中，我们可以向 `provisioners` 添加更多脚本。
+请注意，文件在宿主机上，但效果在磁盘镜像上。
+例如，以下示例在安装 Ubuntu 后运行 `shared/post_installation.sh`，
 
 {% raw %}
 ```shell
@@ -130,33 +130,32 @@ For example, the following example runs `shared/post_installation.sh` after Ubun
 {% endraw %}
 
 <a name="buildsimple"></a>
-### d. Building the Disk Image
+### d. 构建磁盘镜像
 <a name="simplebuild"></a>
-#### i. Building the Disk Image
-In order to build a disk image, the template file is first validated using:
+#### i. 构建磁盘镜像
+为了构建磁盘镜像，首先使用以下命令验证模板文件：
 ```sh
 ./packer validate [disk-name].json
 ```
-Then, the template file can be used to build the disk image:
+然后，可以使用模板文件构建磁盘镜像：
 ```sh
 ./packer build [disk-name].json
 ```
 
-On a fairly recent machine, the building process should not take more than 15 minutes to complete.
-The disk image with the user-defined name (image_name) will be produced in a folder called [image_name]-image.
-[We recommend to use a VNC viewer in order to inspect the building process](#inspect).
+在相当新的机器上，构建过程应该不会超过 15 分钟。
+具有用户定义名称（image_name）的磁盘镜像将在名为 [image_name]-image 的文件夹中生成。
+[我们建议使用 VNC 查看器来检查构建过程](#inspect)。
 <a name="inspect"></a>
-#### ii. Inspecting the Building Process
-While the building process of disk image takes place, packer will run a VNC (Virtual Network Computing) server and you will be able to see the building process by connecting to the VNC server from a VNC client. There are a plenty of choices for VNC client. When you run the packer script, it will tell you which port is used by the VNC server. For example, if it says `qemu: Connecting to VM via VNC (127.0.0.1:5932)`, the VNC port is 5932.
-To connect to VNC server from the VNC client, use the address `127.0.0.1:5932` for a port number 5932.
-If you need port forwarding to forward the VNC port from a remote machine to your local machine, use SSH tunneling
+#### ii. 检查构建过程
+在磁盘镜像的构建过程进行时，packer 将运行 VNC（虚拟网络计算）服务器，您可以通过从 VNC 客户端连接到 VNC 服务器来查看构建过程。VNC 客户端有很多选择。当您运行 packer 脚本时，它会告诉您 VNC 服务器使用哪个端口。例如，如果它显示 `qemu: Connecting to VM via VNC (127.0.0.1:5932)`，则 VNC 端口是 5932。
+要从 VNC 客户端连接到 VNC 服务器，对于端口号 5932，使用地址 `127.0.0.1:5932`。
+如果您需要端口转发以将 VNC 端口从远程机器转发到本地机器，请使用 SSH 隧道
 ```shell
 ssh -L 5932:127.0.0.1:5932 <username>@<host>
 ```
-This command will forward port 5932 from the host machine to your machine, and then you will be able to connect to the VNC server using the address `127.0.0.1:5932` from your VNC viewer.
+此命令将端口 5932 从宿主机转发到您的机器，然后您将能够从 VNC 查看器使用地址 `127.0.0.1:5932` 连接到 VNC 服务器。
 
-**Note**: While packer is installing Ubuntu, the terminal screen will display "waiting for SSH" without any update for a long time.
-This is not an indicator of whether the Ubuntu installation produces any errors.
-Therefore, we strongly recommend using VNC viewer at least once to inspect the image building process.
+**注意**：当 packer 正在安装 Ubuntu 时，终端屏幕将长时间显示"waiting for SSH"而没有任何更新。
+这不是 Ubuntu 安装是否产生任何错误的指示。
+因此，我们强烈建议至少使用一次 VNC 查看器来检查镜像构建过程。
 <a name="checking"></a>
-

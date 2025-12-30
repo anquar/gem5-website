@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: NPB Tutorial
+title: NPB 教程
 doc: gem5art
 parent: tutorial
 permalink: /documentation/gem5art/tutorials/npb-tutorial
@@ -8,25 +8,25 @@ Authors:
   - Ayaz Akram
 ---
 
-# Tutorial: Run NAS Parallel Benchmarks with gem5
+# 教程：使用 gem5 运行 NAS 并行基准测试
 
-## Introduction
-In this tutorial, we will use gem5art to create a disk image for NAS parallel benchmarks ([NPB](https://www.nas.nasa.gov/)) and then run these benchmarks using gem5. NPB belongs to the category of high performance computing (HPC) workloads and consist of 5 kernels and 3 pseudo applications.
-Following are their details:
+## 简介
+在本教程中，我们将使用 gem5art 为 NAS 并行基准测试（[NPB](https://www.nas.nasa.gov/)）创建磁盘镜像，然后使用 gem5 运行这些基准测试。NPB 属于高性能计算 (HPC) 工作负载类别，由 5 个内核和 3 个伪应用程序组成。
+以下是它们的详细信息：
 
-Kernels:
-- **IS:** Integer Sort, random memory access
-- **EP:** Embarrassingly Parallel
-- **CG:** Conjugate Gradient, irregular memory access and communication
-- **MG:** Multi-Grid on a sequence of meshes, long- and short-distance communication, memory intensive
-- **FT:** discrete 3D fast Fourier Transform, all-to-all communication
+内核：
+- **IS:** 整数排序，随机内存访问
+- **EP:** 易并行
+- **CG:** 共轭梯度，不规则内存访问和通信
+- **MG:** 网格序列上的多重网格，长距离和短距离通信，内存密集型
+- **FT:** 离散 3D 快速傅里叶变换，全对全通信
 
-Pseudo Applications:
-- **BT:** Block Tri-diagonal solver
-- **SP:** Scalar Penta-diagonal solver
-- **LU:** Lower-Upper Gauss-Seidel solver
+伪应用程序：
+- **BT:** 块三对角求解器
+- **SP:** 标量五对角求解器
+- **LU:** 下-上高斯-赛德尔求解器
 
-There are different classes (A,B,C,D,E and F) of the workloads based on the data size that is used with the benchmarks. Detailed discussion of the data sizes is available [here](https://www.nas.nasa.gov/publications/npb_problem_sizes.html). In this tutorial, we will use only class A of these workloads.
+根据与基准测试一起使用的数据大小，工作负载有不同的类别（A、B、C、D、E 和 F）。数据大小的详细讨论可在[此处](https://www.nas.nasa.gov/publications/npb_problem_sizes.html)获得。在本教程中，我们仅使用这些工作负载的 A 类。
 
 We assume the following directory structure to follow in this tutorial:
 
@@ -57,13 +57,13 @@ npb/
 ```
 
 
-## Setting up the environment
+## 设置环境
 
-First, we need to create the main directory named **npb-tests** (from where we will run everything) and turn it into a git repository.
-Through the use of **npb-tests** git repo, we will try to keep track of changes in those files which are not included in any git repo otherwise.
-An example of such files is gem5 run and config scripts.
-We want to make sure that we can keep record of any changes in these scripts, so that a particular run of NPB benchmarks can be associated with a particular snapshot of these files.
-We also need to add a git remote to this repo pointing to a remote location where we want this repo to be hosted.
+首先，我们需要创建名为 **npb-tests** 的主目录（我们将从那里运行所有内容）并将其转换为 git 仓库。
+通过使用 **npb-tests** git 仓库，我们将尝试跟踪那些未包含在任何其他 git 仓库中的文件中的更改。
+此类文件的示例是 gem5 运行和配置脚本。
+我们希望确保能够记录这些脚本中的任何更改，以便可以将 NPB 基准测试的特定运行与这些文件的特定快照关联起来。
+我们还需要向此仓库添加一个 git remote，指向我们希望托管此仓库的远程位置。
 
 
 ```sh

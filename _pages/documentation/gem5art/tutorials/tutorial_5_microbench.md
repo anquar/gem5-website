@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Microbench Tutorial
+title: 微基准测试教程
 doc: gem5art
 parent: tutorial
 permalink: /documentation/gem5art/tutorials/microbench-tutorial
@@ -9,15 +9,14 @@ Authors:
   - Nadia Etemadi
 ---
 
-# Tutorial: Run Microbenchmarks with gem5
+# 教程：使用 gem5 运行微基准测试
 
-## Introduction
-In this tutorial, we will learn how to run some simple microbenchmarks using gem5art.
-Microbenchmarks are small benchmarks designed to test a component of a larger system.
-The particular microbenchmarks we are using in this tutorial were originally developed at the
-[University of Wisconsin-Madison](https://github.com/VerticalResearchGroup/microbench).
-This microbenchmark suite is divided into different control, execution and memory benchmarks.
-We will use system emulation (SE) mode of gem5 to run these microbenchmarks with gem5.
+## 简介
+在本教程中，我们将学习如何使用 gem5art 运行一些简单的微基准测试。
+微基准测试是设计用于测试更大系统组件的小型基准测试。
+我们在本教程中使用的特定微基准测试最初是在[威斯康星大学麦迪逊分校](https://github.com/VerticalResearchGroup/microbench)开发的。
+此微基准测试套件分为不同的控制、执行和内存基准测试。
+我们将使用 gem5 的系统仿真 (SE) 模式来使用 gem5 运行这些微基准测试。
 
 
 This tutorial follows the following directory structure:
@@ -29,9 +28,9 @@ This tutorial follows the following directory structure:
 - launch_micro_tests.py: gem5 jobs launch script (creates all of the needed artifacts as well)
 
 
-## Setting up the environment
-First, we need to create the main directory named micro-tests (from where we will run everything) and turn it into a git repository like we did in the previous tutorials.
-Next, add a git remote to this repo pointing to a remote location where we want this repo to be hosted.
+## 设置环境
+首先，我们需要创建名为 micro-tests 的主目录（我们将从那里运行所有内容），并将其转换为 git 仓库，就像我们在之前的教程中所做的那样。
+接下来，向此仓库添加一个 git remote，指向我们希望托管此仓库的远程位置。
 
 ```sh
 mkdir micro-tests

@@ -1,78 +1,75 @@
 ---
 layout: documentation
-title: FAQ
+title: 常见问题
 doc: gem5art
 parent: main
 permalink: /documentation/gem5art/main/faq
 ---
 
-# Frequently Asked Questions
+# 常见问题
 
-**What is gem5art?**
+**什么是 gem5art？**
 
-gem5art (libraries for artifacts, reproducibility and testing) is a set of python modules to do experiments with gem5 in a reproducible and structured way.
+gem5art（用于组件、可重现性和测试的库）是一组 Python 模块，用于以可重现和结构化的方式使用 gem5 进行实验。
 
-**Do I need celery to run gem5 jobs using gem5art?**
+**我需要 celery 来使用 gem5art 运行 gem5 作业吗？**
 
-Celery is not required to run gem5 jobs with gem5art.
-You can use any other job scheduling tool or no tool at all.
-In order to run your job without celery, simply call the run() method of your run object once it is created.
-For example, assuming created run object (in a launch script) is called run, you can do the following:
+使用 gem5art 运行 gem5 作业不需要 Celery。
+您可以使用任何其他作业调度工具，或者根本不使用任何工具。
+为了在没有 celery 的情况下运行作业，只需在创建运行对象后调用运行对象的 run() 方法。
+例如，假设创建的运行对象（在启动脚本中）名为 run，您可以执行以下操作：
 
 ```python
 run.run()
 ```
 
-**Is there a more user-friendly way to launch gem5 jobs?**
+**是否有更用户友好的方式来启动 gem5 作业？**
 
-You can use python multiprocessing library based function calls (provided by gem5art) to launch multiple gem5 jobs in parallel.
-Specifically, you can call the following function in your gem5art launch script:
+您可以使用基于 Python 多进程库的函数调用（由 gem5art 提供）来并行启动多个 gem5 作业。
+具体来说，您可以在 gem5art 启动脚本中调用以下函数：
 
 ```python
 run_job_pool([a list containing all run objects to execute], num_parallel_jobs = [Number of parralel jobs])
 ```
 
-**How to access/search the files/artifacts in the database?**
+**如何访问/搜索数据库中的文件/组件？**
 
-You can use the pymongo API functions to access the files in the database.
-gem5art also provides methods that make it easy to access the entries in the database.
-You can look at the different available methods [here](artifacts.html#searching-the-database).
+您可以使用 pymongo API 函数来访问数据库中的文件。
+gem5art 还提供了使访问数据库中的条目变得容易的方法。
+您可以在此处查看不同的可用方法 [here](artifacts.html#searching-the-database)。
 
-**What if I want to re-run an experiment, using the same artifacts?**
+**如果我想使用相同的组件重新运行实验怎么办？**
 
-As explained in the documentation, when a new run object is created in the launch script,
-a hash is created out of the artifacts that this run is dependent on.
-This hash is used to check if a the same run exists in the database.
-One of the artifacts used to create the hash is runscript artifact (which basically is same as
-experiments repository artifact, as gem5 configuration scripts are part of the base experiments
-repository).
-The easiest way to re-run an experiment is to update the name field of your launch script and commit the changes
-in the launch script to the base experiments repository.
-Make sure to use the new name field to query the results or runs in the database.
+如文档中所述，当在启动脚本中创建新的运行对象时，
+会从该运行所依赖的组件创建一个哈希。
+此哈希用于检查数据库中是否存在相同的运行。
+用于创建哈希的组件之一是运行脚本组件（基本上与实验仓库组件相同，因为 gem5 配置脚本是基础实验仓库的一部分）。
+重新运行实验的最简单方法是更新启动脚本的 name 字段，并将启动脚本中的更改提交到基础实验仓库。
+确保使用新的 name 字段来查询数据库中的结果或运行。
 
-**How can I monitor the status of jobs launched using gem5art launch script?**
+**如何监控使用 gem5art 启动脚本启动的作业状态？**
 
-Celery does not explicitly show the status of the runs by default.
-[flower](https://flower.readthedocs.io/en/latest/), a Python package, is a web-based tool for monitoring and administrating Celery.
+Celery 默认不明确显示运行状态。
+[flower](https://flower.readthedocs.io/en/latest/) 是一个 Python 包，是用于监控和管理 Celery 的基于 Web 的工具。
 
-To install the flower package,
+要安装 flower 包，
 ```sh
 pip install flower
 ```
 
-If you are using celery to run your tasks, you can use celery monitoring tool called flower.
-For this purpose, use the following command:
+如果您使用 celery 来运行任务，可以使用名为 flower 的 celery 监控工具。
+为此，请使用以下命令：
 
 ```sh
 flower -A gem5art.tasks.celery --port=5555
 ```
 
-You can access this server on your web browser using `http://localhost:5555`.
+您可以在 Web 浏览器中使用 `http://localhost:5555` 访问此服务器。
 
-Celery also generates some log files in the directory where you are running celery from.
-You can also look at those log files to know the status of your jobs.
+Celery 还会在您运行 celery 的目录中生成一些日志文件。
+您也可以查看这些日志文件以了解作业的状态。
 
-**How to contribute to gem5art?**
+**如何为 gem5art 做贡献？**
 
-gem5art is open-source.
-If you want to add a new feature or fix a bug, you can create a PR on the gem5art github repo.
+gem5art 是开源的。
+如果您想添加新功能或修复错误，可以在 gem5art github 仓库上创建 PR。

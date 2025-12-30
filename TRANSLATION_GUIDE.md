@@ -21,6 +21,16 @@ Markdown 文件顶部的 YAML 区域（被 `---` 包裹的部分）包含了页�
     *   `parent`: 父级菜单标识。
     *   `nav_order`: 导航顺序。
     *   `id`: 页面唯一标识。
+    *   `doc`: 文档分组标识（用于匹配左侧导航/目录分组）。
+
+#### 2.1.1 左侧目录 (Sidebar / Sidenav) 相关的“绝对不能翻译/改动”的字段
+很多文档页使用 `layout: documentation`，其左侧目录是通过 `page.doc` 去匹配 `_data/documentation.yml` 中的顶层分组来生成的。
+
+因此请遵守以下规则（否则会出现“左侧目录不显示/为空”的问题）：
+
+*   **不要翻译/不要改动 `doc`**：例如 `doc: gem5art`、`doc: Learning gem5`、`doc: gem5 documentation` 这类值必须保持与站点导航配置一致。
+*   **不要翻译/不要改动 `parent` / `id` / `nav_order`**：这些字段也用于导航高亮、折叠展开、排序等逻辑。
+*   **只翻译 `title`**：页面标题翻译不会影响侧边栏匹配逻辑。
 
 **示例：**
 
@@ -93,6 +103,13 @@ A: 首先查看 `GLOSSARY.md`。如果没有收录，建议保留英文原文，
 
 **Q: 侧边栏的菜单名在哪里修改？**
 A: 侧边栏菜单通常由 `_data/documentation.yml` 控制（已完成汉化）或由页面 Front Matter 中的 `title` 字段决定。修改页面的 `title` 通常会自动更新对应的菜单项。
+
+**Q: 为什么某些页面左侧目录突然不显示了？如何避免？**
+A: 最常见原因是 **Front Matter 里的 `doc` 被误翻译/误改动**，或 `_data/documentation.yml` 中对应顶层分组的标识发生了变化，导致两者无法匹配。
+
+避免方法：
+*   **页面侧**：确保 `doc`、`parent`、`id`、`nav_order` 这些字段完全不动，只翻译 `title` 和正文。
+*   **导航配置侧（`_data/documentation.yml`）**：如果需要翻译某个顶层分组的显示名称，请只改 `title/menu_title`，并为顶层分组保留/补充一个稳定的 `id`（例如 `id: gem5art`），后续页面 `doc:` 也应与该 `id` 对齐。
 
 **Q: 图片下的说明文字需要翻译吗？**
 A: 需要翻译。

@@ -353,6 +353,7 @@ docs:
          url: http://doxygen.gem5.org/release/current/index.html
 
   - title: gem5art 工具
+    id: gem5art
     items:
     - title: 简介
       id: introduction

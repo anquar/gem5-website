@@ -16,7 +16,7 @@ defaults:
 sass:
   sass_dir: _sass
 
-include: ['_pages']
+include: ['_pages', '_pages/documentation/general_docs/stdlib_api/_static']
 
 kramdown:
   input: GFM

@@ -1,36 +1,35 @@
 ---
 layout: documentation
-title: Simple CPU Models
+title: Simple CPU 模型
 doc: gem5 documentation
 parent: cpu_models
 permalink: /documentation/general_docs/cpu_models/SimpleCPU
 ---
 # **SimpleCPU**
-The SimpleCPU is a purely functional, in-order model that is suited for cases where a detailed model is not necessary. This can include warm-up periods, client systems that are driving a host, or just testing to make sure a program works.
+SimpleCPU 是一个纯粹的功能性、按序模型，适用于不需要详细模型的场景。这可能包括预热期、驱动主机的客户端系统，或者只是测试程序是否正常工作。
 
-It has recently been re-written to support the new memory system, and is now broken up into three classes:
+它最近经过重写以支持新的内存系统，现在分为三个类：
 
-**Table of Contents**
-
+**目录**
 
   1. [**BaseSimpleCPU**](#basesimplecpu)
   2. [**AtomicSimpleCPU**](#atomicsimplecpu)
   3. [**TimingSimpleCPU**](#timingsimplecpu)
 
 ## **BaseSimpleCPU**
-The BaseSimpleCPU serves several purposes:
-  * Holds architected state, stats common across the SimpleCPU models.
-  * Defines functions for checking for interrupts, setting up a fetch request, handling pre-execute setup, handling post-execute actions, and advancing the PC to the next instruction. These functions are also common across the SimpleCPU models.
-  * Implements the ExecContext interface.
+BaseSimpleCPU 有几个用途：
+  * 保存架构状态，以及 SimpleCPU 模型之间通用的统计信息。
+  * 定义用于检查中断、设置取指请求、处理执行前设置、处理执行后操作以及将 PC 推进到下一条指令的函数。这些函数在 SimpleCPU 模型之间也是通用的。
+  * 实现 ExecContext 接口。
 
-The BaseSimpleCPU can not be run on its own. You must use one of the classes that inherits from BaseSimpleCPU, either AtomicSimpleCPU or TimingSimpleCPU.
+BaseSimpleCPU 不能单独运行。您必须使用继承自 BaseSimpleCPU 的类之一，即 AtomicSimpleCPU 或 TimingSimpleCPU。
 
 ## **AtomicSimpleCPU**
-The AtomicSimpleCPU is the version of SimpleCPU that uses atomic memory accesses (see [Memory systems](../memory_system/index.html#access-types) for details). It uses the latency estimates from the atomic accesses to estimate overall cache access time. The AtomicSimpleCPU is derived from BaseSimpleCPU, and implements functions to read and write memory, and also to tick, which defines what happens every CPU cycle. It defines the port that is used to hook up to memory, and connects the CPU to the cache.
+AtomicSimpleCPU 是使用原子内存访问的 SimpleCPU 版本（有关详细信息，请参阅 [内存系统](../memory_system/index.html#access-types)）。它使用原子访问的延迟估计来估计整体缓存访问时间。AtomicSimpleCPU 派生自 BaseSimpleCPU，并实现了读写内存的函数，以及 tick 函数，它定义了每个 CPU 周期发生的事情。它定义了用于连接到内存的端口，并将 CPU 连接到缓存。
 
 ![AtomicSimpleCPU](/assets/img/AtomicSimpleCPU.jpg)
 
 ## **TimingSimpleCPU**
-The TimingSimpleCPU is the version of SimpleCPU that uses timing memory accesses (see [Memory systems](../memory_system/index.html#access-types) for details). It stalls on cache accesses and waits for the memory system to respond prior to proceeding. Like the AtomicSimpleCPU, the TimingSimpleCPU is also derived from BaseSimpleCPU, and implements the same set of functions. It defines the port that is used to hook up to memory, and connects the CPU to the cache. It also defines the necessary functions for handling the response from memory to the accesses sent out.
+TimingSimpleCPU 是使用时序内存访问的 SimpleCPU 版本（有关详细信息，请参阅 [内存系统](../memory_system/index.html#access-types)）。它在缓存访问时停顿，并在继续之前等待内存系统响应。像 AtomicSimpleCPU 一样，TimingSimpleCPU 也派生自 BaseSimpleCPU，并实现了相同的一组函数。它定义了用于连接到内存的端口，并将 CPU 连接到缓存。它还定义了处理从内存发出的访问响应的必要函数。
 
 ![TimingSimpleCPU](/assets/img/TimingSimpleCPU.jpg)

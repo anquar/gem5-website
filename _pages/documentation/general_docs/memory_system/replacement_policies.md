@@ -1,143 +1,88 @@
 ---
 layout: documentation
-title: "Replacement Policies"
+title: "替换策略"
 doc: gem5 documentation
 parent: memory_system
 permalink: /documentation/general_docs/memory_system/replacement_policies/
 author: Jason Lowe-Power
 ---
 
-# Replacement Policies
+# 替换策略
 
-Gem5 has multiple implemented replacement policies. Each one uses its
-specific replacement data to determine a replacement victim on
-evictions.
+Gem5 实现了多种替换策略。每种策略都使用其特定的替换数据来确定驱逐时的替换受害者。
 
-All of the replacement policies prioritize victimizing invalid blocks.
+所有的替换策略都优先驱逐无效块。
 
-A replacement policy consists of a reset(), touch(), invalidate() and
-getVictim() methods. Each of which handles the replacement data
-differently.
+替换策略由 reset(), touch(), invalidate() 和 getVictim() 方法组成。每个方法以不同的方式处理替换数据。
 
--   reset() is used to initialize a replacement data (i.e., validate).
-    It should be called only on entry insertion, and must not be called
-    again until invalidation. The first touch to an entry must always be
-    a reset().
--   touch() is used on accesses to the replacement data, and as such
-    should be called on entry accesses. It updates the replacement data.
--   invalidate() is called whenever an entry is invalidated, possibly
-    due to coherence handling. It makes the entry as likely to be
-    evicted as possible on the next victim search. An entry does not
-    need to be invalidated before a reset() is done. When the simulation
-    starts all entries are invalid.
--   getVictim() is called when there is a miss, and an eviction must be
-    done. It searches among all replacement candidates for an entry with
-    the worst replacement data, generally prioritizing the eviction of
-    invalid entries.
+-   reset() 用于初始化替换数据（即验证）。它应该仅在条目插入时被调用，并且在无效化之前不得再次调用。对条目的第一次触摸必须始终是 reset()。
+-   touch() 用于访问替换数据，因此应在条目访问时调用。它更新替换数据。
+-   invalidate() 每当条目无效时调用，可能是由于一致性处理。它使得该条目在下一次受害者搜索中尽可能可能被驱逐。在执行 reset() 之前不需要使条目无效。当模拟开始时，所有条目都是无效的。
+-   getVictim() 在未命中且必须进行驱逐时调用。它在所有替换候选者中搜索具有最差替换数据的条目，通常优先驱逐无效条目。
 
-We briefly describe the replacement policies implemented in Gem5. If
-further information is required, the [Cache Replacement Policies
-Wikipedia page](https://en.wikipedia.org/wiki/Cache_replacement_policies), or the respective papers can be studied.
+我们简要描述 Gem5 中实现的替换策略。如果需要更多信息，可以研究 [Cache Replacement Policies Wikipedia 页面](https://en.wikipedia.org/wiki/Cache_replacement_policies) 或相应的论文。
 
 Random
 ------
 
-The simplest replacement policy; it does not need replacement data, as
-it randomly selects a victim among the candidates.
+最简单的替换策略；它不需要替换数据，因为它在候选者中随机选择一个受害者。
 
 Least Recently Used (LRU) {#least_recently_used_lru}
 -------------------------
 
-Its replacement data consists of a last touch timestamp, and the victim
-is chosen based on it: the oldest it is, the more likely its respective
-entry is to be victimized.
+它的替换数据由最后一次触摸的时间戳组成，受害者是根据它选择的：它越旧，其对应的条目就越有可能被驱逐。
 
 Tree Pseudo Least Recently Used (TreePLRU) {#tree_pseudo_least_recently_used_treeplru}
 ------------------------------------------
 
-A variation of the LRU that uses a binary tree to keep track of the
-recency of use of the entries through 1-bit pointers.
+LRU 的一种变体，使用二叉树通过 1 位指针来跟踪条目的使用近期性。
 
 Bimodal Insertion Policy (BIP) {#bimodal_insertion_policy_bip}
 ------------------------------
 
-The [Bimodal Insertion Policy] is similar to the LRU, however, blocks
-have a probability of being inserted as the MRU, according to a bimodal
-throttle parameter (btp). The highest btp is, the highest is the
-likelihood of a new block being inserted as MRU.
+[Bimodal Insertion Policy] 类似于 LRU，但是，根据双峰节流参数 (btp)，块有一定的概率作为 MRU 插入。btp 越高，新块作为 MRU 插入的可能性就越高。
 
 LRU Insertion Policy (LIP) {#lru_insertion_policy_lip}
 --------------------------
 
-The [LRU Insertion Policy][Bimodal Insertion Policy] consists of a LRU
-replacement policy that instead of inserting blocks with the most recent
-last touch timestamp, it inserts them as the LRU entry. On subsequent
-touches to the block, its timestamp is updated to be the MRU, as in LRU.
-It can also be seen as a BIP where the likelihood of inserting a new
-block as the most recently used is 0%.
+[LRU Insertion Policy][Bimodal Insertion Policy] 包含一个 LRU 替换策略，它不插入具有最近最后触摸时间戳的块，而是将它们作为 LRU 条目插入。在随后对该块的触摸中，其时间戳更新为 MRU，如在 LRU 中一样。它也可以被视为 BIP，其中将新块插入为最近使用的可能性为 0%。
 
 Most Recently Used (MRU) {#most_recently_used_mru}
 ------------------------
 
-The Most Recently Used policy chooses replacement victims by their
-recency, however, as opposed to LRU, the newer the entry is, the more
-likely it is to be victimized.
+Most Recently Used 策略根据近期性选择替换受害者，但是，与 LRU 相反，条目越新，它就越有可能被驱逐。
 
 Least Frequently Used (LFU) {#least_frequently_used_lfu}
 ---------------------------
 
-The victim is chosen using the reference frequency. The least referenced
-entry is chosen to be evicted, regardless of the amount of times it has
-been touched, or how much time has passed since its last touch.
+使用引用频率选择受害者。引用最少的条目被选择驱逐，无论它被触摸了多少次，或者自上次触摸以来经过了多长时间。
 
 First-In, First-Out (FIFO) {#first_in_first_out_fifo}
 --------------------------
 
-The victim is chosen using the insertion timestamp. If no invalid
-entries exist, the oldest one is victimized, regardless of the amount of
-times it has been touched.
+使用插入时间戳选择受害者。如果不存在无效条目，则驱逐最旧的条目，无论它被触摸了多少次。
 
 Second-Chance {#second_chance}
 -------------
 
-The [Second-Chance] replacement policy is similar to FIFO, however
-entries are given a second chance before being victimized. If an entry
-would have been the next to be victimized, but its second chance bit is
-set, this bit is cleared, and the entry is re-inserted at the end of the
-FIFO. Following a miss, an entry is inserted with its second chance bit
-cleared.
+[Second-Chance] 替换策略类似于 FIFO，但在被驱逐之前给条目第二次机会。如果一个条目本应是下一个被驱逐的，但它的第二次机会位被设置，则清除此位，并将该条目重新插入 FIFO 的末尾。在未命中之后，插入一个第二次机会位被清除的条目。
 
 Not Recently Used (NRU) {#not_recently_used_nru}
 -----------------------
 
-Not Recently Used (NRU) is an approximation of LRU that uses a single
-bit to determine if a block is going to be re-referenced in the near or
-distant future. If the bit is 1, it is likely to not be referenced soon,
-so it is chosen as the replacement victim. When a block is victimized,
-all its co-replacement candidates have their re-reference bit
-incremented.
+Not Recently Used (NRU) 是 LRU 的近似值，它使用单个位来确定块是否将在近期或远期被重新引用。如果该位为 1，则它很可能不会很快被引用，因此它被选为替换受害者。当一个块被驱逐时，其所有共同替换候选者的重新引用位都会递增。
 
 Re-Reference Interval Prediction (RRIP) {#re_reference_interval_prediction_rrip}
 ---------------------------------------
 
-[Re-Reference Interval Prediction (RRIP)] is an extension of NRU that
-uses a re-reference prediction value to determine if blocks are going to
-be re-used in the near future or not. The higher the value of the RRPV,
-the more distant the block is from its next access. From the original
-paper, this implementation of RRIP is also called Static RRIP (SRRIP),
-as it always inserts blocks with the same RRPV.
+[Re-Reference Interval Prediction (RRIP)] 是 NRU 的扩展，它使用重新引用预测值 (RRPV) 来确定块是否将在不久的将来被重新使用。RRPV 值越高，该块距离其下一次访问越远。从原始论文来看，RRIP 的这种实现也称为 Static RRIP (SRRIP)，因为它总是插入具有相同 RRPV 的块。
 
 Bimodal Re-Reference Interval Prediction (BRRIP) {#bimodal_re_reference_interval_prediction_brrip}
 ------------------------------------------------
 
-[Bimodal Re-Reference Interval Prediction
-(BRRIP)][Re-Reference Interval Prediction (RRIP)] is an extension of
-RRIP that has a probability of not inserting blocks as the LRU, as in
-the Bimodal Insertion Policy. This probability is controlled by the
-bimodal throtle parameter (btp).
+[Bimodal Re-Reference Interval Prediction (BRRIP)][Re-Reference Interval Prediction (RRIP)] 是 RRIP 的扩展，它具有不将块作为 LRU 插入的概率，就像在 Bimodal Insertion Policy 中一样。此概率由双峰节流参数 (btp) 控制。
 
   [Second-Chance]: https://apps.dtic.mil/docs/citations/AD0687552
   [Re-Reference Interval Prediction (RRIP)]: https://dl.acm.org/citation.cfm?id=1815971
   [Cache Replacement Policies Wikipedia page]: https://en.wikipedia.org/wiki/Cache_replacement_policies
   [Bimodal Insertion Policy]: https://dl.acm.org/citation.cfm?id=1250709
-

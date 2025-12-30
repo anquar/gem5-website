@@ -1,13 +1,13 @@
 ---
 layout: documentation
-title: "Release Procedures"
+title: "发布流程"
 doc: gem5 documentation
 parent: development
 permalink: /documentation/general_docs/development/release_procedures/
 ---
 
-Information on when releases are carried out, how the community is notified, versioning information, and how to contribute to a release can be found in our [CONTRIBUTING.md document](https://github.com/gem5/gem5/blob/stable/CONTRIBUTING.md#releases).
-The purpose of this document is to outline specific procedures carried out during a release.
+有关何时进行发布、如何通知社区、版本信息以及如何为发布做出贡献的信息可以在我们的 [CONTRIBUTING.md 文档](https://github.com/gem5/gem5/blob/stable/CONTRIBUTING.md#releases)中找到。
+本文档的目的是概述发布期间执行的具体流程。
 
 ## gem5 repository
 

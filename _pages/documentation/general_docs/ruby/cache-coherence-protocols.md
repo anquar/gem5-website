@@ -1,80 +1,56 @@
 ---
 layout: documentation
-title: "Cache Coherence Protocols"
+title: "缓存一致性协议"
 doc: gem5 documentation
 parent: ruby
 permalink: /documentation/general_docs/ruby/cache-coherence-protocols/
 author: Jason Lowe-Power
 ---
 
-# Cache Coherence Protocols
+# 缓存一致性协议
 
-## Common Notations and Data Structures
+## 通用符号和数据结构
 
-### **Coherence Messages**
+### **一致性消息 (Coherence Messages)**
 
-These are described in the \<*protocol-name*\>-msg.sm file for each
-protocol.
+这些在每个协议的 \<*protocol-name*\>-msg.sm 文件中描述。
 
-| Message           | Description                                                                                                                                                                                                                     |
+| 消息 (Message)    | 描述 (Description)                                                                                                                                                                                                                     |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ACK/NACK**      | positive/negative acknowledgement for requests that wait for the direction of resolution before deciding on the next action. Examples are writeback requests, exclusive requests.                                               |
-| **GETS**          | request for shared permissions to satisfy a CPU's load or IFetch.                                                                                                                                                               |
-| **GETX**          | request for exclusive access.                                                                                                                                                                                                   |
-| **INV**           | invalidation request. This can be triggered by the coherence protocol itself, or by the next cache level/directory to enforce inclusion or to trigger a writeback for a DMA access so that the latest copy of data is obtained. |
-| **PUTX**          | request for writeback of cache block. Some protocols (e.g. MOESI_CMP_directory) may use this only for writeback requests of exclusive data.                                                                                   |
-| **PUTS**          | request for writeback of cache block in shared state.                                                                                                                                                                           |
-| **PUTO**          | request for writeback of cache block in owned state.                                                                                                                                                                            |
-| **PUTO_Sharers** | request for writeback of cache block in owned state but other sharers of the block exist.                                                                                                                                       |
-| **UNBLOCK**       | message to unblock next cache level/directory for blocking protocols.                                                                                                                                                           |
+| **ACK/NACK**      | 对等待解决方向的请求的肯定/否定确认，然后再决定下一个动作。例如写回请求，独占请求。                                               |
+| **GETS**          | 请求共享权限以满足 CPU 的加载或取指 (IFetch)。                                                                                                                                                               |
+| **GETX**          | 请求独占访问。                                                                                                                                                                                                   |
+| **INV**           | 无效请求。这可以由一致性协议本身触发，也可以由下一级缓存/目录触发以强制包含或触发 DMA 访问的写回，以便获得最新副本。 |
+| **PUTX**          | 请求写回缓存块。某些协议（例如 MOESI_CMP_directory）可能仅将其用于独占数据的写回请求。                                                                                   |
+| **PUTS**          | 请求写回处于共享状态的缓存块。                                                                                                                                                                           |
+| **PUTO**          | 请求写回处于拥有 (owned) 状态的缓存块。                                                                                                                                                                            |
+| **PUTO_Sharers** | 请求写回处于拥有 (owned) 状态的缓存块，但该块存在其他共享者。                                                                                                                                       |
+| **UNBLOCK**       | 解除下一级缓存/目录阻塞的消息，用于阻塞协议。                                                                                                                                                           |
 
-### **AccessPermissions**
+### **访问权限 (AccessPermissions)**
 
-These are associated with each cache block and determine what operations
-are permitted on that block. It is closely correlated with coherence
-protocol
-states.
+这些与每个缓存块相关联，并确定该块上允许哪些操作。它与一致性协议状态密切相关。
 
-| Permissions     | Description                                                                                                                                                                                                                                                                                                                  |
+| 权限 (Permissions) | 描述 (Description)                                                                                                                                                                                                                                                                                                                  |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Invalid**     | The cache block is invalid. The block must first be obtained (from elsewhere in the memory hierarchy) before loads/stores can be performed. No action on invalidates (except maybe sending an ACK). No action on replacements. The associated coherence protocol states are I or NP and are stable states in every protocol. |
-| **Busy**        | TODO                                                                                                                                                                                                                                                                                                                         |
-| **Read_Only**  | Only operations permitted are loads, writebacks, invalidates. Stores cannot be performed before transitioning to some other state.                                                                                                                                                                                           |
-| **Read_Write** | Loads, stores, writebacks, invalidations are allowed. Usually indicates that the block is dirty.                                                                                                                                                                                                                             |
+| **Invalid**     | 缓存块无效。在执行加载/存储之前，必须先（从内存层次结构的其他位置）获取该块。对无效操作不执行任何操作（除了可能发送 ACK）。对替换不执行任何操作。相关的一致性协议状态是 I 或 NP，并且在每个协议中都是稳定状态。 |
+| **Busy**        | 忙碌状态，通常表示正在进行某种状态转换或处理。                                                                                                                                                                                                                                                                                                                         |
+| **Read_Only**  | 仅允许加载、写回、无效操作。在转换到其他状态之前无法执行存储。                                                                                                                                                                                           |
+| **Read_Write** | 允许加载、存储、写回、无效。通常表示该块是脏的。                                                                                                                                                                                                                             |
 
-### Data Structures
+### 数据结构
 
-  - **Message Buffers**:TODO
-  - **TBE Table**: TODO
-  - **Timer Table**: This maintains a map of address-based timers. For
-    each target address, a timeout value can be associated and added to
-    the Timer table. This data structure is used, for example, by the L1
-    cache controller implementation of the MOESI_CMP_directory
-    protocol to trigger separate timeouts for cache blocks. Internally,
-    the Timer Table uses the event queue to schedule the timeouts. The
-    TimerTable supports a polling-based interface, **isReady()** to
-    check if a timeout has occurred. Timeouts on addresses can be set
-    using the **set()** method and removed using the **unset()** method.
+  - **Message Buffers**: 用于存储和传输一致性消息的缓冲区。
+  - **TBE Table**: 事务缓冲区条目 (Transaction Buffer Entry) 表，用于跟踪未完成的事务。
+  - **Timer Table**: 这维护了一个基于地址的计时器映射。对于每个目标地址，可以关联一个超时值并将其添加到 Timer 表中。例如，此数据结构由 MOESI_CMP_directory 协议的 L1 缓存控制器实现使用，以触发缓存块的单独超时。在内部，Timer Table 使用事件队列来调度超时。TimerTable 支持基于轮询的接口 **isReady()** 来检查是否发生了超时。可以使用 **set()** 方法设置地址上的超时，并使用 **unset()** 方法删除超时。
 
-  - **Related Files**:
-      - src/mem/ruby/system/TimerTable.hh: Declares the
-                TimerTable class
-      - src/mem/ruby/system/TimerTable.cc: Implementation of the
-                methods of the TimerTable class, that deals with setting
-                addresses & timeouts, scheduling events using the event
-                queue.
+  - **相关文件**:
+      - src/mem/ruby/system/TimerTable.hh: 声明 TimerTable 类
+      - src/mem/ruby/system/TimerTable.cc: 实现 TimerTable 类的方法，处理设置地址和超时，使用事件队列调度事件。
 
-### Coherence controller FSM Diagrams
+### 一致性控制器 FSM 图
 
-  - The Finite State Machines show only the stable states
-  - Transitions are annotated using the notation "**Event list**" or
-    "**Event list : Action list**" or "**Event list : Action list :
-    Event list**". For example, Store : GETX indicates that on a Store
-    event, a GETX message was sent whereas GETX : Mem Read indicates
-    that on receiving a GETX message, a memory read request was sent.
-    Only the main triggers and actions are listed.
-  - Optional actions (e.g. writebacks depending on whether or not the
-    block is dirty) are enclosed within **\[ \]**
-  - In the diagrams, the transition labels are associated with the arc
-    that cuts across the transition label or the closest arc.
-
+  - 有限状态机 (FSM) 仅显示稳定状态
+  - 转换使用符号 "**Event list**" 或 "**Event list : Action list**" 或 "**Event list : Action list : Event list**" 进行注释。例如，Store : GETX 表示在 Store 事件上，发送了 GETX 消息，而 GETX : Mem Read 表示在收到 GETX 消息时，发送了内存读取请求。仅列出主要触发器和动作。
+  - 可选动作（例如，取决于块是否为脏的写回）括在 **\[ \]** 中
+  - 在图中，转换标签与切过转换标签或最近弧的弧相关联。

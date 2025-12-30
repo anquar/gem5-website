@@ -1,24 +1,24 @@
 ---
 layout: documentation
-title: "Building Android Marshmallow"
+title: "构建 Android Marshmallow"
 doc: gem5 documentation
 parent: fullsystem
 permalink: /documentation/general_docs/fullsystem/building_android_m
 ---
 
-# Building Android Marshmallow
+# 构建 Android Marshmallow
 
-This guide gives detailed step-by-step instructions on building an Android Marshmallow image along with a working kernel and .dtb file that work with gem5.
+本指南提供了构建 Android Marshmallow 镜像以及适用于 gem5 的内核和 .dtb 文件的详细分步说明。
 
-## Overview
-To successfully run Android in gem5, an image, a compatible kernel and a device tree blob.dtb file configured for the simulator are necessary. This guide shows how to build Android Marshmallow 32bit version using a 3.14 kernel with Mali support. An extra section will be added in the future on how to build the 4.4 kernel with Mali.
+## 概述
+要在 gem5 中成功运行 Android，需要镜像、兼容的内核和为模拟器配置的设备树 blob.dtb 文件。本指南展示了如何使用支持 Mali 的 3.14 内核构建 Android Marshmallow 32 位版本。将来将添加关于如何构建支持 Mali 的 4.4 内核的额外部分。
 
-## Pre-requisites
-This guide assumes a 64-bit system running 14.04 LTS Ubuntu. Before starting it is important first to set up our system correctly. To do this the following packages need to be installed through shell.
+## 先决条件
+本指南假设使用运行 14.04 LTS Ubuntu 的 64 位系统。在开始之前，首先正确设置系统很重要。为此，需要通过 shell 安装以下软件包。
 
-**Tip: Always check for the up-to-date prerequisites at the Android build page.**
+**提示：始终在 Android 构建页面检查最新的先决条件。**
 
-Update and install all the dependencies. This can be done with the following commands:
+更新并安装所有依赖项。这可以通过以下命令完成：
 
 ```
 sudo apt-get update
@@ -26,23 +26,23 @@ sudo apt-get update
 sudo apt-get install openjdk-7-jdk git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip
 ```
 
-Also, make sure to have repo correctly installed [(instructions here)](https://source.android.com/source/downloading.html#installing-repo).
+此外，确保正确安装了 repo [（说明在此）](https://source.android.com/source/downloading.html#installing-repo)。
 
-Ensure that the default JDK is OpenJDK 1.7:
+确保默认 JDK 是 OpenJDK 1.7：
 
 ```
 javac -version
 ```
 
-To cross-compile the kernel (32bit) and for the device tree we will need the following packages to be installed:
+要交叉编译内核（32 位）和设备树，我们需要安装以下软件包：
 
 ```
 sudo apt-get install gcc-arm-linux-gnueabihf device-tree-compiler
 ```
 
-Before getting started, as a final step make sure to have the gem5 binaries and busybox for 32-bit ARM.
+在开始之前，作为最后一步，确保拥有 32 位 ARM 的 gem5 二进制文件和 busybox。
 
-For the gem5 binaries just do the following starting from your gem5 directory:
+对于 gem5 二进制文件，只需从您的 gem5 目录开始执行以下操作：
 ```
 cd util/m5
 make -f Makefile.arm
@@ -52,14 +52,14 @@ cd ../../system/arm/simple_bootloader/
 make
 ```
 
-For busybox you can find the guide [here](http://wiki.beyondlogic.org/index.php?title=Cross_Compiling_BusyBox_for_ARM).
+对于 busybox，您可以在此处找到指南 [here](http://wiki.beyondlogic.org/index.php?title=Cross_Compiling_BusyBox_for_ARM)。
 
-## Building Android
-We build Android Marshmallow using an AOSP running build based on the release for the Pixel C. The AOSP provides [other builds](https://source.android.com/source/build-numbers.html#source-code-tags-and-builds), which are untested with this guide.
+## 构建 Android
+我们使用基于 Pixel C 发布的 AOSP 运行构建来构建 Android Marshmallow。AOSP 提供[其他构建](https://source.android.com/source/build-numbers.html#source-code-tags-and-builds)，这些构建未使用本指南进行测试。
 
-**Tip: Synching with repo will take a long time. Use the -jN flag to speed up the make process, where N is the number of parallel jobs to run.**
+**提示：与 repo 同步将需要很长时间。使用 -jN 标志来加速 make 过程，其中 N 是要运行的并行作业数。**
 
-Make a directory and pull the Android repository:
+创建目录并拉取 Android 仓库：
 
 ```
 mkdir android
@@ -68,7 +68,7 @@ repo init --depth=1 -u https://android.googlesource.com/platform/manifest -b and
 repo sync -c -jN
 ```
 
-Before you start the AOSP build, you will need to make one change to the build system to enable building libion.so, which is used by the Mali driver. Edit the file `aosp/system/core/libion/Android.mk` to change `LOCAL_MODULE_TAGS` for libion from 'optional' to 'debug'. Here is the output of `repo diff`: 
+在开始 AOSP 构建之前，您需要对构建系统进行一项更改以启用构建 libion.so，它由 Mali 驱动程序使用。编辑文件 `aosp/system/core/libion/Android.mk`，将 libion 的 `LOCAL_MODULE_TAGS` 从 'optional' 更改为 'debug'。以下是 `repo diff` 的输出：
 
 ```
   --- a/system/core/libion/Android.mk
@@ -85,12 +85,12 @@ Before you start the AOSP build, you will need to make one change to the build s
   $(LOCAL_PATH)/kernel-headers
 ```
 
-Source the environment setup and build Android:
+源环境设置并构建 Android：
 
-**Tip: For root access and "debuggability" [sic] we choose userdebug. Build can be done in different modes as seen** [here](https://source.android.com/source/building.html#choose-a-target).
-**Tip: Making Android will take a long time. Use the -jN flag to speed up the make process, where N is the number of parallel jobs to run.**
+**提示：为了 root 访问和"可调试性"[原文如此]，我们选择 userdebug。构建可以在不同模式下完成，如[此处](https://source.android.com/source/building.html#choose-a-target)所示。**
+**提示：构建 Android 将需要很长时间。使用 -jN 标志来加速 make 过程，其中 N 是要运行的并行作业数。**
 
-***Make sure to do this in a bash shell.***
+***确保在 bash shell 中执行此操作。***
 
 ```
 source build/envsetup.sh
@@ -98,34 +98,34 @@ lunch aosp_arm-userdebug
 make -jN
 ```
 
-## Creating an Android image
+## 创建 Android 镜像
 
-After a successful build, we create an image of Android and add the init files and binaries that configure the system for gem5. The following example creates a 3GB image.
+构建成功后，我们创建 Android 镜像并添加为 gem5 配置系统的 init 文件和二进制文件。以下示例创建一个 3GB 镜像。
 
-**Tip: If you want to add applications or data, make the image large enough to fit the build and anything else that is meant to be written into it.**
+**提示：如果您想添加应用程序或数据，请使镜像足够大以容纳构建和任何其他要写入其中的内容。**
 
-Create an empty image to flash the Android build and attach the image to a loopback device:
+创建一个空镜像以刷入 Android 构建，并将镜像附加到回环设备：
 
 ```
 dd if=/dev/zero of=myimage.img bs=1M count=2560
 sudo losetup /dev/loop0 myimage.img
 ```
 
-We now need to create three partitions: AndroidRoot (1.5GB), AndroidData (1GB), and AndroidCache (512MB).
+我们现在需要创建三个分区：AndroidRoot (1.5GB)、AndroidData (1GB) 和 AndroidCache (512MB)。
 
-First, partition the device:
+首先，对设备进行分区：
 
 ```
 sudo fdisk /dev/loop0
 ```
 
-Update the partition table:
+更新分区表：
 
 ```
 sudo partprobe /dev/loop0
 ```
 
-Name the partitions / Define filesystem as ext4:
+命名分区 / 将文件系统定义为 ext4：
 
 ```
 sudo mkfs.ext4 -L AndroidRoot /dev/loop0p1
@@ -133,14 +133,14 @@ sudo mkfs.ext4 -L AndroidData /dev/loop0p
 sudo mkfs.ext4 -L AndroidCache /dev/loop0p3
 ```
 
-Mount the Root partition to a directory:
+将 Root 分区挂载到目录：
 
 ```
 sudo mkdir -p /mnt/androidRoot
 sudo mount /dev/loop0p1 /mnt/androidRoot
 ```
 
-Load the build to the partition:
+将构建加载到分区：
 
 ```
 cd /mnt/androidRoot
@@ -152,7 +152,7 @@ sudo cp -a /mnt/tmp/* system/
 sudo umount /mnt/tmp
 ```
 
-Download and unpack the [overlays](http://dist.gem5.org/dist/current/arm/kitkat-overlay.tar.bz2) that are necessary from the [gem5 Android KitKat page](http://old.gem5.org/Android_KitKat.html "wikilink") and make the following changes to the `init.gem5.rc` file. Here is the output of `repo diff`: 
+从 [gem5 Android KitKat 页面](http://old.gem5.org/Android_KitKat.html "wikilink")下载并解压必要的[覆盖层](http://dist.gem5.org/dist/current/arm/kitkat-overlay.tar.bz2)，并对 `init.gem5.rc` 文件进行以下更改。以下是 `repo diff` 的输出：
 
 ```
   --- /kitkat_overlay/init.gem5.rc
@@ -161,7 +161,7 @@ Download and unpack the [overlays](http://dist.gem5.org/dist/current/arm/kitkat-
   +
    on early-init
        mount debugfs debugfs /sys/kernel/debug
-  
+
    on init
   -    export LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/vendor/lib/egl
   -
@@ -178,13 +178,13 @@ Download and unpack the [overlays](http://dist.gem5.org/dist/current/arm/kitkat-
   -    # Support legacy paths
   -    symlink /storage/sdcard /sdcard
   -    symlink /storage/sdcard /mnt/sdcard
-  
+
    on fs
        mount_all /fstab.gem5
   @@ -60,7 +52,6 @@
        group root
        oneshot
-  
+
   -# fusewrapped external sdcard daemon running as media_rw (1023)
   -service fuse_sdcard /system/bin/sdcard -u 1023 -g 1023 -d
   /mnt/media_rw/sdcard /storage/sdcard
@@ -194,7 +194,7 @@ Download and unpack the [overlays](http://dist.gem5.org/dist/current/arm/kitkat-
   +    user system
 ```
 
-Add the Android overlays and configure their permissions:
+添加 Android 覆盖层并配置其权限：
 
 ```
 sudo cp -r <path/to/android/overlays>/* /mnt/androidRoot/
@@ -202,7 +202,7 @@ sudo chmod ug+x /mnt/androidRoot/init.gem5.rc
 /mnt/androidRoot/gem5/postboot.sh
 ```
 
-Add the m5 and busybox binaries under the sbin directory and make them executable:
+在 sbin 目录下添加 m5 和 busybox 二进制文件并使它们可执行：
 
 ```
 sudo cp <path/to/gem5>/util/m5/m5 /mnt/androidRoot/sbin
@@ -210,19 +210,19 @@ sudo cp <path/to/busybox>/busybox /mnt/androidRoot/sbin
 sudo chmod a+x /mnt/androidRoot/sbin/busybox /mnt/androidRoot/sbin/m5
 ```
 
-Make the directories readable and searchable:
+使目录可读和可搜索：
 
 ```
 sudo chmod a+rx /mnt/androidRoot/sbin/ /mnt/androidRoot/gem5/
 ```
 
-Remove the boot animation:
+删除启动动画：
 
 ```
 sudo rm /mnt/androidRoot/system/bin/bootanimation
 ```
 
-Download and unpack the Mali drivers, for gem5 Android 4.4, from [here](https://developer.arm.com/downloads/-/mali-drivers/midgard-kernel). Then, make the directories for the drivers and copy them:
+从[此处](https://developer.arm.com/downloads/-/mali-drivers/midgard-kernel)下载并解压适用于 gem5 Android 4.4 的 Mali 驱动程序。然后，为驱动程序创建目录并复制它们：
 
 ```
 sudo mkdir -p /mnt/androidRoot/system/vendor/lib/egl
@@ -231,7 +231,7 @@ sudo cp <path/to/userspace/Mali/drivers>/lib/egl/libGLES_mali.so /mnt/androidRoo
 sudo cp <path/to/userspace/Mali/drivers>/lib/hw/gralloc.default.so /mnt/androidRoot/system/vendor/lib/hw
 ```
 
-Change the permissions
+更改权限
 
 ```
 sudo chmod 0755 /mnt/androidRoot/system/vendor/lib/hw
@@ -240,7 +240,7 @@ sudo chmod 0644 /mnt/androidRoot/system/vendor/lib/egl/libGLES_mali.so
 sudo chmod 0644 /mnt/androidRoot/system/vendor/lib/hw/gralloc.default.so
 ```
 
-Unmount and remove loopback device:
+卸载并删除回环设备：
 
 ```
 cd /..
@@ -248,17 +248,17 @@ sudo umount /mnt/androidRoot
 sudo losetup -d /dev/loop0
 ```
 
-## Building the Kernel (3.14)
+## 构建内核 (3.14)
 
-After successfully setting up the image, a compatible kernel needs to be built and a .dtb file generated.
+成功设置镜像后，需要构建兼容的内核并生成 .dtb 文件。
 
-Clone the repository containing the gem5 specific kernel:
+克隆包含 gem5 特定内核的仓库：
 
 ```
 git clone -b ll_20140416.0-gem5 https://github.com/gem5/linux-arm-gem5.git
 ```
 
-Make the following changes to the kernel gem5 config file at `<path/to/kernel/repo>/arch/arm/configs/vexpress_gem5_defconfig`. Here is the output of `repo diff`:
+对 `<path/to/kernel/repo>/arch/arm/configs/vexpress_gem5_defconfig` 处的内核 gem5 配置文件进行以下更改。以下是 `repo diff` 的输出：
 
 ```
   --- a/arch/arm/configs/vexpress_gem5_defconfig
@@ -283,19 +283,19 @@ Make the following changes to the kernel gem5 config file at `<path/to/kernel/re
   +CONFIG_FUSE_FS=y
 ```
 
-For the device tree, add the Mali GPU device and increase the memory to 1.8GB. Do this with the following changes at `<path/to/kernel/repo>/arch/arm/boot/dts/vexpress-v2p-ca15-tc1-gem5.dts.` Here is the output of `repo diff`:
+对于设备树，添加 Mali GPU 设备并将内存增加到 1.8GB。在 `<path/to/kernel/repo>/arch/arm/boot/dts/vexpress-v2p-ca15-tc1-gem5.dts.` 处进行以下更改。以下是 `repo diff` 的输出：
 
 ```
   --- a/arch/arm/boot/dts/vexpress-v2p-ca15-tc1-gem5.dts
   +++ b/arch/arm/boot/dts/vexpress-v2p-ca15-tc1-gem5.dts
   @@ -45,7 +45,7 @@
-  
+
            memory@80000000 {
                    device_type = "memory";
   -                reg = <0 0x80000000 0 0x40000000>;
   +                reg = <0 0x80000000 0 0x74000000>;
            };
-  
+
           hdlcd@2b000000 {
   @@ -59,6 +59,14 @@
   //                mode = "3840x2160MR-16@60"; // UHD4K mode string
@@ -314,13 +314,13 @@ For the device tree, add the Mali GPU device and increase the memory to 1.8GB. D
                     compatible = "arm,pl341", "arm,primecell";
 ```
 
-Download and unpack the userspace matching Mali kernel drivers for gem5 from [http://malideveloper.arm.com/resources/drivers/open-source-mali-midgard-gpu-kernel-drivers/ here]. Copy them to the gpu driver directory:
+从[此处](http://malideveloper.arm.com/resources/drivers/open-source-mali-midgard-gpu-kernel-drivers/)下载并解压适用于 gem5 的用户空间匹配 Mali 内核驱动程序。将它们复制到 gpu 驱动程序目录：
 
 ```
 cp -r <path/to/kernelspace/Mali/drivers>/driver/product/kernel/drivers/gpu/arm/ drivers/gpu
 ```
 
-Change the following in `<path/to/kernelspace/Mali/drivers>/drivers/video/Kconfig` and `<path/to/kernelspace/Mali/drivers>/drivers/gpu/Makefile` based on the following diffs:
+根据以下差异，在 `<path/to/kernelspace/Mali/drivers>/drivers/video/Kconfig` 和 `<path/to/kernelspace/Mali/drivers>/drivers/gpu/Makefile` 中进行以下更改：
 
 Here is the output of the Kconfig `repo diff`:
 
@@ -328,9 +328,9 @@ Here is the output of the Kconfig `repo diff`:
   --- a/drivers/video/Kconfig
   +++ b/drivers/video/Kconfig
   @@ -23,6 +23,8 @@ source "drivers/gpu/host1x/Kconfig"
-  
+
   source "drivers/gpu/drm/Kconfig"
-  
+
   +source "drivers/gpu/arm/Kconfig"
   +
    config VGASTATE
@@ -348,25 +348,25 @@ Here is the output of the drivers/gpu/Makefile `repo diff`:
   +obj-y                += drm/ vga/ arm/
 ```
 
-Finally, build the kernel and the .dtb file.
+最后，构建内核和 .dtb 文件。
 
-**Tip: Use the -jN flag to speed up the make process, where N is the number of parallel jobs to run.**
+**提示：使用 -jN 标志来加速 make 过程，其中 N 是要运行的并行作业数。**
 
-Build the kernel:
+构建内核：
 ```
 make CROSS_COMPILE=arm-linux-gnueabihf- ARCH=arm vexpress_gem5_defconfig
 make CROSS_COMPILE=arm-linux-gnueabihf- ARCH=arm vmlinux -jN
 ```
 
-Create the .dtb file:
+创建 .dtb 文件：
 
 ```
 dtc -I dts -O dtb arch/arm/boot/dts/vexpress-v2p-ca15-tc1-gem5.dts > vexpress-v2p-ca15-tc1-gem5.dtb
 ```
 
-## Testing the build
+## 测试构建
 
-Make the following changes to example/fs.py. Here is the output ``repo diff``:
+对 example/fs.py 进行以下更改。以下是 ``repo diff`` 的输出：
 
 ```
   --- a/configs/example/fs.py Thu Jun 02 20:34:39 2016 +0100
@@ -374,7 +374,7 @@ Make the following changes to example/fs.py. Here is the output ``repo diff``:
   @@ -144,6 +144,13 @@
        if is_kvm_cpu(TestCPUClass) or is_kvm_cpu(FutureClass):
            test_sys.vm = KvmVM()
-  
+
   +    test_sys.gpu = NoMaliGpu(
   +        gpu_type="T760",
   +        ver_maj=0, ver_min=0, ver_status=1,
@@ -387,28 +387,28 @@ Make the following changes to example/fs.py. Here is the output ``repo diff``:
           if not (options.cpu_type == "detailed" or options.cpu_type == "timing"):
 ```
 
-And the changes to FS config to either enable or disable software rendering.
+以及对 FS 配置的更改以启用或禁用软件渲染。
 
 ```
   --- a/configs/common/FSConfig.py Thu Jun 02 20:34:39 2016 +0100
   +++ b/configs/common/FSConfig.py Thu Jun 16 10:23:44 2016 -0700
   @@ -345,7 +345,7 @@
-  
+
              # release-specific tweaks
              if 'kitkat' in mdesc.os_type():
   -                cmdline += " androidboot.hardware=gem5 qemu=1 qemu.gles=0 " + \
   +                cmdline += " androidboot.hardware=gem5 qemu=1 qemu.gles=1 " + \
                             "android.bootanim=0"
-  
+
          self.boot_osflags = fillInCmdline(mdesc, cmdline
 ```
 
-Set the following M5\_PATH:
+设置以下 M5\_PATH：
 
 ```
 M5_PATH=. build/ARM/gem5.opt configs/example/fs.py --cpu-type=atomic --mem-type=SimpleMemory --os-type=android-kitkat --disk-image=myimage.img --machine-type=VExpress_EMM --dtb-filename=vexpress-v2p-ca15-tc1-gem5.dtb -n 1 --mem-size=1800MB
 ```
 
-## Building older versions of Android
+## 构建旧版本的 Android
 
-gem5 has support for running even older versions of Android like KitKat. The documentation to do so, as well as the necessary drivers and files required, can be found on the old wiki [here](http://old.gem5.org/Android_KitKat.html). 
+gem5 支持运行甚至更旧版本的 Android，如 KitKat。执行此操作的文档以及所需的必要驱动程序和文件可以在旧 wiki [此处](http://old.gem5.org/Android_KitKat.html)找到。

@@ -1,56 +1,56 @@
 ---
 layout: toc
-title: "Guest Binaries"
+title: "客户机二进制文件"
 permalink: /documentation/general_docs/fullsystem/guest_binaries
 author: Giacomo Travaglini
 ---
 * TOC
 {:toc}
 
-We provide a set of useful prebuilt binaries users can download (in case they don't want to
-recompile them from scratch).
+我们提供一组有用的预构建二进制文件，用户可以下载（如果他们不想
+从头重新编译它们）。
 
-There are two ways of downloading them:
+有两种下载方式：
 
-* Via Manual Download
-* Via Google Cloud Utilities
+* 通过手动下载
+* 通过 Google Cloud Utilities
 
-## Manual Download
+## 手动下载
 
-Here follows a list of prebuilt binaries to be downloaded by just clicking the link:
+以下是通过单击链接即可下载的预构建二进制文件列表：
 
-### Arm FS Binaries
+### Arm FS 二进制文件
 
-##### Latest Linux Kernel Image / Bootloader (**recommended**)
+##### 最新 Linux 内核镜像 / 引导加载程序（**推荐**）
 
-The tarball below contains a set of binaries: the Linux kernel and a set of bootloaders
+下面的压缩包包含一组二进制文件：Linux 内核和一组引导加载程序
 
 * <http://dist.gem5.org/dist/v22-0/arm/aarch-system-20220707.tar.bz2>
 
-##### Latest Linux Disk Images (**recommended**)
+##### 最新 Linux 磁盘镜像（**推荐**）
 
 * <http://dist.gem5.org/dist/v22-0/arm/disks/ubuntu-18.04-arm64-docker.img.bz2>
 
-  Partition table: yes
+  分区表：是
 
-  gem5 init:
-  * default (using m5 ops): `/init.gem5`
-  * kvm (using m5 --addr ops): `/init.addr.gem5`
-  * fast models (using m5 --semi ops): `/init.semi.gem5`
+  gem5 init：
+  * 默认（使用 m5 ops）：`/init.gem5`
+  * kvm（使用 m5 --addr ops）：`/init.addr.gem5`
+  * fast models（使用 m5 --semi ops）：`/init.semi.gem5`
 
 * <http://dist.gem5.org/dist/v22-0/arm/disks/aarch32-ubuntu-natty-headless.img.bz2>
 
-##### Old Linux Kernel/Disk Image
+##### 旧版 Linux 内核/磁盘镜像
 
-These images are not supported. If you run into problems, we will do our best to help, but there is no guarantee these will work with the latest gem5 version
+这些镜像不受支持。如果您遇到问题，我们会尽力提供帮助，但不能保证这些镜像与最新版本的 gem5 兼容。
 
-###### Disk images only
+###### 仅磁盘镜像
 
 * <http://dist.gem5.org/dist/current/arm/disks/aarch64-ubuntu-trusty-headless.img.bz2>
 * <http://dist.gem5.org/dist/current/arm/disks/linaro-minimal-aarch64.img.bz2>
 * <http://dist.gem5.org/dist/current/arm/disks/linux-aarch32-ael.img.bz2>
 
-###### Disk and kernel images
+###### 磁盘和内核镜像
 
 * <http://dist.gem5.org/dist/current/arm/aarch-system-20170616.tar.xz>
 * <http://dist.gem5.org/dist/current/arm/aarch-system-20180409.tar.xz>
@@ -64,15 +64,14 @@ These images are not supported. If you run into problems, we will do our best to
 
 ## Google Cloud Utilities (gsutil)
 
-gsutil is a Python application that lets you access Cloud Storage from the command line.
-Please have a look at the following documentation which will guide you through the process
-of installing the utility
+gsutil 是一个 Python 应用程序，允许您从命令行访问云存储。
+请查看以下文档，它将指导您完成
+安装该实用程序的过程
 
-* [gsutil tool](https://cloud.google.com/storage/docs/gsutil)
+* [gsutil 工具](https://cloud.google.com/storage/docs/gsutil)
 
-Once installed (NOTE: It require you to provide a valid google account) it will be possible to inspect/download gem5 binaries via the following command line.
+安装后（注意：它要求您提供有效的 Google 帐户），可以通过以下命令行检查/下载 gem5 二进制文件。
 
 ```
 gsutil cp -r gs://dist.gem5.org/dist/<binary>
 ```
-

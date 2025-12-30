@@ -1,20 +1,20 @@
 ---
 layout: documentation
-title: ISA Parser
+title: ISA 解析器
 doc: gem5 documentation
 parent: architecture_support
 permalink: documentation/general_docs/architecture_support/isa_parser/
 ---
 
-# ISA Parser
+# ISA 解析器
 
-The gem5 ISA description language is a custom language designed specifically for generating the class definitions and decoder function needed by gem5. This section provides a practical, informal overview of the language itself. A formal grammar for the language is embedded in the "yacc" portion of the parser (look for the functions starting with p\_ in isa\_parser.py). A second major component of the parser processes C-like code specifications to extract instruction characteristics; this aspect is covered in the section [Code parsing](#code-parsing).
-At the highest level, an ISA description file is divided into two parts: a declarations section and a decode section. The decode section specifies the structure of the decoder and defines the specific instructions returned by the decoder. The declarations section defines the global information (classes, instruction formats, templates, etc.) required to support the decoder. Because the decode section is the focus of the description file, we will begin the discussion there.
+gem5 ISA 描述语言是一种专门为生成 gem5 所需的类定义和解码器函数而设计的自定义语言。本节提供了该语言本身的实用、非正式概述。该语言的正式语法嵌入在解析器的 "yacc" 部分（查找以 p\_ 开头的函数，在 isa\_parser.py 中）。解析器的第二个主要组件处理类似 C 的代码规范以提取指令特征；这方面包含在 [代码解析](#code-parsing) 一节中。
+在最高层面上，ISA 描述文件分为两部分：声明部分和解码部分。解码部分指定了解码器的结构，并定义了解码器返回的具体指令。声明部分定义了支持解码器所需的全局信息（类、指令格式、模板等）。因为解码部分是描述文件的重点，所以我们将从那里开始讨论。
 
-## The decode section
+## 解码部分 (The decode section)
 
-The decode section of the description is a set of nested decode blocks. A decode block specifies a field of a machine instruction to decode and the result to be provided for particular values of that field. A decode block is similar to a C switch statement in both syntax and semantics. In fact, each decode block in the description file generates a switch statement in the resulting decode function.
-Let's begin with a (slightly oversimplified) example:
+描述的解码部分是一组嵌套的解码块。解码块指定要解码的机器指令字段以及为该字段的特定值提供的结果。解码块在语法和语义上都类似于 C switch 语句。实际上，描述文件中的每个解码块都会在生成的解码函数中生成一个 switch 语句。
+让我们从一个（稍微简化的）例子开始：
 
 {% raw %}
 ```
@@ -25,22 +25,22 @@ decode OPCODE {
 ```
 {% endraw %}
 
-A decode block begins with the keyword `decode` followed by the name of the instruction field to decode. The latter must be defined in the declarations section of the file using a bitfield definition (see [Bitfield definitions](#bitfield-definitions)). The remainder of the decode block is a list of statements enclosed in braces. The most common statement is an integer constant and a colon followed by an instruction definition. This statement corresponds to a 'case' statement in a C switch (but note that the 'case' keyword is omitted for brevity). A comma-separated list of integer constants may be used to allow a single decode statement to apply to any of a set of bitfield values.
+解码块以关键字 `decode` 开头，后跟要解码的指令字段的名称。后者必须在文件的声明部分使用位域定义进行定义（参见 [位域定义](#bitfield-definitions)）。解码块的其余部分是用大括号括起来的语句列表。最常见的语句是一个整型常量和一个冒号，后跟一个指令定义。此语句对应于 C switch 中的 'case' 语句（但请注意，为简洁起见省略了 'case' 关键字）。可以使用逗号分隔的整型常量列表，以允许单个解码语句应用于一组位域值。
 
 {% raw %}
-Instruction definitions are similar in syntax to C function calls, with the instruction mnemonic taking the place of the function name. The comma-separated arguments are used when processing the instruction definition. In the example above, the instruction definitions each take a single argument, a ''code literal''. A code literal is operationally similar to a string constant, but is delimited by double braces (`{{` and `}}`). Code literals may span multiple lines without escaping the end-of-line characters. No backslash escape processing is performed (e.g., `\t` is taken literally, and does not produce a tab). The delimiters were chosen so that C-like code contained in a code literal would be formatted nicely by emacs C-mode.
+指令定义在语法上类似于 C 函数调用，指令助记符代替函数名。逗号分隔的参数在处理指令定义时使用。在上面的示例中，指令定义各自接受一个参数，即一个“代码字面量”。代码字面量在操作上类似于字符串常量，但由双大括号（`{{` 和 `}}`）分隔。代码字面量可以跨越多行，而无需转义行尾字符。不执行反斜杠转义处理（例如，`\t` 被按字面意思理解，不会产生制表符）。选择这些分隔符是为了使代码字面量中包含的类 C 代码可以通过 emacs C 模式很好地格式化。
 {% endraw %}
 
-A decode statement may specify a nested decode block in place of an instruction definition. In this case, if the bitfield specified by the outer block matches the given value(s), the bitfield specified by the inner block is examined and an additional switch is performed.
+解码语句可以指定嵌套的解码块来代替指令定义。在这种情况下，如果外部块指定的位域匹配给定值，则检查内部块指定的位域并执行额外的 switch。
 
-It is also legal, as in C, to use the keyword `default` in place of an integer constant to define a default action. However, it is more common to use the decode-block default syntax discussed in the section [Decode block defaults](#decode-block-defaults) below.
+就像在 C 中一样，使用关键字 `default` 代替整型常量来定义默认操作也是合法的。但是，更常见的是使用下面 [解码块默认值](#decode-block-defaults) 部分中讨论的解码块默认语法。
 
-### Specifying instruction formats
+### 指定指令格式
 
-When the ISA description file is processed, each instruction definition does in fact invoke a function call to generate the appropriate C++ code for the decode file. The function that is invoked is determined by the instruction format. The instruction format determines the number and type of the arguments given to the instruction definition, and how they are processed to generate the corresponding output. Note that the term "instruction format" as used in this context refers solely to one of these definition-processing functions, and does not necessarily map one-to-one to the machine instruction formats defined by the ISA.
-The one oversimplification in the previous example is that no instruction format was specified. As a result, the parser does not know how to process the instruction definitions.
+当处理 ISA 描述文件时，每个指令定义实际上都会调用一个函数调用以生成相应的 C++ 代码用于解码文件。调用的函数由指令格式决定。指令格式确定提供给指令定义的参数的数量和类型，以及如何处理它们以生成相应的输出。请注意，在此上下文中使用的术语“指令格式”仅指这些定义处理函数之一，并不一定与 ISA 定义的机器指令格式一一对应。
+前面例子中的一个过度简化是未指定指令格式。结果，解析器不知道如何处理指令定义。
 
-Instruction formats can be specified in two ways. An explicit format specification can be given before the mnemonic, separated by a double colon (::), as follows:
+可以通过两种方式指定指令格式。可以在助记符之前给出显式格式规范，由双冒号 (::) 分隔，如下所示：
 
 
 {% raw %}
@@ -52,7 +52,7 @@ decode OPCODE {
 ```
 {% endraw %}
 
-In this example, both instruction definitions will be processed using the format Integer. A more common approach specifies the format for a set of definitions using a format block, as follows:
+在此示例中，两个指令定义都将使用格式 Integer 处理。一种更常见的方法是使用格式块指定一组定义的格式，如下所示：
 
 {% raw %}
 ```
@@ -65,13 +65,13 @@ decode OPCODE {
 ```
 {% endraw %}
 
-In this example, the format "Integer" applies to all of the instruction definitions within the inner braces. The two examples are thus functionally equivalent. There are few restrictions on the use of format blocks. A format block may include only a subset of the statements in a decode block. Format blocks and explicit format specifications may be mixed freely, with the latter taking precedence. Format and decode blocks can be nested within each other arbitrarily. Note that a closing brace will always bind with the nearest format or decode block, making it syntactically impossible to generate format or decode blocks that do not nest fully inside the enclosing block.
+在此示例中，格式 "Integer" 适用于内部大括号内的所有指令定义。因此，这两个示例在功能上是等效的。对格式块的使用几乎没有限制。格式块可能仅包含解码块中的一部分语句。格式块和显式格式规范可以自由混合，后者优先。格式块和解码块可以任意相互嵌套。请注意，右大括号将始终与最近的格式或解码块绑定，从而使得在语法上不可能生成不完全嵌套在封闭块内的格式或解码块。
 
-At any point where an instruction definition occurs without an explicit format specification, the format associated with the innermost enclosing format block will be used. If a definition occurs with no explicit format and no enclosing format block, a runtime error will be raised.
+在任何出现没有显式格式规范的指令定义的地方，都将使用与最内层封闭格式块关联的格式。如果出现定义没有显式格式且没有封闭格式块，将引发运行时错误。
 
-### Decode block defaults
+### 解码块默认值
 
-Default cases for decode blocks can be specified by `default:` labels, as in C switch statements. However, it is common in ISA descriptions that unspecified cases correspond to unknown or illegal instruction encodings. To avoid the requirement of a `default:` case in every decode block, the language allows an alternate default syntax that specifies a default case for the current decode block and any nested decode block with no explicit default. This alternate default is specified by giving the `default` keyword and an instruction definition after the bitfield specification (prior to the opening brace). Specifying the outermost decode block as follows:
+解码块的默认情况可以通过 `default:` 标签指定，就像在 C switch 语句中一样。但是，在 ISA 描述中，未指定的情况通常对应于未知或非法的指令编码。为了避免在每个解码块中都要求 `default:` 情况，该语言允许使用一种替代默认语法，该语法为当前解码块和任何没有显式默认值的嵌套解码块指定默认情况。通过在位域规范之后（在左大括号之前）给出 `default` 关键字和指令定义来指定此替代默认值。如下指定最外层的解码块：
 
 ```
 decode OPCODE default Unknown::unknown() {
@@ -79,54 +79,54 @@ decode OPCODE default Unknown::unknown() {
 }
 ```
 
-is thus (nearly) equivalent to adding `default: Unknown::unknown();` inside every decode block that does not otherwise specify a default case.
+因此（几乎）等同于在每个没有以其他方式指定默认情况的解码块内添加 `default: Unknown::unknown();`。
 
-_Note: The appropriate format definition (see _[Format definitions](#format-definitions)_) is invoked each time an instruction definition is encountered.  Thus there is a semantic difference between having a single block-level default and a default within each nested block, which is that the former will invoke the format definition once, while the latter could result in multiple invocations of the format definition.  If the format definition generates header, decoder, or exec output, then that output will be included multiple times in the corresponding files, which typically leads to multiple definition errors when the C++ gets compiled.  If it is absolutely necessary to invoke the format definition for a single instruction multiple times, the format definition should be written to produce _only_ decode-block output, and all needed header, decoder, and exec output should be produced once using_ `output` _blocks (see _[Output blocks](#output-blocks])_)._
+_注意：每次遇到指令定义时都会调用相应的格式定义（参见 [格式定义](#format-definitions)）。因此，拥有单个块级默认值与每个嵌套块内的默认值之间存在语义差异，即前者将调用格式定义一次，而后者可能导致多次调用格式定义。如果格式定义生成头文件、解码器或执行输出，则该输出将多次包含在相应的文件中，这通常会在编译 C++ 时导致多重定义错误。如果绝对有必要为单个指令多次调用格式定义，则应将格式定义编写为仅生成解码块输出，并且应使用_ `output` _块（参见 [输出块](#output-blocks)）生成一次所有需要的头文件、解码器和执行输出。_
 
-### Preprocessor directive handling
+### 预处理器指令处理
 
-The decode block may also contain C preprocessor directives. These directives are not processed by the parser; instead, they are passed through to the C++ output to be processed when the C++ decoder is compiled. The parser does not recognize any specific directives; any line with a # in the first column is treated as a preprocessor directive.
-The directives are copied to all of the output streams (the header, the decoder, and the execute files; see [Format definitions](#format-definitions). The directives maintain their position relative to the code generated by the instruction definitions within the decode block. The net result is that, for example, #ifdef/#endif pairs that surround a set of instruction definitions will enclose both the declarations generated by those definitions and the corresponding case statements within the decode function. Thus #ifdef and similar constructs can be used to delineate instruction definitions that will be conditionally compiled into the simulator based on preprocessor symbols (e.g., FULL\_SYSTEM). It should be emphasized that #ifdef does not affect the ISA description parser. In an #ifdef/#else/#endif construct, all of the instruction definitions in both parts of the conditional will be processed. Only during the subsequent C++ compilation of the decoder will one or the other set of definitions be selected.
+解码块还可以包含 C 预处理器指令。这些指令不由解析器处理；相反，它们被传递到 C++ 输出，以便在编译 C++ 解码器时进行处理。解析器不识别任何特定指令；第一列中有 # 的任何行都被视为预处理器指令。
+指令被复制到所有输出流（头文件、解码器和执行文件；参见 [格式定义](#format-definitions)）。指令保持其相对于解码块内指令定义生成的代码的位置。最终结果是，例如，围绕一组指令定义的 #ifdef/#endif 对将包含这些定义生成的声明以及解码函数中的相应 case 语句。因此，#ifdef 和类似的构造可用于根据预处理器符号（例如，FULL\_SYSTEM）划定将有条件地编译到模拟器中的指令定义。应该强调的是，#ifdef 不会影响 ISA 描述解析器。在 #ifdef/#else/#endif 结构中，条件两部分的指令定义都将被处理。只有在随后的解码器 C++ 编译期间，才会选择这组或那组定义。
 
-## The declaration section
+## 声明部分 (The declaration section)
 
-As mentioned above, the decode section of the ISA description (consisting of a single outer decode block) is preceded by the declarations section. The primary purpose of the declarations section is to define the instruction formats and other supporting elements that will be used in the decode block, as well as supporting C++ code that is passed almost verbatim to the generated output.
-This section describes the components that appear in the declaration section: [Format definitions](#format-definitions), [Template definitions](#template-definitions), [Output blocks](#output-blocks), [Let blocks](#let-blocks), [Bitfield definitions](#bitfield-definitions), [Operand and operand type definitions](#operand-and-operand-type-definitions), and [Namespace declaration](#namespace-declaration).
+如上所述，ISA 描述的解码部分（由单个外部解码块组成）之前是声明部分。声明部分的主要目的是定义将在解码块中使用的指令格式和其他支持元素，以及几乎逐字传递给生成输出的支持 C++ 代码。
+本节描述出现在声明部分中的组件：[格式定义](#format-definitions)、[模板定义](#template-definitions)、[输出块](#output-blocks)、[Let 块](#let-blocks)、[位域定义](#bitfield-definitions)、[操作数和操作数类型定义](#operand-and-operand-type-definitions) 和 [命名空间声明](#namespace-declaration)。
 
-### Format definitions
+### 格式定义
 
-An instruction format is basically a Python function that takes the arguments supplied by an instruction definition (found inside a decode block) and generates up to four pieces of C++ code. The pieces of C++ code are distinguished by where they appear in the generated output.
- 1. The ''header output'' goes in the header file (decoder.hh) that is included in all the generated source files (decoder.cc and all the per-CPU-model execute .cc files). The header output typically contains the C++ class declaration(s) (if any) that correspond to the instruction.
- 2. The ''decoder output'' goes before the decode function in the same source file (decoder.cc). This output typically contains definitions that do not need to be visible to the `execute()` methods: inline constructor definitions, non-inline method definitions (e.g., for disassembly), etc.
- 3. The ''exec output'' contains per-CPU model definitions, i.e., the `execute()` methods for the instruction class.
- 4. The ''decode block'' contains a statement or block of statements that go into the decode function (in the body of the corresponding case statement). These statements take control once the bit pattern specified by the decode block is recognized, and are responsible for returning an appropriate instruction object.
+指令格式基本上是一个 Python 函数，它接受指令定义（在解码块内找到）提供的参数，并生成多达四段 C++ 代码。C++ 代码段通过它们在生成输出中的位置来区分。
+ 1. “header output” 进入头文件 (decoder.hh)，该文件包含在所有生成的源文件（decoder.cc 和所有每个 CPU 模型的 execute .cc 文件）中。头文件输出通常包含与指令对应的 C++ 类声明（如果有）。
+ 2. “decoder output” 进入同一个源文件 (decoder.cc) 中的解码函数之前。此输出通常包含不需要对 `execute()` 方法可见的定义：内联构造函数定义、非内联方法定义（例如，用于反汇编）等。
+ 3. “exec output” 包含每个 CPU 模型的定义，即指令类的 `execute()` 方法。
+ 4. “decode block” 包含一条语句或语句块，进入解码函数（在相应 case 语句的主体中）。一旦识别出解码块指定的位模式，这些语句就会接管控制权，并负责返回适当的指令对象。
 
-The syntax for defining an instruction format is as follows:
+定义指令格式的语法如下：
 
 {% raw %}
 ```
 def format FormatName(arg1, arg2) {{
-    [code omitted]
+    [代码省略]
 }};
 ```
 {% endraw %}
 
-In this example, the format is named "FormatName". (By convention, instruction format names begin with a capital letter and use mixed case.) Instruction definitions using this format will be expected to provide two arguments (`arg1` and `arg2`). The language also supports the Python variable-argument mechanism: if the final parameter begins with an asterisk (e.g., `*rest`), it receives a list of all the otherwise unbound arguments from the call site.
+在此示例中，格式名为 "FormatName"。（按照惯例，指令格式名称以大写字母开头并使用混合大小写。）使用此格式的指令定义将被期望提供两个参数（`arg1` 和 `arg2`）。该语言还支持 Python 可变参数机制：如果最后一个参数以星号开头（例如，`*rest`），它将接收来自调用站点的所有其他未绑定参数的列表。
 
-Note that the next-to-last syntactic token in the format definition (prior to the semicolon) is simply a code literal (string constant), as described above. In this case, the text within the code literal is a Python code block. This Python code will be called at each instruction definition that uses the specified format.
+请注意，格式定义中的倒数第二个语法标记（在分号之前）只是一个代码字面量（字符串常量），如上所述。在这种情况下，代码字面量内的文本是一个 Python 代码块。此 Python 代码将在每个使用指定格式的指令定义处被调用。
 
-In addition to the explicit arguments, the Python code is supplied with two additional parameters: `name`, which is bound to the instruction mnemonic, and `Name`, which is the mnemonic with the first letter capitalized (useful for forming C++ class names based on the mnemonic).
+除了显式参数外，Python 代码还提供了两个附加参数：`name`，绑定到指令助记符；以及 `Name`，首字母大写的助记符（用于基于助记符形成 C++ 类名）。
 
-The format code block specifies the generated code by assigning strings to four special variables: `header_output`, `decoder_output`, `exec_output`, and `decode_block`. Assignment is optional; for any of these variables that does not receive a value, no code will be generated for the corresponding section. These strings may be generated by whatever method is convenient. In practice, nearly all instruction formats use the support functions provided by the ISA description parser to specialize code templates based on characteristics extracted automatically from C-like code snippets. Discussion of these features is deferred to the [Code parsing](#code-parsing) page.
+格式代码块通过将字符串分配给四个特殊变量来指定生成的代码：`header_output`、`decoder_output`、`exec_output` 和 `decode_block`。分配是可选的；对于任何未接收值的变量，将不会为相应部分生成代码。这些字符串可以通过任何方便的方法生成。实际上，几乎所有指令格式都使用 ISA 描述解析器提供的支持函数，根据从类似 C 的代码片段自动提取的特征来专门化代码模板。对这些功能的讨论推迟到 [代码解析](#code-parsing) 页面。
 
-Although the ISA description is completely independent of any specific simulator CPU model, some C++ code (particularly the exec output) must be specialized slightly for each model. This specialization is handled by automatic substitution of CPU-model-specific symbols. These symbols start with `CPU_` and are treated specially by the parser. Currently there is only one model-specific symbol, `CPU_exec_context`, which evaluates to the model's execution context class name. As with templates (see [Template definitions](#template-definitions)), references to CPU-specific symbols use Python key-based format strings; a reference to the `CPU_exec_context` symbol thus appears in a string as `%(CPU_exec_context)s`.
+尽管 ISA 描述完全独立于任何特定的模拟器 CPU 模型，但某些 C++ 代码（特别是 exec 输出）必须针对每个模型稍微专门化。这种专门化是通过自动替换 CPU 模型特定的符号来处理的。这些符号以 `CPU_` 开头，并由解析器专门处理。目前只有一个模型特定符号，`CPU_exec_context`，它评估为模型的执行上下文类名。与模板一样（参见 [模板定义](#template-definitions)），对 CPU 特定符号的引用使用基于 Python 键的格式字符串；因此对 `CPU_exec_context` 符号的引用在字符串中显示为 `%(CPU_exec_context)s`。
 
-If a string assigned to `header_output`, `decoder_output`, or `decode_block` contains a CPU-specific symbol reference, the string is replicated once for each CPU model, and each instance has its CPU-specific symbols substituted according to that model. The resulting strings are then concatenated to form the final output. Strings assigned to `exec_output` are always replicated and subsituted once for each CPU model, regardless of whether they contain CPU-specific symbol references. The instances are not concatenated, but are tracked separately, and are placed in separate per-CPU-model files (e.g., simple\_cpu\_exec.cc).
+如果分配给 `header_output`、`decoder_output` 或 `decode_block` 的字符串包含 CPU 特定符号引用，则该字符串将为每个 CPU 模型复制一次，并且每个实例都有根据该模型替换的 CPU 特定符号。然后将生成的字符串连接起来形成最终输出。无论是否包含 CPU 特定符号引用，分配给 `exec_output` 的字符串总是为每个 CPU 模型复制并替换一次。这些实例不被连接，而是单独跟踪，并放置在单独的每个 CPU 模型文件中（例如，simple\_cpu\_exec.cc）。
 
-### Template definitions
+### 模板定义
 
-As discussed in section Format definitions above, the purpose of an instruction format is to process the arguments of an instruction definition and generate several pieces of C++ code. These code pieces are usually generated by specializing a code template. The description language provides a simple syntax for defining these templates: the keywords `def template`, the template name, the template body (a code literal), and a semicolon. By convention, template names start with a capital letter, use mixed case, and end with "Declare" (for declaration (header output) templates), "Decode" (for decode-block templates), "Constructor" (for decoder output templates), or "Execute" (for exec output templates).
-For example, the simplest useful decode template is as follows:
+如上文格式定义部分所述，指令格式的目的是处理指令定义的参数并生成几段 C++ 代码。这些代码段通常通过专门化代码模板来生成。描述语言提供了一种简单的语法来定义这些模板：关键字 `def template`、模板名称、模板主体（代码字面量）和分号。按照惯例，模板名称以大写字母开头，使用混合大小写，并以 "Declare"（用于声明（头文件输出）模板）、"Decode"（用于解码块模板）、"Constructor"（用于解码器输出模板）或 "Execute"（用于 exec 输出模板）结尾。
+例如，最简单的有用解码模板如下：
 
 {% raw %}
 ```
@@ -136,35 +136,35 @@ def template BasicDecode {{
 ```
 {% endraw %}
 
-An instruction format would specialize this template for a particular instruction by substituting the actual class name for `%(class_name)s`. (Template specialization relies on the Python string format operator `%`. The term `%(class_name)s` is an extension of the C `%s` format string indicating that the value of the symbol `class_name` should be substituted.) The resulting code would then cause the C++ decode function to create a new object of the specified class when the particular instruction was recognized.
+指令格式将通过用实际类名替换 `%(class_name)s` 来专门化此模板以用于特定指令。（模板专门化依赖于 Python 字符串格式运算符 `%`。术语 `%(class_name)s` 是 C `%s` 格式字符串的扩展，指示应替换符号 `class_name` 的值。）生成的代码随后将导致 C++ 解码函数在识别出特定指令时创建指定类的新对象。
 
-Templates are represented in the parser as Python objects. A template is used to generate a string typically by calling the template object's `subst()` method. This method takes a single argument that specifies the mapping of substitution symbols in the template (e.g., `%(class_name)s`) to specific values. If the argument is a dictionary, the dictionary itself specifies the mapping. Otherwise, the argument must be another Python object, and the object's attributes are used as the mapping. In practice, the argument to `subst()` is nearly always an instance of the parser's InstObjParams class; see the [InstObjParams class](#the-instobjparams-class). A template may also reference other templates (e.g., `%(BasicDecode)s`) in addition to symbols specified by the `subst()` argument; these will be interpolated into the result by `subst()` as well.
+模板在解析器中表示为 Python 对象。模板通常通过调用模板对象的 `subst()` 方法来生成字符串。此方法接受一个参数，该参数指定模板中替换符号（例如，`%(class_name)s`）到特定值的映射。如果参数是字典，则字典本身指定映射。否则，参数必须是另一个 Python 对象，并且该对象的属性用作映射。实际上，`subst()` 的参数几乎总是解析器的 InstObjParams 类的实例；参见 [InstObjParams 类](#the-instobjparams-class)。除了由 `subst()` 参数指定的符号外，模板还可以引用其他模板（例如，`%(BasicDecode)s`）；这些也将由 `subst()` 插值到结果中。
 
-Template references to CPU-model-specific symbols (see [Format definitions](#format-definitions)) are not expanded by `subst()`, but are passed through intact. This feature allows them to later be expanded appropriately according to whether the result is assigned to `exec_output` or another output section. However, when a template containing a CPU-model-specific symbol is referenced by another template, then the former template is replicated and expanded into a single string before interpolation, as with templates assigned to `header_output` or `decoder_output`. This policy guarantees that only templates directly containing CPU-model-specific symbols will be replicated, never templates that contain such symbols indirectly. This last feature is used to interpolate per-CPU declarations of the `execute()` method into the instruction class declaration template (see the `BasicExecDeclare` template in the Alpha ISA description).
+对 CPU 模型特定符号（参见 [格式定义](#format-definitions)）的模板引用不会被 `subst()` 展开，而是原样传递。此功能允许稍后根据结果是否分配给 `exec_output` 或其他输出部分来适当地展开它们。但是，当包含 CPU 模型特定符号的模板被另一个模板引用时，前一个模板在插值之前被复制并展开为单个字符串，就像分配给 `header_output` 或 `decoder_output` 的模板一样。此策略保证只有直接包含 CPU 模型特定符号的模板才会被复制，而包含这些符号的模板永远不会被复制。最后一个功能用于将 `execute()` 方法的每个 CPU 声明插入到指令类声明模板中（参见 Alpha ISA 描述中的 `BasicExecDeclare` 模板）。
 
-### Output blocks
+### 输出块
 
-Output blocks allow the ISA description to include C++ code that is copied nearly verbatim to the output file. These blocks are useful for defining classes and local functions that are shared among multiple instruction objects. An output block has the following format:
+输出块允许 ISA 描述包含几乎逐字复制到输出文件的 C++ 代码。这些块对于定义在多个指令对象之间共享的类和局部函数非常有用。输出块具有以下格式：
 
 {% raw %}
 ```
 output <destination> {{
-    [code omitted]
+    [代码省略]
 }};
 ```
 {% endraw %}
 
-The `<destination>` keyword must be one of `header`, `decoder`, or `exec`. The code within the code literal is treated as if it were assigned to the `header_output` `decoder_output`, or `exec_output` variable within an instruction format, respectively, including the special processing of CPU-model-specific symbols. The only additional processing performed on the code literal is substitution of bitfield operators, as used in instruction definitions (see [Bitfield operators](#bitfield-operators), and interpolation of references to templates.
+`<destination>` 关键字必须是 `header`、`decoder` 或 `exec` 之一。代码字面量内的代码被视为分别分配给指令格式中的 `header_output`、`decoder_output` 或 `exec_output` 变量，包括 CPU 模型特定符号的特殊处理。对代码字面量执行的唯一额外处理是替换指令定义中使用的位域运算符（参见 [位域运算符](#bitfield-operators)），以及插值对模板的引用。
 
-### Let blocks
+### Let 块
 
-Let blocks provide for global Python code. These blocks consist simply of the keyword `let` followed by a code literal (double-brace delimited string) and a semicolon.
-The code literal is executed immediately by the Python interpreter. The parser maintains the execution context across let blocks, so that variables and functions defined in one let block will be accessible in subsequent let blocks. This context is also used when executing instruction format definitions. The primary purpose of let blocks is to define shared Python data structures and functions for use in instruction formats. The parser exports a limited set of definitions into this execution context, including the set of defined templates (see [Template definitions](#template-definitions), the `InstObjParams` and `CodeBlock` classes (see [Code parsing](#code-parsing)), and the standard Python `string` and `re` (regular expression) modules.
+Let 块提供全局 Python 代码。这些块仅包含关键字 `let`，后跟代码字面量（双大括号分隔的字符串）和分号。
+代码字面量由 Python 解释器立即执行。解析器跨 let 块维护执行上下文，以便在一个 let 块中定义的变量和函数可以在后续 let 块中访问。此上下文也用于执行指令格式定义。let 块的主要目的是定义用于指令格式的共享 Python 数据结构和函数。解析器将一组有限的定义导出到此执行上下文中，包括定义的模板集（参见 [模板定义](#template-definitions)）、`InstObjParams` 和 `CodeBlock` 类（参见 [代码解析](#code-parsing)）以及标准 Python `string` 和 `re`（正则表达式）模块。
 
-### Bitfield definitions
+### 位域定义
 
-A bitfield definition provides a name for a bitfield within a machine instruction. These names are typically used as the bitfield specifications in decode blocks. The names are also used within other C++ code in the decoder file, including instruction class definitions and decode code.
-The bitfield definition syntax is demonstrated in these examples:
+位域定义为机器指令内的位域提供名称。这些名称通常用作解码块中的位域规范。这些名称也用于解码器文件中的其他 C++ 代码，包括指令类定义和解码代码。
+位域定义语法如下例所示：
 
 ```
 def bitfield OPCODE <31:26>;
@@ -172,50 +172,50 @@ def bitfield IMM <12>;
 def signed bitfield MEMDISP <15:0>;
 ```
 
-The specified bit range is inclusive on both ends, and bit 0 is the least significant bit; thus the OPCODE bitfield in the example extracts the most significant six bits from a 32-bit instruction. A single index value extracts a one-bit field, IMM. The extracted value is zero-extended by default; with the additional signed keyword, as in the MEMDISP example, the extracted value will be sign extended. The implementation of bitfields is based on preprocessor macros and C++ template functions, so the size of the resulting value will depend on the context.
+指定的位范围在两端都是包含的，位 0 是最低有效位；因此示例中的 OPCODE 位域从 32 位指令中提取最高有效六位。单个索引值提取一位字段，IMM。提取的值默认为零扩展；使用额外的 signed 关键字，如 MEMDISP 示例中一样，提取的值将被符号扩展。位域的实现基于预处理器宏和 C++ 模板函数，因此结果值的大小将取决于上下文。
 
-To fully understand where bitfield definitions can be used, we need to go under the hood a bit. A bitfield definition simply generates a C++ preprocessor macro that extracts the specified bitfield from the implicit variable `machInst`. The machine instruction parameter to the decode function is also called `machInst`; thus any use of a bitfield name that ends up inside the decode function (such as the argument of a decode block or the decode piece of an instruction format's output) will implicitly reference the instruction currently being decoded. The binary machine instruction stored in the `StaticInst` object is also named `machInst`, so any use of a bitfield name in a member function of an instruction object will reference this stored value. This data member is initialized in the `StaticInst` constructor, so it is safe to use bitfield names even in the constructors of derived objects.
+要完全了解可以在何处使用位域定义，我们需要深入了解一下。位域定义只是生成一个 C++ 预处理器宏，该宏从隐式变量 `machInst` 中提取指定的位域。解码函数的机器指令参数也称为 `machInst`；因此，任何最终在解码函数内部使用的位域名称（例如解码块的参数或指令格式输出的解码部分）都将隐式引用当前正在解码的指令。存储在 `StaticInst` 对象中的二进制机器指令也名为 `machInst`，因此在指令对象的成员函数中使用的任何位域名称都将引用此存储值。此数据成员在 `StaticInst` 构造函数中初始化，因此即使在派生对象的构造函数中使用位域名称也是安全的。
 
-### Operand and operand type definitions
+### 操作数和操作数类型定义
 
-These statements specify the operand types that can be used in the code blocks that express the functional operation of instructions. See [Operand type qualifiers](#operand-type-qualifiers)  and [Instruction parsing](#instruction-operands).
+这些语句指定可以在表达指令功能操作的代码块中使用的操作数类型。参见 [操作数类型限定符](#operand-type-qualifiers) 和 [指令解析](#instruction-operands)。
 
-### Namespace declaration
+### 命名空间声明
 
-The final component of the declaration section is the namespace declaration, consisting of the keyword `namespace` followed by an identifier and a semicolon. Exactly one namespace declaration must appear in the declarations section. The resulting C++ decode function, the declarations resulting from the instruction definitions in the decode block, and the contents of any `declare` statements occurring after then namespace declaration will be placed in a C++ namespace with the specified name. The contents of `declare` statements occurring before the namespace declaration will be outside the namespace.
+声明部分的最后一个组件是命名空间声明，由关键字 `namespace` 后跟一个标识符和一个分号组成。声明部分必须恰好出现一个命名空间声明。生成的 C++ 解码函数、解码块中指令定义产生的声明以及命名空间声明之后出现的任何 `declare` 语句的内容都将放置在具有指定名称的 C++ 命名空间中。命名空间声明之前出现的 `declare` 语句的内容将在命名空间之外。
 
 
-## ISA parser
+## ISA 解析器
 
-### Formats
+### 格式
 
-### operands
+### 操作数
 
-### decode tree
+### 解码树
 
-### let blocks
+### let 块
 
-### microcode assembler
-#### microops
-#### macroops
-#### directives
-#### rom object
+### 微码汇编器
+#### 微操作
+#### 宏操作
+#### 指令
+#### rom 对象
 
-### Lots more stuff
+### 更多内容
 
-# Code parsing
+# 代码解析
 
-To a large extent, the power and flexibility of the ISA description mechanism stem from the fact that the mapping from a brief instruction definition provided in the decode block to the resulting C++ code is performed in a general-purpose programming language (Python). (This function is performed by the "instruction format" definition described above in [Format definitions](#format-definitions). Technically, the ISA description language allows any arbitrary Python code to perform this mapping. However, the parser provides a library of Python classes and functions designed to automate the process of deducing an instruction's characteristics from a brief description of its operation, and generating the strings required to populate declaration and decode templates. This library represents roughly half of the code in isa\_parser.py.
+在很大程度上，ISA 描述机制的强大功能和灵活性源于这样一个事实，即从解码块中提供的简短指令定义到生成的 C++ 代码的映射是在通用编程语言 (Python) 中执行的。（此功能由上面 [格式定义](#format-definitions) 中描述的“指令格式”定义执行。从技术上讲，ISA 描述语言允许任何任意 Python 代码执行此映射。但是，解析器提供了一个 Python 类和函数库，旨在自动从其操作的简短描述中推断指令的特征，并生成填充声明和解码模板所需的字符串。该库约占 isa\_parser.py 代码的一半。
 
-Instruction behaviors are described using C++ with two extensions: bitfield operators and operand type qualifiers. To avoid building a full C++ parser into the ISA description system (or conversely constraining the C++ that could be used for instruction descriptions), these extensions are implemented using regular expression matching and substitution. As a result, there are some syntactic constraints on their usage. The following two sections discuss these extensions in turn. The third section discusses operand parsing, the technique by which the parser automatically infers most instruction characteristics. The final two sections discuss the Python classes through which instruction formats interact with the library: `CodeBlock`, which analyzes and encapsulates instruction description code; and the instruction object parameter class, `InstObjParams`, which encapsulates the full set of parameters to be substituted into a template.
+指令行为使用带有两个扩展的 C++ 进行描述：位域运算符和操作数类型限定符。为了避免在 ISA 描述系统中构建完整的 C++ 解析器（或反过来限制可用于指令描述的 C++），这些扩展是使用正则表达式匹配和替换实现的。因此，它们的使用存在一些语法限制。接下来的两节依次讨论这些扩展。第三部分讨论操作数解析，解析器通过该技术自动推断大多数指令特征。最后两节讨论指令格式与其交互的 Python 类：`CodeBlock`，它分析和封装指令描述代码；以及指令对象参数类 `InstObjParams`，它封装了要替换到模板中的完整参数集。
 
-### Bitfield operators
+### 位域运算符
 
-Simple bitfield extraction can be performed on rvalues using the `<:>` postfix operator. Bit numbering matches that used in global bitfield definitions (see [Bitfield definitions](#bitfield-definitions)). For example, `Ra<7:0>` extracts the low 8 bits of register `Ra`. Single-bit fields can be specified by eliminating the latter operand, e.g. `Rb<31:>`. Unlike in global bitfield definitions, the colon cannot be eliminated, as it becomes too difficult to distinguish bitfield operators from template arguments. In addition, the bit index parameters must be either identifiers or integer constants; expressions are not allowed. The bit operator will apply either to the syntactic token on its left, or, if that token is a closing parenthesis, to the parenthesized expression.
+可以使用 `<:>` 后缀运算符对右值执行简单的位域提取。位编号与全局位域定义中使用的匹配（参见 [位域定义](#bitfield-definitions)）。例如，`Ra<7:0>` 提取寄存器 `Ra` 的低 8 位。可以通过消除后一个操作数来指定单位字段，例如 `Rb<31:>`。与全局位域定义不同，不能消除冒号，因为区分位域运算符和模板参数变得太难了。此外，位索引参数必须是标识符或整型常量；不允许表达式。位运算符将应用于其左侧的语法标记，或者如果该标记是右括号，则应用于括号表达式。
 
-### Operand type qualifiers
+### 操作数类型限定符
 
-The effective type of an instruction operand (e.g., a register) may be specified by appending a period and a type qualifier to the operand name. The list of type qualifiers is architecture-specific; the `def operand_types` statement in the ISA description is used to specify it. The specification is in the form of a Python dictionary which maps a type extension to type name. For example, the Alpha ISA definition is as follows:
+指令操作数（例如寄存器）的有效类型可以通过在操作数名称后附加句点和类型限定符来指定。类型限定符列表是特定于架构的；ISA 描述中的 `def operand_types` 语句用于指定它。规范采用 Python 字典的形式，将类型扩展名映射到类型名称。例如，Alpha ISA 定义如下：
 
 {% raw %}
 ```
@@ -234,27 +234,27 @@ def operand_types {{
 ```
 {% endraw %}
 
-Thus the Alpha 32-bit add instruction addl could be defined as:
+因此 Alpha 32 位加法指令 addl 可以定义为：
 ```
 Rc.sl = Ra.sl + Rb.sl;
 ```
-The operations are performed using the types specified; the result will be converted from the specified type to the appropriate register value (in this case by sign-extending the 32-bit result to 64 bits, since Alpha integer registers are 64 bits in size).
+操作使用指定的类型执行；结果将从指定类型转换为适当的寄存器值（在这种情况下，通过将 32 位结果符号扩展为 64 位，因为 Alpha 整数寄存器的大小为 64 位）。
 
-Type qualifiers are allowed only on recognized instruction operands (see [Instruction operands](#instruction-operands)).
+类型限定符仅允许用于已识别的指令操作数（参见 [指令操作数](#instruction-operands)）。
 
-### Instruction operands
+### 指令操作数
 
-Most of the automation provided by the parser is based on its recognition of the operands used in the instruction definition code. Most relevant instruction characteristics can be inferred from the operands: floating-point vs. integer instructions can be recognized by the registers used, an instruction that reads from a memory location is a load, etc. In combination with the bitfield operands and type qualifiers described above, most instructions can be described in a single line of code. In addition, most of the differences between simulator CPU models lies in the operand access mechanisms; by generating the code for these accesses automatically, a single description suffices for a variety of situations.
+解析器提供的大部分自动化基于其对指令定义代码中使用的操作数的识别。大多数相关的指令特征可以从操作数推断出来：浮点与整数指令可以通过使用的寄存器来识别，从内存位置读取的指令是加载，等等。结合上述位域操作数和类型限定符，大多数指令可以在单行代码中描述。此外，模拟器 CPU 模型之间的大部分差异在于操作数访问机制；通过自动生成这些访问的代码，单个描述足以应对各种情况。
 
-The ISA description provides a list of recognized instruction operands and their characteristics via the `def operands` statement. This statement specifies a Python dictionary that maps operand strings to a five-element tuple.  The elements of the tuple specify the operand as follows:
+ISA 描述通过 `def operands` 语句提供已识别的指令操作数及其特征列表。此语句指定一个 Python 字典，将操作数字符串映射到五元素元组。元组的元素指定操作数如下：
 
-1. the operand class, which must be one of the strings "IntReg", "FloatReg", "Mem", "NPC", or "ControlReg", indicating an integer register, floating-point register, memory location, the next program counter (NPC), or a control register, respectively. 
-2. the default type of the operand (an extension string defined in the `def operand_types` block),
-3. a specifier indicating how specific instances of the operand are decoded (e.g., a bitfield name),
-4. a string or triple of strings indicating the instruction flags that can be inferred when the operand is used, and
-5. a sort priority used to control the order of operands in disassembly.
+1. 操作数类，必须是字符串 "IntReg"、"FloatReg"、"Mem"、"NPC" 或 "ControlReg" 之一，分别表示整数寄存器、浮点寄存器、内存位置、下一个程序计数器 (NPC) 或控制寄存器。
+2. 操作数的默认类型（在 `def operand_types` 块中定义的扩展字符串），
+3. 指示如何解码操作数的特定实例的说明符（例如，位域名称），
+4. 一个字符串或字符串三元组，指示使用操作数时可以推断出的指令标志，以及
+5. 用于控制反汇编中操作数顺序的排序优先级。
 
-For example, a simplified subset of the Alpha ISA operand traits map is as follows:
+例如，Alpha ISA 操作数特征映射的简化子集如下：
 
 {% raw %}
 ```
@@ -271,38 +271,37 @@ def operands {{
 ```
 {% endraw %}
 
-The operand named `Ra` is an integer register, default type `uq` (unsigned quadword), uses the `RA` bitfield from the instruction, implies the `IsInteger` instruction flag, and has a sort priority of 1 (placing it first in any list of operands).
+名为 `Ra` 的操作数是一个整数寄存器，默认类型 `uq`（无符号四字），使用指令中的 `RA` 位域，暗示 `IsInteger` 指令标志，并且排序优先级为 1（将其放在任何操作数列表的首位）。
 
-For the instruction flag element, a single string (such as `'IsInteger'` implies an unconditionally inferred instruction flag. If the flag operand is a triple, the first element is unconditional, the second is inferred when the operand is a source, and the third when it is a destination. Thus the `('IsMemRef', 'IsLoad', 'IsStore')` element for memory references indicates that any instruction with a memory operand is marked as a memory reference. In addition, if the memory operand is a source, the instruction is marked as a load, while if the operand is a destination, the instruction is marked a store. Similarly, the `(None, None, 'IsControl')` tuple for the NPC operand indicates that any instruction that writes to the NPC is a control instruction, but instructions which merely reference NPC as a source do not receive any default flags.
+对于指令标志元素，单个字符串（例如 `'IsInteger'`）暗示无条件推断的指令标志。如果标志操作数是三元组，则第一个元素是无条件的，第二个元素是在操作数为源时推断的，第三个元素是在操作数为目标时推断的。因此，内存引用的 `('IsMemRef', 'IsLoad', 'IsStore')` 元素表示任何带有内存操作数的指令都被标记为内存引用。此外，如果内存操作数是源，则指令标记为加载，而如果操作数是目标，则指令标记为存储。同样，NPC 操作数的 `(None, None, 'IsControl')` 元组表示任何写入 NPC 的指令都是控制指令，但仅仅引用 NPC 作为源的指令不会收到任何默认标志。
 
-Note that description code parsing uses regular expressions, which limits the ability of the parser to infer the nature of a partciular operand.  In particular, destination operands are distinguished from source operands solely by testing whether the operand appears on the left-hand side of an assignment operator (`=`). Destination operands that are assigned to in a different fashion, e.g. by being passed by reference to other functions, must still appear on the left-hand side of an assignment to be properly recognized as destinations.  The parser also does not recognize C compound assignments, e.g., `+=`.  If an operand is both a source and a destination, it must appear on both the left- and right-hand sides of `=`.
+请注意，描述代码解析使用正则表达式，这限制了解析器推断特定操作数性质的能力。特别是，仅通过测试操作数是否出现在赋值运算符 (`=`) 的左侧来区分目标操作数和源操作数。以不同方式分配的目标操作数，例如通过引用传递给其他函数，必须仍然出现在赋值的左侧才能被正确识别为目标。解析器也不识别 C 复合赋值，例如 `+=`。如果操作数既是源又是目标，它必须出现在 `=` 的左侧和右侧。
 
-Another limitation of regular-expression-based code parsing is that control flow in the code block is not recognized.  Combined with the details of how register updates are performed in the CPU models, this means that destinations cannot be updated conditionally.  If a particular register is recognized as a destination register, that register will always be updated at the end of the `execute()` method, and thus the code must assign a valid value to that register along each possible code path within the block.
+基于正则表达式的代码解析的另一个限制是不识别代码块中的控制流。结合寄存器更新在 CPU 模型中执行的细节，这意味着目标不能有条件地更新。如果特定寄存器被识别为目标寄存器，则该寄存器将始终在 `execute()` 方法结束时更新，因此代码必须沿块内的每个可能的代码路径为该寄存器分配一个有效值。
 
-### The CodeBlock class
+### CodeBlock 类
 
-An instruction format requests processing of a string containing instruction description code by passing the string to the CodeBlock constructor. The constructor performs all of the needed analysis and processing, storing the results in the returned object. Among the CodeBlock fields are:
+指令格式通过将包含指令描述代码的字符串传递给 CodeBlock 构造函数来请求处理该字符串。构造函数执行所有需要的分析和处理，将结果存储在返回的对象中。CodeBlock 字段包括：
 
-* `orig_code`: the original code string.
-* `code`: a processed string containing legal C++ code, derived from the original code by substituting in the bitfield operators and munging operand type qualifiers (s/\./\_/) to make valid C++ identifiers.
-* `constructor`: code for the constructor of an instruction object, initializing various C++ object fields including the number of operands and the register indices of the operands.
-* `exec_decl`: code to declare the C++ variables corresponding to the operands, for use in an execution emulation function.
-* `*_rd`: code to read the actual operand values into the corresponding C++ variables for source operands. The first part of the name indicates the relevant CPU model (currently simple and dtld are supported).
-* `*_wb`: code to write the C++ variable contents back to the appropriate register or memory location. Again, the first part of the name reflects the CPU model.
-* `*_mem_rd`, `*_nonmem_rd`, `*_mem_wb`, `*_nonmem_wb`: as above, but with memory and non-memory operands segregated.
-* `flags`: the set of instruction flags implied by the operands.
-* `op_class`: a basic guess at the instruction's operation class (see OpClass) based on the operand types alone.
+* `orig_code`: 原始代码字符串。
+* `code`: 包含合法 C++ 代码的处理后字符串，源自原始代码，通过替换位域运算符和处理操作数类型限定符 (s/\./\_/) 以生成有效的 C++ 标识符。
+* `constructor`: 指令对象构造函数的代码，初始化各种 C++ 对象字段，包括操作数的数量和操作数的寄存器索引。
+* `exec_decl`: 声明与操作数对应的 C++ 变量的代码，用于执行仿真函数。
+* `*_rd`: 将源操作数的实际操作数值读入相应 C++ 变量的代码。名称的第一部分指示相关的 CPU 模型（目前支持 simple 和 dtld）。
+* `*_wb`: 将 C++ 变量内容写回相应寄存器或内存位置的代码。同样，名称的第一部分反映了 CPU 模型。
+* `*_mem_rd`, `*_nonmem_rd`, `*_mem_wb`, `*_nonmem_wb`: 如上所述，但将内存和非内存操作数分开。
+* `flags`: 操作数暗示的指令标志集。
+* `op_class`: 仅基于操作数类型对指令操作类 (参见 OpClass) 的基本猜测。
 
-### The InstObjParams class
+### InstObjParams 类
 
-Instances of the InstObjParams class encapsulate all of the parameters needed to substitute into a code template, to be used as the argument to a template's `subst()` method (see Template definitions). 
+InstObjParams 类的实例封装了替换到代码模板中所需的所有参数，用作模板 `subst()` 方法的参数（参见模板定义）。
 
 ```python
 class InstObjParams(object):
-    def __init___(self, parser, 
+    def __init___(self, parser,
                   mem, class_name, base_class = '',
                   snippets = {}, opt_args = []):
 ```
 
-The first three constructor arguments populate the object's `mnemonic`, `class_name`, and (optionally) `base_class` members. The fourth (optional) argument is a CodeBlock object; all of the members of the provided CodeBlock object are copied to the new object, making them accessible for template substitution. Any remaining arguments are interpreted as either additional instruction flags (appended to the `flags` list inherited from the CodeBlock argument, if any), or as an operation class (overriding any `op_class` from the CodeBlock).
-
+前三个构造函数参数填充对象的 `mnemonic`、`class_name` 和（可选）`base_class` 成员。第四个（可选）参数是一个 CodeBlock 对象；提供的 CodeBlock 对象的所有成员都被复制到新对象，使其可用于模板替换。任何剩余的参数都被解释为附加指令标志（附加到从 CodeBlock 参数继承的 `flags` 列表，如果有），或者是操作类（覆盖来自 CodeBlock 的任何 `op_class`）。

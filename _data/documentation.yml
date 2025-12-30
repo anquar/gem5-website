@@ -1,7 +1,8 @@
 title: 文档
 
 docs:
-  - title: gem5 文档
+  - title: gem5 documentation
+    menu_title: gem5 文档
     items:
     - title: gem5 文档
       id: gem5_documentation
@@ -255,7 +256,8 @@ docs:
       id: statistics-api
       url: /documentation/general_docs/statistics/api
 
-  - title: 学习 gem5 (Learning gem5)
+  - title: Learning gem5
+    menu_title: 学习 gem5
     items:
     - title: 简介
       id: introduction

@@ -1,264 +1,99 @@
 ---
 layout: documentation
-title: "Memory system"
+title: "内存系统"
 doc: gem5 documentation
 parent: memory_system
 permalink: /documentation/general_docs/memory_system/
 author: Jason Lowe-Power
 ---
 
-# Memory system
+# 内存系统
 
-M5's new memory system (introduced in the first 2.0 beta release) was
-designed with the following goals:
+M5 的新内存系统（在第一个 2.0 beta 版本中引入）的设计目标如下：
 
-1.  Unify timing and functional accesses in timing mode. With the old
-    memory system the timing accesses did not have data and just
-    accounted for the time it would take to do an operation. Then a
-    separate functional access actually made the operation visible to
-    the system. This method was confusing, it allowed simulated
-    components to accidentally cheat, and prevented the memory system
-    from returning timing-dependent values, which isn't reasonable for
-    an execute-in-execute CPU model.
-2.  Simplify the memory system code -- remove the huge amount of
-    templating and duplicate code.
-3.  Make changes easier, specifically to allow other memory
-    interconnects besides a shared bus.
+1.  在时序模式下统一时序和功能访问。对于旧的内存系统，时序访问没有数据，只是计算操作所需的时间。然后，单独的功能访问实际上使操作对系统可见。这种方法令人困惑，它允许模拟组件意外作弊，并阻止内存系统返回依赖于时序的值，这对于 execute-in-execute CPU 模型是不合理的。
+2.  简化内存系统代码——删除大量的模板和重复代码。
+3.  使更改更容易，特别是允许除共享总线之外的其他内存互连。
 
-For details on the new coherence protocol, introduced (along with a
-substantial cache model rewrite) in 2.0b4, see [Coherence
-Protocol](classic-coherence-protocol "wikilink").
+有关新一致性协议的详细信息，该协议是在 2.0b4 中引入的（连同大量的缓存模型重写），请参阅 [一致性协议](classic-coherence-protocol "wikilink")。
 
 ### MemObjects
 
-All objects that connect to the memory system inherit from `MemObject`.
-This class adds the pure virtual functions `getMasterPort(const
-std::string &name, PortID idx)` and `getSlavePort(const std::string
-&name, PortID idx)` which returns a port corresponding to the given name
-and index. This interface is used to structurally connect the MemObjects
-together.
+连接到内存系统的所有对象都继承自 `MemObject`。
+此类添加了纯虚函数 `getMasterPort(const std::string &name, PortID idx)` 和 `getSlavePort(const std::string &name, PortID idx)`，它们返回对应于给定名称和索引的端口。此接口用于在结构上将 MemObjects 连接在一起。
 
-### Ports
+### 端口
 
-The next large part of the memory system is the idea of ports. Ports are
-used to interface memory objects to each other. They will always come in
-pairs, with a MasterPort and a SlavePort, and we refer to the other port
-object as the peer. These are used to make the design more modular. With
-ports a specific interface between every type of object doesn't have to
-be created. Every memory object has to have at least one port to be
-useful. A master module, such as a CPU, has one or more MasterPort
-instances. A slave module, such as a memory controller, has one or more
-SlavePorts. An interconnect component, such as a cache, bridge or bus,
-has both MasterPort and SlavePort instances.
+内存系统的下一个主要部分是端口的概念。端口用于将内存对象相互接口。它们总是成对出现，有一个 MasterPort 和一个 SlavePort，我们将另一个端口对象称为对等端口。这些用于使设计更加模块化。使用端口，不必在每种类型的对象之间创建特定接口。每个内存对象必须至少有一个端口才能有用。主模块（如 CPU）具有一个或多个 MasterPort 实例。从模块（如内存控制器）具有一个或多个 SlavePort。互连组件（如缓存、桥接器或总线）具有 MasterPort 和 SlavePort 实例。
 
-There are two groups of functions in the port object. The `send*`
-functions are called on the port by the object that owns that port. For
-example to send a packet in the memory system a CPU would call
-`myPort->sendTimingReq(pkt)`. Each send function has a
-corresponding recv function that is called on the ports peer. So the
-implementation of the `sendTimingReq()` call above would simply be
-`peer->recvTimingReq(pkt)` on the slave port. Using this method we only
-have one virtual function call penalty but keep generic ports that can
-connect together any memory system objects.
+端口对象中有两组函数。`send*` 函数由拥有该端口的对象在端口上调用。例如，要在内存系统中发送数据包，CPU 将调用 `myPort->sendTimingReq(pkt)`。每个发送函数都有一个相应的 recv 函数，该函数在端口对等方上调用。因此，上述 `sendTimingReq()` 调用的实现将仅仅是 slave 端口上的 `peer->recvTimingReq(pkt)`。使用这种方法，我们只有一个虚函数调用惩罚，但保留了可以将任何内存系统对象连接在一起的通用端口。
 
-Master ports can send requests and receive responses, whereas slave
-ports receive requests and send responses. Due to the coherence
-protocol, a slave port can also send snoop requests and receive snoop
-responses, with the master port having the mirrored interface.
+主端口可以发送请求和接收响应，而从端口接收请求并发送响应。由于一致性协议，从端口还可以发送 snoop 请求并接收 snoop 响应，主端口具有镜像接口。
 
-### Connections
+### 连接
 
-In Python, Ports are first-class attributes of simulation objects, much
-like Params. Two objects can specify that their ports should be
-connected using the assignment operator. Unlike a normal variable or
-parameter assignment, port connections are symmetric: `A.port1 =
-B.port2` has the same meaning as `B.port2 = A.port1`. The notion of
-master and slave ports exists in the Python objects as well, and a check
-is done when the ports are connected together.
+在 Python 中，端口是模拟对象的一流属性，很像 Params。两个对象可以使用赋值运算符指定它们的端口应该连接。与普通变量或参数赋值不同，端口连接是对称的：`A.port1 = B.port2` 与 `B.port2 = A.port1` 含义相同。主端口和从端口的概念也存在于 Python 对象中，并且在端口连接在一起时会进行检查。
 
-Objects such as busses that have a potentially unlimited number of ports
-use "vector ports". An assignment to a vector port appends the peer to a
-list of connections rather than overwriting a previous connection.
+诸如总线之类的具有潜在无限数量端口的对象使用“向量端口”。对向量端口的赋值将对等方附加到连接列表，而不是覆盖以前的连接。
 
-In C++, memory ports are connected together by the python code after all
-objects are instantiated.
+在 C++ 中，内存端口在所有对象实例化后由 python 代码连接在一起。
 
-### Request
+### 请求 (Request)
 
-A request object encapsulates the original request issued by a CPU or
-I/O device. The parameters of this request are persistent throughout the
-transaction, so a request object's fields are intended to be written at
-most once for a given request. There are a handful of constructors and
-update methods that allow subsets of the object's fields to be written
-at different times (or not at all). Read access to all request fields is
-provided via accessor methods which verify that the data in the field
-being read is valid.
+请求对象封装了 CPU 或 I/O 设备发出的原始请求。此请求的参数在整个事务中是持久的，因此请求对象的字段旨在对于给定的请求最多写入一次。有少数构造函数和更新方法允许在不同时间写入（或根本不写入）对象字段的子集。通过验证正在读取的字段中的数据是否有效的访问器方法提供对所有请求字段的读取访问。
 
-The fields in the request object are typically not available to devices
-in a real system, so they should normally be used only for statistics or
-debugging and not as architectural values.
+请求对象中的字段通常对真实系统中的设备不可用，因此它们通常只应用于统计或调试，而不作为架构值。
 
-Request object fields include:
+请求对象字段包括：
 
-- Virtual address. This field may be invalid if the request was issued
-  directly on a physical address (e.g., by a DMA I/O device).
-- Physical address.
-- Data size.
-- Time the request was created.
-- The ID of the CPU/thread that caused this request. May be invalid if
-  the request was not issued by a CPU (e.g., a device access or a
-  cache writeback).
-- The PC that caused this request. Also may be invalid if the request
-  was not issued by a CPU.
+- 虚拟地址。如果请求是直接在物理地址上发出的（例如，由 DMA I/O 设备），则该字段可能无效。
+- 物理地址。
+- 数据大小。
+- 请求创建的时间。
+- 导致此请求的 CPU/线程的 ID。如果请求不是由 CPU 发出的（例如，设备访问或缓存写回），则可能无效。
+- 导致此请求的 PC。如果请求不是由 CPU 发出的，也可能无效。
 
-### Packet
+### 数据包 (Packet)
 
-A Packet is used to encapsulate a transfer between two objects in the
-memory system (e.g., the L1 and L2 cache). This is in contrast to a
-Request where a single Request travels all the way from the requester to
-the ultimate destination and back, possibly being conveyed by several
-different Packets along the way.
+Packet 用于封装内存系统中两个对象之间的传输（例如，L1 和 L2 缓存）。这与 Request 形成对比，单个 Request 从请求者一直传输到最终目的地并返回，沿途可能由几个不同的 Packet 传送。
 
-Read access to many packet fields is provided via accessor methods which
-verify that the data in the field being read is valid.
+许多数据包字段的读取访问是通过访问器方法提供的，这些方法验证正在读取的字段中的数据是否有效。
 
-A packet contains the following all of which are accessed by accessors
-to be certain the data is valid:
+数据包包含以下所有内容，这些内容都通过访问器访问以确保数据有效：
 
-- The address. This is the address that will be used to route the
-  packet to its target (if the destination is not explicitly set) and
-  to process the packet at the target. It is typically derived from
-  the request object's physical address, but may be derived from the
-  virtual address in some situations (e.g., for accessing a fully
-  virtual cache before address translation has been performed). It may
-  not be identical to the original request address: for example, on a
-  cache miss, the packet address may be the address of the block to
-  fetch and not the request address.
-- The size. Again, this size may not be the same as that of the
-  original request, as in the cache miss scenario.
-- A pointer to the data being manipulated.
-    - Set by `dataStatic()`, `dataDynamic()`, and `dataDynamicArray()`
-      which control if the data associated with the packet is freed
-      when the packet is, not, with `delete`, and with `delete []`
-      respectively.
-    - Allocated if not set by one of the above methods `allocate()`
-      and the data is freed when the packet is destroyed. (Always safe
-      to call).
-    - A pointer can be retrived by calling `getPtr()`
-    - `get()` and `set()` can be used to manipulate the data in the
-      packet. The get() method does a guest-to-host endian conversion
-      and the set method does a host-to-guest endian conversion.
-- A status indicating Success, BadAddress, Not Acknowleged, and
-  Unknown.
-- A list of command attributes associated with the packet
-    - Note: There is some overlap in the data in the status field and
-      the command attributes. This is largely so that a packet can be
-      easily reinitialized when nacked or easily reused with atomic or
-      functional accesses.
-- A `SenderState` pointer which is a virtual base opaque structure
-  used to hold state associated with the packet but specific to the
-  sending device (e.g., an MSHR). A pointer to this state is returned
-  in the packet's response so that the sender can quickly look up the
-  state needed to process it. A specific subclass would be derived
-  from this to carry state specific to a particular sending device.
-- A `CoherenceState` pointer which is a virtual base opaque structure
-  used to hold coherence-related state. A specific subclass would be
-  derived from this to carry state specific to a particular coherence
-  protocol.
-- A pointer to the request.
+- 地址。这是将用于将数据包路由到其目标（如果未显式设置目的地）并在目标处处理数据包的地址。它通常源自请求对象的物理地址，但在某些情况下可能源自虚拟地址（例如，在执行地址转换之前访问完全虚拟缓存）。它可能与原始请求地址不同：例如，在缓存未命中时，数据包地址可能是要获取的块的地址，而不是请求地址。
+- 大小。同样，这个大小可能与原始请求的大小不同，如在缓存未命中场景中。
+- 指向正在操作的数据的指针。
+    - 由 `dataStatic()`, `dataDynamic()`, 和 `dataDynamicArray()` 设置，它们分别控制与数据包关联的数据是在数据包销毁时释放、不释放、使用 `delete` 释放，还是使用 `delete []` 释放。
+    - 如果未通过上述方法之一设置，则通过 `allocate()` 分配，并且数据在数据包被销毁时释放。（总是可以安全调用）。
+    - 可以通过调用 `getPtr()` 获取指针
+    - `get()` 和 `set()` 可用于操作数据包中的数据。get() 方法执行 guest-to-host 字节序转换，set 方法执行 host-to-guest 字节序转换。
+- 指示 Success, BadAddress, Not Acknowleged, 和 Unknown 的状态。
+- 与数据包关联的命令属性列表
+    - 注意：状态字段中的数据与命令属性有一些重叠。这主要是为了使数据包在被 nack 时可以轻松地重新初始化，或者轻松地重用于原子或功能访问。
+- 一个 `SenderState` 指针，这是一个虚拟基类不透明结构，用于保存与数据包关联但特定于发送设备（例如 MSHR）的状态。指向此状态的指针在数据包的响应中返回，以便发送者可以快速查找处理它所需的状态。将从中派生特定的子类以携带特定于特定发送设备的状态。
+- 一个 `CoherenceState` 指针，这是一个虚拟基类不透明结构，用于保存一致性相关状态。将从中派生特定的子类以携带特定于特定一致性协议的状态。
+- 指向请求的指针。
 
-### Access Types
+### 访问类型
 
-There are three types of accesses supported by the ports.
+端口支持三种类型的访问。
 
-1.  **Timing** - Timing accesses are the most detailed access. They
-    reflect our best effort for realistic timing and include the
-    modeling of queuing delay and resource contention. Once a timing
-    request is successfully sent at some point in the future the device
-    that sent the request will either get the response or a NACK if the
-    request could not be completed (more below). Timing and Atomic
-    accesses can not coexist in the memory system.
-2.  **Atomic** - Atomic accesses are a faster than detailed access. They
-    are used for fast forwarding and warming up caches and return an
-    approximate time to complete the request without any resource
-    contention or queuing delay. When a atomic access is sent the
-    response is provided when the function returns. Atomic and timing
-    accesses can not coexist in the memory system.
-3.  **Functional** - Like atomic accesses functional accesses happen
-    instantaneously, but unlike atomic accesses they can coexist in the
-    memory system with atomic or timing accesses. Functional accesses
-    are used for things such as loading binaries, examining/changing
-    variables in the simulated system, and allowing a remote debugger to
-    be attached to the simulator. The important note is when a
-    functional access is received by a device, if it contains a queue of
-    packets all the packets must be searched for requests or responses
-    that the functional access is effecting and they must be updated as
-    appropriate. The `Packet::intersect()` and `fixPacket()` methods can
-    help with this.
+1.  **Timing** - Timing 访问是最详细的访问。它们反映了我们对现实时序的最佳努力，包括排队延迟和资源争用的建模。一旦成功发送时序请求，在将来的某个时间点，发送请求的设备将获得响应，或者如果请求无法完成，将获得 NACK（下文详述）。Timing 和 Atomic 访问不能在内存系统中共存。
+2.  **Atomic** - Atomic 访问是比详细访问更快的访问。它们用于快进和预热缓存，并在没有任何资源争用或排队延迟的情况下返回完成请求的大致时间。发送原子访问时，函数返回时提供响应。Atomic 和 timing 访问不能在内存系统中共存。
+3.  **Functional** - 与原子访问一样，功能访问瞬间发生，但与原子访问不同，它们可以在内存系统中与原子或时序访问共存。功能访问用于加载二进制文件、检查/更改模拟系统中的变量以及允许将远程调试器附加到模拟器等事情。重要的一点是，当设备接收到功能访问时，如果它包含数据包队列，则必须搜索所有数据包以查找功能访问正在影响的请求或响应，并且必须适当地更新它们。`Packet::intersect()` 和 `fixPacket()` 方法可以帮助解决这个问题。
 
-### Packet allocation protocol
+### 数据包分配协议
 
-The protocol for allocation and deallocation of Packet objects varies
-depending on the access type. (We're talking about low-level C++
-`new`/`delete` issues here, not anything related to the coherence
-protocol.)
+Packet 对象的分配和释放协议根据访问类型而异。（我们在这里讨论的是低级 C++ `new`/`delete` 问题，而不是与一致性协议相关的任何内容。）
 
-- *Atomic* and *Functional* : The Packet object is owned by the
-  requester. The responder must overwrite the request packet with the
-  response (typically using the `Packet::makeResponse()` method).
-  There is no provision for having multiple responders to a single
-  request. Since the response is always generated before
-  `sendAtomic()` or `sendFunctional()` returns, the requester can
-  allocate the Packet object statically or on the stack.
-- *Timing* : Timing transactions are composed of two one-way messages,
-  a request and a response. In both cases, the Packet object must be
-  dynamically allocated by the sender. Deallocation is the
-  responsibility of the receiver (or, for broadcast coherence packets,
-  the target device, typically memory). In the case where the receiver
-  of a request is generating a response, it *may* choose to reuse the
-  request packet for its response to save the overhead of calling
-  `delete` and then `new` (and gain the convenience of using
-  `makeResponse()`). However, this optimization is optional, and the
-  requester must not rely on receiving the same Packet object back in
-  response to a request. Note that when the responder is not the
-  target device (as in a cache-to-cache transfer), then the target
-  device will still delete the request packet, and thus the responding
-  cache must allocate a new Packet object for its response. Also,
-  because the target device may delete the request packet immediately
-  on delivery, any other memory device wishing to reference a
-  broadcast packet past the point where the packet is delivered must make
-  a copy of that packet, as the pointer to the packet that is
-  delivered cannot be relied upon to stay valid.
+- *Atomic* 和 *Functional* : Packet 对象归请求者所有。响应者必须用响应覆盖请求数据包（通常使用 `Packet::makeResponse()` 方法）。没有为单个请求提供多个响应者的规定。由于响应总是在 `sendAtomic()` 或 `sendFunctional()` 返回之前生成，因此请求者可以静态地或在堆栈上分配 Packet 对象。
+- *Timing* : Timing 事务由两个单向消息组成，请求和响应。在这两种情况下，Packet 对象必须由发送者动态分配。释放是接收者（或对于广播一致性数据包，是目标设备，通常是内存）的责任。在接收请求者生成响应的情况下，它 *可以* 选择重用请求数据包作为其响应，以节省调用 `delete` 然后调用 `new` 的开销（并获得使用 `makeResponse()` 的便利）。但是，此优化是可选的，请求者不得依赖于收到相同的 Packet 对象作为请求的响应。请注意，当响应者不是目标设备（如在缓存到缓存传输中）时，目标设备仍将删除请求数据包，因此响应缓存必须为其响应分配一个新的 Packet 对象。此外，因为目标设备可能会在交付时立即删除请求数据包，所以任何希望在数据包交付点之后引用广播数据包的其他内存设备必须制作该数据包的副本，因为交付的数据包的指针不能依赖于保持有效。
 
-### Timing Flow control
+### 时序流控制
 
-Timing requests simulate a real memory system, so unlike functional and
-atomic accesses their response is not instantaneous. Because the timing
-requests are not instantaneous, flow control is needed. When a timing
-packet is sent via `sendTiming()` the packet may or may not be accepted,
-which is signaled by returning true or false. If false is returned the
-object should not attempt to sent anymore packets until it receives a
-`recvRetry()` call. At this time it should again try to call
-`sendTiming()`; however the packet may again be rejected. Note: The
-original packet does not need to be resent, a higher priority packet can
-be sent instead. Once `sendTiming()` returns true, the packet may still
-not be able to make it to its destination. For packets that require a
-response (i.e. `pkt->needsResponse()` is true), any memory object can
-refuse to acknowledge the packet by changing its result to `Nacked` and
-sending it back to its source. However, if it is a response packet, this
-can not be done. The true/false return is intended to be used for local
-flow control, while nacking is for global flow control. In both cases a
-response can not be nacked.
+时序请求模拟真实的内存系统，因此与功能和原子访问不同，它们的响应不是瞬时的。由于时序请求不是瞬时的，因此需要流控制。当通过 `sendTiming()` 发送时序数据包时，数据包可能会或可能不会被接受，这是通过返回 true 或 false 来发信号的。如果返回 false，则对象不应尝试发送更多数据包，直到收到 `recvRetry()` 调用。此时，它应该再次尝试调用 `sendTiming()`；但是，数据包可能会再次被拒绝。注意：原始数据包不需要重新发送，可以发送更高优先级的数据包。一旦 `sendTiming()` 返回 true，数据包可能仍然无法到达其目的地。对于需要响应的数据包（即 `pkt->needsResponse()` 为 true），任何内存对象都可以通过将其结果更改为 `Nacked` 并将其发送回源来拒绝确认该数据包。但是，如果是响应数据包，则不能这样做。true/false 返回旨在用于本地流控制，而 nacking 用于全局流控制。在这两种情况下，响应都不能被 nack。
 
-### Response and Snoop ranges
+### 响应和 Snoop 范围
 
-Ranges in the memory system are handled by having devices that are
-sensitive to an address range provide an implementation for
-`getAddrRanges` in their slave port objects. This method returns an
-`AddrRangeList` of addresses it responds to. When these ranges change
-(e.g. from PCI configuration taking place) the device should call
-`sendRangeChange()` on its slave port so that the new ranges are
-propagated to the entire hierarchy. This is precisely what happens
-during `init()`; all memory objects call `sendRangeChange()`, and a
-flurry of range updates occur until everyones ranges have been
-propagated to all busses in the system.
+内存系统中的范围是通过让对地址范围敏感的设备在其从端口对象中提供 `getAddrRanges` 的实现来处理的。此方法返回它响应的 `AddrRangeList`。当这些范围发生变化（例如，由于 PCI 配置发生）时，设备应在其从端口上调用 `sendRangeChange()`，以便新范围传播到整个层次结构。这正是 `init()` 期间发生的事情；所有内存对象都调用 `sendRangeChange()`，并且会发生一系列范围更新，直到每个人的范围都传播到系统中的所有总线。

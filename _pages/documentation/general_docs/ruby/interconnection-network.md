@@ -1,20 +1,19 @@
 ---
 layout: documentation
-title: "Interconnection network"
+title: "互连网络"
 doc: gem5 documentation
 parent: ruby
 permalink: /documentation/general_docs/ruby/interconnection-network/
 author: Jason Lowe-Power
 ---
 
-# Interconnection Network
+# 互连网络
 
-The various components of the interconnection network model inside
-gem5's ruby memory system are described here.
+此处描述了 gem5 ruby 内存系统内部互连网络模型的各个组件。
 
-## How to invoke the network
+## 如何调用网络
 
-**Simple Network**:
+**简单网络 (Simple Network)**:
 
 ```
 ./build/<ISA>/gem5.debug \
@@ -26,9 +25,9 @@ gem5's ruby memory system are described here.
                       --mesh-rows=4
 ```
 
-The default network is simple, and the default topology is crossbar.
+默认网络是 simple，默认拓扑是 crossbar。
 
-**Garnet network**:
+**Garnet 网络**:
 
 ```
 ./build/<ISA>/gem5.debug \
@@ -40,15 +39,11 @@ The default network is simple, and the default topology is crossbar.
                       --mesh-rows=4
 ```
 
-## Topology
+## 拓扑
 
-The connection between the various controllers are specified via python
-files. All external links (between the controllers and routers) are
-bi-directional. All internal links (between routers) are uni-directional
--- this allows a per-direction weight on each link to bias routing
-decisions.
+各种控制器之间的连接通过 python 文件指定。所有外部链路（控制器和路由器之间）都是双向的。所有内部链路（路由器之间）都是单向的——这允许每个链路上的每个方向权重来偏置路由决策。
 
-- **Related Files**:
+- **相关文件**:
     - **src/mem/ruby/network/topologies/Crossbar.py**
     - **src/mem/ruby/network/topologies/CrossbarGarnet.py**
     - **src/mem/ruby/network/topologies/Mesh_XY.py**
@@ -61,158 +56,80 @@ decisions.
 
 
 
-- **Topology Descriptions**:
-  - **Crossbar**: Each controller (L1/L2/Directory) is connected to
-    a simple switch. Each switch is connected to a central switch
-    (modeling the crossbar). This can be invoked from command line
-    by **--topology=Crossbar**.
-  - **CrossbarGarnet**: Each controller (L1/L2/Directory) is
-    connected to every other controller via one garnet router (which
-    internally models the crossbar and allocator). This can be
-    invoked from command line by **--topology=CrossbarGarnet**.
-  - **Mesh_\***: This topology requires the number of directories
-    to be equal to the number of cpus. The number of
-    routers/switches is equal to the number of cpus in the system.
-    Each router/switch is connected to one L1, one L2 (if present),
-    and one Directory. The number of rows in the mesh **has to be
-    specified** by **--mesh-rows**. This parameter enables the
-    creation of non-symmetrical meshes too.
-      - **Mesh_XY**: Mesh with XY routing. All x-directional links
-        are biased with a weight of 1, while all y-directional links
-        are biased with a weight of 2. This forces all messages to
-        use X-links first, before using Y-links. It can be invoked
-        from command line by **--topology=Mesh_XY**
-      - **Mesh_westfirst**: Mesh with west-first routing. All
-        west-directional links are biased with a weight of 1, al
-        other links are biased with a weight of 2. This forces all
-        messages to use west-directional links first, before using
-        other links. It can be invoked from command line by
-        **--topology=Mesh_westfirst**
-  - **MeshDirCorners_XY**: This topology requires the number of
-    directories to be equal to 4. number of routers/switches is
-    equal to the number of cpus in the system. Each router/switch is
-    connected to one L1, one L2 (if present). Each corner
-    router/switch is connected to one Directory. It can be invoked
-    from command line by **--topology=MeshDirCorners_XY**. The
-    number of rows in the mesh **has to be specified** by
-    **--mesh-rows**. The XY routing algorithm is used.
-  - **Pt2Pt**: Each controller (L1/L2/Directory) is connected to
-    every other controller via a direct link. This can be invoked
-    from command line by
-  - **Pt2Pt**: All to all point-to-point connection
+- **拓扑描述**:
+  - **Crossbar**: 每个控制器 (L1/L2/Directory) 连接到一个简单的交换机。每个交换机连接到一个中央交换机（模拟交叉开关）。这可以通过 **--topology=Crossbar** 从命令行调用。
+  - **CrossbarGarnet**: 每个控制器 (L1/L2/Directory) 通过一个 garnet 路由器（内部模拟交叉开关和分配器）连接到每个其他控制器。这可以通过 **--topology=CrossbarGarnet** 从命令行调用。
+  - **Mesh_\***: 此拓扑要求目录数等于 cpu 数。路由器/交换机的数量等于系统中的 cpu 数。每个路由器/交换机连接到一个 L1、一个 L2（如果存在）和一个 Directory。网格中的行数 **必须由 --mesh-rows 指定**。此参数也允许创建非对称网格。
+      - **Mesh_XY**: 具有 XY 路由的网格。所有 x 方向链路的权重为 1，而所有 y 方向链路的权重为 2。这强制所有消息在使用 Y 链路之前先使用 X 链路。它可以由 **--topology=Mesh_XY** 从命令行调用
+      - **Mesh_westfirst**: 具有西优先路由的网格。所有西向链路的权重为 1，所有其他链路的权重为 2。这强制所有消息在使用其他链路之前先使用西向链路。它可以由 **--topology=Mesh_westfirst** 从命令行调用
+  - **MeshDirCorners_XY**: 此拓扑要求目录数等于 4。路由器/交换机数等于系统中的 cpu 数。每个路由器/交换机连接到一个 L1、一个 L2（如果存在）。每个角落路由器/交换机连接到一个 Directory。它可以由 **--topology=MeshDirCorners_XY** 从命令行调用。网格中的行数 **必须由 --mesh-rows 指定**。使用 XY 路由算法。
+  - **Pt2Pt**: 每个控制器 (L1/L2/Directory) 通过直接链路连接到每个其他控制器。这可以通过命令行调用
+  - **Pt2Pt**: 全对全点对点连接
 
 ![](http://pwp.gatech.edu/ece-synergy/wp-content/uploads/sites/332/2016/10/topologies.jpg)
 
-**In each topology, each link and each router can independently be
-passed a parameter that overrides the defaults (in BasicLink.py and
-BasicRouter.py)**:
+**在每个拓扑中，每个链路和每个路由器都可以独立传递一个覆盖默认值的参数（在 BasicLink.py 和 BasicRouter.py 中）**:
 
-  - **Link Parameters:**
-      - **latency**: latency of traversal within the link.
-      - **weight**: weight associated with this link. This parameter is
-        used by the routing table while deciding routes, as explained
-        next in [Routing](Interconnection_Network#Routing "wikilink").
-      - **bandwidth_factor**: Only used by simple network to specify
-        width of the link in bytes. This translates to a bandwidth
-        multiplier (simple/SimpleLink.cc) and the individual link
-        bandwidth becomes bandwidth multiplier x endpoint_bandwidth
-        (specified in SimpleNetwork.py). In garnet, the bandwidth is
-        specified by ni_flit_size in GarnetNetwork.py)
+  - **链路参数:**
+      - **latency**: 链路内的传输延迟。
+      - **weight**: 与此链路关联的权重。此参数由路由表在决定路由时使用，如下文 [路由](Interconnection_Network#Routing "wikilink") 中所述。
+      - **bandwidth_factor**: 仅由简单网络使用，以指定链路的宽度（以字节为单位）。这转换为带宽乘数 (simple/SimpleLink.cc)，单个链路带宽变为带宽乘数 x endpoint_bandwidth (在 SimpleNetwork.py 中指定)。在 garnet 中，带宽由 GarnetNetwork.py 中的 ni_flit_size 指定)
 
 
-  - **Internal Link Parameters:**
-      - **src_outport**: String with name for output port from source
-        router.
-      - **dst_inport**: String with name for input port at destination
-        router.
+  - **内部链路参数:**
+      - **src_outport**: 带有源路由器输出端口名称的字符串。
+      - **dst_inport**: 带有目标路由器输入端口名称的字符串。
 
-These two parameters can be used by routers to implement custom routing
-algorithms in garnet2.0
+这两个参数可由路由器用于在 garnet2.0 中实现自定义路由算法
 
-  - **Router Parameters:**
-      - **latency**: latency of each router. Only supported by
-        garnet2.0.
+  - **路由器参数:**
+      - **latency**: 每个路由器的延迟。仅由 garnet2.0 支持。
 
-## Routing
+## 路由
 
-**Table-based Routing (Default):** Based on the topology, shortest
-path graph traversals are used to populate *routing tables* at each
-router/switch. This is done in src/mem/ruby/network/Topology.cc The
-default routing algorithm is table-based and tries to choose the route
-with minimum number of link traversals. Links can be given weights in
-the topology files to model different routing algorithms. For example,
-in Mesh_XY.py and MeshDirCorners_XY.py Y-direction links are given
-weights of 2, while X-direction links are given weights of 1, resulting
-in XY traversals. In Mesh_westfirst.py, the west-links are given
-weights of 1, and all other links are given weights of 2. In garnet2.0,
-the routing algorithm randomly chooses between links with equal weights.
-In simple network, it statically chooses between links with equal
-weights.
+**基于表的路由 (默认):** 基于拓扑，使用最短路径图遍历来填充每个路由器/交换机的 *路由表*。这是在 src/mem/ruby/network/Topology.cc 中完成的。默认路由算法是基于表的，并尝试选择链路遍历次数最少的路径。可以在拓扑文件中给链路赋予权重以模拟不同的路由算法。例如，在 Mesh_XY.py 和 MeshDirCorners_XY.py 中，Y 方向链路的权重为 2，而 X 方向链路的权重为 1，从而导致 XY 遍历。在 Mesh_westfirst.py 中，西向链路的权重为 1，所有其他链路的权重为 2。在 garnet2.0 中，路由算法在权重相等的链路之间随机选择。在简单网络中，它在权重相等的链路之间静态选择。
 
-**Custom Routing algorithms:** In garnet2.0, we provide additional
-support to implement custom (including adaptive) routing algorithms (See
-outportComputeXY() in src/mem/ruby/network/garnet2.0/RoutingUnit.cc).
-The src_outport and dst_inport fields of the links can be used to give
-custom names to each link (e.g., directions if a mesh), and these can be
-used inside garnet to implement any routing algorithm. A custom routing
-algorithm can be selected from the command line by setting
---routing-algorithm=2. See configs/network/Network.py and
-src/mem/ruby/network/garnet2.0/GarnetNetwork.py
+**自定义路由算法:** 在 garnet2.0 中，我们提供了额外的支持来实现自定义（包括自适应）路由算法（参见 src/mem/ruby/network/garnet2.0/RoutingUnit.cc 中的 outportComputeXY()）。链路的 src_outport 和 dst_inport 字段可用于为每个链路赋予自定义名称（例如，如果是网格，则为方向），这些可以在 garnet 内部用于实现任何路由算法。可以通过设置 --routing-algorithm=2 从命令行选择自定义路由算法。参见 configs/network/Network.py 和 src/mem/ruby/network/garnet2.0/GarnetNetwork.py
 
-## Flow-Control and Router Microarchitecture
+## 流控制和路由器微架构
 
-Ruby supports two network models, Simple and Garnet, which trade-off
-detailed modeling versus simulation speed respectively.
+Ruby 支持两种网络模型，Simple 和 Garnet，它们分别权衡详细建模与模拟速度。
 
-### Simple Network
+### 简单网络
 
-The default network model in Ruby is the simple network.
+Ruby 中的默认网络模型是简单网络。
 
-- **Related Files**:
+- **相关文件**:
     - **src/mem/ruby/network/Network.py**
     - **src/mem/ruby/network/simple**
     - **src/mem/ruby/network/simple/SimpleNetwork.py**
 
-## Configuration
+## 配置
 
-Simple network uses the generic network parameters in Network.py:
+简单网络使用 Network.py 中的通用网络参数：
 
-- **number_of_virtual_networks**: This is the maximum number of
-      virtual networks. The actual number of active virtual networks
-      is determined by the protocol.
-- **control_msg_size**: The size of control messages in bytes.
-      Default is 8. **m_data_msg_size** in Network.cc is set to the
-      block size in bytes + control_msg_size.
+- **number_of_virtual_networks**: 这是最大虚拟网络数。实际活动的虚拟网络数由协议决定。
+- **control_msg_size**: 控制消息的大小（以字节为单位）。默认为 8。Network.cc 中的 **m_data_msg_size** 设置为块大小（以字节为单位）+ control_msg_size。
 
-Additional parameters are specified in simple/SimpleNetwork.py:
+其他参数在 simple/SimpleNetwork.py 中指定：
 
-- **buffer_size**: Size of buffers at each switch input and
-  output ports. A value of 0 implies infinite buffering.
-- **endpoint_bandwidth**: Bandwidth at the end points of the
-  network in 1000th of byte.
-- **adaptive_routing**: This enables adaptive routing based on
-  occupancy of output buffers.
+- **buffer_size**: 每个交换机输入和输出端口的缓冲区大小。值 0 意味着无限缓冲。
+- **endpoint_bandwidth**: 网络端点的带宽，以 1/1000 字节为单位。
+- **adaptive_routing**: 这启用了基于输出缓冲区占用率的自适应路由。
 
-## Switch Model
+## 交换机模型
 
-The simple network models hop-by-hop network traversal, but abstracts
-out detailed modeling within the switches. The switches are modeled in
-simple/PerfectSwitch.cc while the links are modeled in
-simple/Throttle.cc. The flow-control is implemented by monitoring the
-available buffers and available bandwidth in output links before
-sending.
+简单网络模拟逐跳网络遍历，但抽象出交换机内的详细建模。交换机在 simple/PerfectSwitch.cc 中建模，而链路在 simple/Throttle.cc 中建模。流控制是通过在发送之前监视输出链路中的可用缓冲区和可用带宽来实现的。
 
 ![Simple_network.jpg](/assets/img/Simple_network.jpg "Simple_network.jpg")
 
 
 ### Garnet2.0
 
-Details of the new (2016) Garnet2.0 network are
-**[here](garnet-2)**.
+新 (2016) Garnet2.0 网络的详细信息在 **[这里](garnet-2)**。
 
-## Running the Network with Synthetic Traffic
+## 使用合成流量运行网络
 
-The interconnection networks can be run in a standalone manner and fed
-with synthetic traffic. We recommend doing this with garnet2.0.
+互连网络可以以独立方式运行并馈送合成流量。我们建议使用 garnet2.0 执行此操作。
 
-**[Running Garnet Standalone with Synthetic Traffic](/documentation/general_docs/ruby/garnet_synthetic_traffic)**
+**[使用合成流量运行 Garnet Standalone](/documentation/general_docs/ruby/garnet_synthetic_traffic)**

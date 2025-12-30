@@ -1,89 +1,32 @@
 ---
 layout: documentation
-title: "Classic memory system coherence"
+title: "经典内存系统一致性"
 doc: gem5 documentation
 parent: memory_system
 permalink: /documentation/general_docs/memory_system/classic-coherence-protocol/
 author: Jason Lowe-Power
 ---
 
-# Classic Memory System coherence
+# 经典内存系统一致性
 
-M5 2.0b4 introduced a substantially rewritten and streamlined cache
-model, including a new coherence protocol. (The old pre-2.0 cache model
-had been patched up to work with the new [Memory
-System](/documentation/general_docs/memory_system/) introduced in 2.0beta, but not
-rewritten to take advantage of the new memory system's features.)
+M5 2.0b4 引入了一个经过大幅重写和精简的缓存模型，包括一个新的相干性协议。（旧的 2.0 之前的缓存模型已被修补以与 2.0beta 中引入的新 [内存系统](/documentation/general_docs/memory_system/) 一起工作，但没有重写以利用新内存系统的功能。）
 
-The key feature of the new coherence protocol is that it is designed to
-work with more-or-less arbitrary cache hierarchies (multiple caches each
-on multiple levels). In contrast, the old protocol restricted sharing to
-a single bus.
+新一致性协议的关键特性是它旨在与差不多任意的缓存层次结构（多个级别上的多个缓存）一起工作。相比之下，旧协议限制共享单个总线。
 
-In the real world, a system architecture will have limits on the number
-or configuration of caches that the protocol can be designed to
-accommodate. It's not practical to design a protocol that's fully
-realistic and yet efficient for arbitrary configurations. In order to
-enable our protocol to work on (nearly) arbitrary configurations, we
-currently sacrifice a little bit of realism and a little bit of
-configurability. Our intent is that this protocol is adequate for
-researchers studying aspects of system behavior other than coherence
-mechanisms. Researchers studying coherence specifically will probably
-want to replace the default coherence mechanism with implementations of
-the specific protocols under investigation.
+在现实世界中，系统架构对协议设计所能适应的缓存数量或配置有限制。设计一个既完全逼真又对任意配置高效的协议是不切实际的。为了使我们的协议能够在（几乎）任意配置上工作，我们目前牺牲了一点真实性和一点可配置性。我们的意图是，此协议对于研究系统行为方面而不是一致性机制的研究人员来说已经足够了。专门研究一致性的研究人员可能希望用正在调查的特定协议的实现替换默认的一致性机制。
 
-The protocol is a MOESI snooping protocol. Inclusion is **not**
-enforced; in a CMP configuration where you have several L1s whose total
-capacity is a significant fraction of the capacity of the common L2 they
-share, inclusion can be very inefficient.
+该协议是一个 MOESI 监听协议。包含 **未** 强制执行；在 CMP 配置中，如果您有多个 L1，其总容量占它们共享的公共 L2 容量的很大一部分，包含可能会非常低效。
 
-Requests from upper-level caches (those closer to the CPUs) propagate
-toward memory in the expected fashion: an L1 miss is broadcast on the
-local L1/L2 bus, where it is snooped by the other L1s on that bus and
-(if none respond) serviced by the L2. If the request misses in the L2,
-then after some delay (currently set equal to the L2 hit latency), the
-L2 will issue the request on its memory-side bus, where it will possibly
-be snooped by other L2s and then be issued to an L3 or memory.
+来自上层缓存（更靠近 CPU 的那些）的请求以预期的方式向内存传播：L1 未命中在本地 L1/L2 总线上广播，在那里它被该总线上的其他 L1 监听，并（如果没有响应）由 L2 服务。如果请求在 L2 中未命中，那么在一些延迟（目前设置为等于 L2 命中延迟）之后，L2 将在其内存侧总线上发出请求，在那里它可能被其他 L2 监听，然后发布到 L3 或内存。
 
-Unfortunately, propagating snoop requests incrementally back up the
-hierarchy in a similar fashion is a source of myriad nearly intractable
-race conditions. Real systems don't typically do this anyway; in general
-you want a single snoop operation at the L2 bus to tell you the state of
-the block in the whole L1/L2 hierarchy. There are a handful of methods
-for this:
+不幸的是，以类似的方式将 snoop 请求逐级向上传播到层次结构中是无数几乎棘手的竞争条件的来源。无论如何，真实系统通常不会这样做；通常，您希望在 L2 总线处进行一次 snoop 操作，以告知您整个 L1/L2 层次结构中块的状态。有几种方法可以做到这一点：
 
-1.  just snoop the L2, but enforce inclusion so that the L2 has all the
-    info you need about the L1s as well---an idea we've already rejected
-    above
-2.  keep an extra set of tags for all the L1s at the L2 so those can be
-    snooped at the same time (see the Compaq Piranha)---reasonable, if
-    you're hierarchy's not too deep, but now you've got to size the tags
-    in the lower-level caches based on the number, size, and
-    configuration of the upper-level caches, which is a configuration
-    pain
-3.  snoop the L1s in parallel with the L2, something that's not hard if
-    they're all on the same die (I believe Intel started doing this with
-    the Pentium Pro; not sure if they still do with the Core2 chips or
-    not, or if AMD does this as well, but I suspect so)---also
-    reasonable, but adding explicit paths for these snoops would also
-    make for a very cumbersome configuration process
+1.  只监听 L2，但强制包含，以便 L2 也拥有您需要的有关 L1 的所有信息——我们已经在上面拒绝了这个想法
+2.  在 L2 处为所有 L1 保留一组额外的标记，以便可以同时监听这些标记（参见 Compaq Piranha）——如果您的层次结构不太深，这是合理的，但现在您必须根据上层缓存的数量、大小和配置来确定下层缓存中标记的大小，这是一个配置痛苦
+3.  与 L2 并行监听 L1，如果它们都在同一个芯片上，这并不难（我相信 Intel 从 Pentium Pro 开始就这样做了；不确定他们是否还在 Core2 芯片上这样做，或者 AMD 是否也这样做，但我怀疑是这样）——也是合理的，但为这些 snoop 添加显式路径也会导致非常繁琐的配置过程
 
-We solve this dilemma by introducing "express snoops", which are special
-snoop requests that get propagated up the hierarchy instantaneously and
-atomically (much like the atomic-mode accesses described on the [Memory
-System](/documentation/general_docs/memory_system) page), even when the system is running
-in timing mode. Functionally this behaves very much like options 2 or 3
-above, but because the snoops propagate along the regular bus
-interconnects, there's no additional configuration overhead. There is
-some timing inaccuracy introduced, but if we assume that there are
-dedicated paths in the real hardware for these snoops (or for
-maintaining the additional copies of the upper-level tags at the
-lower-level caches) then the differences are probably minor.
+我们通过引入“express snoops”来解决这一困境，这是一种特殊的 snoop 请求，即使系统在 timing 模式下运行，它也能瞬间且原子地向上传播到层次结构中（很像 [内存系统](/documentation/general_docs/memory_system) 页面上描述的 atomic 模式访问）。在功能上，这非常类似于上面的选项 2 或 3，但由于 snoop 沿着常规总线互连传播，因此没有额外的配置开销。引入了一些时序不准确性，但如果我们假设真实硬件中有用于这些 snoop 的专用路径（或者用于在下层缓存处维护上层标记的额外副本），那么差异可能很小。
 
-(More to come: how does a cache know when its request is completed? and
-other fascinating questions...)
+（更多内容即将到来：缓存如何知道其请求何时完成？以及其他引人入胜的问题……）
 
-Note: there are still some bugs in this protocol as of 2.0b4,
-particularly if you have multiple L2s each with multiple L1s behind it,
-but I believe it works for any configuration that worked in 2.0b3.
-
+注意：截至 2.0b4，此协议中仍有一些错误，特别是如果您有多个 L2，每个 L2 后面有多个 L1，但我相信它适用于任何在 2.0b3 中工作的配置。

@@ -1,17 +1,17 @@
 ---
 layout: documentation
-title: Garnet Synthetic Traffic
+title: Garnet 合成流量
 doc: gem5 documentation
 parent: directed_testers
 permalink: /documentation/general_docs/debugging_and_testing/directed_testers/garnet_synthetic_traffic/
 author: Bobby R. Bruce
 ---
 
-# Garnet Synthetic Traffic
+# Garnet 合成流量
 
-The Garnet Synthetic Traffic provides a framework for simulating the Garnet
-network with controlled inputs. This is useful for network testing/debugging,
-or for network-only simulations with synthetic traffic.
+Garnet 合成流量提供了一个框架，用于使用受控输入模拟 Garnet
+网络。这对于网络测试/调试
+或使用合成流量进行纯网络模拟很有用。
 
 **Note: The garnet synthetic traffic injector only works with Garnet_standalone
 coherence protocol.**

@@ -1,159 +1,130 @@
 ---
 layout: documentation
-title: gem5-resources
+title: gem5 资源
 doc: gem5 documentation
 parent: gem5_resources
 permalink: /documentation/general_docs/gem5_resources/
 authors: Bobby R. Bruce, Kunal Pai, Parth Shah
 ---
 
-# gem5 Resources
+# gem5 资源
 
-gem5 Resources is a repository providing sources for artifacts known and
-proven compatible with the gem5 architecture simulator. These resources
-are not necessary for the compilation or running of gem5, but may aid users
-in producing certain simulations.
+gem5 Resources 是一个仓库，提供已知并证明与 gem5 架构模拟器兼容的工件源。这些资源对于 gem5 的编译或运行不是必需的，但可能有助于用户生成某些模拟。
 
-## Why gem5 Resources?
+## 为什么需要 gem5 资源？
 
-gem5 has been designed with flexibility in mind. Users may simulate a wide
-variety of hardware, with an equally wide variety of workloads. However,
-requiring users to find and configure workloads for gem5 (their own disk
-images, their own OS boots, their own tests, etc.) is a significant
-investment, and a hurdle to many.
+gem5 的设计考虑了灵活性。用户可以模拟各种各样的硬件，以及同样各种各样的工作负载。然而，要求用户查找和配置 gem5 的工作负载（他们自己的磁盘镜像、他们自己的 OS 引导、他们自己的测试等）是一项重大投资，对许多人来说是一个障碍。
 
-The purpose of gem5 Resources is therefore __to provide a stable set of
-commonly used resources, with proven and documented compatibility with gem5__.
-In addition to this, gem5 resources also puts emphasis on __reproducibility
-of experiments__ by providing citable, stable resources, tied to a particular
-release of gem5.
+因此，gem5 Resources 的目的是 **提供一套稳定的常用资源，并具有经过验证和记录的与 gem5 的兼容性**。除此之外，gem5 资源还通过提供可引用、稳定的资源（绑定到 gem5 的特定版本）来强调 **实验的可重复性**。
 
-## Where can I obtain the gem5 Resources?
+## 我在哪里可以获得 gem5 资源？
 
-To find a specific resource with the gem5 Resources, we recommend using the [gem5 Resources Website](https://resources.gem5.org). Detailed information on how searching, filtering and sorting works on this website is on this [help page](https://resources.gem5.org/help).
+要在 gem5 Resources 中查找特定资源，我们建议使用 [gem5 Resources 网站](https://resources.gem5.org)。有关如何在此网站上搜索、过滤和排序的详细信息，请参阅此 [帮助页面](https://resources.gem5.org/help)。
 
-The gem5 Resources are hosted on our Google Cloud Bucket. Links to the
-resources can be found [gem5 resources README.md file](
-https://gem5.googlesource.com/public/gem5-resources/+/refs/heads/stable/README.md).
-The resource metadata is stored in a MongoDB database hosted on MongoDB Atlas.
-To request updates to gem5 resources, create an issue or mail gem5-dev.
+gem5 Resources 托管在我们的 Google Cloud Bucket 上。资源的链接可以在 [gem5 resources README.md 文件](
+https://gem5.googlesource.com/public/gem5-resources/+/refs/heads/stable/README.md) 中找到。
+资源元数据存储在托管于 MongoDB Atlas 的 MongoDB 数据库中。
+要请求更新 gem5 资源，请创建 issue 或邮件 gem5-dev。
 
-## Using a Resource from the gem5 Resources Website in gem5
+## 在 gem5 中使用 gem5 Resources 网站的资源
 
-When you find the Resource that you want to use in your simulation, navigate to the 'Usage' tab of that Resource.
+当您找到要在模拟中使用的资源时，请导航到该资源的“Usage”选项卡。
 
-For the purpose of this tutorial, let's assume that the Resource you are looking for is `riscv-hello`, found [here](https://resources.gem5.org/resources/riscv-hello).In the ['Usage'](https://resources.gem5.org/resources/riscv-hello/usage) tab of this Resource, you will find the code that can be pasted in a gem5 simulation to use this Resource.
+为了本教程的目的，让我们假设您正在寻找的资源是 `riscv-hello`，在 [这里](https://resources.gem5.org/resources/riscv-hello) 找到。在该资源的 ['Usage'](https://resources.gem5.org/resources/riscv-hello/usage) 选项卡中，您将找到可以粘贴到 gem5 模拟中以使用此资源的代码。
 
-In this case, the code is `obtain_resource(resource_id="riscv-hello")`.
+在这种情况下，代码是 `obtain_resource(resource_id="riscv-hello")`。
 
-To use the `obtain_resource` function, you require the following import statement:
+要使用 `obtain_resource` 函数，您需要以下导入语句：
 
 ```
 from gem5.resources.resource import obtain_resource
 ```
 
-The `obtain_resource` function accepts the following parameters:
+`obtain_resource` 函数接受以下参数：
 
-- `resource_id`: The ID of the Resource you want to use.
-- `resource_version`: An optional parameter that specifies the version of the Resource you want to use. If not specified, the latest version of the Resource compatible with the version of gem5 being used will be used.
-- `clients`: An optional parameter that specifies the list of clients that gem5 would search for the Resource in. If not specified, gem5 will search for the Resource in all clients specified in the `src/python/gem5_default_config.py` file. By default, gem5 will use the public MongoDB metadata database to find resources. This can be overridden to specify your own local resource metadata.
+- `resource_id`: 您要使用的资源的 ID。
+- `resource_version`: 可选参数，指定您要使用的资源版本。如果未指定，将使用与正在使用的 gem5 版本兼容的资源的最新版本。
+- `clients`: 可选参数，指定 gem5 搜索资源的客户端列表。如果未指定，gem5 将在 `src/python/gem5_default_config.py` 文件中指定的所有客户端中搜索资源。默认情况下，gem5 将使用公共 MongoDB 元数据数据库来查找资源。这可以被覆盖以指定您自己的本地资源元数据。
 
-## Using a Workload from the gem5 Resources Website in gem5
+## 在 gem5 中使用 gem5 Resources 网站的工作负载
 
-When you find the Workload that you want to use in your simulation, navigate to the 'Usage' tab of that Workload.
+当您找到要在模拟中使用的工作负载时，请导航到该工作负载的“Usage”选项卡。
 
-For the purpose of this tutorial, let's assume that the Workload you are looking for is `riscv-ubuntu-20.04-boot`, found [here](https://resources.gem5.org/resources/riscv-ubuntu-20.04-boot). In the ['Usage'](https://resources.gem5.org/resources/riscv-ubuntu-20.04-boot/usage) tab of this Workload, you will find the code that can be pasted in a gem5 simulation to use this Workload.
+为了本教程的目的，让我们假设您正在寻找的工作负载是 `riscv-ubuntu-20.04-boot`，在 [这里](https://resources.gem5.org/resources/riscv-ubuntu-20.04-boot) 找到。在该工作负载的 ['Usage'](https://resources.gem5.org/resources/riscv-ubuntu-20.04-boot/usage) 选项卡中，您将找到可以粘贴到 gem5 模拟中以使用此工作负载的代码。
 
-In this case, the code is `Workload("riscv-ubuntu-20.04-boot")`.
+在这种情况下，代码是 `Workload("riscv-ubuntu-20.04-boot")`。
 
-To use the `Workload` class, you require the following import statement:
+要使用 `Workload` 类，您需要以下导入语句：
 
 ```
 from gem5.resources.workload import Workload
 ```
 
-The `Workload` class accepts the following parameters:
+`Workload` 类接受以下参数：
 
-- `workload_name`: The name of the Workload you want to use.
-- `resource_directory`: An optional parameter that specifies where any resources should be download and accessed from.
-- `resource_version`: An optional parameter that specifies the version of the Resource that should be used. If not specified, the latest version of the Resource compatible with the version of gem5 being used will be used.
-- `clients`: An optional parameter that specifies a list of clients that gem5 would search for the Resource in. If not specified, gem5 will search for the Resource in all clients specified in the `src/python/gem5_default_config.py` file.
+- `workload_name`: 您要使用的工作负载的名称。
+- `resource_directory`: 可选参数，指定应从何处下载和访问任何资源。
+- `resource_version`: 可选参数，指定应使用的资源版本。如果未指定，将使用与正在使用的 gem5 版本兼容的资源的最新版本。
+- `clients`: 可选参数，指定 gem5 搜索资源的客户端列表。如果未指定，gem5 将在 `src/python/gem5_default_config.py` 文件中指定的所有客户端中搜索资源。
 
-## Using a Custom Resource in gem5
+## 在 gem5 中使用自定义资源
 
-To use a Custom Resource in gem5, we recommend using one of the supported data sources formats in gem5. Currently, we support MongoDB Atlas, local JSON files and remote JSON files.
+要在 gem5 中使用自定义资源，我们建议使用 gem5 中支持的数据源格式之一。目前，我们支持 MongoDB Atlas、本地 JSON 文件和远程 JSON 文件。
 
-You can use your own config file by overriding the `GEM5_DEFAULT_CONFIG` variable while running a file.
+您可以通过在运行文件时覆盖 `GEM5_DEFAULT_CONFIG` 变量来使用您自己的配置文件。
 
-NOTE: Any Custom Resource you add must be compliant with the [gem5 Resources Schema](https://resources.gem5.org/gem5-resources-schema.json).
+注意：您添加的任何自定义资源都必须符合 [gem5 Resources Schema](https://resources.gem5.org/gem5-resources-schema.json)。
 
-There is a utility in `utils/gem5-resources-manager` which provides a GUI for updating and creating resources for both the public resources (only modifiable by gem5 admins) and local resource metadata.
-You can find more information on the gem5 Resources Manager in the README file.
+`utils/gem5-resources-manager` 中有一个实用程序，它提供了一个 GUI 来更新和创建公共资源（只能由 gem5 管理员修改）和本地资源元数据。
+您可以在 README 文件中找到有关 gem5 Resources Manager 的更多信息。
 
-## How do I obtain the gem5 Resource sources?
+## 我如何获取 gem5 Resource 源码？
 
-gem5 resources sources may be obtained from
+gem5 resources 源码可以从以下位置获得
 <https://github.com/gem5/gem5-resources>:
 
 ```bash
 git clone https://github.com/gem5/gem5-resources
 ```
 
-The HEAD of the `stable` branch will point towards a set of resource sources
-compatible with the latest release of gem5 (which can be obtained via
-`git clone https://github.com/gem5/gem5.git`).
+`stable` 分支的 HEAD 将指向一组与最新发布的 gem5 版本兼容的资源源（可以通过 `git clone https://github.com/gem5/gem5.git` 获得）。
 
-Please consult the [README.md](
+请查阅 [README.md](
 https://gem5.googlesource.com/public/gem5-resources/+/refs/heads/stable/README.md)
-file for information on compiling individual gem5 resources. Where license
-permits, the [README.md](
+文件以获取有关编译单个 gem5 资源的信息。在许可允许的情况下，[README.md](
 https://gem5.googlesource.com/public/gem5-resources/+/refs/heads/stable/README.md)
-file will provide a link to download the compiled resource from our
-dist.gem5.org Google Cloud Bucket.
+文件将提供从我们的 dist.gem5.org Google Cloud Bucket 下载编译资源的链接。
 
-## How is gem5 Resources repository constructed?
+## gem5 Resources 仓库是如何构建的？
 
-The structure of this repository is as follows:
+该仓库的结构如下：
 
-* **README.md** : This README will outline each resources, their origin,
-how they have been modified to work with gem5 (if applicable), relevant
-licensing information, and compilation instructions. This should be the first
-port-of-call for those looking to use a gem5 resource.
-* **src** : The resource sources. The gem5 resources can be found in this
-directory. Each sub-directory outlines a resource. Each resource contains its
-own README.md file documenting relevant information -- compilation
-instructions, usage notes, etc.
-* **CHANGELOG.md** : This CHANGELOG will outline the changes in a particular resource across its versions.
+* **README.md** : 此 README 将概述每个资源、它们的来源、它们如何修改以与 gem5 一起工作（如果适用）、相关的许可信息和编译说明。对于那些希望使用 gem5 资源的人来说，这应该是第一个停靠港。
+* **src** : 资源源。gem5 资源可以在此目录中找到。每个子目录概述一个资源。每个资源都包含其自己的 README.md 文件，记录相关信息——编译说明、使用说明等。
+* **CHANGELOG.md** : 此 CHANGELOG 将概述特定资源在其版本之间的更改。
 
-### Versioning
+### 版本控制
 
-Each resource can have multiple versions. A version is in the form of
-`<major>.<minor>.<patch>`. The versioning scheme is based on [Semantic
-Versioning](https://semver.org/). Each version of a resource is linked to one
-or more gem5 versions (e.g., v20.0, v20.1, v20.2, etc.).
+每个资源可以有多个版本。版本采用 `<major>.<minor>.<patch>` 的形式。版本控制方案基于 [语义化版本控制 (Semantic Versioning)](https://semver.org/)。资源的每个版本都链接到一个或多个 gem5 版本（例如，v20.0, v20.1, v20.2 等）。
 
-By default, gem5 uses the latest version of a resource compatible with the
-version of gem5 being used. However, users may specify a particular version
-of a resource to use. If a user specifies a version of a resource that is not
-compatible with the version of gem5 being used, gem5 will throw a warning.
-You may still use the resource at your own risk.
+默认情况下，gem5 使用与正在使用的 gem5 版本兼容的资源的最新版本。但是，用户可以指定要使用的资源的特定版本。如果用户指定的资源版本与正在使用的 gem5 版本不兼容，gem5 将抛出警告。
+您仍然可以使用该资源，但风险自负。
 
-### Citing a Resource
+### 引用资源
 
-We strongly recommend gem5 Resources are cited in publications to aid in
-replication of experiments, tutorials, etc.
+我们强烈建议在出版物中引用 gem5 Resources，以帮助复制实验、教程等。
 
-To cite as a URL, please use the following formats:
+要作为 URL 引用，请使用以下格式：
 
 ```
-# For the git repository at a particular revision:
+# 对于特定修订的 git 仓库：
 https://github.com/gem5/gem5-resources/<revision>/src/<resource>
 
-# For the git repository at a particular tag:
+# 对于特定标签的 git 仓库：
 https://github.com/gem5/gem5-resources/tree/<branch>/src/<resource>
 ```
 
-Alternatively, as BibTex:
+或者，作为 BibTex：
 
 ```
 @misc{gem5-resources,
@@ -169,40 +140,37 @@ Alternatively, as BibTex:
 }
 ```
 
-## How to I contribute to gem5 Resources?
+## 我如何为 gem5 Resources 做贡献？
 
-Changes to the gem5 Resources repository are made to the develop branch via our
-Gerrit code review system. Therefore, to make changes, first clone the
-repository:
+对 gem5 Resources 仓库的更改是通过我们的 Gerrit 代码审查系统对 develop 分支进行的。因此，要进行更改，首先克隆仓库：
 
 ```
 git clone https://github.com/gem5/gem5-resources.git
 ```
 
-Then make changes and commit. When ready, push to Gerrit with:
+然后进行更改并提交。准备好后，使用以下命令推送到 Gerrit：
 
 ```
 git push origin HEAD:refs/for/stable
 ```
 
-This will add resources to be used in the latest release of gem5.
+这将添加将在最新 gem5 版本中使用的资源。
 
-To contribute resources to the next release of gem5,
+要为下一个 gem5 版本贡献资源，
 ```
 git clone https://github.com/gem5/gem5-resources.git
 git checkout --track origin/develop
 ```
 
-Then make changes, commit, and push with:
+然后进行更改，提交并使用以下命令推送：
 
 ```
 git push origin HEAD:refs/for/develop
 ```
 
-Commit message heads should not exceed 65 characters and start with the tag
-`resources:`. The description after the header must not exceed 72 characters.
+提交消息头不应超过 65 个字符，并以标记 `resources:` 开头。标题后的描述不得超过 72 个字符。
 
-E.g.:
+例如：
 
 ```
 resources: Adding a new resources X
@@ -211,12 +179,9 @@ This is where the description of this commit will occur taking into
 note the 72 character line limit.
 ```
 
-We strongly advise contributors follow our [Style Guide](
-/documentation/general_docs/development/coding_style/) where
-possible and appropriate.
+我们强烈建议贡献者在可能和适当的情况下遵循我们的 [风格指南](
+/documentation/general_docs/development/coding_style/)。
 
-Any change will then be reviewed via our [Gerrit code review system](
-https://gem5-review.googlesource.com). Once fully accepted and merged into
-the gem5 resources repository, please contact Bobby R. Bruce
-([bbruce@ucdavis.edu](mailto:bbruce@ucdavis.edu)) to have any compiled sources
-uploaded to the gem5 resources bucket.
+任何更改随后将通过我们的 [Gerrit 代码审查系统](
+https://gem5-review.googlesource.com) 进行审查。一旦完全接受并合并到 gem5 resources 仓库中，请联系 Bobby R. Bruce
+([bbruce@ucdavis.edu](mailto:bbruce@ucdavis.edu)) 将任何编译的源上传到 gem5 resources bucket。

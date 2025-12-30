@@ -1,21 +1,21 @@
 ---
 layout: documentation
-title: Debugging Simulated Code
+title: 调试模拟代码
 doc: gem5 documentation
 parent: debugging
 permalink: /documentation/general_docs/debugging_and_testing/debugging/debugging_simulated_code
 author: Bobby R. Bruce
 ---
 
-# Debugging Simulated Code
+# 调试模拟代码
 
-gem5 has built-in support for gdb's remote debugger interface. If you are
-interested in monitoring what the code on the simulated machine is doing
-(the kernel, in FS mode, or program, in SE mode) you can fire up gdb on the
-host platform and have it talk to the simulated gem5 system as if it were a
-real machine/process (only better, since gem5 executions are deterministic and
-gem5's remote debugger interface is guaranteed not to perturb execution on the
-simulated system).
+gem5 内置支持 gdb 的远程调试器接口。如果您
+有兴趣监控模拟机器上的代码正在做什么
+（内核，在 FS 模式下，或程序，在 SE 模式下），您可以在
+主机平台上启动 gdb，并让它与模拟的 gem5 系统对话，就像它是
+真实机器/进程一样（甚至更好，因为 gem5 执行是确定性的，并且
+gem5 的远程调试器接口保证不会干扰
+模拟系统上的执行）。
 
 If you are simulating a system that uses a different ISA from the host you're
 running on, you'll need a cross-architecture gdb; see below for instructions.

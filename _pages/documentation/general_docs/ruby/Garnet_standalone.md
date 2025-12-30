@@ -1,99 +1,65 @@
 ---
 layout: documentation
-title: "Garnet standalone"
+title: "Garnet 独立运行"
 doc: gem5 documentation
 parent: ruby
 permalink: /documentation/general_docs/ruby/Garnet_standalone/
 author: Jason Lowe-Power
 ---
 
-# Garnet Standalone
+# Garnet 独立运行
 
-This is a dummy cache coherence protocol that is used to operate Garnet
-in a standalone manner. This protocol works in conjunction with the
-[Garnet Synthetic Traffic](/documentation/general_docs/ruby/garnet_synthetic_traffic)
-injector.
+这是一个虚拟缓存一致性协议，用于以独立方式运行 Garnet。该协议与 [Garnet 合成流量 (Garnet Synthetic Traffic)](/documentation/general_docs/ruby/garnet_synthetic_traffic) 注入器一起工作。
 
-### Related Files
+### 相关文件
 
   - **src/mem/protocols**
-      - **Garnet_standalone-cache.sm**: cache controller specification
-      - **Garnet_standalone-dir.sm**: directory controller
-        specification
-      - **Garnet_standalone-msg.sm**: message type specification
-      - **Garnet_standalone.slicc**: container file
+      - **Garnet_standalone-cache.sm**: 缓存控制器规范
+      - **Garnet_standalone-dir.sm**: 目录控制器规范
+      - **Garnet_standalone-msg.sm**: 消息类型规范
+      - **Garnet_standalone.slicc**: 容器文件
 
-### Cache Hierarchy
+### 缓存层次结构
 
-This protocol assumes a 1-level cache hierarchy. The role of the cache
-is to simply send messages from the cpu to the appropriate directory
-(based on the address), in the appropriate virtual network (based on the
-message type). It does not track any state. Infact, no CacheMemory is
-created unlike other protocols. The directory receives the messages from
-the caches, but does not send any back. The goal of this protocol is to
-enable simulation/testing of just the interconnection network.
+此协议假设 1 级缓存层次结构。缓存的作用只是简单地将消息从 cpu 发送到适当的目录（基于地址），在适当的虚拟网络中（基于消息类型）。它不跟踪任何状态。事实上，与其他协议不同，没有创建 CacheMemory。目录接收来自缓存的消息，但不发回任何消息。此协议的目标是仅启用互连网络的模拟/测试。
 
-### Stable States and Invariants
+### 稳定状态和不变量
 
-| States | Invariants                        |
+| 状态 | 不变量                        |
 | ------ | --------------------------------- |
-| **I**  | Default state of all cache blocks |
+| **I**  | 所有缓存块的默认状态 |
 
-### Cache controller
+### 缓存控制器
 
-  - Requests, Responses, Triggers:
-      - Load, Instruction fetch, Store from the core.
+  - 请求、响应、触发器：
+      - 来自核心的加载、指令提取、存储。
 
-The network tester (in src/cpu/testers/networktest/networktest.cc)
-generates packets of the type **ReadReq**, **INST_FETCH**, and
-**WriteReq**, which are converted into **RubyRequestType:LD**,
-**RubyRequestType:IFETCH**, and **RubyRequestType:ST**, respectively, by
-the RubyPort (in src/mem/ruby/system/RubyPort.hh/cc). These messages
-reach the cache controller via the Sequencer. The destination for these
-messages is determined by the traffic type, and embedded in the address.
-More details can be found [here](/documentation/general_docs/debugging_and_testing/directed_testers/ruby_random_tester).
+网络测试器 (在 src/cpu/testers/networktest/networktest.cc 中) 生成 **ReadReq**、**INST_FETCH** 和 **WriteReq** 类型的数据包，它们分别由 RubyPort (在 src/mem/ruby/system/RubyPort.hh/cc 中) 转换为 **RubyRequestType:LD**、**RubyRequestType:IFETCH** 和 **RubyRequestType:ST**。这些消息通过 Sequencer 到达缓存控制器。这些消息的目的地由流量类型确定，并嵌入在地址中。更多详细信息可以在 [这里](/documentation/general_docs/debugging_and_testing/directed_testers/ruby_random_tester) 找到。
 
-  - Main Operation:
-      - The goal of the cache is only to act as a source node in the
-        underlying interconnection network. It does not track any
-        states.
-      - On a **LD** from the core:
-          - it returns a hit, and
-          - maps the address to a directory, and issues a message for it
-            of type **MSG**, and size **Control** (8 bytes) in the
-            request vnet (0).
-          - Note: vnet 0 could also be made to broadcast, instead of
-            sending a directed message to a particular directory, by
-            uncommenting the appropriate line in the *a_issueRequest*
-            action in Network_test-cache.sm
-      - On a **IFETCH** from the core:
-          - it returns a hit, and
-          - maps the address to a directory, and issues a message for it
-            of type **MSG**, and size **Control** (8 bytes) in the
-            forward vnet (1).
-      - On a **ST** from the core:
-          - it returns a hit, and
-          - maps the address to a directory, and issues a message for it
-            of type **MSG**, and size **Data** (72 bytes) in the
-            response vnet (2).
-      - Note: request, forward and response are just used to
-        differentiate the vnets, but do not have any physical
-        significance in this protocol.
+  - 主要操作：
+      - 缓存的目标仅仅是充当底层互连网络中的源节点。它不跟踪任何状态。
+      - 在来自核心的 **LD** 上：
+          - 它返回命中，并且
+          - 将地址映射到目录，并在请求 vnet (0) 中为其发出类型为 **MSG**、大小为 **Control** (8 字节) 的消息。
+          - 注意：通过取消注释 Network_test-cache.sm 中 *a_issueRequest* 动作中的相应行，也可以使 vnet 0 广播，而不是向特定目录发送定向消息
+      - 在来自核心的 **IFETCH** 上：
+          - 它返回命中，并且
+          - 将地址映射到目录，并在转发 vnet (1) 中为其发出类型为 **MSG**、大小为 **Control** (8 字节) 的消息。
+      - 在来自核心的 **ST** 上：
+          - 它返回命中，并且
+          - 将地址映射到目录，并在响应 vnet (2) 中为其发出类型为 **MSG**、大小为 **Data** (72 字节) 的消息。
+      - 注意：请求、转发和响应仅用于区分 vnet，但在此协议中没有任何物理意义。
 
-### Directory controller
+### 目录控制器
 
-  - Requests, Responses, Triggers:
-      - **MSG** from the cores
+  - 请求、响应、触发器：
+      - 来自核心的 **MSG**
 
-  - Main Operation:
-      - The goal of the directory is only to act as a destination node
-        in the underlying interconnection network. It does not track any
-        states.
-      - The directory simply pops its incoming queue upon receiving the
-        message.
+  - 主要操作：
+      - 目录的目标仅仅是充当底层互连网络中的目标节点。它不跟踪任何状态。
+      - 目录在收到消息时只是弹出其传入队列。
 
-### Other features
+### 其他功能
 
-   This protocol assumes only 3 vnets.
-  - It should only be used when running [Garnet Synthetic
-        Traffic](/documentation/general_docs/ruby/garnet_synthetic_traffic).
+   此协议假设只有 3 个 vnet。
+  - 它仅应在运行 [Garnet 合成流量](/documentation/general_docs/ruby/garnet_synthetic_traffic) 时使用。

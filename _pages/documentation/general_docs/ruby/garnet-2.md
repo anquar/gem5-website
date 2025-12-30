@@ -7,23 +7,15 @@ permalink: /documentation/general_docs/ruby/garnet-2/
 author: Jason Lowe-Power
 ---
 
-**More details of the gem5 Ruby Interconnection Network are
-[here](/documentation/general_docs/ruby/interconnection-network/).**
+**gem5 Ruby 互连网络的更多详细信息在 [这里](/documentation/general_docs/ruby/interconnection-network/)。**
 
-### Garnet2.0: An On-Chip Network Model for Heterogeneous SoCs
+### Garnet2.0: 用于异构 SoC 的片上网络模型
 
-Garnet2.0 is a detailed interconnection network model inside gem5. It is
-in active development, and patches with more features will be
-periodically pushed into gem5. **Additional garnet-related patches and
-tool support under development (not part of the repo) can be found at
-the** [Garnet page at Georgia
-Tech](http://synergy.ece.gatech.edu/tools/garnet).
+Garnet2.0 是 gem5 内部的一个详细互连网络模型。它正在积极开发中，更多功能的补丁将定期推送到 gem5。**正在开发的（不属于 repo 的）其他 garnet 相关补丁和工具支持可以在 [佐治亚理工学院的 Garnet 页面](http://synergy.ece.gatech.edu/tools/garnet) 找到**。
 
-Garnet2.0 builds upon the original Garnet model which was published in
-[2009](http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4919636%7CISPASS).
+Garnet2.0 建立在最初的 Garnet 模型之上，该模型发布于 [2009 年](http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4919636%7CISPASS)。
 
-If your use of Garnet contributes to a published paper, please cite the
-following paper:
+如果您对 Garnet 的使用有助于发表论文，请引用以下论文：
 
 ```
     @inproceedings{garnet,
@@ -36,287 +28,150 @@ following paper:
     }
 ```
 
-Garnet2.0 provides a cycle-accurate micro-architectural implementation
-of an on-chip network router. It leverages the [Topology](
-/documentation/general_docs/ruby/interconnection-network#Topology) and [Routing](
-/documentation/general_docs/ruby/interconnection-network#Routing) frastructure
-provided by gem5's ruby memory system model. The default router is a
-state-of-the-art 1-cycle pipeline. There is support to add additional
-delay of any number of cycles in any router, by specifying it within the
-topology.
+Garnet2.0 提供了一个片上网络路由器的周期精确微架构实现。它利用了 gem5 的 ruby 内存系统模型提供的 [拓扑](/documentation/general_docs/ruby/interconnection-network#Topology) 和 [路由](/documentation/general_docs/ruby/interconnection-network#Routing) 基础设施。默认路由器是最先进的 1 周期流水线。支持通过在拓扑中指定，在任何路由器中添加任意周期数的额外延迟。
 
-Garnet2.0 can also be used to model an off-chip interconnection network
-by setting appropriate delays in the routers and links.
+Garnet2.0 也可以通过在路由器和链路中设置适当的延迟来模拟片外互连网络。
 
-- **Related Files**:
+- **相关文件**:
   - **src/mem/ruby/network/Network.py**
   - **src/mem/ruby/network/garnet2.0/GarnetNetwork.py**
   - **src/mem/ruby/network/Topology.cc**
 
-## Invocation
+## 调用
 
-The garnet networks can be enabled by adding **--network=garnet2.0**.
+可以通过添加 **--network=garnet2.0** 来启用 garnet 网络。
 
-## Configuration
+## 配置
 
-Garnet2.0 uses the generic network parameters in Network.py:
+Garnet2.0 使用 Network.py 中的通用网络参数：
 
-- **number_of_virtual_networks**: This is the maximum number of
-  virtual networks. The actual number of active virtual networks
-  is determined by the protocol.
-- **control_msg_size**: The size of control messages in bytes.
-  Default is 8. **m_data_msg_size** in Network.cc is set to the
-  block size in bytes + control_msg_size.
+- **number_of_virtual_networks**: 这是最大虚拟网络数。实际活动的虚拟网络数由协议决定。
+- **control_msg_size**: 控制消息的大小（以字节为单位）。默认为 8。Network.cc 中的 **m_data_msg_size** 设置为块大小（以字节为单位）+ control_msg_size。
 
-Additional parameters are specified in garnet2.0/GarnetNetwork.py:
+其他参数在 garnet2.0/GarnetNetwork.py 中指定：
 
-- **ni_flit_size**: flit size in bytes. Flits are the
-  granularity at which information is sent from one router to the
-  other. Default is 16 (=\> 128 bits). \[This default value of 16
-  results in control messages fitting within 1 flit, and data
-  messages fitting within 5 flits\]. Garnet requires the
-  ni_flit_size to be the same as the bandwidth_factor (in
-  network/BasicLink.py) as it does not model variable bandwidth
-  within the network. This can also be set from the command line
-  with **--link-width-bits**.
-- **vcs_per_vnet**: number of virtual channels (VC) per virtual
-  network. Default is 4. This can also be set from the command
-  line with **--vcs-per-vnet**.
-- **buffers_per_data_vc**: number of flit-buffers per VC in the
-  data message class. Since data messages occupy 5 flits, this
-  value can lie between 1-5. Default is 4.
-- **buffers_per_ctrl_vc**: number of flit-buffers per VC in the
-  control message class. Since control messages occupy 1 flit, and
-  a VC can only hold one message at a time, this value has to be
-  1. Default is 1.
-- **routing_algorithm**: 0: Weight-based table (default), 1: XY,
-  2: Custom. More details below.
+- **ni_flit_size**: flit 大小（以字节为单位）。Flits 是信息从一个路由器发送到另一个路由器的粒度。默认为 16 (=\> 128 位)。\[此默认值 16 导致控制消息适合 1 个 flit，数据消息适合 5 个 flit\]。Garnet 要求 ni_flit_size 与 bandwidth_factor (在 network/BasicLink.py 中) 相同，因为它不模拟网络内的可变带宽。这也可以通过 **--link-width-bits** 从命令行设置。
+- **vcs_per_vnet**: 每个虚拟网络的虚拟通道 (VC) 数。默认为 4。这也可以通过 **--vcs-per-vnet** 从命令行设置。
+- **buffers_per_data_vc**: 数据消息类中每个 VC 的 flit 缓冲区数。由于数据消息占用 5 个 flit，此值可以在 1-5 之间。默认为 4。
+- **buffers_per_ctrl_vc**: 控制消息类中每个 VC 的 flit 缓冲区数。由于控制消息占用 1 个 flit，并且 VC 一次只能保存一条消息，因此此值必须为 1。默认为 1。
+- **routing_algorithm**: 0: 基于权重的表（默认），1: XY，2: 自定义。更多详情如下。
 
-## Topology
+## 拓扑
 
-Garnet2.0 leverages the
-[Topology](/documentation/general_docs/ruby/interconnection-network#Topology)
-infrastructure
-provided by gem5's ruby memory system model. Any heterogeneous topology
-can be modeled. Each router in the topology file can be given an
-independent latency, which overrides the default. In addition, each link
-has 2 optional parameters: src_outport and dst_inport, which are
-strings with names of the output and input ports of the source and
-destination routers for each link. These can be used inside garnet2.0 to
-implement custom routing algorithms, as described next. For instance, in
-a Mesh, the west to east links have src_outport set to "west" and
-dst_inport" set to "east".
+Garnet2.0 利用 gem5 的 ruby 内存系统模型提供的 [拓扑](/documentation/general_docs/ruby/interconnection-network#Topology) 基础设施。可以模拟任何异构拓扑。拓扑文件中的每个路由器都可以给定一个独立的延迟，覆盖默认值。此外，每个链路有 2 个可选参数：src_outport 和 dst_inport，它们是包含每个链路的源路由器和目标路由器的输出和输入端口名称的字符串。这些可以在 garnet2.0 内部用于实现自定义路由算法，如下所述。例如，在 Mesh 中，西向东的链路将 src_outport 设置为 "west"，将 dst_inport 设置为 "east"。
 
-- **Network Components**:
-    - **GarnetNetwork**: This is the top level object that
-      instantiates all network interfaces, routers, and links.
-      Topology.cc calls the methods to add "external links" between
-      NIs and routers, and "internal links" between routers.
-    - **NetworkInterface**: Each NI connects to one coherence
-      controller via MsgBuffer interfaces on one side. It has a link
-      to a router on the other. Every protocol message is put into a
-      one-flit control or multi (default=5)-flit data (depending on
-      its vnet), and injected into the router. Multiple NIs can
-      connect to the same router (for e.g., in the Mesh topology,
-      cache and dir controllers connect via individual NIs to the same
-      router).
-    - **Router**: The router manages arbitration for output links, and
-      flow control between routers.
-    - **NetworkLink**: Network links carry flits. They can be of one
-      of 3 types: EXT_OUT_ (router to NI), EXT_IN_ (NI to router),
-      and INT_ (internal router to router)
-    - **CreditLink**: Credit links carry VC/buffer credits between
-      routers for flow control.
+- **网络组件**:
+    - **GarnetNetwork**: 这是实例化所有网络接口、路由器和链路的顶层对象。Topology.cc 调用方法在 NI 和路由器之间添加“外部链路”，在路由器之间添加“内部链路”。
+    - **NetworkInterface**: 每个 NI 一端通过 MsgBuffer 接口连接到一个一致性控制器。另一端有一个连接到路由器的链路。每个协议消息都被放入一个一 flit 控制或多（默认=5）flit 数据（取决于其 vnet），并注入到路由器中。多个 NI 可以连接到同一个路由器（例如，在 Mesh 拓扑中，缓存和目录控制器通过单独的 NI 连接到同一个路由器）。
+    - **Router**: 路由器管理输出链路的仲裁，以及路由器之间的流控制。
+    - **NetworkLink**: 网络链路携带 flits。它们可以是 3 种类型之一：EXT_OUT_ (路由器到 NI)，EXT_IN_ (NI 到路由器)，和 INT_ (内部路由器到路由器)
+    - **CreditLink**: 信用链路在路由器之间携带 VC/缓冲区信用以进行流控制。
 
-## Routing
+## 路由
 
-Garnet2.0 leverages the
-[Routing](/documentation/general_docs/ruby/interconnection-network#Routing) infrastructure
-provided by gem5's ruby memory system model. The default routing
-algorithm is a deterministic table-based routing algorithm with shortest
-paths. Link weights can be used to prioritize certain links over others.
-See src/mem/ruby/network/Topology.cc for details about how the routing
-table is populated.
+Garnet2.0 利用 gem5 的 ruby 内存系统模型提供的 [路由](/documentation/general_docs/ruby/interconnection-network#Routing) 基础设施。默认路由算法是具有最短路径的确定性基于表的路由算法。链路权重可用于优先选择某些链路而不是其他链路。有关路由表如何填充的详细信息，请参见 src/mem/ruby/network/Topology.cc。
 
-**Custom Routing**: To model custom routing algorithms, say adaptive, we
-provide a framework to name each link with a src_outport and
-dst_inport direction, and use these inside garnet to implement routing
-algorithms. For instance, in a Mesh, West-first can be implemented by
-sending a flit along the "west" outport link till the flit no longer has
-any X- hops remaining, and then randomly (or based on next router VC
-availability) choosing one of the remaining links. See how
-outportComputeXY() is implemented in
-src/mem/ruby/network/garnet2.0/RoutingUnit.cc. Similarly,
-outportComputeCustom() can be implemented, and invoked by adding
---routing-algorithm=2 in the command line.
+**自定义路由**: 为了模拟自定义路由算法（比如自适应算法），我们提供了一个框架，用 src_outport 和 dst_inport 方向命名每个链路，并在 garnet 内部使用这些来实现路由算法。例如，在 Mesh 中，West-first 可以通过沿着“西”输出端口链路发送 flit 来实现，直到 flit 不再有任何 X- 跳数剩余，然后随机（或基于下一个路由器 VC 可用性）选择剩余链路之一。参见 src/mem/ruby/network/garnet2.0/RoutingUnit.cc 中 outportComputeXY() 是如何实现的。类似地，可以实现 outportComputeCustom()，并通过在命令行中添加 --routing-algorithm=2 来调用。
 
-**Multicast messages**: The network modeled does not have hardware
-multi-cast support within the network. A multi-cast message gets broken
-into multiple uni-cast messages at the Network Interface.
+**组播消息**: 模拟的网络在网络内部没有硬件多播支持。多播消息在网络接口处被分解为多个单播消息。
 
-## Flow Control
+## 流控制
 
-Virtual Channel Flow Control is used in the design. Each VC can hold one
-packet. There are two kinds of VCs in the design - control and data. The
-buffer depth in each can be independently controlled from
-GarnetNetwork.py. The default values are 1-flit deep control VCs, and
-4-flit deep data VCs. Default size of control packets is 1-flit, and
-data packets is 5-flit.
+设计中使用了虚拟通道流控制。每个 VC 可以容纳一个数据包。设计中有两种 VC - 控制和数据。每个中的缓冲区深度可以从 GarnetNetwork.py 独立控制。默认值是 1-flit 深的控制 VC，和 4-flit 深的数据 VC。控制数据包的默认大小是 1-flit，数据数据包是 5-flit。
 
-## Router Microarchitecture
+## 路由器微架构
 
-The garnet2.0 router performs the following actions:
+garnet2.0 路由器执行以下操作：
 
-1.  **Buffer Write (BW)**: The incoming flit gets buffered in its VC.
-2.  **Route Compute (RC)** The buffered flit computes its output port,
-    and this information is stored in its VC.
-3.  **Switch Allocation (SA)**: All buffered flits try to reserve the
-    switch ports for the next cycle. \[The allocation occurs in a
-    *separable* manner: First, each input chooses one input VC, using
-    input arbiters, which places a switch request. Then, each output
-    port breaks conflicts via output arbiters\]. All arbiters in ordered
-    virtual networks are *queueing* to maintain point-to-point ordering.
-    All other arbiters are *round-robin*.
-4.  **VC Selection (VS)**: The winner of SA selects a free VC (if
-    HEAD/HEAD_TAIL flit) from its output port.
-5.  **Switch Traversal (ST)**: Flits that won SA traverse the crossbar
-    switch.
-6.  **Link Traversal (LT)**: Flits from the crossbar traverse links to
-    reach the next routers.
+1.  **缓冲区写入 (BW)**: 传入的 flit 被缓冲在其 VC 中。
+2.  **路由计算 (RC)** 缓冲的 flit 计算其输出端口，此信息存储在其 VC 中。
+3.  **交换机分配 (SA)**: 所有缓冲的 flit 尝试为下一个周期预留交换机端口。\[分配以 *可分离* 的方式发生：首先，每个输入使用输入仲裁器选择一个放置交换机请求的输入 VC。然后，每个输出端口通过输出仲裁器解决冲突\]。有序虚拟网络中的所有仲裁器都是 *排队* 的，以维持点对点排序。所有其他仲裁器都是 *轮询* 的。
+4.  **VC 选择 (VS)**: SA 的获胜者从其输出端口选择一个空闲 VC（如果是 HEAD/HEAD_TAIL flit）。
+5.  **交换机遍历 (ST)**: 赢得 SA 的 flit 遍历交叉开关交换机。
+6.  **链路遍历 (LT)**: 来自交叉开关的 flit 遍历链路以到达下一个路由器。
 
-In the default design, BW, RC, SA, VS, and ST all happen in 1-cycle. LT
-happens in the next cycle.
+在默认设计中，BW、RC、SA、VS 和 ST 都发生在 1 个周期内。LT 发生在下一个周期。
 
-**Multi-cycle Router**: Multi-cycle routers can be modeled by specifying
-a per-router latency in the topology file, or changing the default
-router latency in src/mem/ruby/network/BasicRouter.py. This is
-implemented by making a buffered flit wait in the router for (latency-1)
-cycles before becoming eligible for SA.
+**多周期路由器**: 可以通过在拓扑文件中指定每个路由器的延迟，或更改 src/mem/ruby/network/BasicRouter.py 中的默认路由器延迟来模拟多周期路由器。这是通过使缓冲的 flit 在路由器中等待 (latency-1) 个周期才有资格进行 SA 来实现的。
 
-## Buffer Management
+## 缓冲区管理
 
-Each router input port has number_of_virtual_networks Vnets, each
-with vcs_per_vnet VCs. VCs in control Vnets have a depth of
-buffers_per_ctrl_vc (default = 1) and VCs in data Vnets have a depth
-of buffers_per_data_vc (default = 4). **Credits are used to relay
-information about free VCs, and number of buffers within each VC.**
+每个路由器输入端口有 number_of_virtual_networks 个 Vnet，每个 Vnet 有 vcs_per_vnet 个 VC。控制 Vnet 中的 VC 深度为 buffers_per_ctrl_vc (默认 = 1)，数据 Vnet 中的 VC 深度为 buffers_per_data_vc (默认 = 4)。**信用用于传递有关空闲 VC 和每个 VC 内缓冲区数量的信息。**
 
-## Lifecycle of a Network Traversal
+## 网络遍历的生命周期
 
   - NetworkInterface.cc::wakeup()
-      - Every NI connected to one coherence protocol controller on one
-        end, and one router on the other.
-      - receives messages from coherence protocol buffer in appropriate
-        vnet and converts them into network packets and sends them into
-        the network.
-          - garnet2.0 adds the ability to capture a network trace at
-            this point \[under development\].
-      - receives flits from the network, extracts the protocol message
-        and sends it to the coherence protocol buffer in appropriate
-        vnet.
-      - manages flow-control (i.e., credits) with its attached router.
-      - The consuming flit/credit output link of the NI is put in the
-        global event queue with a timestamp set to next cycle. The
-        eventqueue calls the wakeup function in the consumer.
+      - 每个 NI 一端连接到一个一致性协议控制器，另一端连接到一个路由器。
+      - 接收来自一致性协议缓冲区的消息（在适当的 vnet 中），将其转换为网络数据包并发送到网络中。
+          - garnet2.0 添加了此时捕获网络跟踪的能力 \[开发中\]。
+      - 从网络接收 flit，提取协议消息并将其发送到适当 vnet 中的一致性协议缓冲区。
+      - 管理与其连接的路由器的流控制（即信用）。
+      - NI 的消费 flit/信用输出链路被放入全局事件队列，时间戳设置为下一个周期。事件队列调用消费者中的 wakeup 函数。
 
 <!-- end list -->
 
   - NetworkLink.cc::wakeup()
-      - receives flits from NI/router and sends it to NI/router after
-        m_latency cycles delay
-      - Default latency value for every link can be set from command
-        line (see configs/network/Network.py)
-      - Per link latency can be overwritten in the topology file
-      - The consumer of the link (NI/router) is put in the global event
-        queue with a timestamp set after m_latency cycles. The
-        eventqueue calls the wakeup function in the consumer.
+      - 从 NI/路由器接收 flit 并在 m_latency 周期延迟后将其发送到 NI/路由器
+      - 每个链路的默认延迟值可以从命令行设置（参见 configs/network/Network.py）
+      - 每个链路的延迟可以在拓扑文件中覆盖
+      - 链路的消费者（NI/路由器）被放入全局事件队列，时间戳设置为 m_latency 周期后。事件队列调用消费者中的 wakeup 函数。
 
 <!-- end list -->
 
   - Router.cc::wakeup()
-      - Loop through all InputUnits and call their wakeup()
-      - Loop through all OutputUnits and call their wakeup()
-      - Call SwitchAllocator's wakeup()
-      - Call CrossbarSwitch's wakeup()
-      - The router's wakeup function is called whenever any of its
-        modules (InputUnit, OutputUnit, SwitchAllocator, CrossbarSwitch)
-        have a ready flit/credit to act upon this cycle.
+      - 循环遍历所有 InputUnits 并调用其 wakeup()
+      - 循环遍历所有 OutputUnits 并调用其 wakeup()
+      - 调用 SwitchAllocator 的 wakeup()
+      - 调用 CrossbarSwitch 的 wakeup()
+      - 只要路由器的任何模块（InputUnit、OutputUnit、SwitchAllocator、CrossbarSwitch）在此周期有准备好的 flit/信用可操作，就会调用路由器的 wakeup 函数。
 
 <!-- end list -->
 
   - InputUnit.cc::wakeup()
-      - Read input flit from upstream router if it is ready for this
-        cycle
-      - For HEAD/HEAD_TAIL flits, perform route computation, and update
-        route in the VC.
-      - Buffer the flit for (m_latency - 1) cycles and mark it valid
-        for SwitchAllocation starting that cycle.
-          - Default latency for every router can be set from command
-            line (see configs/network/Network.py)
-          - Per router latency (i.e., num pipeline stages) can be set in
-            the topology file.
+      - 如果在本周期准备就绪，则从上游路由器读取输入 flit
+      - 对于 HEAD/HEAD_TAIL flit，执行路由计算，并更新 VC 中的路由。
+      - 缓冲 flit (m_latency - 1) 个周期，并标记为从该周期开始对 SwitchAllocation 有效。
+          - 每个路由器的默认延迟可以从命令行设置（参见 configs/network/Network.py）
+          - 每个路由器的延迟（即流水线级数）可以在拓扑文件中设置。
 
 <!-- end list -->
 
   - OutputUnit.cc::wakeup()
-      - Read input credit from downstream router if it is ready for this
-        cycle
-      - Increment the credit in the appropriate output VC state.
-      - Mark output VC as free if the credit carries is_free_signal as
-        true
+      - 如果在本周期准备就绪，则从下游路由器读取输入信用
+      - 增加适当输出 VC 状态的信用。
+      - 如果信用携带 is_free_signal 为 true，则将输出 VC 标记为空闲
 
 <!-- end list -->
 
   - SwitchAllocator.cc::wakeup()
-      - Note: SwitchAllocator performs VC arbitration and selection
-        within it.
-      - SA-I (or SA-i): Loop through all input VCs at every input port,
-        and select one in a round robin manner.
-          - For HEAD/HEAD_TAIL flits only select an input VC whose
-            output port has at least one free output VC.
-          - For BODY/TAIL flits, only select an input VC that has
-            credits in its output VC.
-      - Place a request for the output port from this VC.
-      - SA-II (or SA-o): Loop through all output ports, and select one
-        input VC (that placed a request during SA-I) as the winner for
-        this output port in a round robin manner.
-          - For HEAD/HEAD_TAIL flits, perform outvc allocation (i.e.,
-            select a free VC from the output port.
-          - For BODY/TAIL flits, decrement a credit in the output vc.
-      - Read the flit out from the input VC, and send it to the
-        CrossbarSwitch
-      - Send a increment_credit signal to the upstream router for this
-        input VC.
-          - for HEAD_TAIL/TAIL flits, mark is_free_signal as true in
-            the credit.
-          - The input unit sends the credit out on the credit link to
-            the upstream router.
-      - Reschedule the Router to wakeup next cycle for any flits ready
-        for SA next cycle.
+      - 注意：SwitchAllocator 在其内部执行 VC 仲裁和选择。
+      - SA-I (或 SA-i): 循环遍历每个输入端口的所有输入 VC，并以轮询方式选择一个。
+          - 对于 HEAD/HEAD_TAIL flit，仅选择其输出端口具有至少一个空闲输出 VC 的输入 VC。
+          - 对于 BODY/TAIL flit，仅选择在其输出 VC 中有信用的输入 VC。
+      - 从此 VC 发出输出端口请求。
+      - SA-II (或 SA-o): 循环遍历所有输出端口，并以轮询方式选择一个输入 VC（在 SA-I 期间发出请求的）作为此输出端口的获胜者。
+          - 对于 HEAD/HEAD_TAIL flit，执行 outvc 分配（即，从输出端口选择一个空闲 VC。
+          - 对于 BODY/TAIL flit，减少输出 vc 中的信用。
+      - 从输入 VC 读出 flit，并将其发送到 CrossbarSwitch
+      - 为此输入 VC 向由上游路由器发送 increment_credit 信号。
+          - 对于 HEAD_TAIL/TAIL flit，在信用中将 is_free_signal 标记为 true。
+          - 输入单元通过信用链路将信用发送到上游路由器。
+      - 重新调度 Router 在下一个周期唤醒，以处理下一个周期准备好进行 SA 的任何 flit。
 
 <!-- end list -->
 
   - CrossbarSwitch.cc::wakeup()
-      - Loop through all input ports, and send the winning flit out of
-        its output port onto the output link.
-      - The consuming flit output link of the router is put in the
-        global event queue with a timestamp set to next cycle. The
-        eventqueue calls the wakeup function in the consumer.
+      - 循环遍历所有输入端口，并将获胜的 flit 从其输出端口发送到输出链路上。
+      - 路由器的消费 flit 输出链路被放入全局事件队列，时间戳设置为下一个周期。事件队列调用消费者中的 wakeup 函数。
 
 <!-- end list -->
 
   - NetworkLink.cc::wakeup()
-      - receives flits from NI/router and sends it to NI/router after
-        m_latency cycles delay
-      - Default latency value for every link can be set from command
-        line (see configs/network/Network.py)
-      - Per link latency can be overwritten in the topology file
-      - The consumer of the link (NI/router) is put in the global event
-        queue with a timestamp set after m_latency cycles. The
-        eventqueue calls the wakeup function in the consumer.
+      - 从 NI/路由器接收 flit 并在 m_latency 周期延迟后将其发送到 NI/路由器
+      - 每个链路的默认延迟值可以从命令行设置（参见 configs/network/Network.py）
+      - 每个链路的延迟可以在拓扑文件中覆盖
+      - 链路的消费者（NI/路由器）被放入全局事件队列，时间戳设置为 m_latency 周期后。事件队列调用消费者中的 wakeup 函数。
 
-## Running Garnet2.0 with Synthetic Traffic
+## 使用合成流量运行 Garnet2.0
 
-Garnet2.0 can be run in a standalone manner and fed with synthetic
-traffic. The details are described here: **[Garnet Synthetic
-Traffic](/documentation/general_docs/ruby/garnet_synthetic_traffic)**
+Garnet2.0 可以以独立方式运行并馈送合成流量。详细信息在此处描述：**[Garnet 合成流量](/documentation/general_docs/ruby/garnet_synthetic_traffic)**

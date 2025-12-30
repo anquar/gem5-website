@@ -1,12 +1,14 @@
 ---
 layout: documentation
-title: "m5 term"
+title: "m5 终端"
 doc: gem5 documentation
 parent: fullsystem
 permalink: /documentation/general_docs/fullsystem/m5term
 ---
-# m5 term
-The m5term program allows the user to connect to the simulated console interface that full-system gem5 provides. Simply change into the util/term directory and build m5term:
+# m5 终端
+
+m5term 程序允许用户连接到全系统 gem5 提供的模拟控制台接口。只需切换到 util/term 目录并构建 m5term：
+
 ```
 % cd gem5/util/term
 % make
@@ -14,27 +16,23 @@ gcc  -o m5term term.c
 % make install
 sudo install -o root -m 555 m5term /usr/local/bin
 ```
-The usage of m5term is:
+
+m5term 的用法是：
+
 ```
 ./m5term <host> <port>
 ```
-	<host> is the host that is running gem5
+	<host> 是运行 gem5 的主机
 
-	<port> is the console port to connect to. gem5 defaults to
-	using port 3456, but if the port is used, it will try the next
-	higher port until it finds one available.
+	<port> 是要连接的控制台端口。gem5 默认使用端口 3456，但如果该端口被使用，它将尝试下一个更高的端口，直到找到一个可用的端口。
 
-	If there are multiple systems running within one simulation,
-	there will be a console for each one.  (The first system's
-	console will be on 3456 and the second on 3457 for example)
+	如果在一个模拟中运行多个系统，每个系统都会有一个控制台。（例如，第一个系统的控制台将在 3456，第二个在 3457）
 
-	m5term uses '~' as an escape character.  If you enter
-	the escape character followed by a '.', the m5term program
-	will exit.
+	m5term 使用 '~' 作为转义字符。如果您输入转义字符后跟 '.'，m5term 程序将退出。
 
-m5term can be used to interactively work with the simulator, though users must often set various terminal settings to get things to work
+m5term 可用于与模拟器进行交互式工作，尽管用户通常必须设置各种终端设置才能使其正常工作
 
-A slightly shortened example of m5term in action:
+m5term 运行的一个稍微简短的示例：
 
 	% m5term localhost 3456
 	==== m5 slave console: Console 0 ====

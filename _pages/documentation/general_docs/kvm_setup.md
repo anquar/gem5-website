@@ -1,94 +1,94 @@
 ---
 layout: page
-title: Setting Up and Using KVM on your machine
+title: 在您的机器上设置和使用 KVM
 permalink: /documentation/general_docs/using_kvm/
 author: Mahyar Samani and Bobby R. Bruce
 ---
 
-Kernel-based Virtual Machine (KVM) is a Linux kernel module allowing creating a virtual machine managed by the kernel.
-On recent x86 and ARM processors, KVM supports hardware-assisted virtualization, enabling running the virtual machine at close to native speed.
-gem5's `KVMCPU` enables this feature in gem5, with the trade-offs being architectual statistics are not being recorded by gem5.
-Some statistics can be optionally gathered via `perf` when using `KVMCPU`, but this option requires `root` permission.
+基于内核的虚拟机 (KVM) 是一个 Linux 内核模块，允许创建由内核管理的虚拟机。
+在最新的 x86 和 ARM 处理器上，KVM 支持硬件辅助虚拟化，使虚拟机能够以接近原生速度运行。
+gem5 的 `KVMCPU` 在 gem5 中启用了此功能，但代价是架构统计信息不会被 gem5 记录。
+使用 `KVMCPU` 时，可以通过 `perf` 可选地收集一些统计信息，但此选项需要 `root` 权限。
 
-In order to use gem5's `KVMCPU` to fast-forward your simulation, you must have a KVM compatible processor and have KVM installed on your machine.
-This page will guide you through the process of enabling KVM on your machine and using it with gem5.
+为了使用 gem5 的 `KVMCPU` 来快进您的模拟，您必须拥有兼容 KVM 的处理器并在您的机器上安装 KVM。
+本页将指导您在机器上启用 KVM 并在 gem5 中使用它。
 
-Note: The following tutorial assumes an X86 Linux host machine.
-Various parts of this tutorial may not be applicable to other architectures or different operating systems.
-At present KVM support is available for X86 and ARM simulations (with respective X86 and ARM hosts).
+注意：以下教程假设使用 X86 Linux 主机。
+本教程的各个部分可能不适用于其他架构或不同的操作系统。
+目前 KVM 支持可用于 X86 和 ARM 模拟（分别使用 X86 和 ARM 主机）。
 
-## Ensuring system compatibility
+## 确保系统兼容性
 
-In order to see if your processor supports hardware virtualization, run the following command:
+要查看您的处理器是否支持硬件虚拟化，请运行以下命令：
 
 ```console
 grep -E -c '(vmx|svm)' /proc/cpuinfo
 ```
 
-If the command returns 0, your processor does not support hardware virtualization.
-If the command returns 1 or more, your processor does support hardware virtualization
+如果命令返回 0，您的处理器不支持硬件虚拟化。
+如果命令返回 1 或更多，您的处理器确实支持硬件虚拟化
 
-You may still have to ensure it is enabled in your bios.
-The processes for doing so varies from depending on manufacturer and model.
-Please consult your motherboard's manual for more information on this.
+您可能仍需要确保在 BIOS 中启用了它。
+执行此操作的过程因制造商和型号而异。
+请查阅您的主板手册以获取更多信息。
 
-Finally, it is recommended that you use a 64-bit kernel on your host machine.
-The limitations of using a 32-bit kernel on your host machine are as follows:
+最后，建议您在主机上使用 64 位内核。
+在主机上使用 32 位内核的限制如下：
 
-* You can only allocate 2GB of memory for your VMs
-* You can only create 32-bit VMs.
+* 您只能为虚拟机分配 2GB 内存
+* 您只能创建 32 位虚拟机。
 
-This can severely limit the usefulness of KVM in for gem5 simulations.
+这可能会严重限制 KVM 在 gem5 模拟中的有用性。
 
-## Enabling KVM
+## 启用 KVM
 
-For KVM to function directly with gem5, the following dependencies must be installed:
+为了让 KVM 直接与 gem5 一起工作，必须安装以下依赖项：
 
 ```console
 sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
 ```
 
-Next, you need to add your user to the `kvm` and `libvirt` groups.
-Run the two commands below:
+接下来，您需要将用户添加到 `kvm` 和 `libvirt` 组。
+运行以下两个命令：
 
 ```console
 sudo adduser `id -un` libvirt
 sudo adduser `id -un` kvm
 ```
 
-After this, you need to leave then re-connect to your account.
-If you are using SSH, disconnect all your session and login again.
-Now if you run the `groups` command below you should see `kvm` and `libvirt`.
+之后，您需要退出然后重新连接到您的帐户。
+如果您使用 SSH，请断开所有会话并重新登录。
+现在，如果您运行下面的 `groups` 命令，您应该看到 `kvm` 和 `libvirt`。
 
-## Proving KVM is working
+## 验证 KVM 是否工作
 
-The "configs/example/gem5_library/x86-ubuntu-run-with-kvm.py" file is a gem5 configuration that will create a simulation which boots a Ubuntu 24.04 image using KVM.
-It can be executed with the following:
+"configs/example/gem5_library/x86-ubuntu-run-with-kvm.py" 文件是一个 gem5 配置，它将创建一个使用 KVM 启动 Ubuntu 24.04 镜像的模拟。
+可以使用以下命令执行：
 
 ```console
 scons build/ALL/gem5.opt -j`nproc`
 ./build/ALL/gem5.opt configs/example/gem5_library/x86-ubuntu-run-with-kvm.py
 ```
 
-If you are using a pre-built gem5 binary, use the following command:
+如果您使用预构建的 gem5 二进制文件，请使用以下命令：
 
 ```console
 gem5 configs/example/gem5_library/x86-ubuntu-run-with-kvm.py
 
 ```
 
-If the simulation runs successfully, you have successfully installed KVM and can use it with gem5.
+如果模拟成功运行，您已成功安装 KVM 并可以在 gem5 中使用它。
 
-## `KVMCPU`, fast-forwarding, and `perf`
+## `KVMCPU`、快进和 `perf`
 
-`perf` is a feature in Linux allowing users to access performance counters.
-By default, `perf` is enabled by `KVMCPU` to collect statistics, such as the number of executed instructions.
-Typically, `perf` requires some system privileges to setup.
-Otherwise, you'll see related permission issues, such as `kernel.perf_event_paranoid` value is too high.
+`perf` 是 Linux 中的一项功能，允许用户访问性能计数器。
+默认情况下，`KVMCPU` 启用 `perf` 以收集统计信息，例如执行的指令数。
+通常，`perf` 需要一些系统权限来设置。
+否则，您会遇到相关的权限问题，例如 `kernel.perf_event_paranoid` 值太高。
 
-However, if you'd like to fast-forward the simulation and do not intent to collect the statistics of the fast-forwarded phase, you can choose not to use `perf` when using `KVMCPU`.
-The `KVMCPU` SimObject has a parameter called `usePerf`, which specifies if the `KVMCPU` should collect statistics using `perf`.
-This option is enabled by default.
+但是，如果您想快进模拟并且不打算收集快进阶段的统计信息，您可以在使用 `KVMCPU` 时选择不使用 `perf`。
+`KVMCPU` SimObject 有一个名为 `usePerf` 的参数，它指定 `KVMCPU` 是否应该使用 `perf` 收集统计信息。
+此选项默认启用。
 
-The following is an example of turning `perf` off,
-[https://github.com/gem5/gem5/blob/stable/configs/example/gem5\_library/x86-ubuntu-run-with-kvm-no-perf.py](https://github.com/gem5/gem5/blob/stable/configs/example/gem5_library/x86-ubuntu-run-with-kvm-no-perf.py).
+以下是关闭 `perf` 的示例，
+[https://github.com/gem5/gem5/blob/stable/configs/example/gem5\_library/x86-ubuntu-run-with-kvm-no-perf.py](https://github.com/gem5/gem5/blob/stable/configs/example/gem5_library/x86-ubuntu-run-with-kvm-no-perf.py)。

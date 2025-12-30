@@ -1,23 +1,23 @@
 ---
 layout: documentation
-title: Debugger-based Debugging
+title: 基于调试器的调试
 doc: gem5 documentation
 parent: debugging
 permalink: /documentation/general_docs/debugging_and_testing/debugging/debugger_based_debugging
 author: Bobby R. Bruce
 ---
 
-# Debugger-based Debugging
+# 基于调试器的调试
 
-If traces alone are not sufficient, you'll need to inspect what gem5 is doing
-in detail using a debugger (e.g., gdb). You definitely want to use the
-`gem5.debug` binary if you reach this point. Ideally, looking at traces should
-at least allow you to narrow down the range of cycles in which you think
-something is going wrong. The fastest way to reach that point is to use a
-`DebugEvent`, which goes on gem5's event queue and forces entry into the
-debugger when the specified cycle is reached by sending the process a `SIGTRAP`
-signal. You'll need to to start gem5 under the debugger or have the debugger
-attached to the gem5 process for this to work.
+如果仅跟踪不够，您需要使用调试器（例如，gdb）详细检查 gem5 正在做什么。
+如果您达到这一点，您肯定想使用
+`gem5.debug` 二进制文件。理想情况下，查看跟踪应该
+至少允许您缩小您认为
+出现问题的时间范围。达到该点的最快方法是使用
+`DebugEvent`，它进入 gem5 的事件队列，并在通过向进程发送 `SIGTRAP`
+信号达到指定周期时强制进入
+调试器。您需要在调试器下启动 gem5 或让调试器
+附加到 gem5 进程才能工作。
 
 You can create one or more DebugEvents when you invoke gem5 using the
 `--debug-break=100` parameter. You can also create new DebugEvents from the

@@ -1,22 +1,22 @@
 ---
 layout: documentation
-title: Trace-based Debugging
+title: 基于跟踪的调试
 doc: gem5 documentation
 parent: debugging
 permalink: /documentation/general_docs/debugging_and_testing/debugging/trace_based_debugging
 author: Bobby R. Bruce
 ---
 
-# Trace-based Debugging
+# 基于跟踪的调试
 
-## Introduction
+## 介绍
 
-The simplest method of debugging is to have gem5 print out traces of what it's
-doing. The simulator contains many DPRINTF statements that print trace messages
-describing potentially interesting events. Each DPRINTF is associated with a
-debug flag (e.g., `Bus`, `Cache`, `Ethernet`, `Disk`, etc.). To turn on the
-messages for a particular flag, use the `--debug-flags` command line argument.
-Multiple flags can be specified by giving a list of strings, e.g.:
+最简单的调试方法是让 gem5 打印出它正在做什么的跟踪。
+模拟器包含许多 DPRINTF 语句，这些语句打印描述潜在有趣事件的跟踪消息。
+每个 DPRINTF 都与一个
+调试标志（例如，`Bus`、`Cache`、`Ethernet`、`Disk` 等）相关联。要打开
+特定标志的消息，请使用 `--debug-flags` 命令行参数。
+可以通过提供字符串列表来指定多个标志，例如：
 
 ```
 build/<ISA>/gem5.opt --debug-flags=Bus,Cache configs/examples/fs.py

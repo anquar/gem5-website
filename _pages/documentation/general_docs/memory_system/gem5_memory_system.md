@@ -1,273 +1,193 @@
 ---
 layout: documentation
-title: "gem5_memory_syste"
+title: "gem5 内存系统"
 doc: gem5 documentation
 parent: memory_system
 permalink: /documentation/general_docs/memory_system/gem5_memory_system/
 author: Djordje Kovacevi
 ---
 
-# The gem5 Memory System
+# gem5 内存系统
 
-The document describes memory subsystem in gem5 with focus on program flow
-during CPU’s simple memory transactions (read or write).
+本文档描述了 gem5 中的内存子系统，重点关注 CPU 简单内存事务（读取或写入）期间的程序流程。
 
-## Model Hierarchy
+## 模型层次结构
 
-Model that is used in this document consists of two out-of-order (O3) ARM v7
-CPUs with corresponding L1 data caches and Simple Memory. It is created by
-running gem5 with the following parameters:
+本文档中使用的模型由两个乱序 (O3) ARM v7 CPU 以及相应的 L1 数据缓存和简单内存组成。它是通过使用以下参数运行 gem5 创建的：
 
 ```
 configs/example/fs.py –-caches –-cpu-type=arm_detailed –-num-cpus=2
 ```
 
-Gem5 uses Simulation Objects derived objects as basic blocks for building
-memory system. They are connected via ports with established master/slave
-hierarchy. Data flow is initiated on master port while the response messages
-and snoop queries appear on the slave port.
+Gem5 使用 Simulation Objects 派生对象作为构建内存系统的基本块。它们通过已建立主/从层次结构的端口连接。数据流在主端口上启动，而响应消息和 snoop 查询出现在从端口上。
 
 
-![Simulation Object hierarchy of the model](/assets/img/gem5_MS_Fig1.PNG)
+![模型的模拟对象层次结构](/assets/img/gem5_MS_Fig1.PNG)
 
 
 ## CPU
 
-Data [Cache](http://doxygen.gem5.org/release/current/classgem5_1_1cache.html) object
-implements a standard cache structure:
+Data [Cache](http://doxygen.gem5.org/release/current/classgem5_1_1cache.html) 对象实现了标准缓存结构：
 
 ![DCache Simulation Objet](/assets/img/gem5_MS_Fig2.PNG)
 
-It is not in the scope of this document to describe O3 CPU model in details, so
-here are only a few relevant notes about the model:
+详细描述 O3 CPU 模型不在本文档的范围内，因此这里仅提供有关该模型的几条相关说明：
 
-**Read access** is initiated by sending message to the port towards DCache
-object. If DCache rejects the message (for being blocked or busy) CPU will
-flush the pipeline and the access will be re-attempted later on. The access is
-completed upon receiving reply message (ReadRep) from DCache.
+**读取访问** 通过向 DCache 对象发送消息来启动。如果 DCache 拒绝该消息（因为被阻塞或忙碌），CPU 将刷新流水线，稍后将重新尝试访问。访问在收到来自 DCache 的回复消息 (ReadRep) 时完成。
 
-**Write access** is initiated by storing the request into store buffer whose
-context is emptied and sent to DCache on every tick. DCache may also reject the
-request. Write access is completed when write reply (WriteRep) message is
-received from DCache.
+**写入访问** 通过将请求存储到存储缓冲区来启动，该缓冲区的上下文在每个 tick 被清空并发送到 DCache。DCache 也可能拒绝该请求。当收到来自 DCache 的写入回复 (WriteRep) 消息时，写入访问完成。
 
-Load & store buffers (for read and write access) don’t impose any restriction
-on the number of active memory accesses. Therefore, the maximum number of
-outstanding CPU’s memory access requests is not limited by CPU Simulation
-Object but by underlying memory system model.
+加载和存储缓冲区（用于读取和写入访问）不对活动内存访问的数量施加任何限制。因此，未完成的 CPU 内存访问请求的最大数量不受 CPU 模拟对象的限制，而是受底层内存系统模型的限制。
 
-**Split memory access** is implemented.
+**拆分内存访问** 已实现。
 
-The message that is sent by CPU contains memory type (Normal, Device, Strongly
-Ordered and cachebility) of the accessed region. However, this is not being
-used by the rest of the model that takes more simplified approach towards
-memory types.
+CPU 发送的消息包含访问区域的内存类型（Normal, Device, Strongly Ordered 和 cachebility）。但是，采用更简化的内存类型方法的模型的其余部分并未使用此信息。
 
-## Data Cache Object
+## 数据缓存对象
 
-Data [Cache](http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) object
-implements a standard cache structure:
+Data [Cache](http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) 对象实现了标准缓存结构：
 
-**Cached memory reads** that match particular cache tag (with Valid & Read
-flags) will be completed (by sending ReadResp to CPU) after a configurable
-time. Otherwise, the request is forwarded to Miss Status and Handling Register
-([MSHR](http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html)) block.
+与特定缓存标记匹配（设置了 Valid 和 Read 标志）的 **缓存内存读取** 将在可配置的时间后完成（通过向 CPU 发送 ReadResp）。否则，请求将转发到 Miss Status and Handling Register ([MSHR](http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html)) 块。
 
-**Cached memory writes** that match particular cache tag (with Valid, Read &
-Write flags) will be completed (by sending WriteResp CPU) after the same
-configurable time. Otherwise, the request is forwarded to Miss Status and
-Handling Register(MSHR) block.
+与特定缓存标记匹配（设置了 Valid、Read 和 Write 标志）的 **缓存内存写入** 将在相同的可配置时间后完成（通过向 CPU 发送 WriteResp）。否则，请求将转发到 Miss Status and Handling Register (MSHR) 块。
 
-**Uncached memory reads** are forwarded to [MSHR](
-http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) block.
+**未缓存的内存读取** 转发到 [MSHR](
+http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) 块。
 
-**Uncached memory writes** are forwarded to WriteBuffer block.
+**未缓存的内存写入** 转发到 WriteBuffer 块。
 
-**Evicted (& dirty) cache lines** are forwarded to WriteBuffer block.
+**被驱逐的（和脏的）缓存行** 转发到 WriteBuffer 块。
 
-CPU’s access to Data [Cache](
-http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) is blocked if any of the
-following is true:
+如果以下任何一项为真，则 CPU 对 Data [Cache](
+http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) 的访问将被阻止：
 
-* [MSHR](http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) block is full.
-(The size of MSHR’s buffer is configurable.)
-* Writeback block is full. (The size of the block’s buffer is configurable.)
-* The number of outstanding memory accesses against the same memory cache line
-has reached configurable threshold value – see [MSHR](
-http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) and Write Buffer for
-details.
+* [MSHR](http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) 块已满。
+（MSHR 缓冲区的大小是可配置的。）
+* Writeback 块已满。（该块的缓冲区大小是可配置的。）
+* 针对同一内存缓存行的未完成内存访问次数已达到可配置的阈值——有关详细信息，请参阅 [MSHR](
+http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) 和 Write Buffer。
 
-Data [Cache](http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) in block
-state will reject any request from slave port (from CPU) regardless of whether
-it would result in cache hit or miss. Note that incoming messages on master
-port (response messages and snoop requests) are never rejected.
+处于阻塞状态的 Data [Cache](http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) 将拒绝来自从端口（来自 CPU）的任何请求，无论它会导致缓存命中还是未命中。请注意，主端口上的传入消息（响应消息和 snoop 请求）永远不会被拒绝。
 
-[Cache](http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) hit on uncachable
-memory region (unpredicted behaviour according to ARM ARM) will invalidate
-cache line and fetch data from memory.
+未缓存内存区域上的 [Cache](http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) 命中（根据 ARM ARM 是不可预测的行为）将使缓存行无效并从内存中获取数据。
 
-### Tags & Data Block
+### 标记和数据块
 
-[Cache](http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) lines (referred as
-blocks in source code) are organised into sets with configurable associativity
-and size. They have the following status flags:
+[Cache](http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) 行（在源代码中称为块）被组织成具有可配置关联性和大小的集合。它们具有以下状态标志：
 
-* **Valid**. It holds data. Address tag is valid
-* **Read**. No read request will be accepted without this flag being set. For
-example, cache line is valid and unreadable when it waits for write flag to
-complete write access.
-* **Write**. It may accept writes. Cache line with Write flags identifies
-Unique state – no other cache memory holds the copy.
-* **Dirty**. It needs Writeback when evicted.
+* **Valid**。它保存数据。地址标记有效
+* **Read**。如果没有设置此标志，将不接受任何读取请求。例如，当缓存行等待写标志完成写访问时，它是有效且不可读的。
+* **Write**。它可以接受写入。带有 Write 标志的缓存行标识 Unique 状态——没有其他缓存内存持有副本。
+* **Dirty**。被驱逐时需要 Writeback。
 
-Read access will hit cache line if address tags match and Valid and Read flags
-are set. Write access will hit cache line if address tags match and Valid, Read
-and Write flags are set.
+如果地址标记匹配并且设置了 Valid 和 Read 标志，则读取访问将命中缓存行。如果地址标记匹配并且设置了 Valid、Read 和 Write 标志，则写入访问将命中缓存行。
 
-### MSHR and Write Buffer Queues
+### MSHR 和写缓冲区队列
 
 Miss Status and Handling Register ([MSHR](
-http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html)) queue holds the list of
-CPU’s outstanding memory requests that require read access to lower memory
-level. They are:
+http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html)) 队列保存 CPU 的未完成内存请求列表，这些请求需要对较低内存级别进行读取访问。它们是：
 
-* Cached Read misses.
-* Cached Write misses.
-* Uncached reads.
+* 缓存读取未命中。
+* 缓存写入未命中。
+* 未缓存读取。
 
-WriteBuffer queue holds the following memory requests:
+WriteBuffer 队列保存以下内存请求：
 
-* Uncached writes.
-* Writeback from evicted (& dirty) cache lines.
+* 未缓存写入。
+* 来自被驱逐（和脏）缓存行的 Writeback。
 
-![MSHR and Write Buffer Blocks](/assets/img/gem5_MS_Fig3.PNG)
+![MSHR 和写缓冲区块](/assets/img/gem5_MS_Fig3.PNG)
 
-Each memory request is assigned to corresponding [MSHR](
-http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) object (READ or WRITE on
-diagram above) that represents particular block (cache line) of memory that has
-to be read or written in order to complete the command(s). As shown on gigure
-above, cached read/writes against the same cache line have a common [MSHR](
-http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) object and will be
-completed with a single memory access.
+每个内存请求都被分配给相应的 [MSHR](
+http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) 对象（上图中的 READ 或 WRITE），该对象代表必须读取或写入以完成命令的特定内存块（缓存行）。如上图所示，针对同一缓存行的缓存读/写共享一个公共 [MSHR](
+http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) 对象，并将通过单个内存访问完成。
 
-The size of the block (and therefore the size of read/write access to lower
-memory) is:
+块的大小（以及对较低内存的读/写访问的大小）是：
 
-* The size of cache line for cached access & writeback;
-* As specified in CPU instruction for uncached access.
+* 对于缓存访问和写回，为缓存行的大小；
+* 对于未缓存访问，为 CPU 指令中指定的大小。
 
-In general, Data [Cache](http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html)
-model distinguishes between just two memory types:
+通常，Data [Cache](http://doxygen.gem5.org/release/current/classgem5_1_1Cache.html) 模型仅区分两种内存类型：
 
-* Normal Cached memory. It is always treated as write back, read and write
-allocate.
-* Normal uncached, Device and Strongly Ordered types are treated equally (as
-uncached memory)
+* 正常的 Cached 内存。它总是被视为写回、读分配和写分配。
+* 正常的未缓存、设备和强有序类型被同等对待（作为未缓存内存）
 
-### Memory Access Ordering
+### 内存访问排序
 
-An unique order number is assigned to each CPU read/write request(as they
-appear on slave port). Order numbers of [MSHR](
-http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) objects are copied from the
-first assigned read/write.
+每个 CPU 读/写请求（当它们出现在从端口时）都被分配一个唯一的序列号。[MSHR](
+http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) 对象的序列号是从第一个分配的读/写复制的。
 
-Memory read/writes from each of these two queues are executed in order
-(according to the assigned order number). When both queues are not empty the
-model will execute memory read from [MSHR](
-http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) block unless WriteBuffer is
-full. It will, however, always preserve the order of read/writes on the same
-(or overlapping) memory cache line (block).
+来自这两个队列中每一个的内存读/写都是按顺序执行的（根据分配的序列号）。当两个队列都不为空时，模型将执行来自 [MSHR](
+http://doxygen.gem5.org/release/current/classgem5_1_1MSHR.html) 块的内存读取，除非 WriteBuffer 已满。但是，它将始终保留同一（或重叠）内存缓存行（块）上的读/写顺序。
 
-In summary:
+总之：
 
-* Order of accesses to cached memory is not preserved unless they target the
-same cache line. For example, the accesses #1, #5 & #10 will complete
-simultaneously in the same tick (still in order). The access #5 will complete
-before #3.
-* Order of all uncached memory writes is preserved. Write#6 always completes
-before Write#13.
-* Order to all uncached memory reads is preserved. Read#2 always completes
-before Read#8.
-* The order of a read and a write uncached access is not necessarily preserved
-unless their access regions overlap. Therefore, Write#6 always completes before
-Read#8 (they target the same memory block). However, Write#13 may complete
-before Read#8.
+* 对缓存内存的访问顺序不被保留，除非它们针对同一个缓存行。例如，访问 #1、#5 和 #10 将在同一个 tick 中同时完成（仍按顺序）。访问 #5 将在 #3 之前完成。
+* 保留所有未缓存内存写入的顺序。Write#6 总是先于 Write#13 完成。
+* 保留所有未缓存内存读取的顺序。Read#2 总是先于 Read#8 完成。
+* 未缓存读写的顺序不一定保留，除非它们的访问区域重叠。因此，Write#6 总是先于 Read#8 完成（它们针对同一个内存块）。但是，Write#13 可能先于 Read#8 完成。
 
-## Coherent Bus Object
+## 一致性总线对象
 
 
-![Coherent Bus Object](/assets/img/gem5_MS_Fig4.PNG)
+![一致性总线对象](/assets/img/gem5_MS_Fig4.PNG)
 
 
-Coherent Bus object provides basic support for snoop protocol:
+Coherent Bus 对象为 snoop 协议提供基本支持：
 
-All requests on the slave port are forwarded to the appropriate master port.
-Requests for cached memory regions are also forwarded to other slave ports (as
-snoop requests).
+从端口上的所有请求都转发到相应的主端口。
+对缓存内存区域的请求也转发到其他从端口（作为 snoop 请求）。
 
-Master port replies are forwarded to the appropriate slave port.
+主端口回复转发到相应的从端口。
 
-Master port snoop requests are forwarded to all slave ports.
+主端口 snoop 请求转发到所有从端口。
 
-Slave port snoop replies are forwarded to the port that was the source of the
-request. (Note that the source of snoop request can be either slave or master
-port.)
+从端口 snoop 回复转发到作为请求源的端口。（请注意，snoop 请求的源可以是主端口或从端口。）
 
-The bus declares itself blocked for a configurable period of time after any of
-the following events:
+在发生以下任何事件后，总线会在可配置的时间段内声明自己处于阻塞状态：
 
-* A packet is sent (or failed to be sent) to a slave port.
-* A reply message is sent to a master port.
-* Snoop response from one slave port is sent to another slave port.
+* 数据包被发送（或未能发送）到从端口。
+* 回复消息被发送到主端口。
+* snoop 响应从一个从端口发送到另一个从端口。
 
-The bus in blocked state rejects the following incoming messages:
+处于阻塞状态的总线拒绝以下传入消息：
 
-* Slave port requests.
-* Master port replies.
-* Master port snoop requests.
+* 从端口请求。
+* 主端口回复。
+* 主端口 snoop 请求。
 
-## Simple Memory Object
+## 简单内存对象
 
-It never blocks the access on slave port.
+它从不阻止从端口上的访问。
 
-Memory read/write takes immediate effect. (Read or write is performed when the
-request is received).
+内存读/写立即生效。（收到请求时执行读取或写入）。
 
-Reply message is sent after a configurable period of time .
+回复消息在可配置的时间段后发送。
 
-## Message Flow
+## 消息流
 
-### Memory Access Ordering
+### 内存访问排序
 
-The following diagram shows read access that hits Data Cache line with Valid
-and Read flags:
+下图显示了命中具有 Valid 和 Read 标志的 Data Cache 行的读取访问：
 
-![Read Hit(Read flag must be set in cache line)](/assets/img/gem5_MS_Fig5.PNG)
+![Read Hit (必须在缓存行中设置 Read 标志)](/assets/img/gem5_MS_Fig5.PNG)
 
-Cache miss read access will generate the following sequence of messages:
+缓存未命中读取访问将生成以下消息序列：
 
 ![Read Miss with snoop reply](/assets/img/gem5_MS_Fig6.PNG)
 
-Note that bus object never gets response from both DCache2 and Memory object.
-It sends the very same ReadReq package (message) object to memory and data
-cache. When Data Cache wants to reply on snoop request it marks the message
-with MEM_INHIBIT flag that tells Memory object not to process the message.
+请注意，总线对象永远不会从 DCache2 和 Memory 对象都获得响应。它将完全相同的 ReadReq 包（消息）对象发送到内存和数据缓存。当 Data Cache 想要回复 snoop 请求时，它会用 MEM_INHIBIT 标志标记消息，该标志告诉 Memory 对象不要处理该消息。
 
-### Memory Access Ordering
+### 内存访问排序
 
-The following diagram shows write access that hits DCache1 cache line with
-Valid & Write flags:
+下图显示了命中具有 Valid 和 Write 标志的 DCache1 缓存行的写入访问：
 
-![Write Hit (with Write flag set in cache line)](/assets/img/gem5_MS_Fig7.PNG)
+![Write Hit (缓存行中设置了 Write 标志)](/assets/img/gem5_MS_Fig7.PNG)
 
-Next figure shows write access that hits DCache1 cache line with Valid but no
-Write flags – which qualifies as write miss. DCache1 issues UpgradeReq to
-obtain write permission. DCache2::snoopTiming will invalidate cache line that
-has been hit. Note that UpgradeResp message doesn’t carry data.
+下图显示了命中具有 Valid 但没有 Write 标志的 DCache1 缓存行的写入访问——这符合写入未命中的条件。DCache1 发出 UpgradeReq 以获得写入权限。DCache2::snoopTiming 将使被命中的缓存行无效。请注意，UpgradeResp 消息不携带数据。
 
-![Write Miss – matching tag with no Write flag](/assets/img/gem5_MS_Fig8.PNG)
+![Write Miss – 匹配标记但没有 Write 标志](/assets/img/gem5_MS_Fig8.PNG)
 
-The next diagram shows write miss in DCache. ReadExReq invalidates cache line
-in DCache2. ReadExResp carries the content of memory cache line.
+下图显示了 DCache 中的写入未命中。ReadExReq 使 DCache2 中的缓存行无效。ReadExResp 携带内存缓存行的内容。
 
-![Miss - no matching tag](/assets/img/gem5_MS_Fig9.PNG)
+![Miss - 没有匹配的标记](/assets/img/gem5_MS_Fig9.PNG)

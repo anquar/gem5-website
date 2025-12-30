@@ -1,10 +1,10 @@
 ---
 layout: documentation
-title: Debugging and Testing
+title: 调试与测试
 doc: Debugging and Testing
 parent: debugging
 permalink: /documentation/general_docs/debugging_and_testing/
 author: Bobby R. Bruce
 ---
 
-TODO
+待办事项

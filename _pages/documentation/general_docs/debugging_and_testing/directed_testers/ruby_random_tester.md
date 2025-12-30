@@ -1,24 +1,24 @@
 ---
 layout: documentation
-title: Ruby Random Tester
+title: Ruby 随机测试器
 doc: gem5 documentation
 parent: directed_testers
 permalink: /documentation/general_docs/debugging_and_testing/directed_testers/ruby_random_tester/
 author: Bobby R. Bruce
 ---
 
-# Ruby Random Tester
+# Ruby 随机测试器
 
-A cache coherence protocol usually has several different types of state
-machines, with state machine having several different states. For example, the
-`MESI CMP` directory protocol has four different state machines (`L1`, `L2`,
-`directory`, `dma`). Testing such a protocol for functional correctness is a
-challenging task. gem5 provides a random tester for testing coherence
-protocols. It is called the Ruby Random Tester. The source files related to the
-tester are present in the directory `src/cpu/testers/rubytest`. The file
-`configs/examples/ruby_random_test.py` is used for configuration and execution
-of the test. For example, the following command can be used for testing a
-protocol:
+缓存一致性协议通常有几种不同类型的状态
+机，状态机有几种不同的状态。例如，
+`MESI CMP` 目录协议有四种不同的状态机（`L1`、`L2`、
+`directory`、`dma`）。测试这样的协议的功能正确性是一个
+具有挑战性的任务。gem5 提供了一个随机测试器来测试一致性
+协议。它被称为 Ruby 随机测试器。与测试器相关的源文件
+位于目录 `src/cpu/testers/rubytest` 中。文件
+`configs/examples/ruby_random_test.py` 用于配置和执行
+测试。例如，以下命令可用于测试
+协议：
 
 ```bash
 ./build/NULL/gem5.fast ./configs/example/ruby_random_test.py

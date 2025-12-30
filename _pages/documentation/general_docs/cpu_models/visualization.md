@@ -1,34 +1,34 @@
 ---
 layout: documentation
-title: "Visualization"
+title: "可视化"
 doc: gem5 documentation
 parent: cpu_models
 permalink: /documentation/general_docs/cpu_models/visualization/
 ---
 
-# Visualization
-This page contains information about different types of information visualization that is integrated or can be used with gem5.
+# 可视化
+本页面包含有关集成的或可与 gem5 一起使用的不同类型信息可视化的信息。
 
-## O3 Pipeline Viewer
-The o3 pipeline viewer is a text based viewer of the out-of-order CPU pipeline. It shows when instructions are fetched (f), decoded (d), renamed (n), dispatched (p), issued (i), completed (c), and retired (r). It is very useful for understanding where the pipeline is stalling or squashing in a reasonable small sequence of code. Next to the colorized viewer that wraps around is the tick the current instruction retired, the pc of that instruction, it's disassembly, and the o3 sequence number for that instruction.
+## O3 流水线查看器
+o3 流水线查看器是乱序 CPU 流水线的基于文本的查看器。它显示指令何时被取指 (f)、解码 (d)、重命名 (n)、分派 (p)、发出 (i)、完成 (c) 和退休 (r)。这对于理解流水线在合理的代码小序列中在哪里停顿或挤压非常有用。在环绕的彩色查看器旁边是当前指令退休的 tick、该指令的 pc、它的反汇编以及该指令的 o3 序列号。
 
 ![o3pipeviewer](/assets/img/O3pipeview.png)
 
-To generate output line you see above you first need to run an experiment with the o3 cpu:
+要生成您在上面看到的输出行，您首先需要使用 o3 cpu 运行实验：
 
 ```./build/ARM/gem5.opt --debug-flags=O3PipeView --debug-start=<first tick of interest> --debug-file=trace.out configs/example/se.py --cpu-type=detailed --caches -c <path to binary> -m <last cycle of interest>```
 
-Then you can run the script to generate a trace similar to the above (500 is the number of ticks per clock (2GHz) in this case):
+然后您可以运行脚本以生成类似于上面的 trace（在本例中 500 是每个时钟 (2GHz) 的 tick 数）：
 
 ```./util/o3-pipeview.py -c 500 -o pipeview.out --color m5out/trace.out```
 
-You can view the output in color by piping the file through less:
+您可以通过将文件通过 less 管道传输来查看彩色输出：
 
 ```less -r pipeview.out```
 
-When CYCLE_TIME (-c) is wrong, Right square brackets in output may not aligned to the same column. Default value of CYCLE_TIME is 1000. Be careful.
+当 CYCLE_TIME (-c) 错误时，输出中的右方括号可能无法对齐到同一列。CYCLE_TIME 的默认值为 1000。请小心。
 
-The script has some additional integrated help: (type ‘./util/o3-pipeview.py --help’ for help).
+该脚本有一些额外的集成帮助：（键入 ‘./util/o3-pipeview.py --help’ 获取帮助）。
 
-## Minor Viewer
-The [new page](minor_view) on minor viewer is yet to be made, refer to [old page](http://pages.cs.wisc.edu/~swilson/gem5-docs/minor.html#trace) for documentation.
+## Minor 查看器
+关于 minor 查看器的 [新页面](minor_view) 尚未制作，请参阅 [旧页面](http://pages.cs.wisc.edu/~swilson/gem5-docs/minor.html#trace) 以获取文档。

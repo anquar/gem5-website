@@ -1,53 +1,52 @@
 ---
 layout: documentation
-title: Statistics API
+title: 统计信息 API
 parent: statistics
 doc: gem5 documentation
 permalink: /documentation/general_docs/statistics/api
 ---
 
-# Statistics APIs
+# 统计信息 API
 
-## Contents
-1. [General Statistics Functions](#general-statistics-functions)
-2. [Stats::Group - Statistics Container](#stats_group-statistics-container)
-3. [Stats Flags](#stats-flags)
-4. [Statistic Classes](#statistics-classes)
-5. [Appendix: Migrating to the new style of tracking statistics](#appendix_migrating-to-the-new-style-of-tracking-statistics)
+## 目录
+1. [通用统计信息函数](#general-statistics-functions)
+2. [Stats::Group - 统计信息容器](#stats_group-statistics-container)
+3. [统计信息标志](#stats-flags)
+4. [统计信息类](#statistics-classes)
+5. [附录：迁移到新的统计信息跟踪样式](#appendix_migrating-to-the-new-style-of-tracking-statistics)
 
 ---
 
-## General Statistics Functions
+## 通用统计信息函数
 
-| Function signatures                                 | Descriptions                                                           |
+| 函数签名                                 | 描述                                                           |
 |-----------------------------------------------------|------------------------------------------------------------------------|
-|`void Stats::dump()`                                 | Dump all stats to registered outputs, e.g. stats.txt.                  |
-|`void Stats::reset()`                                | Reset stats.                                                           |
+|`void Stats::dump()`                                 | 将所有统计信息转储到注册的输出，例如 stats.txt。                  |
+|`void Stats::reset()`                                | 重置统计信息。                                                           |
 
 ---
 
-## Stats::Group - Statistics Container
-Typically, a statistic object can be placed in any `SimObject` as a class variable.
-However, [a recent update](https://gem5-review.googlesource.com/c/public/gem5/+/19368)
-addresses the hierarchical nature of `SimObject` 's in gem5,
-which in turns makes the statistics of the objects hierarchical.
-The update introduces the `Stats::Group` class, which is a statistics container
-and is aware of the hierarchical structure of `SimObject`'s.
-Ideally, this container should contain all stats in a `SimObject`.
+## Stats::Group - 统计信息容器
+通常，统计信息对象可以作为类变量放置在任何 `SimObject` 中。
+但是，[最近的更新](https://gem5-review.googlesource.com/c/public/gem5/+/19368)
+解决了 gem5 中 `SimObject` 的层次结构性质，
+这反过来使对象的统计信息具有层次结构。
+该更新引入了 `Stats::Group` 类，它是一个统计信息容器
+并且了解 `SimObject` 的层次结构。
+理想情况下，此容器应包含 `SimObject` 中的所有统计信息。
 
-**Note**: If you decide to use a `Stats::Group` struct inside of a `SimObject`,
-there are typically two ways of doing this:
-- Create a subgroup using `Stats::Group(Stats::Group &parent, const std::string &name)` constructor. This is useful when it is desired to have multiple instances of the same stats structure.
-- Using `Stats::Group(Stats::Group &parent)` constructor, which merges (i.e. adds) the stats of the current group to the parent group. Thus, the stats added to the current group behave as if they were added to the parent group.
+**注意**：如果您决定在 `SimObject` 内使用 `Stats::Group` 结构体，
+通常有两种方法：
+- 使用 `Stats::Group(Stats::Group &parent, const std::string &name)` 构造函数创建子组。当需要同一统计信息结构的多个实例时，这很有用。
+- 使用 `Stats::Group(Stats::Group &parent)` 构造函数，它将当前组的统计信息合并（即添加）到父组。因此，添加到当前组的统计信息的行为就像它们被直接添加到父组一样。
 
-### Stats::Group macros
+### Stats::Group 宏
 ##### `#define ADD_STAT(n, ...) n(this, # n, __VA_ARGS__)`
-Convenience macro to add a stat to a statistics group.
+用于向统计信息组添加统计信息的便捷宏。
 
-This macro is used to add a stat to a Stats::Group in the
-initilization list in the Group's constructor. The macro
-automatically assigns the stat to the current group and gives it
-the same name as in the class. For example:
+此宏用于在 Group 构造函数的初始化列表中将统计信息添加到 Stats::Group。该宏
+自动将统计信息分配给当前组并为其提供
+与类中相同的名称。例如：
 ```
 struct MyStats : public Stats::Group
 {
@@ -56,7 +55,7 @@ struct MyStats : public Stats::Group
 
     MyStats(Stats::Group *parent)
         : Stats::Group(parent),
-          ADD_STAT(scalar0, "Description of scalar0"),       // equivalent to scalar0(this, "scalar0", "Description of scalar0"), where scalar0 has the follwing constructor
+          ADD_STAT(scalar0, "Description of scalar0"),       // 等价于 scalar0(this, "scalar0", "Description of scalar0")，其中 scalar0 具有以下构造函数
                                                              // Stats::Scalar(Group *parent = nullptr, const char *name = nullptr, const char *desc = nullptr)
           scalar1(this, "scalar1", "Description of scalar1")
      {
@@ -65,128 +64,127 @@ struct MyStats : public Stats::Group
 ```
 
 
-### Stats::Group functions
+### Stats::Group 函数
 ##### `Group(Group *parent, const char *name = nullptr)`
-Construct a new statistics group.
+构造一个新的统计信息组。
 
-The constructor takes two parameters, a parent and a name. The
-parent group should typically be specified. However, there are
-special cases where the parent group may be null. One such
-special case is SimObjects where the Python code performs late
-binding of the group parent.
+构造函数接受两个参数：父组和名称。
+通常应指定父组。但是，有一些
+特殊情况，父组可能为 null。一个这样的
+特殊情况是 SimObjects，其中 Python 代码执行
+组父级的后期绑定。
 
-If the name parameter is NULL, the group gets merged into the
-parent group instead of creating a sub-group. Stats belonging
-to a merged group behave as if they have been added directly to
-the parent group.
+如果 name 参数为 NULL，组将合并到
+父组而不是创建子组。属于
+合并组的统计信息的行为就像它们被直接添加到
+父组一样。
 
 ##### `virtual void regStats()`
-Callback to set stat parameters.
+用于设置统计信息参数的回调。
 
-This callback is typically used for complex stats (e.g.,
-distributions) that need parameters in addition to a name and a
-description. In the case stats objects cannot be initilalized
-in the constructor (such as the stats that keep track of the
-bus masters, which only can be discovered after the entire
-system is instantiated). Stat names and descriptions should
-typically be set from the constructor using the `ADD_STAT` macro.
+此回调通常用于复杂的统计信息（例如，
+分布），除了名称和
+描述之外还需要参数。在统计信息对象无法在
+构造函数中初始化的情况下（例如跟踪
+总线主控器的统计信息，只有在整个
+系统实例化后才能发现）。统计信息名称和描述应该
+通常使用 `ADD_STAT` 宏从构造函数中设置。
 
 ##### `virtual void resetStats()`
-Callback to reset stats.
+用于重置统计信息的回调。
 
 ##### `virtual void preDumpStats()`
-Callback before stats are dumped. This can be overridden by
-objects that need to perform calculations in addition to the
-capabiltiies implemented in the stat framework.
+在转储统计信息之前的回调。这可以被
+需要在统计信息框架实现的功能之外执行计算的对象覆盖。
 
 ##### `void addStat(Stats::Info *info)`
-Register a stat with this group. This method is normally called
-automatically when a stat is instantiated.
+向此组注册统计信息。此方法通常在
+实例化统计信息时自动调用。
 
 ##### `const std::map<std::string, Group *> &getStatGroups() const`
-Get all child groups associated with this object.
+获取与此对象关联的所有子组。
 
 ##### `const std::vector<Info *> &getStats() const`
-Get all stats associated with this object.
+获取与此对象关联的所有统计信息。
 
 ##### `void addStatGroup(const char *name, Group *block)`
-Add a stat block as a child of this block.
+将统计信息块添加为此块的子项。
 
-This method may only be called from a Group constructor or from
-regStats. It's typically only called explicitly from Python
-when setting up the SimObject hierarchy.
+此方法只能从 Group 构造函数或从
+regStats 调用。它通常只在从 Python
+设置 SimObject 层次结构时显式调用。
 
 ##### `const Info * resolveStat(std::string name) const`
-Resolve a stat by its name within this group.
+在此组中按名称解析统计信息。
 
-This method goes through the stats in this group and sub-groups
-and returns a pointer to the the stat that matches the provided
-name. The input name has to be relative to the name of this
-group.
+此方法遍历此组和子组中的统计信息
+并返回与提供的
+名称匹配的统计信息的指针。输入名称必须相对于此
+组的名称。
 
-For example, if this group is the `SimObject
-system.bigCluster.cpus` and we want the stat
-`system.bigCluster.cpus.ipc`, the input param should be the
-string "ipc".
+例如，如果此组是 `SimObject
+system.bigCluster.cpus` 并且我们想要统计信息
+`system.bigCluster.cpus.ipc`，输入参数应该是
+字符串 "ipc"。
 
 ---
 
-## Stats Flags
+## 统计信息标志
 
-| Flags            | Descriptions                                                   |
+| 标志            | 描述                                                   |
 |------------------|----------------------------------------------------------------|
-| `Stats::none`    | Nothing extra to print.                                        |
-| `Stats::total`   | Print the total.                                               |
-| `Stats::pdf`     | Print the percent of the total that this entry represents.     |
-| `Stats::cdf`     | Print the cumulative percentage of total upto this entry.      |
-| `Stats::dist`    | Print the distribution.                                        |
-| `Stats::nozero`  | Don't print if this is zero.                                   |
-| `Stats::nonan`   | Don't print if this is NAN                                     |
-| `Stats::oneline` | Print all values on a single line. Useful only for histograms. |
+| `Stats::none`    | 不打印额外内容。                                        |
+| `Stats::total`   | 打印总和。                                               |
+| `Stats::pdf`     | 打印此条目占总数的百分比。     |
+| `Stats::cdf`     | 打印到此条目为止的累积百分比。      |
+| `Stats::dist`    | 打印分布。                                        |
+| `Stats::nozero`  | 如果为零则不打印。                                   |
+| `Stats::nonan`   | 如果为 NAN 则不打印                                     |
+| `Stats::oneline` | 在单行上打印所有值。仅对直方图有用。 |
 
-Note: even though the flags `Stats::init` and `Stats::display` are available, the flags
-are not allowed to be set by users.
+注意：尽管标志 `Stats::init` 和 `Stats::display` 可用，但这些标志
+不允许由用户设置。
 
 ---
 
-## Statistics Classes
+## 统计信息类
 
-| Class names                                         | Descriptions                                                            |
+| 类名                                         | 描述                                                            |
 |-----------------------------------------------------|-------------------------------------------------------------------------|
-| [`Stats::Scalar`](#statsscalar)                     | Simple scalar statistic.                                                |
-| [`Stats::Average`](#statsaverage)                   | A statistic that calculate the PER TICK average of a value.             |
-| [`Stats::Value`](#statsvalue)                       | Similar to Stats::Scalar.                                               |
-| [`Stats::Vector`](#statsvector)                     | A vector of scalar statistics.                                          |
-| [`Stats::AverageVector`](#statsaveragevector)       | A vector of average statistics.                                         |
-| [`Stats::Vector2d`](#statsvector2d)                 | A 2D vector of scalar statistics.                                       |
-| [`Stats::Distribution`](#statsdistribution)         | A simple distribution statistic (having convinient min, max sum, etc.). |
-| [`Stats::Histogram`](#statshistogram)               | A simple histogram statistic (keeping the frequencies of equally-splitted continuous ranges). |
-| [`Stats::SparseHistogram`](#statssparsehistogram)   | Keeps the frequency / histogram of a collection of discrete values.     |
-| [`Stats::StandardDeviation`](#statsstandarddeviation)| Calculates the mean and variance of all samples.                       |
-| [`Stats::AverageDeviation`](#statsaveragedeviation) | Calculates per tick mean and variance of samples.                       |
-| [`Stats::VectorDistribution`](#statsvectordistribution)| A vector of distributions.                                           |
-| [`Stats::VectorStandardDeviation`](#statsvectorstandarddeviation)| A vector of standard deviation statistics.                 |
-| [`Stats::VectorAverageDeviation`](#statsvectoraveragedeviation)| A vector of average deviation statistics.                    |
-| [`Stats::Formula`](#statsformula)                   | Keeps the statistic involving arithmetics of multiple stats objects.    |
+| [`Stats::Scalar`](#statsscalar)                     | 简单标量统计信息。                                                |
+| [`Stats::Average`](#statsaverage)                   | 计算值的每 TICK 平均值的统计信息。             |
+| [`Stats::Value`](#statsvalue)                       | 类似于 Stats::Scalar。                                               |
+| [`Stats::Vector`](#statsvector)                     | 标量统计信息的向量。                                          |
+| [`Stats::AverageVector`](#statsaveragevector)       | 平均值统计信息的向量。                                         |
+| [`Stats::Vector2d`](#statsvector2d)                 | 标量统计信息的二维向量。                                       |
+| [`Stats::Distribution`](#statsdistribution)         | 简单分布统计信息（具有方便的 min、max、sum 等）。 |
+| [`Stats::Histogram`](#statshistogram)               | 简单直方图统计信息（保持等分连续范围的频率）。 |
+| [`Stats::SparseHistogram`](#statssparsehistogram)   | 保持离散值集合的频率/直方图。     |
+| [`Stats::StandardDeviation`](#statsstandarddeviation)| 计算所有样本的均值和方差。                       |
+| [`Stats::AverageDeviation`](#statsaveragedeviation) | 计算每 tick 的样本均值和方差。                       |
+| [`Stats::VectorDistribution`](#statsvectordistribution)| 分布的向量。                                           |
+| [`Stats::VectorStandardDeviation`](#statsvectorstandarddeviation)| 标准差统计信息的向量。                 |
+| [`Stats::VectorAverageDeviation`](#statsvectoraveragedeviation)| 平均偏差统计信息的向量。                    |
+| [`Stats::Formula`](#statsformula)                   | 保持涉及多个统计信息对象的算术运算的统计信息。    |
 
-**Note:** `Stats::Average` only calculates the average of a scalar over the number of simulated ticks.
-In order to get the average of quantity A over quantity B, `Stats::Formula` can be utilized.
-For example,
+**注意**：`Stats::Average` 仅计算标量在模拟 tick 数上的平均值。
+为了获得数量 A 相对于数量 B 的平均值，可以使用 `Stats::Formula`。
+例如，
 ```C++
 Stats::Scalar totalReadLatency;
 Stats::Scalar numReads;
 Stats::Formula averageReadLatency = totalReadLatency/numReads;
 ```
 
-### Common statistic functions
+### 通用统计信息函数
 
-| Function signatures                                 | Descriptions                                                           |
+| 函数签名                                 | 描述                                                           |
 |-----------------------------------------------------|------------------------------------------------------------------------|
-|`StatClass name(const std::string &name)`            | sets the statistic name, marks the stats to be printed                 |
-|`StatClass desc(const std::string &_desc)`           | sets the description for the statistic                                 |
-|`StatClass precision(int _precision)`                | sets the precision of the statistic                                    |
-|`StatClass flags(Flags _flags)`                      | sets the flags                                                         |
-|`StatClass prereq(const Stat &prereq)`               | sets the prerequisite stat                                             |
+|`StatClass name(const std::string &name)`            | 设置统计信息名称，标记要打印的统计信息                 |
+|`StatClass desc(const std::string &_desc)`           | 设置统计信息的描述                                 |
+|`StatClass precision(int _precision)`                | 设置统计信息的精度                                    |
+|`StatClass flags(Flags _flags)`                      | 设置标志                                                         |
+|`StatClass prereq(const Stat &prereq)`               | 设置先决条件统计信息                                             |
 
 ### `Stats::Scalar`
 Storing a signed integer statistic.
@@ -411,60 +409,60 @@ Stats::Formula averageReadLatency = totalReadLatency/numReads;
 
 ---
 
-## Appendix. Migrating to the new style of tracking statistics
+## 附录：迁移到新的统计信息跟踪样式
 
-### A new style of tracking statistics
-gem5 statistics have a flat structure that are not aware of the hierarchical structure of `SimObject`, which usually contains stat objects.
-This causes the problem of different stats having the same name, and more importantly, it was not trivial to manipulating the structure of gem5 statistics.
-Also, gem5 did not offer a way to group a collection of stat objects into different groups, which is important to maintain a large number of stat objects.
+### 新的统计信息跟踪样式
+gem5 统计信息具有扁平结构，不了解 `SimObject` 的层次结构，而 `SimObject` 通常包含统计信息对象。
+这导致不同统计信息具有相同名称的问题，更重要的是，操作 gem5 统计信息的结构并不简单。
+此外，gem5 没有提供将统计信息对象集合分组到不同组的方法，这对于维护大量统计信息对象很重要。
 
-[A recent commit](https://gem5-review.googlesource.com/c/public/gem5/+/19368) introduces `Stats::Group`, a structure intended to keep all statistics belong to an object.
-The new structure offers an explicit way to reflect the hierarchical nature of `SimObject`
-`Stats::Group` also makes it more explicit and easier to maintain a large set of `Stats` objects that should be grouped into different collections as one can make several `Stats::Group`'s in a `SimObject` and merges them to the `SimObject`, which is also a `Stats::Group` that is aware of its children `Stats::Group`'s.
+[最近的提交](https://gem5-review.googlesource.com/c/public/gem5/+/19368)引入了 `Stats::Group`，这是一个旨在保存属于对象的所有统计信息的结构。
+新结构提供了一种明确的方式来反映 `SimObject` 的层次结构性质
+`Stats::Group` 还使维护大量应分组到不同集合的 `Stats` 对象更加明确和容易，因为可以在 `SimObject` 中创建多个 `Stats::Group` 并将它们合并到 `SimObject`，`SimObject` 也是一个了解其子 `Stats::Group` 的 `Stats::Group`。
 
-Generally, this is a step towards a more structured `Stats` format, which should facilitate the process of manipulating the overall structure of statistics in gem5, such as filtering out statistics and producing `Stats` to more standardized formats such as JSON and XML, which, in turns, have an enormous amount of supported libraries in a variety of programming languages.
+总的来说，这是朝着更结构化的 `Stats` 格式迈出的一步，这将有助于操作 gem5 中统计信息的整体结构，例如过滤统计信息并将 `Stats` 生成更标准化的格式，如 JSON 和 XML，这些格式反过来在各种编程语言中都有大量支持的库。
 
-### Migrating to the new style of tracking statistics
+### 迁移到新的统计信息跟踪样式
 
-*Notes*: Migrating to the new style is highly encouraged; however, the legacy style of statistics (i.e. the one with a flat structure) is still supported.
+*注意*：强烈建议迁移到新样式；但是，旧样式的统计信息（即具有扁平结构的样式）仍然受支持。
 
-This guide provides a broad look of how to migrate to the new style of gem5 statistics tracking, as well as points out some concrete examples showing how it is being done.
+本指南提供了如何迁移到 gem5 统计信息跟踪新样式的广泛概述，并指出了一些显示如何完成此操作的具体示例。
 
 #### `ADD_STAT`
-`ADD_STAT` is a macro defined as,
+`ADD_STAT` 是一个定义为以下内容的宏，
 ```C++
 #define ADD_STAT(n, ...) n(this, # n, __VA_ARGS__)
 ```
-This macro is intended to be used in `Stats::Group` constructors to initilize a `Stats` object.
-In other words, `ADD_STAT` is an alias for caling `Stats` object constructors.
-For example, `ADD_STAT(stat_name, stat_desc)` is the same as,
+此宏旨在在 `Stats::Group` 构造函数中使用以初始化 `Stats` 对象。
+换句话说，`ADD_STAT` 是调用 `Stats` 对象构造函数的别名。
+例如，`ADD_STAT(stat_name, stat_desc)` 等同于，
 ```
-  stat_name.parent = the `Stats::Group` where stat_name is defined
+  stat_name.parent = 定义 stat_name 的 `Stats::Group`
   stat_name.name = "stat_name"
   stat_name.desc = "stat_desc"
 ```
-This is applicable for most of `Stats` data types with an exception that for `Stats::Formula`, the macro `ADD_STAT` can handle an optional parameter specifying the formula.
-For example, `ADD_STAT(ips, "Instructions per Second", n_instructions/sim_seconds)`.
+这适用于大多数 `Stats` 数据类型，但 `Stats::Formula` 例外，宏 `ADD_STAT` 可以处理指定公式的可选参数。
+例如，`ADD_STAT(ips, "Instructions per Second", n_instructions/sim_seconds)`。
 
 
-An example use case of `ADD_STAT` (and we refer to this example as "**Example 1**" throughout this section).
-This example is also served as a template of constructing a `Stats::Group` struct.
+`ADD_STAT` 的示例用例（我们在本节中将此示例称为"**示例 1**"）。
+此示例还用作构造 `Stats::Group` 结构体的模板。
 ```C++
     protected:
-        // Defining the a stat group
+        // 定义统计信息组
         struct StatGroup : public Stats::Group
         {
-            StatGroup(Stats::Group *parent); // constructor
+            StatGroup(Stats::Group *parent); // 构造函数
             Stats::Histogram histogram;
             Stats::Scalar scalar;
             Stats::Formula formula;
         } stats;
 
-    // Defining the declared constructor
+    // 定义声明的构造函数
     StatGroup::StatGroup(Stats::Group *parent)
-      : Stats::Group(parent),                           // initilizing the base class
+      : Stats::Group(parent),                           // 初始化基类
         ADD_STAT(histogram, "A useful histogram"),
-        scalar(this, "scalar", "A number"),             // this is the same as ADD_STAT(scalar, "A number")
+        scalar(this, "scalar", "A number"),             // 这与 ADD_STAT(scalar, "A number") 相同
         ADD_STAT(formula, "A formula", scalar1/scalar2)
     {
         histogram
@@ -475,17 +473,17 @@ This example is also served as a template of constructing a `Stats::Group` struc
     }
 ```
 
-#### Moving to the new style
-Those are concrete examples of converting stats to the new style: [here](https://gem5-review.googlesource.com/c/public/gem5/+/19370), [here](https://gem5-review.googlesource.com/c/public/gem5/+/19371) and [here](https://gem5-review.googlesource.com/c/public/gem5/+/32794).
+#### 迁移到新样式
+这些是将统计信息转换为新样式的具体示例：[here](https://gem5-review.googlesource.com/c/public/gem5/+/19370)、[here](https://gem5-review.googlesource.com/c/public/gem5/+/19371) 和 [here](https://gem5-review.googlesource.com/c/public/gem5/+/32794)。
 
-Moving stats to the new style involves:
-  - Creating a struct `Stats::Group`, and moving all stats variables there. This struct's scope should be `protected`. The declaration of stat variables is usually in the header files.
-  - Getting rid of `regStats()`, and moving the initialzation of stat variables to `Stats::Group` constructor as shown in **Example 1**.
-  - In both header files and cpp files, all stats variables should be pre-appended by the newly created `Stats::Group` name as the stats are now under the `Stats::Group` struct.
-  - Updating the class constructors to initialize `Stats::Group` variable. Usually, it's adding `stats(this)` to the constructors assuming the name of the variable is `stats`.
+将统计信息迁移到新样式涉及：
+  - 创建一个 `Stats::Group` 结构体，并将所有统计信息变量移到那里。此结构体的作用域应为 `protected`。统计信息变量的声明通常在头文件中。
+  - 摆脱 `regStats()`，并将统计信息变量的初始化移到 `Stats::Group` 构造函数，如**示例 1** 所示。
+  - 在头文件和 cpp 文件中，所有统计信息变量都应该以新创建的 `Stats::Group` 名称作为前缀，因为统计信息现在位于 `Stats::Group` 结构体下。
+  - 更新类构造函数以初始化 `Stats::Group` 变量。通常，这是将 `stats(this)` 添加到构造函数，假设变量名是 `stats`。
 
-Some examples,
-  - An example of `Stats::Group` declaration is [here](https://github.com/gem5/gem5/blob/v20.0.0.3/src/cpu/testers/traffic_gen/base.hh#L194).
-Note that all variables of type starting with `Stats::` have been moved to the struct.
-  - An example of a `Stats::Group` constructor that utilizes `ADD_STAT` is [here](https://github.com/gem5/gem5/blob/v20.0.0.3/src/cpu/testers/traffic_gen/base.cc#L332).
-  - In the case where a stat variable requiring additional initializations other than `name` and `description`, you can follow [this example](https://github.com/gem5/gem5/blob/v20.0.0.3/src/mem/comm_monitor.cc#L105).
+一些示例，
+  - `Stats::Group` 声明的示例在[此处](https://github.com/gem5/gem5/blob/v20.0.0.3/src/cpu/testers/traffic_gen/base.hh#L194)。
+注意，所有以 `Stats::` 开头的类型变量都已移到结构体中。
+  - 使用 `ADD_STAT` 的 `Stats::Group` 构造函数的示例在[此处](https://github.com/gem5/gem5/blob/v20.0.0.3/src/cpu/testers/traffic_gen/base.cc#L332)。
+  - 在统计信息变量需要除 `name` 和 `description` 之外的额外初始化的情况下，您可以遵循[此示例](https://github.com/gem5/gem5/blob/v20.0.0.3/src/mem/comm_monitor.cc#L105)。

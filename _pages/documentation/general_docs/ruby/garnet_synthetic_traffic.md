@@ -1,37 +1,37 @@
 ---
 layout: documentation
-title: "Garnet Synthetic Traffic"
+title: "Garnet 合成流量"
 doc: gem5 documentation
 parent: ruby
 permalink: /documentation/general_docs/ruby/garnet_synthetic_traffic/
 author: Jason Lowe-Power
 ---
 
-# Garnet Synthetic Traffic
+# Garnet 合成流量
 
-The Garnet Synthetic Traffic provides a framework for simulating the [Garnet network](/documentation/general_docs/ruby/garnet-2) with controlled inputs. This is useful for network testing/debugging, or for network-only simulations with synthetic traffic.
+Garnet 合成流量提供了一个框架，用于模拟带有受控输入的 [Garnet 网络](/documentation/general_docs/ruby/garnet-2)。这对网络测试/调试，或带有合成流量的仅网络模拟非常有用。
 
-**Note: The garnet synthetic traffic injector only works with the [Garnet_standalone](/documentation/general_docs/ruby/Garnet_standalone.md) coherence protocol.**
+**注意：garnet 合成流量注入器仅适用于 [Garnet_standalone](/documentation/general_docs/ruby/Garnet_standalone.md) 一致性协议。**
 
-## Related files
+## 相关文件
 
-* configs/example/garnet_synth_traffic.py: file to invoke the network tester
-* src/cpu/testers/garnet_synthetic_traffic: files implementing the tester.
+* configs/example/garnet_synth_traffic.py: 调用网络测试器的文件
+* src/cpu/testers/garnet_synthetic_traffic: 实现测试器的文件。
   * GarnetSyntheticTraffic.py
   * GarnetSyntheticTraffic.hh
   * GarnetSyntheticTraffic.cc
 
-## How to run
+## 如何运行
 
-First build gem5 with the [Garnet_standalone](/documentation/general_docs/ruby/Garnet_standalone.md) coherence protocol. The Garnet_standalone protocol is ISA-agnostic, and hence we build it with the NULL ISA.
+首先使用 [Garnet_standalone](/documentation/general_docs/ruby/Garnet_standalone.md) 一致性协议构建 gem5。Garnet_standalone 协议与 ISA 无关，因此我们使用 NULL ISA 构建它。
 
-For gem5 <= 23.0:
+对于 gem5 <= 23.0:
 
 ```
 scons build/NULL/gem5.debug PROTOCOL=Garnet_standalone
 ```
 
-For gem5 >= 23.1
+对于 gem5 >= 23.1
 
 ```
 scons defconfig build/NULL build_opts/NULL
@@ -39,7 +39,7 @@ scons setconfig build/NULL RUBY_PROTOCOL_GARNET_STANDALONE=y
 scons build/NULL/gem5.debug
 ```
 
-Example command:
+示例命令：
 
 ```
 ./build/NULL/gem5.debug configs/example/garnet_synth_traffic.py  \
@@ -53,49 +53,49 @@ Example command:
         --injectionrate=0.01
 ```
 
-## Parameterized Options
+## 参数化选项
 
-| **System Configuration** |  **Description**  |
+| **系统配置** |  **描述**  |
 |------------|-----------|
- | **--num-cpus** | Number of cpus. This is the number of source (injection) nodes in the network. |
- | **--num-dirs** | Number of directories. This is the number of destination (ejection) nodes in the network. |
- | **--network** | Network model: simple or garnet. Use garnet for running synthetic traffic. |
- | **--topology** | Topology for connecting the cpus and dirs to the network routers/switches. More detail about different topologies can be found (here)[Interconnection_Network#Topology]. |
- | **--mesh-rows** | The number of rows in the mesh. Only valid when ''--topology'' is ''Mesh_*'' or ''MeshDirCorners_*''. |
+| **--num-cpus** | cpu 数量。这是网络中源（注入）节点的数量。 |
+| **--num-dirs** | 目录数量。这是网络中目的地（弹出）节点的数量。 |
+| **--network** | 网络模型：simple 或 garnet。使用 garnet 运行合成流量。 |
+| **--topology** | 用于将 cpu 和 dirs 连接到网络路由器/交换机的拓扑。有关不同拓扑的更多详细信息可以在 (这里)[Interconnection_Network#Topology] 找到。 |
+| **--mesh-rows** | 网格中的行数。仅当 ''--topology'' 为 ''Mesh_*'' 或 ''MeshDirCorners_*'' 时有效。 |
 
 
 
- | **Network Configuration** | **Description** |
- |------------|-----------|
- | **--router-latency** | Default number of pipeline stages in the garnet router. Has to be >= 1.  Can be over-ridden on a per router basis in the topology file. |
- | **--link-latency** | Default latency of each link in the network. Has to be >= 1.  Can be over-ridden on a per link basis in the topology file. |
- | **--vcs-per-vnet** | Number of VCs per Virtual Network. |
- | **--link-width-bits** | Width in bits for all links inside the garnet network. Default = 128. |
+| **网络配置** | **描述** |
+|------------|-----------|
+| **--router-latency** | garnet 路由器中流水线级的默认数量。必须 >= 1。可以在拓扑文件中逐个路由器覆盖。 |
+| **--link-latency** | 网络中每个链接的默认延迟。必须 >= 1。可以在拓扑文件中逐个链接覆盖。 |
+| **--vcs-per-vnet** | 每个虚拟网络的 VC 数量。 |
+| **--link-width-bits** | garnet 网络内所有链接的位宽。默认 = 128。 |
 
 
 
- | **Traffic Injection** | **Description** |
- |------------|-----------|
- | **--sim-cycles** | Total number of cycles for which the simulation should run. |
- | **--synthetic** | The type of synthetic traffic to be injected. The following synthetic traffic patterns are currently supported: 'uniform_random', 'tornado', 'bit_complement', 'bit_reverse', 'bit_rotation', 'neighbor', 'shuffle',  and 'transpose'. |
- | **--injectionrate** | Traffic Injection Rate in packets/node/cycle. It can take any decimal value between 0 and 1. The number of digits of precision after the decimal point can be controlled by ''--precision'' which is set to 3 as default in ''garnet_synth_traffic.py''. |
- | **--single-sender-id** | Only inject from this sender. To send from all nodes, set to -1. |
- | **--single-dest-id** | Only send to this destination. To send to all destinations as specified by the synthetic traffic pattern, set to -1. |
- | **--num-packets-max** | Maximum number of packets to be injected by each cpu node. Default value is -1 (keep injecting till sim-cycles). |
- | **--inj-vnet** | Only inject in this vnet (0, 1 or 2). 0 and 1 are 1-flit, 2 is 5-flit. Set to -1 to inject randomly in all vnets. |
+| **流量注入** | **描述** |
+|------------|-----------|
+| **--sim-cycles** | 模拟应运行的总周期数。 |
+| **--synthetic** | 要注入的合成流量类型。目前支持以下合成流量模式：'uniform_random', 'tornado', 'bit_complement', 'bit_reverse', 'bit_rotation', 'neighbor', 'shuffle', 和 'transpose'。 |
+| **--injectionrate** | 流量注入率，以 包/节点/周期 为单位。它可以取 0 到 1 之间的任何十进制值。小数点后的精度位数可以通过 ''--precision'' 控制，该参数在 ''garnet_synth_traffic.py'' 中默认为 3。 |
+| **--single-sender-id** | 仅从此发送者注入。要从所有节点发送，请设置为 -1。 |
+| **--single-dest-id** | 仅发送到此目的地。要发送到合成流量模式指定的所有目的地，请设置为 -1。 |
+| **--num-packets-max** | 每个 cpu 节点要注入的最大数据包数。默认值为 -1（保持注入直到 sim-cycles）。 |
+| **--inj-vnet** | 仅在此 vnet（0, 1 或 2）中注入。0 和 1 是 1-flit，2 是 5-flit。设置为 -1 以在所有 vnet 中随机注入。 |
 
 
-## Implementation of Garnet synthetic traffic
-The synthetic traffic injector is implemented in GarnetSyntheticTraffic.cc. The sequence of steps involved in generating and sending a packet are as follows.
+## Garnet 合成流量的实现
+合成流量注入器在 GarnetSyntheticTraffic.cc 中实现。生成和发送数据包所涉及的步骤序列如下。
 
-* Every cycle, each cpu performs a bernouli trial with probability equal to --injectionrate to determine whether to generate a packet or not.
-* If --num-packets-max is non negative, each cpu stops generating new packets after generating --num-packets-max number of packets. The injector terminates after --sim-cycles.
-* If the cpu has to generate a new packet, it computes the destination for the new packet based on the synthetic traffic type (--synthetic).
-* This destination is embedded into the bits after block offset in the packet address.
-* The generated packet is randomly tagged as a ReadReq, or an INST_FETCH, or a WriteReq, and sent to the Ruby Port (src/mem/ruby/system/RubyPort.hh/cc).
-* The Ruby Port converts the packet into a RubyRequestType:LD, RubyRequestType:IFETCH, and RubyRequestType:ST, respectively, and sends it to the Sequencer, which in turn sends it to the Garnet_standalone cache controller.
-* The cache controller extracts the destination directory from the packet address.
-* The cache controller injects the LD, IFETCH and ST into virtual networks 0, 1 and 2 respectively.
-  * LD and IFETCH are injected as control packets (8 bytes), while ST is injected as a data packet (72 bytes).
-* The packet traverses the network and reaches the directory.
-* The directory controller simply drops it.
+* 每个周期，每个 cpu 执行一个概率等于 --injectionrate 的伯努利试验，以确定是否生成数据包。
+* 如果 --num-packets-max 为非负数，每个 cpu 在生成 --num-packets-max 个数据包后停止生成新数据包。注入器在 --sim-cycles 后终止。
+* 如果 cpu 必须生成新数据包，它会根据合成流量类型 (--synthetic) 计算新数据包的目的地。
+* 此目的地嵌入到数据包地址中块偏移量之后的位中。
+* 生成的数据包随机标记为 ReadReq、INST_FETCH 或 WriteReq，并发送到 Ruby 端口 (src/mem/ruby/system/RubyPort.hh/cc)。
+* Ruby 端口将数据包分别转换为 RubyRequestType:LD、RubyRequestType:IFETCH 和 RubyRequestType:ST，并将其发送到 Sequencer，Sequencer 依次将其发送到 Garnet_standalone 缓存控制器。
+* 缓存控制器从数据包地址中提取目的地目录。
+* 缓存控制器分别将 LD、IFETCH 和 ST 注入虚拟网络 0、1 和 2。
+  * LD 和 IFETCH 作为控制数据包（8 字节）注入，而 ST 作为数据数据包（72 字节）注入。
+* 数据包遍历网络并到达目录。
+* 目录控制器只是将其丢弃。

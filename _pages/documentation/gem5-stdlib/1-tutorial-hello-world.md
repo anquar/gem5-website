@@ -1,30 +1,30 @@
 ---
 layout: documentation
-title: Hello World Tutorial
+title: Hello World 教程
 parent: gem5-standard-library
 doc: gem5 documentation
 permalink: /documentation/gem5-stdlib/hello-world-tutorial
 author: Bobby R. Bruce
 ---
 
-## Building a "Hello World" example with the gem5 standard library
+## 使用 gem5 标准库构建 "Hello World" 示例
 
-In this tutorial we will cover how to create a very basic simulation using gem5 components.
-This simulation will setup a system consisting of a single-core processor, running in Atomic mode, connected directly to main memory with no caches, I/O, or other components.
-The system will run an X86 binary in syscall emulation (SE) mode.
-The binary will be obtained from gem5-resources and which will print a "Hello World!" string to stdout upon execution.
+在本教程中，我们将介绍如何使用 gem5 组件创建一个非常基础的模拟。
+此模拟将设置一个由单核处理器组成的系统，在 Atomic 模式下运行，直接连接到主内存，没有缓存、I/O 或其他组件。
+系统将在系统调用仿真 (SE) 模式下运行 X86 二进制文件。
+该二进制文件将从 gem5-resources 获取，执行时会将 "Hello World!" 字符串打印到 stdout。
 
-To start we must compile the ALL build for gem5:
+首先，我们必须编译 gem5 的 ALL 构建：
 
 ```sh
-# In the root of the gem5 directory
-scons build/ALL/gem5.opt -j <number of threads>
+# 在 gem5 目录的根目录下
+scons build/ALL/gem5.opt -j <线程数>
 ```
 
-As of gem5 v24.1, the ALL build includes all Ruby protocols and all ISAs. If you are using a prebuilt gem5 binary, this step is not necessary.
+从 gem5 v24.1 开始，ALL 构建包括所有 Ruby 协议和所有 ISA。如果您使用的是预构建的 gem5 二进制文件，则不需要此步骤。
 
-Then a new Python file should be created (we will refer to this as `hello-world.py` going forward).
-The first lines in this file should be the needed imports:
+然后应该创建一个新的 Python 文件（我们将在下文中将其称为 `hello-world.py`）。
+该文件的前几行应该是所需的导入：
 
 ```python
 from gem5.components.boards.simple_board import SimpleBoard
@@ -37,48 +37,48 @@ from gem5.resources.resource import obtain_resource
 from gem5.simulate.simulator import Simulator
 ```
 
-All these libraries are included inside the compiled gem5 binary.
-Therefore, you will not need to obtain them from elsewhere.
-`from gem5.` indicates we are importing from the `gem5` standard library, and the lines starting with `from gem5.components` are importing components from the gem5 components package.
-The `from gem5.resources` line means we are importing from the resources package, and `from gem5.simulate`, the simulate package.
-All these packages, `components`, `resources`, and `simulate` are part of the gem5 standard library.
+所有这些库都包含在编译的 gem5 二进制文件中。
+因此，您无需从其他地方获取它们。
+`from gem5.` 表示我们从 `gem5` 标准库导入，以 `from gem5.components` 开头的行是从 gem5 组件包导入组件。
+`from gem5.resources` 行表示我们从资源包导入，`from gem5.simulate` 表示从 Simulate 包导入。
+所有这些包，`components`、`resources` 和 `simulate` 都是 gem5 标准库的一部分。
 
-Next we begin specifying the system.
-The gem5 library requires the user to specify four main components: the _board_, the _cache hierarchy_, the _memory system_, and the _processor_.
+接下来我们开始指定系统。
+gem5 库要求用户指定四个主要组件：_board_（开发板）、_cache hierarchy_（缓存层次结构）、_memory system_（内存系统）和 _processor_（处理器）。
 
-Let's start with the _cache hierarchy_:
+让我们从 _cache hierarchy_（缓存层次结构）开始：
 
 ```python
 cache_hierarchy = NoCache()
 ```
 
-Here we are using `NoCache()`.
-This means, for our system, we are stating there is no cache hierarchy (i.e., no caches).
-In the gem5 library the cache hierarchy is a broad term for anything that exists between the processor cores and main memory.
-Here we are stating the processor is connected directly to main memory.
+这里我们使用 `NoCache()`。
+这意味着，对于我们的系统，我们声明没有缓存层次结构（即没有缓存）。
+在 gem5 库中，缓存层次结构是处理器核心和主内存之间存在的任何东西的广义术语。
+这里我们声明处理器直接连接到主内存。
 
-Next we declare the _memory system_:
+接下来我们声明 _memory system_（内存系统）：
 
 ```python
 memory = SingleChannelDDR3_1600("1GiB")
 ```
 
-There exists many memory components to choose from within `gem5.components.memory`.
-Here we are using a single-channel DDR3 1600, and setting its size to 1 GiB.
-It should be noted that setting the size here is technically optional.
-If not set, the `SingleChannelDDR3_1600` will default to 8 GiB.
+在 `gem5.components.memory` 中有许多内存组件可供选择。
+这里我们使用单通道 DDR3 1600，并将其大小设置为 1 GiB。
+应该注意的是，在这里设置大小在技术上是可选的。
+如果未设置，`SingleChannelDDR3_1600` 将默认为 8 GiB。
 
-Then we consider the _processor_:
+然后我们考虑 _processor_（处理器）：
 
 ```python
 processor = SimpleProcessor(cpu_type=CPUTypes.ATOMIC, num_cores=1, isa=ISA.X86)
 ```
 
-A processor in `gem5.components` is an object which contains a number of gem5 CPU cores, of a particular or varying type (`ATOMIC`, `TIMING`, `KVM`, `O3`, etc.).
-The `SimpleProcessor` used in this example is a processor where all the CPU Cores are of an identical type.
-It requires two arguments: the `cpu_type`, which we set to `ATOMIC`, and `num_cores`, the number of cores, which we set to one.
+`gem5.components` 中的处理器是一个包含多个 gem5 CPU 核心的对象，这些核心可以是特定类型或不同类型（`ATOMIC`、`TIMING`、`KVM`、`O3` 等）。
+本示例中使用的 `SimpleProcessor` 是一个所有 CPU 核心都是相同类型的处理器。
+它需要两个参数：`cpu_type`（我们设置为 `ATOMIC`）和 `num_cores`（核心数，我们设置为 1）。
 
-Finally we specify which _board_ we are using:
+最后我们指定要使用的 _board_（开发板）：
 
 ```python
 board = SimpleBoard(
@@ -89,32 +89,32 @@ board = SimpleBoard(
 )
 ```
 
-While the constructor of each board may vary, they will typically require the user to specify the _processor_, _memory system_, and _cache hierarchy_, as well as the clock frequency to use.
-In this example we use the `SimpleBoard`.
-The `SimpleBoard` is a very basic system with no I/O which only supports SE-mode and can only work with "classic" cache hierarchies.
+虽然每个开发板的构造函数可能不同，但它们通常要求用户指定 _processor_（处理器）、_memory system_（内存系统）和 _cache hierarchy_（缓存层次结构），以及要使用的时钟频率。
+在本示例中，我们使用 `SimpleBoard`。
+`SimpleBoard` 是一个非常基础的系统，没有 I/O，仅支持 SE 模式，并且只能与"经典"缓存层次结构一起工作。
 
-At this point in the script we have specified everything we require to simulate our system.
-Of course, in order to run a meaningful simulation, we must specify a workload for this system to run.
-To do so we add the following lines:
+此时，在脚本中我们已经指定了模拟系统所需的一切。
+当然，为了运行有意义的模拟，我们必须为此系统指定要运行的工作负载。
+为此，我们添加以下行：
 
 ```python
 binary = obtain_resource("x86-hello64-static")
 board.set_se_binary_workload(binary)
 ```
 
-The `obtain_resource` function takes a string which specifies which resource, from [gem5-resources](/documentation/general_docs/gem5_resources), is to be obtained for the simulation.
-All the gem5 resources can be found on the [gem5 Resources website](https://resources.gem5.org).
+`obtain_resource` 函数接受一个字符串，该字符串指定要从 [gem5-resources](/documentation/general_docs/gem5_resources) 获取哪个资源用于模拟。
+所有 gem5 资源都可以在 [gem5 Resources 网站](https://resources.gem5.org) 上找到。
 
-If the resource is not present on the host system it'll be automatically downloaded.
-In this example we are going to use the `x86-hello-64-static` resource;
-an x86, 64-bit, statically compiled binary which will print "Hello World!" to stdout.
-After specifying the resource we set the workload via the board's `set_se_binary_workload` function.
-As the name suggests `set_se_binary_workload` is a function used to set a binary to be executed in Syscall Execution mode.
+如果主机系统上不存在该资源，它将自动下载。
+在本示例中，我们将使用 `x86-hello-64-static` 资源；
+这是一个 x86、64 位、静态编译的二进制文件，会将 "Hello World!" 打印到 stdout。
+指定资源后，我们通过开发板的 `set_se_binary_workload` 函数设置工作负载。
+顾名思义，`set_se_binary_workload` 是用于设置在系统调用执行模式下执行的二进制文件的函数。
 
-You can see and search for available resources on the [gem5 resources website](https://resources.gem5.org/).
+您可以在 [gem5 resources 网站](https://resources.gem5.org/) 上查看和搜索可用资源。
 
-This is all that is required to setup your simulation.
-From this you simply need to construct and run the `Simulator`:
+这就是设置模拟所需的一切。
+从这一点开始，您只需要构造并运行 `Simulator`：
 
 ```python
 simulator = Simulator(board=board)
@@ -155,19 +155,19 @@ simulator = Simulator(board=board)
 simulator.run()
 ```
 
-It can then be executed with:
+然后可以使用以下命令执行：
 
 ```sh
 ./build/ALL/gem5.opt hello-world.py
 ```
 
-If you are using a pre-built binary, you can execute the simulation with:
+如果您使用的是预构建的二进制文件，可以使用以下命令执行模拟：
 
 ```sh
 gem5 hello-world.py
 ```
 
-If setup correctly, the output will look something like:
+如果设置正确，输出将类似于：
 
 ```text
 info: Using default config
@@ -181,19 +181,19 @@ src/sim/mem_state.cc:448: info: Increasing stack size by one page.
 Hello world!
 ```
 
-It should be obvious from this point that a _board's_ parameters may be altered to test other designs.
-For example, if we want to test a `TIMING` CPU setup we'd change our _processor_ to:
+从这一点应该很明显，可以更改 _board_（开发板）的参数以测试其他设计。
+例如，如果我们想测试 `TIMING` CPU 设置，我们会将 _processor_（处理器）更改为：
 
 ```python
 processor = SimpleProcessor(cpu_type=CPUTypes.TIMING, num_cores=1, isa=ISA.X86)
 ```
 
-This is all that is required.
-The gem5 standard library will reconfigure the design as is necessary.
+这就是所需的一切。
+gem5 标准库将根据需要重新配置设计。
 
-As another example, consider swapping out a component for another.
-In this design we decided on `NoCache` but we could use another classic cache hierarchy, such as `PrivateL1CacheHierarchy`.
-To do so we'd change our `cache_hierarchy` parameter:
+作为另一个示例，考虑将一个组件替换为另一个组件。
+在这个设计中，我们决定使用 `NoCache`，但我们可以使用另一个经典缓存层次结构，例如 `PrivateL1CacheHierarchy`。
+为此，我们将更改 `cache_hierarchy` 参数：
 
 ```python
 # We import the cache hierarchy we want.
@@ -205,15 +205,15 @@ from gem5.components.cachehierarchies.classic.private_l1_cache_hierarchy import 
 cache_hierarchy = PrivateL1CacheHierarchy(l1d_size="32KiB", l1i_size="32KiB")
 ```
 
-Note here that `PrivateL1CacheHierarchy` requires the user to specify the L1 data and instruction cache sizes to be constructed.
-No other part of the design need change.
-The gem5 standard library will incorporate the cache hierarchy as required.
+请注意，`PrivateL1CacheHierarchy` 要求用户指定要构造的 L1 数据和指令缓存大小。
+设计的其他部分无需更改。
+gem5 标准库将根据需要整合缓存层次结构。
 
-To recap on what was learned in this tutorial:
+总结本教程中学到的内容：
 
-* A system can be built with the gem5 components package using _processor_, _cache hierarchy_, _memory system_, and _board_ components.
-* Generally speaking, components of the same type are interchangeable as much as is possible. E.g., different _cache hierarchy_ components may be swapped in and out of a design without reconfiguration needed in other components.
-* _boards_ contain functions to set workloads.
-* The resources package may be used to obtain prebuilt resources from gem5-resources.
-These are typically workloads that may be run via set workload functions.
-* The simulate package can be used to run a board within a gem5 simulation.
+* 可以使用 gem5 组件包使用 _processor_（处理器）、_cache hierarchy_（缓存层次结构）、_memory system_（内存系统）和 _board_（开发板）组件构建系统。
+* 一般来说，同类型的组件尽可能可以互换。例如，不同的 _cache hierarchy_（缓存层次结构）组件可以在设计中交换进出，而无需在其他组件中进行重新配置。
+* _boards_（开发板）包含设置工作负载的函数。
+* 资源包可用于从 gem5-resources 获取预构建的资源。
+这些通常是通过设置工作负载函数可以运行的工作负载。
+* Simulate 包可用于在 gem5 模拟中运行开发板。

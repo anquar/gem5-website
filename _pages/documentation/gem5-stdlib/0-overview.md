@@ -1,58 +1,58 @@
 ---
 layout: documentation
-title: Standard Library Overview
+title: 标准库概览
 parent: gem5-standard-library
 doc: gem5 documentation
 permalink: /documentation/gem5-stdlib/overview
 author: Bobby R. Bruce
 ---
 
-## An overview of the gem5 standard library
+## gem5 标准库概览
 
-Similar to standard libraries in programming languages, the gem5 standard library is designed to provide users of gem5 with commonly used components, features, and functionality with the goal of improving their productivity.
-The gem5 stdlib was introduced in [v21.1](https://github.com/gem5/gem5/tree/v21.1.0.0) in an alpha-release state (then referred to as "gem5 components"), and has been fully released as of [v21.2](https://github.com/gem5/gem5/tree/v21.2.0.0).
+与编程语言中的标准库类似，gem5 标准库旨在为 gem5 用户提供常用的组件、特性和功能，以提高他们的生产力。
+gem5 标准库在 [v21.1](https://github.com/gem5/gem5/tree/v21.1.0.0) 版本中以 alpha 发布状态引入（当时称为 "gem5 components"），并在 [v21.2](https://github.com/gem5/gem5/tree/v21.2.0.0) 版本中正式发布。
 
-For users new to the gem5 standard library, the following tutorials may be of help in understanding how the gem5 stdlib may be used to improve the creation of gem5 simulations.
-They include a tutorial on building syscall emulation and full-system simulations, as well as a guide on how to extend the library and contribute.
-The [`configs/examples/gem5_library`](https://github.com/gem5/gem5/tree/stable/configs/example/gem5_library) directory in the gem5 repository also contains example scripts which use the library.
+对于 gem5 标准库的新用户，以下教程可能有助于理解如何使用 gem5 标准库来改进 gem5 模拟的创建。
+这些教程包括构建系统调用仿真和全系统模拟的教程，以及如何扩展库和贡献的指南。
+gem5 仓库中的 [`configs/examples/gem5_library`](https://github.com/gem5/gem5/tree/stable/configs/example/gem5_library) 目录也包含使用该库的示例脚本。
 
-The following subsections give a broad overview of the gem5 stdlib packages and what there intended purposes are.
+以下小节对 gem5 标准库的包及其预期用途进行了广泛概述。
 
-**Note: The documentation/tutorials/etc. related to the standard library have been updated for the v24.1 release.
-Please ensure you have the correct version of gem5 before proceeding.**
+**注意：与标准库相关的文档/教程等已针对 v24.1 版本进行了更新。
+请确保在继续之前使用正确版本的 gem5。**
 
-As part of [gem5's 2022 Bootcamp](/events/boot-camp-2022), the stdlib was taught as a tutorial.
-Slides for this tutorial can be found [here](https://raw.githubusercontent.com/gem5bootcamp/gem5-bootcamp-env/main/assets/slides/using-gem5-02-gem5-stdlib-tutorial.pdf).
-A video recording of this tutorial can be found [here](https://www.youtube.com/watch?v=vbruiMyIFsA).
+作为 [gem5 2022 训练营](/events/boot-camp-2022) 的一部分，标准库作为教程进行了讲授。
+该教程的幻灯片可以在[这里](https://raw.githubusercontent.com/gem5bootcamp/gem5-bootcamp-env/main/assets/slides/using-gem5-02-gem5-stdlib-tutorial.pdf)找到。
+该教程的视频录制可以在[这里](https://www.youtube.com/watch?v=vbruiMyIFsA)找到。
 
-The stdlib was also covered during the [2024 gem5 Bootcamp](https://bootcamp.gem5.org/#02-Using-gem5/01-stdlib).
+标准库也在 [2024 gem5 训练营](https://bootcamp.gem5.org/#02-Using-gem5/01-stdlib) 期间进行了介绍。
 
 <!-- Could use a nice picture here showing the main modules of the stdlib and how they relate -->
 
-## The gem5 stdlib components package and its design philosophy
+## gem5 标准库组件包及其设计理念
 
-The gem5 stdlib components package is the central part of the gem5 stdlib.
-With it users can built complex systems from simple components which connect together using standardized APIs.
+gem5 标准库组件包是 gem5 标准库的核心部分。
+通过它，用户可以使用标准化 API 从简单组件构建复杂系统，这些组件可以连接在一起。
 
-The metaphor that guided the components package development was that of building a computer using off-the-shelf components.
-When building a computer, someone may select components, plug them into a board, and assume the interface between the board and the component have been designed in a way in which they will "just work."
-For example, someone can remove a processor from a board and add a different one, compatible with the same socket, without needing to change everything else in their setup.
-While there are always limitations to this design philosophy, the components package has a highly modular and extensible design with components of the same type being interchangeable with one another as much as is possible.
+指导组件包开发的隐喻是使用现成组件构建计算机。
+在构建计算机时，某人可以选择组件，将它们插入开发板，并假设开发板和组件之间的接口已经设计成可以"即插即用"的方式。
+例如，某人可以从开发板上移除一个处理器并添加另一个兼容相同插槽的处理器，而无需更改设置中的其他所有内容。
+虽然这种设计理念总是存在局限性，但组件包具有高度模块化和可扩展的设计，同类型的组件尽可能可以相互替换。
 
-At the core of the components package is the idea of a _board_.
-This plays a similar role to the motherboard in a real-world system.
-While it may contain embedded caches, controllers, and other complex components, its main purpose is to expose standardized interfaces for other hardware to be added and handle communication between them.
-For example, a memory device and a processor may be added to a board with the board responsible for communication without the designer of the memory or the processor having to consider this assuming they conform to known APIs.
+组件包的核心是 _board_（开发板）的概念。
+它在真实系统中的作用类似于主板。
+虽然它可能包含嵌入式缓存、控制器和其他复杂组件，但它的主要目的是为要添加的其他硬件暴露标准化接口，并处理它们之间的通信。
+例如，可以将内存设备和处理器添加到开发板，开发板负责通信，而内存或处理器的设计者无需考虑这一点，假设它们符合已知的 API。
 
-Typically, a gem5 components package _board_ requires declaration of these three components:
+通常，gem5 组件包 _board_ 需要声明这三个组件：
 
-1. The _processor_ : The system processor. A processor component contains at least one _core_ which may be Atomic, O3, Timing, or KVM.
-2. The _memory_ system: The memory system, for example, a DDR3_1600.
-3. The _cache hierarchies_: This component defines any and all components between the processor and main memory, most notably the cache setup. In the simplest of setups this will connect memory directly to the processor.
+1. _processor_（处理器）：系统处理器。处理器组件包含至少一个 _core_（核心），可以是 Atomic、O3、Timing 或 KVM。
+2. _memory_（内存）系统：内存系统，例如 DDR3_1600。
+3. _cache hierarchies_（缓存层次结构）：此组件定义处理器和主内存之间的所有组件，最显著的是缓存设置。在最简单的设置中，这将直接将内存连接到处理器。
 
-The other devices required for full-system simulation, which rarely change between simulations, are handled by the board.
+全系统模拟所需的其他设备（在模拟之间很少改变）由开发板处理。
 
-A typical usage of the components may therefore look like:
+因此，组件的典型用法可能如下所示：
 
 ```python
 
@@ -78,22 +78,22 @@ board = X86Board(
 )
 ```
 
-The following tutorials go into greater detail on how to use the components package to create gem5 simulations.
+以下教程将详细介绍如何使用组件包创建 gem5 模拟。
 
-## The gem5 resources package
+## gem5 资源包
 
-The gem5 stdlib's resource package is used to obtain and incorporate resources.
-A resource, in the context of gem5, is something used in a simulation, or by a simulation, but not directly used to construct a system to be simulated.
-Typically these are applications, kernels, disk images, benchmarks, or tests.
+gem5 标准库的资源包用于获取和整合资源。
+在 gem5 的上下文中，资源是模拟中使用的或由模拟使用的东西，但不直接用于构建要模拟的系统。
+通常这些是应用程序、内核、磁盘镜像、基准测试程序或测试。
 
-As these resources can be hard to find, or hard to create, we provide pre-built resources as part of [gem5-resources](/documentation/general_docs/gem5_resources).
-For example, via gem5-resources, a user may download an Ubuntu 18.04 disk image with known compatibility with gem5.
-They need not setup this themselves.
+由于这些资源可能难以找到或难以创建，我们作为 [gem5-resources](/documentation/general_docs/gem5_resources) 的一部分提供预构建的资源。
+例如，通过 gem5-resources，用户可以下载与 gem5 已知兼容的 Ubuntu 18.04 磁盘镜像。
+他们无需自己设置。
 
-A core feature of the gem5 stdlib resource package is that it allows users to _automatically obtain_ prebuilt gem5 resources for their simulation.
-A user may specify in their Python config file that a specific gem5 resource is required and, when run, the package will check if there is a local copy on the host system, and if not, download it.
+gem5 标准库资源包的核心特性是它允许用户为他们的模拟 _自动获取_ 预构建的 gem5 资源。
+用户可以在他们的 Python 配置文件中指定需要特定的 gem5 资源，运行时，包将检查主机系统上是否有本地副本，如果没有，则下载它。
 
-The tutorials will demonstrate how to use the resource package in greater detail, but for now, a typical pattern is as follows:
+教程将更详细地演示如何使用资源包，但现在，典型的模式如下：
 
 ```python
 from gem5.resources.resource import Resource
@@ -103,21 +103,21 @@ resource = Resource("riscv-disk-img")
 print(f"The resources is available at {resource.get_local_path()}")
 ```
 
-This will obtain the `riscv-disk-img` resource and store it locally for use in a gem5 simulation.
+这将获取 `riscv-disk-img` 资源并将其存储在本地，以供 gem5 模拟使用。
 
-The resources package references the resources that are available to view at the [gem5 Resources website](https://resources.gem5.org) and the [gem5 Resources repository](https://github.com/gem5/gem5-resources). The website is strongly recommended to get info on what resources are available and where they may be downloaded from.
+资源包引用的资源可以在 [gem5 Resources 网站](https://resources.gem5.org) 和 [gem5 Resources 仓库](https://github.com/gem5/gem5-resources) 上查看。强烈建议使用该网站获取有关可用资源以及可以从哪里下载它们的信息。
 
-## The Simulate package
+## Simulate 包
 
-The simulate package is used to run gem5 simulations.
-While there is some boilerplate code this module handles on the users behalf, its primary purpose is to provde default behavior and APIs for what we refer to as _Exit Events_.
-Exit events are when a simulation exits for a particular reason.
+Simulate 包用于运行 gem5 模拟。
+虽然此模块代表用户处理一些样板代码，但其主要目的是为我们称为 _Exit Events_（退出事件）的内容提供默认行为和 API。
+退出事件是模拟因特定原因而退出的时候。
 
-A typical example of an exit event would be a `Workbegin` exit event.
-This is used to specify that a Region-of-Interest (ROI) has been reached.
-Usually this exit would be used to allow a user to begin logging statistics or to switch to a more detailed CPU model.
-Prior to the stdlib, the user would need to specify precisely what the expected behavior was at exit events such as this.
-The simulation would exit and the configuration script would contain Python code specifying what to do next.
-Now, with the simulate package, there is a default behavior for this kind of event (the stats are reset), and an easy interface to override this behavior with something the user requires.
+退出事件的典型示例是 `Workbegin` 退出事件。
+这用于指定已到达感兴趣区域 (ROI)。
+通常，此退出将用于允许用户开始记录统计信息或切换到更详细的 CPU 模型。
+在标准库之前，用户需要精确指定在此类退出事件处的预期行为。
+模拟将退出，配置脚本将包含指定下一步要做什么的 Python 代码。
+现在，使用 Simulate 包，此类事件有默认行为（统计信息被重置），并且有一个简单的接口可以用用户需要的内容覆盖此行为。
 
-More information about exit events can be found in the [M5ops documentation](https://www.gem5.org/documentation/general_docs/m5ops/).
+有关退出事件的更多信息可以在 [M5ops 文档](https://www.gem5.org/documentation/general_docs/m5ops/) 中找到。

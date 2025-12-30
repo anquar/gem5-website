@@ -1,31 +1,31 @@
 ---
 layout: documentation
-title: Developing Your Own Components Tutorial
+title: 开发自定义组件教程
 parent: gem5-standard-library
 doc: gem5 documentation
 permalink: /documentation/gem5-stdlib/develop-own-components-tutorial
 author: Bobby R. Bruce
 ---
 
-## Developing your own gem5 standard library components
+## 开发您自己的 gem5 标准库组件
 
-![gem5 component library design](/assets/img/stdlib/gem5-components-design.png)
+![gem5 组件库设计](/assets/img/stdlib/gem5-components-design.png)
 
-The above diagram shows the basic design of the gem5 library components.
-There are four important abstract classes: `AbstractBoard`, `AbstractProcessor`, `AbstractMemorySystem`, and `AbstractCacheHierarchy`.
-Every gem5 component inherits from one of these to be a gem5 component usable in a design.
-The `AbstractBoard` must be constructed by specifying an `AbstractProcessor`, `AbstractMemorySystem`, and an `AbstractCacheHierarchy`.
-With this design any board may use any combination of components which inherit from `AbstractProcessor`, `AbstractMemorySystem`, and `AbstractCacheHierarchy`.
-For example, using the image as a guide, we can add a `SimpleProcessor`, `SingleChannelDDR3_1600` and a `PrivateL1PrivateL2CacheHierarchy` to an `X86Board`.
-If we desire, we can swap out the `PrivateL1PrivateL2CacheHierarchy` for another class which inherits from `AbstractCacheHierarchy`.
+上图显示了 gem5 库组件的基本设计。
+有四个重要的抽象类：`AbstractBoard`、`AbstractProcessor`、`AbstractMemorySystem` 和 `AbstractCacheHierarchy`。
+每个 gem5 组件都继承自其中之一，以成为可在设计中使用的 gem5 组件。
+`AbstractBoard` 必须通过指定 `AbstractProcessor`、`AbstractMemorySystem` 和 `AbstractCacheHierarchy` 来构造。
+通过这种设计，任何开发板都可以使用继承自 `AbstractProcessor`、`AbstractMemorySystem` 和 `AbstractCacheHierarchy` 的组件的任何组合。
+例如，使用图像作为指南，我们可以将 `SimpleProcessor`、`SingleChannelDDR3_1600` 和 `PrivateL1PrivateL2CacheHierarchy` 添加到 `X86Board`。
+如果我们愿意，可以将 `PrivateL1PrivateL2CacheHierarchy` 替换为继承自 `AbstractCacheHierarchy` 的另一个类。
 
-In this tutorial we will imagine a user wishes to create a new cache hierarchy.
-As you can see from the diagram, there are two subclasses which inherit from `AbstractCacheHierarchy`: `AbstractRubyCacheHierarchy` and `AbstractClassicCacheHierarchy`.
-While you _can_ inherit directly from `AbstractCacheHierarchy`, we recommend inheriting from the subclasses (depending on whether you wish to develop a ruby or classic cache hierarchy setup).
-We will inherit from the `AbstractClassicCacheHierarchy` class to create a classic cache setup.
+在本教程中，我们将想象用户希望创建一个新的缓存层次结构。
+从图中可以看出，有两个继承自 `AbstractCacheHierarchy` 的子类：`AbstractRubyCacheHierarchy` 和 `AbstractClassicCacheHierarchy`。
+虽然您 _可以_ 直接从 `AbstractCacheHierarchy` 继承，但我们建议从子类继承（取决于您希望开发 ruby 还是经典缓存层次结构设置）。
+我们将从 `AbstractClassicCacheHierarchy` 类继承以创建经典缓存设置。
 
-To begin, we should create a new Python class which inherits from the `AbstractClassicCacheHierarchy`.
-In this example we will call this `UniqueCacheHierarchy`, contained within a file `unique_cache_hierarchy.py`:
+首先，我们应该创建一个继承自 `AbstractClassicCacheHierarchy` 的新 Python 类。
+在本示例中，我们将其称为 `UniqueCacheHierarchy`，包含在文件 `unique_cache_hierarchy.py` 中：
 
 ```python
 from m5.objects import (
@@ -54,21 +54,21 @@ class UniqueCacheHierarchy(AbstractClassicCacheHierarchy):
         pass
 ```
 
-As with every abstract base class, there are virtual functions which must be implemented.
-Once implemented the `UniqueCacheHierarchy` can be used in simulations.
-The `get_mem_side_port` and `get_cpu_side_port` are declared in the [AbstractClassicCacheHierarchy](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/cachehierarchies/classic/abstract_classic_cache_hierarchy.py), while `incorporate_cache` is declared in the [AbstractCacheHierarchy](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/cachehierarchies/abstract_cache_hierarchy.py)
+与每个抽象基类一样，有一些必须实现的虚函数。
+一旦实现，`UniqueCacheHierarchy` 就可以在模拟中使用。
+`get_mem_side_port` 和 `get_cpu_side_port` 在 [AbstractClassicCacheHierarchy](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/cachehierarchies/classic/abstract_classic_cache_hierarchy.py) 中声明，而 `incorporate_cache` 在 [AbstractCacheHierarchy](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/cachehierarchies/abstract_cache_hierarchy.py) 中声明。
 
-The `get_mem_side_port` and `get_cpu_side_port` functions return a `Port` each.
-As their name suggests, these are ports used by the board to access the cache hierarchy from the memory side and the cpu side.
-These must be specified for all classic cache hierarchy setups.
+`get_mem_side_port` 和 `get_cpu_side_port` 函数各自返回一个 `Port`。
+顾名思义，这些是开发板用于从内存端和 CPU 端访问缓存层次结构的端口。
+这些必须为所有经典缓存层次结构设置指定。
 
-The `incorporate_cache` function is the function which is called to incorporate the cache into the board.
-The contents of this function will vary between cache hierarchy setups but will typically inspect the board it is connected to, and use the board's API to connect the cache hierarchy.
+`incorporate_cache` 函数是用于将缓存整合到开发板中的函数。
+此函数的内容会因缓存层次结构设置而异，但通常会检查它连接到的开发板，并使用开发板的 API 连接缓存层次结构。
 
-In this example we assume the user is looking to implement a private L1 cache hierarchy, consisting of a data cache and instruction cache for each CPU core.
-This has actually already been implemented in the gem5 stdlib as the [PrivateL1CacheHierarchy](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/cachehierarchies/classic/private_l1_cache_hierarchy.py), but for this example we shall duplicate the effort.
+在本示例中，我们假设用户希望实现一个私有 L1 缓存层次结构，由每个 CPU 核心的数据缓存和指令缓存组成。
+这实际上已经在 gem5 标准库中实现为 [PrivateL1CacheHierarchy](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/cachehierarchies/classic/private_l1_cache_hierarchy.py)，但为了本示例，我们将重复这项工作。
 
-First we start by implementing the `get_mem_side_port` and `get_cpu_side_port` functions:
+首先，我们通过实现 `get_mem_side_port` 和 `get_cpu_side_port` 函数开始：
 
 ```python
 from m5.objects import (
@@ -101,9 +101,9 @@ class UniqueCacheHierarchy(AbstractClassicCacheHierarchy):
         pass
 ```
 
-Here we have used a simple memory bus.
+这里我们使用了一个简单的内存总线。
 
-Next, we implement the `incorporate_cache` function:
+接下来，我们实现 `incorporate_cache` 函数：
 
 ```python
 from m5.objects import (
@@ -201,20 +201,20 @@ class UniqueCacheHierarchy(AbstractClassicCacheHierarchy):
         self.iocache.cpu_side = board.get_mem_side_coherent_io_port()
 ```
 
-This completes the code we'd need to create our own cache hierarchy.
+这完成了我们创建自己的缓存层次结构所需的代码。
 
-To use this code, a user can import it as they would any other Python module.
-As long as this code is in gem5's python search path, you can import it.
-You can also add `import sys; sys.path.append(<path to new component>)` at the beginning of your gem5 runscript to add the path of this new component to the python search path.
+要使用此代码，用户可以像导入任何其他 Python 模块一样导入它。
+只要此代码在 gem5 的 python 搜索路径中，您就可以导入它。
+您还可以在 gem5 运行脚本的开头添加 `import sys; sys.path.append(<path to new component>)`，以将此新组件的路径添加到 python 搜索路径。
 
-## Contributing your component to the gem5 stdlib
+## 将您的组件贡献给 gem5 标准库
 
-Before contributing your component, you will need to move it into the `src/` directory so that it is compiled into the gem5 binary.
+在贡献您的组件之前，您需要将其移动到 `src/` 目录中，以便将其编译到 gem5 二进制文件中。
 
-### Compiling your component into the gem5 standard library
+### 将您的组件编译到 gem5 标准库中
 
-The gem5 standard library code resides in `src/python/gem5`.
-The basic directory structure is as follows:
+gem5 标准库代码位于 `src/python/gem5`。
+基本目录结构如下：
 
 ```txt
 gem5/
@@ -234,17 +234,17 @@ gem5/
     utils/                      # General utilities.
 ```
 
-We recommend putting the `unique_cache_hierarchy.py` in `src/python/gem5/components/cachehierarchies/classic/`.
+我们建议将 `unique_cache_hierarchy.py` 放在 `src/python/gem5/components/cachehierarchies/classic/` 中。
 
-From then you need to add the following line to `src/python/SConscript`:
+然后，您需要在 `src/python/SConscript` 中添加以下行：
 
 ```scons
 PySource('gem5.components.cachehierarchies.classic',
     'gem5/components/cachehierarchies/classic/unique_cache_hierarchy.py')
 ```
 
-Then, when you recompile the gem5 binary, the `UniqueCacheHierarchy` class will be included.
-To use it in your own scripts you need only include it:
+然后，当您重新编译 gem5 二进制文件时，`UniqueCacheHierarchy` 类将被包含在内。
+要在您自己的脚本中使用它，您只需要包含它：
 
 ```python
 from gem5.components.cachehierarchies.classic.unique_cache_hierarchy import UniqueCacheHierarchy
@@ -257,23 +257,23 @@ cache_hierarchy = UniqueCacheHierarchy()
 
 ```
 
-### gem5 Code contribution and review
+### gem5 代码贡献和审查
 
-If you believe your addition to the gem5 stdlib would be beneficial to the gem5 community, you may submit it as a patch.
-Please follow our [Contributing Guidelines](/contributing) if you have not contributed to gem5 before or need a reminder on our procedures.
+如果您认为您对 gem5 标准库的添加对 gem5 社区有益，您可以将其作为补丁提交。
+如果您之前没有为 gem5 做出贡献或需要提醒我们的程序，请遵循我们的[贡献指南](/contributing)。
 
-In addition to our normal contribution guidelines, we strongly advise you do the following to your stdlib contribution:
+除了我们的常规贡献指南外，我们强烈建议您对标准库贡献执行以下操作：
 
-* **Add Documentation**: Classes and methods should be documented using [reStructured text](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html).
-Please look over other source code in the stdlib to see how this is typically done.
-* **Use Python Typing**: Utilize the [Python typing module](https://docs.python.org/3/library/typing.html) to specify parameter and method return types.
-* **Use relative imports**: Within the gem5 stdlib, relative imports should be used to reference other modules/package in the stdlib (i.e., that contained in `src/python/gem5`).
-* **Format using black**: Please format your Python code with [Python black](https://pypi.org/project/black/), with 79 max line widths: `black --line-length=79 <file/directory>`.
-**Note**: Python black does not always enforce line lengths.
-For example, it will not reduce string lengths.
-You may have to manually reduce the length of some lines.
+* **添加文档**：应使用 [reStructured text](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html) 记录类和方法。
+请查看标准库中的其他源代码，了解通常是如何完成的。
+* **使用 Python 类型**：利用 [Python typing 模块](https://docs.python.org/3/library/typing.html) 指定参数和方法返回类型。
+* **使用相对导入**：在 gem5 标准库中，应使用相对导入来引用标准库中的其他模块/包（即，包含在 `src/python/gem5` 中的内容）。
+* **使用 black 格式化**：请使用 [Python black](https://pypi.org/project/black/) 格式化您的 Python 代码，最大行宽为 79：`black --line-length=79 <file/directory>`。
+**注意**：Python black 并不总是强制执行行长度。
+例如，它不会减少字符串长度。
+您可能需要手动减少某些行的长度。
 
-Code will be reviewed via [GitHub](https://github.com/gem5/gem5) like all other contributions.
-We would, however, emphasize that we will not accept patches to the library for simply being functional and tested;
-we require some persuasion that the contribution improves the library and benefits the community.
-For example, niche components may not be incorporated if they are seen to be low utility while increasing the library's maintenance overhead.
+代码将通过 [GitHub](https://github.com/gem5/gem5) 进行审查，就像所有其他贡献一样。
+但是，我们要强调的是，我们不会仅仅因为功能性和经过测试就接受对库的补丁；
+我们需要一些说服力，证明贡献改进了库并有益于社区。
+例如，如果小众组件被认为效用较低，同时增加了库的维护开销，则可能不会被纳入。

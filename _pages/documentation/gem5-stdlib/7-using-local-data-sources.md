@@ -1,31 +1,31 @@
 ---
 layout: documentation
-title: Setting gem5 Resources data sources to support local resources
+title: 设置 gem5 Resources 数据源以支持本地资源
 parent: gem5-standard-library
 doc: gem5 documentation
 permalink: /documentation/gem5-stdlib/using-local-resources
 author: Harshil Patel
 ---
 
-gem5 supports using local data sources in the form of a MongoDB Atlas and JSON datasource. gem5 has a default resources config in `src/python/gem5_default_config.py`. This resources config points to the MongoDB Atlas collection of gem5 resources. To utilize data sources other than the main gem5 resources database, you will need to override the gem5-resources-config.
+gem5 支持使用 MongoDB Atlas 和 JSON 数据源形式的本地数据源。gem5 在 `src/python/gem5_default_config.py` 中有一个默认资源配置。此资源配置指向 gem5 资源的 MongoDB Atlas 集合。要使用主 gem5 资源数据库以外的数据源，您需要覆盖 gem5-resources-config。
 
-There are several ways to update the gem5 resources configuration:
+有几种方法可以更新 gem5 资源配置：
 
-1. **Setting GEM5_CONFIG environment variable:** You can set the GEM5_CONFIG environment variable to specify a new configuration file. Doing this will replace the default resources configuration with the one you've specified.
+1. **设置 GEM5_CONFIG 环境变量**：您可以设置 GEM5_CONFIG 环境变量以指定新的配置文件。这样做将用您指定的配置替换默认资源配置。
 
-2. **Using gem5-config.json:** If a file named gem5-config.json exists in the current working directory, it will take precedence over the default resources configuration.
+2. **使用 gem5-config.json**：如果当前工作目录中存在名为 gem5-config.json 的文件，它将优先于默认资源配置。
 
-3. **Fallback to default resources config:** If neither of the above methods is used, the system will resort to using the default resources configuration.
+3. **回退到默认资源配置**：如果上述两种方法都未使用，系统将使用默认资源配置。
 
-Additionally, if you wish to utilize or add a local resource JSON file to the currently selected config (as mentioned in the above methods), you have two additional methods available:
+此外，如果您希望利用或添加本地资源 JSON 文件到当前选定的配置（如上述方法中所述），您还有两种额外的方法可用：
 
-- **GEM5_RESOURCE_JSON environment variable:** This variable can be employed to override the current resources configuration and make use of a specified JSON file.
+- **GEM5_RESOURCE_JSON 环境变量**：此变量可用于覆盖当前资源配置并使用指定的 JSON 文件。
 
-- **GEM5_RESOURCE_JSON_APPEND environment variable:** Use this variable to add a JSON file to the existing resources configuration without replacing it.
+- **GEM5_RESOURCE_JSON_APPEND 环境变量**：使用此变量将 JSON 文件添加到现有资源配置中，而不替换它。
 
-It's essential to note that overriding or appending doesn't modify the actual configuration files themselves. These methods allow you to temporarily specify or add resource configurations during runtime without altering the original configuration files.
+需要注意的是，覆盖或追加不会修改实际的配置文件本身。这些方法允许您在运行时临时指定或添加资源配置，而无需更改原始配置文件。
 
-MongoDB Atlas Config Format:
+MongoDB Atlas 配置格式：
 
 ```json
 {
@@ -43,7 +43,7 @@ MongoDB Atlas Config Format:
 }
 ```
 
-JSON Config Format:
+JSON 配置格式：
 
 ```json
 {
@@ -56,17 +56,17 @@ JSON Config Format:
 }
 ```
 
-### Setting up a MongoDB Atlas Database
+### 设置 MongoDB Atlas 数据库
 
-You would need to set up an Atlas cluster, steps on setting up an Atlas cluster can be found here:
+您需要设置 Atlas 集群，设置 Atlas 集群的步骤可以在这里找到：
 - https://www.mongodb.com/basics/mongodb-atlas-tutorial
 
-You would also need to enable Atlas dataAPI, steps on enabling dataAPI can be found here:
+您还需要启用 Atlas dataAPI，启用 dataAPI 的步骤可以在这里找到：
 - https://www.mongodb.com/docs/atlas/app-services/data-api/generated-endpoints/
 
-### Using Multiple Data Sources
+### 使用多个数据源
 
-gem5 supports the use of more than one data source. The structure of the resource configuration is as follows:
+gem5 支持使用多个数据源。资源配置的结构如下：
 
 ```json
 {
@@ -93,29 +93,29 @@ gem5 supports the use of more than one data source. The structure of the resourc
 }
 ```
 
-The above example shows a gem5 resources config with a MongoDB Atlas data source and 2 JSON data sources. By default gem5 will create a union of all the resources present in all the specified data sources. If you ask to obtain a resource where multiple data sources have the same `id` and `resource_version` of the resource then an error will be thrown. You can also specify a subset of data sources to obtain resources from:
+上面的示例显示了一个 gem5 资源配置，其中包含一个 MongoDB Atlas 数据源和 2 个 JSON 数据源。默认情况下，gem5 将创建所有指定数据源中存在的所有资源的并集。如果您要求获取多个数据源具有相同 `id` 和 `resource_version` 的资源，则会抛出错误。您还可以指定数据源的子集以从中获取资源：
 
 ```python
 resource = obtain_resource("id", clients=["data-source-json-1"])
 ```
 
-### Understanding Local Resources
+### 理解本地资源
 
-Local resources, in the context of gem5, pertain to resources that users possess and wish to integrate into gem5 but aren't pre-existing in the gem5 resources database.
+本地资源，在 gem5 的上下文中，是指用户拥有并希望集成到 gem5 中但不在 gem5 资源数据库中预先存在的资源。
 
-For users, This offers the flexibility to employ their own resources seamlessly within gem5, bypassing the need to create dedicated resource objects using `BinaryResource(local_path=/path/to/binary)`. Instead, they can directly utilize these local resources through `obtain_resource()`, streamlining the integration process.
+对于用户来说，这提供了在 gem5 中无缝使用自己资源的灵活性，无需使用 `BinaryResource(local_path=/path/to/binary)` 创建专用资源对象。相反，他们可以直接通过 `obtain_resource()` 使用这些本地资源，简化集成过程。
 
-### Using Custom Resource Configuration and Local Resources
+### 使用自定义资源配置和本地资源
 
-In this example, we will walk through how to set up your custom configuration and utilize your own local resources. For this illustration, we'll employ a JSON file as our resource data source.
+在本示例中，我们将逐步介绍如何设置自定义配置并使用您自己的本地资源。为了说明，我们将使用 JSON 文件作为资源数据源。
 
-#### Creating a Custom Resource Data Source
+#### 创建自定义资源数据源
 
-Let's begin by creating a local resource. This is a bare bones resource that will serve as an example. To use local resources with `obtain_resource()`, our bare bones resource need to have a binary file. Here we use an empty binary called `fake-binary`. 
+让我们首先创建一个本地资源。这是一个基础资源，将作为示例。要使用 `obtain_resource()` 使用本地资源，我们的基础资源需要有一个二进制文件。这里我们使用一个名为 `fake-binary` 的空二进制文件。
 
-**Note**: Make sure that Gem5 binary and `fake-binary` have same ISA target (RISCV here).
+**注意**：确保 Gem5 二进制文件和 `fake-binary` 具有相同的 ISA 目标（这里是 RISCV）。
 
-Next, let's create the JSON data source. I'll name the file `my-resources.json`. The contents should look like this:
+接下来，让我们创建 JSON 数据源。我将文件命名为 `my-resources.json`。内容应该如下所示：
 
 ```json
 [
@@ -144,13 +144,13 @@ Next, let's create the JSON data source. I'll name the file `my-resources.json`.
 ]
 ```
 
-The JSON file of a resource should adhere to the [gem5 resources schema](https://resources.gem5.org/gem5-resources-schema.json).
+资源的 JSON 文件应遵循 [gem5 resources schema](https://resources.gem5.org/gem5-resources-schema.json)。
 
-**Note**: While the `url` field can be a link, in this case, I'm using a local file.
+**注意**：虽然 `url` 字段可以是链接，但在这种情况下，我使用的是本地文件。
 
-#### Creating Your Custom Resource Configuration
+#### 创建您的自定义资源配置
 
-Create a file named `gem5-config.json` with the following content:
+创建一个名为 `gem5-config.json` 的文件，内容如下：
 
 ```json
 {
@@ -163,28 +163,28 @@ Create a file named `gem5-config.json` with the following content:
 }
 ```
 
-**Note**: It is implied that isMongo = false means that the data source is a JSON data source as gem5 currently only supports 2 types of data sources.
+**注意**：隐含的是 isMongo = false 意味着数据源是 JSON 数据源，因为 gem5 目前仅支持 2 种类型的数据源。
 
-#### Running gem5 with a Local Data Source
+#### 使用本地数据源运行 gem5
 
-First, build gem5 with the ALL build, which contains RISCV:
+首先，使用包含 RISCV 的 ALL 构建构建 gem5：
 
 ```bash
 scons build/ALL/gem5.opt -j`nproc`
 ```
 
-Next, run the `local-resource-example.py` file using our local `test-binary` resource:
+接下来，使用我们的本地 `test-binary` 资源运行 `local-resource-example.py` 文件：
 
-Using environment variable
+使用环境变量
 
 ```bash
 GEM5_RESOURCE_JSON_APPEND=path/to/my-resources.json ./build/ALL/gem5.opt configs/example/gem5_library/local-resource-example.py --resource test-binary
 ```
 
-or you can overwrite the `gem5_default_config` with our own custom config:
+或者您可以用我们自己的自定义配置覆盖 `gem5_default_config`：
 
 ```bash
 GEM5_CONFIG=path/to/gem5-config.json ./build/ALL/gem5.opt configs/example/gem5_library/local-resource-example.py --resource test-binary
 ```
 
-This command will execute the `local-resource-example.py` script using our locally downloaded resource. This script just calls the obtain_resource function and prints the local path of the resource. This script indicates that local resources function similarly as resources on the gem5 resources database.
+此命令将使用我们本地下载的资源执行 `local-resource-example.py` 脚本。此脚本只是调用 obtain_resource 函数并打印资源的本地路径。此脚本表明本地资源的功能与 gem5 资源数据库上的资源类似。

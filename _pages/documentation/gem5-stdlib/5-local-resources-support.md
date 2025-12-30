@@ -1,46 +1,46 @@
 ---
 layout: documentation
-title: Local Resources Support in gem5
+title: gem5 中的本地资源支持
 parent: gem5-standard-library
 doc: gem5 documentation
 permalink: /documentation/gem5-stdlib/local-resources-support
 author: Kunal Pai, Harshil Patel
 ---
 
-This tutorial will walk you through the process of creating a WorkloadResource in gem5 and testing it, through the new gem5 Resources infrastructure introduced in gem5 v23.0.
+本教程将引导您完成在 gem5 中创建 WorkloadResource 并测试它的过程，通过 gem5 v23.0 中引入的新 gem5 Resources 基础设施。
 
-A workload is set to a board in gem5 through the following line:
+工作负载通过以下行设置到 gem5 中的开发板：
 
 ``` python
 board.set_workload(obtain_resource(<ID_OF_WORKLOAD>))
 ```
 
-The following image shows what a Resource ID is, as viewed on the [gem5 Resources website](https://resources.gem5.org/):
-![gem5 resource ID example](/assets/img/stdlib/gem5-resource-id-example.png)
+下图显示了资源 ID 是什么，如 [gem5 Resources 网站](https://resources.gem5.org/) 上所示：
+![gem5 资源 ID 示例](/assets/img/stdlib/gem5-resource-id-example.png)
 
-Therefore, the WorkloadResource with ID '<ID_OF_WORKLOAD>' will be parsed and it will be used to construct the function call it defines. 
+因此，ID 为 '<ID_OF_WORKLOAD>' 的 WorkloadResource 将被解析，并将用于构造它定义的函数调用。
 
-The function call specified in the `"function"` field of the Workload JSON is then executed on the board, along with any parameters it has defined in the `"additional_parameters"` field.
+然后在开发板上执行 Workload JSON 的 `"function"` 字段中指定的函数调用，以及它在 `"additional_parameters"` 字段中定义的任何参数。
 
-## Introduction
+## 简介
 
-The gem5 Resources infrastructure allows adding a local JSON data source that can be added to the main gem5 Resources MongoDB database.
+gem5 Resources 基础设施允许添加本地 JSON 数据源，可以将其添加到主 gem5 Resources MongoDB 数据库。
 
-We will use the local JSON data source to add a new WorkloadResource to gem5.
+我们将使用本地 JSON 数据源向 gem5 添加新的 WorkloadResource。
 
-## Prerequisites
+## 先决条件
 
-This tutorial assumes that you already have a pre-compiled Resource that you want to make into a WorkloadResource.
+本教程假设您已经有一个预编译的资源，您想将其制作为 WorkloadResource。
 
-## Defining the Workload
+## 定义工作负载
 
-### Defining the Resource JSON
+### 定义资源 JSON
 
-The first step is to define the Resource that is used in a WorkloadResource.
-In case the Resource already exists in gem5, you may skip this step.
-Let's assume that the Resource we want to wrap in a WorkloadResource is compiled for `RISC-V`, categorized as a `binary`, and has the name `my-benchmark`.
+第一步是定义在 WorkloadResource 中使用的资源。
+如果资源已存在于 gem5 中，您可以跳过此步骤。
+让我们假设我们想要包装在 WorkloadResource 中的资源是为 `RISC-V` 编译的，分类为 `binary`，名称为 `my-benchmark`。
 
-We can define this Resource in a JSON object as follows:
+我们可以在 JSON 对象中定义此资源，如下所示：
 
 ``` json
 {
@@ -56,16 +56,16 @@ We can define this Resource in a JSON object as follows:
 }
 ```
 
-It is important to initialize all the fields here correctly, as they are used by gem5 to initialize and run the Resource.
+正确初始化此处的所有字段很重要，因为 gem5 使用它们来初始化和运行资源。
 
-To see more about the fields required and not required by the Resources, see the [gem5 Resources JSON Schema](https://github.com/gem5/gem5-resources-website/blob/main/public/gem5-resources-schema.json).
+要查看资源所需和不需要的字段的更多信息，请参阅 [gem5 Resources JSON Schema](https://github.com/gem5/gem5-resources-website/blob/main/public/gem5-resources-schema.json)。
 
-### Defining the Workload JSON
+### 定义工作负载 JSON
 
-Assuming that the binary of the Resource is uploaded to gem5 Resources cloud, its source code is available on the [gem5-resources GitHub repository](https://github.com/gem5/gem5-resources/) and the Resource is viewable on the [gem5 Resources website](https://resources.gem5.org) , you can now define the Workload JSON.
-Let's assume that the WorkloadResource we are building wraps `my-benchmark`, and is called `binary-workload`.
+假设资源的二进制文件已上传到 gem5 Resources 云，其源代码在 [gem5-resources GitHub 仓库](https://github.com/gem5/gem5-resources/) 上可用，并且资源在 [gem5 Resources 网站](https://resources.gem5.org) 上可见，您现在可以定义工作负载 JSON。
+让我们假设我们正在构建的 WorkloadResource 包装了 `my-benchmark`，并称为 `binary-workload`。
 
-We can define this WorkloadResource in a local JSON file as follows:
+我们可以在本地 JSON 文件中定义此 WorkloadResource，如下所示：
 
 ``` json
 {
@@ -87,22 +87,22 @@ We can define this WorkloadResource in a local JSON file as follows:
 }
 ```
 
-The `"function"` field defines the function that will be called on the board.
-The `"resources"` field defines the Resources that will be passed into the Workload.
-The `"additional_parameters"` field defines the additional parameters that will be passed into the WorkloadResource.
-So, the WorkloadResource defined above is equivalent to the following line of code:
+`"function"` 字段定义将在开发板上调用的函数。
+`"resources"` 字段定义将传递到工作负载的资源。
+`"additional_parameters"` 字段定义将传递到 WorkloadResource 的附加参数。
+因此，上面定义的 WorkloadResource 等效于以下代码行：
 
 ``` python
 board.set_se_binary_workload(binary = obtain_resource("binary_resource"), arguments = ["arg1", "arg2"])
 ```
 
-To see more about the fields required and not required by the workloads, see the [gem5 Resources JSON Schema](https://github.com/gem5/gem5-resources-website/blob/main/public/gem5-resources-schema.json)
+要查看工作负载所需和不需要的字段的更多信息，请参阅 [gem5 Resources JSON Schema](https://github.com/gem5/gem5-resources-website/blob/main/public/gem5-resources-schema.json)
 
-## Testing the Workload
+## 测试工作负载
 
-To test the WorkloadResource, we first have to add the local JSON file as a data source for gem5.
+要测试 WorkloadResource，我们首先必须将本地 JSON 文件添加为 gem5 的数据源。
 
-This can be done by creating a new JSON file with the following format:
+这可以通过创建具有以下格式的新 JSON 文件来完成：
 
 ``` json
 {
@@ -114,20 +114,20 @@ This can be done by creating a new JSON file with the following format:
     }
 }
 ```
-On running gem5, if the new JSON config file you have created is present in the current working directory, it will be used as the data source for gem5.
-If the JSON file is not present in the current working directory, you can specify the path to the JSON file using the `GEM5_CONFIG` flag while building gem5.
+在运行 gem5 时，如果您创建的新 JSON 配置文件存在于当前工作目录中，它将用作 gem5 的数据源。
+如果 JSON 文件不在当前工作目录中，您可以在构建 gem5 时使用 `GEM5_CONFIG` 标志指定 JSON 文件的路径。
 
-You should now be able to use the WorkloadResource in your simulations through its name, `binary-workload`.
+您现在应该能够通过其名称 `binary-workload` 在模拟中使用 WorkloadResource。
 
-**NOTE**: In order to check if the Resources you specified as part of a WorkloadResource are being passed into the WorkloadResource correctly, you can use the `get_parameters()` function in the WorkloadResource class.
-This function returns a dictionary of the Resources passed into the WorkloadResource.
-Its implementation can be found in [`src/python/gem5/resources/resource.py`](https://github.com/gem5/gem5/blob/6f5d877b1aacd551749dafa87da26600a4f01155/src/python/gem5/resources/resource.py#L673).
+**注意**：为了检查您指定为 WorkloadResource 一部分的资源是否正确传递到 WorkloadResource，您可以使用 WorkloadResource 类中的 `get_parameters()` 函数。
+此函数返回传递到 WorkloadResource 的资源的字典。
+其实现可以在 [`src/python/gem5/resources/resource.py`](https://github.com/gem5/gem5/blob/6f5d877b1aacd551749dafa87da26600a4f01155/src/python/gem5/resources/resource.py#L673) 找到。
 
-From gem5 v23.1, there are a couple additional ways to define your local `resources.json` file.
-Both these ways are through environment variables and are defined through the command line while running a gem5 simulation.
+从 gem5 v23.1 开始，有几种额外的方法来定义本地 `resources.json` 文件。
+这两种方法都通过环境变量，并在运行 gem5 模拟时通过命令行定义。
 
-1. `GEM5_RESOURCE_JSON` variable: This variable substitutes all the current data sources used by gem5 with the JSON file present at the path passed in through this variable. 
-This is equivalent to a gem5 data source configuration file as follows:
+1. `GEM5_RESOURCE_JSON` 变量：此变量用通过此变量传入的路径中存在的 JSON 文件替换 gem5 使用的所有当前数据源。
+这等效于如下所示的 gem5 数据源配置文件：
 
     ``` json
     {
@@ -140,8 +140,8 @@ This is equivalent to a gem5 data source configuration file as follows:
     }
     ```
 
-2. `GEM5_RESOURCE_JSON_APPEND` variable: This variable adds the JSON file present at the path passed in through this variable to all the current data sources used by gem5.
-This is equivalent to a gem5 data source configuration file as follows:
+2. `GEM5_RESOURCE_JSON_APPEND` 变量：此变量将通过此变量传入的路径中存在的 JSON 文件添加到 gem5 使用的所有当前数据源。
+这等效于如下所示的 gem5 数据源配置文件：
 
     ``` json
     {
@@ -158,16 +158,16 @@ This is equivalent to a gem5 data source configuration file as follows:
     }
     ```
 
-## Support for Local Path to Resources
+## 对资源本地路径的支持
 
-From gem5 v23.1, support has been added to make a workload of local resources through the method mentioned above.
+从 gem5 v23.1 开始，已添加支持，通过上述方法创建本地资源的工作负载。
 
-This method involves making the same JSON object as mentioned in [Defining the Resource JSON](#defining-the-resource-json), with the addition of the "url" field.
-This field is used in the gem5 Resources database to indicate where the file for a Resource is.
-From gem5 v23.1, this field also accepts the _file_ URI scheme.
-You can specify a path on your localhost and gem5 would be able to run it.
+此方法涉及创建与[定义资源 JSON](#defining-the-resource-json) 中提到的相同的 JSON 对象，并添加 "url" 字段。
+此字段在 gem5 Resources 数据库中用于指示资源文件的位置。
+从 gem5 v23.1 开始，此字段还接受 _file_ URI 方案。
+您可以指定本地主机上的路径，gem5 将能够运行它。
 
-With these changes, a JSON object for a local instance of `my-benchmark` would look like:
+通过这些更改，`my-benchmark` 的本地实例的 JSON 对象将如下所示：
 
 ``` json
 {
@@ -184,4 +184,4 @@ With these changes, a JSON object for a local instance of `my-benchmark` would l
 }
 ```
 
-**NOTE**: If you are creating a local version of a Resource with an ID that exists in gem5 Resources, be sure to change the `"resource_version"` field to a resource version that does not exist in the gem5 Resources database to avoid receiving an error while running a gem5 simulation. 
+**注意**：如果您正在创建 ID 存在于 gem5 Resources 中的资源的本地版本，请确保将 `"resource_version"` 字段更改为 gem5 Resources 数据库中不存在的资源版本，以避免在运行 gem5 模拟时收到错误。

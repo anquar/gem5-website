@@ -1,23 +1,23 @@
 ---
 layout: documentation
-title: How To Create Your Own Board Using The gem5 Standard Library
+title: 如何使用 gem5 标准库创建您自己的开发板
 parent: gem5-standard-library
 doc: gem5 documentation
 permalink: /documentation/gem5-stdlib/develop-stdlib-board
 author: Jasjeet Rangi, Kunal Pai
 ---
 
-## How to Create Your Own Board Using the gem5 Standard Library
+## 如何使用 gem5 标准库创建您自己的开发板
 
-In this tutorial we will cover how to create a custom board using the gem5 Standard Library.
+在本教程中，我们将介绍如何使用 gem5 标准库创建自定义开发板。
 
-This tutorial is based on the process used to make the _RiscvMatched_, a RISC-V prebuilt board that inherits from `MinorCPU`. This board can be found at `src/python/gem5/prebuilt/riscvmatched`.
+本教程基于制作 _RiscvMatched_ 的过程，这是一个继承自 `MinorCPU` 的 RISC-V 预构建开发板。此开发板可以在 `src/python/gem5/prebuilt/riscvmatched` 找到。
 
-This tutorial will create a single-channeled DDR4 memory of size 2 GiB, a core using the MinorCPU and the RISC-V ISA though the same process can be used for another type or size of memory, ISA and core.
+本教程将创建一个大小为 2 GiB 的单通道 DDR4 内存，一个使用 MinorCPU 和 RISC-V ISA 的核心，尽管相同的过程可以用于其他类型或大小的内存、ISA 和核心。
 
-Likewise, this tutorial will utilize the UniqueCacheHierarchy made in the [Developing Your Own Components Tutorial](https://www.gem5.org/documentation/gem5-stdlib/develop-own-components-tutorial), though anyother cache hierarchy may be used.
+同样，本教程将利用在[开发您自己的组件教程](https://www.gem5.org/documentation/gem5-stdlib/develop-own-components-tutorial)中制作的 UniqueCacheHierarchy，尽管可以使用任何其他缓存层次结构。
 
-First, we start by importing the components and stdlib features we require.
+首先，我们开始导入所需的组件和标准库功能。
 
 ``` python
 from typing import List
@@ -44,20 +44,20 @@ from gem5.isas import ISA
 from gem5.utils.override import overrides
 ```
 
-We will begin development by creating a specialized CPU core for our board which inherits from an ISA-specific version of the chosen CPU.
-Since our ISA is RISC-V and the CPU type we desire is a MinorCPU, we will inherit from `RiscvMinorCPU`.
-This is done so that we can set our own parameters to tailor the CPU it to our requirements.
-In our example will override a single parameter:  `decodeToExecuteForwardDelay` (the default is 1).
-We have called this new CPU core type `UniqueCPU`.
+我们将通过为我们的开发板创建一个专门的 CPU 核心来开始开发，该核心继承自所选 CPU 的 ISA 特定版本。
+由于我们的 ISA 是 RISC-V，我们想要的 CPU 类型是 MinorCPU，我们将从 `RiscvMinorCPU` 继承。
+这样做是为了我们可以设置自己的参数以根据我们的要求定制 CPU。
+在我们的示例中，我们将覆盖单个参数：`decodeToExecuteForwardDelay`（默认值为 1）。
+我们将这个新的 CPU 核心类型称为 `UniqueCPU`。
 
 ``` python
 class UniqueCPU(RiscvMinorCPU):
     decodeToExecuteForwardDelay = 2
 ```
 
-As `RiscvMinorCPU` inherits from `BaseCPU`, we can incorporate this into the standard library using `BaseCPUCore`, a Standard Library wrapper for `BaseCPU` objects (source code for this can be found at `src/python/gem5/components/processors/base_cpu_core.py`).
-The `BaseCPUCore` takes the `BaseCPU` as an argument during construction.
-Ergo, we can do the following:
+由于 `RiscvMinorCPU` 继承自 `BaseCPU`，我们可以使用 `BaseCPUCore`（`BaseCPU` 对象的标准库包装器，其源代码可以在 `src/python/gem5/components/processors/base_cpu_core.py` 找到）将其整合到标准库中。
+`BaseCPUCore` 在构造时将 `BaseCPU` 作为参数。
+因此，我们可以执行以下操作：
 
 ```python
 core = BaseCPUCore(core=UniqueCPU(), isa=ISA.RISCV)
@@ -65,26 +65,26 @@ core = BaseCPUCore(core=UniqueCPU(), isa=ISA.RISCV)
 
 <!-- **Note**: `BaseCPU` objects require a unique `core_id` to be specified upon construction. -->
 
-Next we must define our processor.
-In the gem5 Standard Library a processor is a collection of cores.
-In cases, such as ours, we can utilize the library's `BaseCPUProcessor`, a processor which contains `BaseCPUCore` objects (source code can be found in `src/python/gem5/components/processors/base_cpu_processor.py`).
-The `BaseCPUProcessor` requires a list of `BaseCPUCore`s.
-Therefore:
+接下来我们必须定义我们的处理器。
+在 gem5 标准库中，处理器是核心的集合。
+在这种情况下，例如我们的情况，我们可以利用库的 `BaseCPUProcessor`，一个包含 `BaseCPUCore` 对象的处理器（源代码可以在 `src/python/gem5/components/processors/base_cpu_processor.py` 找到）。
+`BaseCPUProcessor` 需要一个 `BaseCPUCore` 列表。
+因此：
 
 ```python
 processor = BaseCPUProcessor(cores=[core])
 ```
 
-Next we focus on the construction of the board to host our components.
-All boards must inherit from `AbstractBoard` and in most cases, gem5's `System` simobject.
-Therefore, our board will inherit from `AbstractSystemBoard` in this case; an abstract class that inherits from both.
+接下来我们专注于构建开发板以承载我们的组件。
+所有开发板都必须继承自 `AbstractBoard`，在大多数情况下，还要继承 gem5 的 `System` simobject。
+因此，在这种情况下，我们的开发板将从 `AbstractSystemBoard` 继承；这是一个继承自两者的抽象类。
 
-In order to run simulations with SE mode, we must also inherit from `SEBinaryWorkload`.
+为了在 SE 模式下运行模拟，我们还必须继承自 `SEBinaryWorkload`。
 
-All `AbstractBoard`s must specify `clk_freq` (the clock frequency), the `processor`, `memory`, and the `cache_hierarchy`.
-We already have our processor, and will use the `UniqueCacheHierarchy` for the `cache_hierarchy` and a `SingleChannelDDR4_2400`, with a size of 2GiB for the memory.
+所有 `AbstractBoard` 都必须指定 `clk_freq`（时钟频率）、`processor`、`memory` 和 `cache_hierarchy`。
+我们已经有了处理器，并将使用 `UniqueCacheHierarchy` 作为 `cache_hierarchy`，使用大小为 2GiB 的 `SingleChannelDDR4_2400` 作为内存。
 
-We will call this the `UniqueBoard` and it should look like the following:
+我们将此称为 `UniqueBoard`，它应该如下所示：
 
 ``` python
 class UniqueBoard(AbstractSystemBoard, SEBinaryWorkload):
@@ -104,16 +104,16 @@ class UniqueBoard(AbstractSystemBoard, SEBinaryWorkload):
         )
 ```
 
-With the contructor complete, we must implement the abstract methods in `AbstractSystemBoard`.
-It is useful here to look at the source for `AbstractBoard` in `/src/python/gem5/components/boards/abstract_system_board.py`.
+构造函数完成后，我们必须实现 `AbstractSystemBoard` 中的抽象方法。
+在这里查看 `/src/python/gem5/components/boards/abstract_system_board.py` 中 `AbstractBoard` 的源代码很有用。
 
-The abstract methods you choose to implement or not will depend on what type of system you are creating.
-In our example functions such as `_setup_board`, are unneeded so we will implement them with `pass`.
-In other instances we will use `NotImplementedError` for cases where a particular component/feature is not available on this board and an error should be returned if trying to access it.
-For example, our board will have no IO bus.
-We will therefore implement `has_io_bus` to return `False` and have `get_io_bus` raise a `NotImplementedError` if called.
+您选择实现或不实现的抽象方法将取决于您创建的系统类型。
+在我们的示例中，诸如 `_setup_board` 之类的函数是不需要的，因此我们将使用 `pass` 实现它们。
+在其他情况下，我们将使用 `NotImplementedError` 来处理此开发板上不可用的特定组件/功能的情况，如果尝试访问它，应该返回错误。
+例如，我们的开发板将没有 IO 总线。
+因此，我们将实现 `has_io_bus` 返回 `False`，并让 `get_io_bus` 在调用时引发 `NotImplementedError`。
 
-With the exception of `_setup_memory_ranges`, we do not implement many of the features the `AbstractSystemBoard` requires. The board should look like this:
+除了 `_setup_memory_ranges` 之外，我们不实现 `AbstractSystemBoard` 所需的许多功能。开发板应该如下所示：
 
 ``` python
 class UniqueBoard(AbstractSystemBoard, SEBinaryWorkload):
@@ -176,8 +176,8 @@ class UniqueBoard(AbstractSystemBoard, SEBinaryWorkload):
         memory.set_memory_range(self.mem_ranges)
 ```
 
-This concludes the creation of your custom board for the gem5 standard library.
-The completed board is as follows:
+这完成了为 gem5 标准库创建自定义开发板的工作。
+完成的开发板如下：
 
 ```python
 from typing import List
@@ -269,7 +269,7 @@ class UniqueBoard(AbstractSystemBoard, SEBinaryWorkload):
 
 ```
 
-From this you can create a runscript and test your board:
+由此，您可以创建一个运行脚本并测试您的开发板：
 
 ``` python
 from unique_board import UniqueBoard

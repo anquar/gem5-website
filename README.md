@@ -5,7 +5,7 @@
 
 本仓库维护 **gem5 官网/文档的中文翻译**，并部署到 **Cloudflare Pages**：
 
-- **main 分支 = 可部署稳定线**：任何改动（翻译/同步上游）都通过 PR 合入，`main` 永远保持能 `jekyll build`。
+- **main 分支 = 可部署稳定线**：任何改动（翻译/同步上游）都通过 PR 合入，`main` 永远保持能 `bundle exec jekyll build`。
 - **upstream-main 分支 = 上游镜像**：定时从上游拉取并强制镜像，保持“干净对齐上游”，不在此分支做翻译提交。
 - **工作分支**：
   - **翻译**：`tr/<topic>` → PR → `main`
@@ -26,17 +26,17 @@ git remote -v
 ### Cloudflare Pages 推荐配置
 
 - **生产分支（Production branch）**: `main`
-- **构建命令（Build command）**: `bundle exec jekyll build --config _config.yml`
+- **构建命令（Build command）**: `bash ./script/build`（推荐）或 `bundle exec jekyll build --config _config.yml`
 - **构建输出目录（Build output directory）**: `_site`
 
 > 仓库已在 `.gitignore` 中忽略 `_site/`，建议不要提交构建产物。
 
-### 自动化（已内置在本仓库）
+### 自动化（建议）
 
-- **CI 构建检查**：`.github/workflows/ci.yml`（对 `main` 的 push/PR 自动跑 `jekyll build`）
-- **上游镜像 + 提醒**：`.github/workflows/sync-upstream.yml`
-  - 定时把 `upstream-main` 镜像到上游最新
-  - 若检测到更新，会自动创建一个带 `sync` 标签的 Issue，提醒你开 `sync/YYYYMMDD` PR 进行人工同步与冲突处理
+当前仓库未内置 CI workflow；如果你要在 CI（或其它构建环境）里做构建检查，建议统一使用：
+
+- `bash ./script/build`，或
+- `bundle exec jekyll build --config _config.yml`
 
 
 ## 开发
@@ -46,15 +46,13 @@ git remote -v
 ```
 git clone https://github.com/anquar/gem5-website
 cd website
-bundle
-jekyll serve --config _config.yml,_config_dev.yml
-```
-
-也可以使用 `bundle exec` 的方式启动 Jekyll 服务器：
-
-```
+bundle install
 bundle exec jekyll serve --config _config.yml,_config_dev.yml
 ```
+
+> 注意：请优先使用 `bundle exec jekyll ...`（或直接运行 `bash ./script/build` / `bash ./script/serve`），
+> 否则在 Cloudflare Pages 等环境中可能遇到 “You have already activated public_suffix ...” 这类
+> gem 版本冲突错误。
 
 修改完成后，可用以下命令提交：
 

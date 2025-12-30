@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Install gems into vendor/ so CI/Cloudflare caches can reuse them.
+bundle install --path vendor/bundle --jobs 4 --retry 3
+
+# Always run Jekyll via Bundler to avoid "already activated" gem version conflicts.
+bundle exec jekyll build --config _config.yml
+
+

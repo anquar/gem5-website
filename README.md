@@ -1,12 +1,41 @@
 # gem5 website
 
-The website for gem5 is written in
-[Jekyll markdown](https://jekyllrb.com/docs/configuration/markdown/).
-It serves as the primarily source of information for those interested in the
-gem5 project. In the spirit of gem5's community-led, open governance model
-anyone who wishes may make contributions and improvements to the website.
-This README outlines the basic procedure to do so, as well as notes the
-directory structure and general guidelines.
+## 中文翻译版
+
+本仓库维护 **gem5 官网/文档的中文翻译**，并部署到 **Cloudflare Pages**：
+
+- **main 分支 = 可部署稳定线**：任何改动（翻译/同步上游）都通过 PR 合入，`main` 永远保持能 `jekyll build`。
+- **upstream-main 分支 = 上游镜像**：定时从上游拉取并强制镜像，保持“干净对齐上游”，不在此分支做翻译提交。
+- **工作分支**：
+  - **翻译**：`tr/<topic>` → PR → `main`
+  - **同步上游**：`sync/YYYYMMDD`（从 `main` 拉出）→ 合并 `upstream-main` 并解决冲突 → PR → `main`
+
+### 远端（remotes）建议
+
+- **origin**：本 GitHub 仓库（Cloudflare Pages 拉取这里的 `main`）
+- **upstream**：源仓库（gem5/website 或你实际跟随的上游）
+
+示例：
+
+```
+git remote add upstream https://github.com/gem5/website.git
+git remote -v
+```
+
+### Cloudflare Pages 推荐配置
+
+- **Production branch**: `main`
+- **Build command**: `bundle exec jekyll build --config _config.yml`
+- **Build output directory**: `_site`
+
+> 仓库已在 `.gitignore` 中忽略 `_site/`，建议不要提交构建产物。
+
+### 自动化（已内置在本仓库）
+
+- **CI 构建检查**：`.github/workflows/ci.yml`（对 `main` 的 push/PR 自动跑 `jekyll build`）
+- **上游镜像 + 提醒**：`.github/workflows/sync-upstream.yml`
+  - 定时把 `upstream-main` 镜像到上游最新
+  - 若检测到更新，会自动创建一个带 `sync` 标签的 Issue，提醒你开 `sync/YYYYMMDD` PR 进行人工同步与冲突处理
 
 ## Development
 

@@ -1,74 +1,74 @@
 ---
 layout: bootcamp
-title: gem5 Resources
+title: gem5 资源
 permalink: /bootcamp/using-gem5/gem5-resources
 section: using-gem5
 ---
 <!-- _class: title -->
 
-## gem5 Resources
+## gem5 资源
 
 ---
 
-## What are Resources? (Disks, kernels, binaries, etc.)
+## 什么是资源？（磁盘、内核、二进制文件等）
 
-- gem5 resources are prebuilt artifacts that can be used to run gem5 simulations.
-- Each gem5 resource falls into one of 13 categories (such as binary or kernel) and supports one of 6 ISAs (including ARM, x86, and RISC-V).
-- For more information about categories, visit [resources.gem5.org/category](https://resources.gem5.org/category)
-- The [gem5 resources website](https://resources.gem5.org) is an easy way to search for the resources you want to use.
-  - There are filters based on category, ISA, and gem5 version that help you narrow down the resources based on your requirements.
-
----
-
-## Important categories and their description
-
-**Kernel**: A computer program that acts as the core of an operating system by managing system resources.
-**disk-image**: A file that contains an exact copy of the data stored on a storage device.
-**binary**: A program that is used to test the performance of a computer system.
-**bootloader**: A small program that is responsible for loading the operating system into memory when a computer starts up.
-**checkpoint**: A snapshot of a simulation.
-**simpoint**: This resource stores all information required to create and restore a Simpoint.
-**file**: A resource consisting of a single file.
-**workload**: Bundles of resources and any input parameters that can be run directly in gem5.
-**suite**: A collection of workloads.
+- gem5 资源是可用于运行 gem5 模拟的预构建工件。
+- 每个 gem5 资源属于 13 个类别之一（如二进制文件或内核），并支持 6 个 ISA 之一（包括 ARM、x86 和 RISC-V）。
+- 有关类别的更多信息，请访问 [resources.gem5.org/category](https://resources.gem5.org/category)
+- [gem5 资源网站](https://resources.gem5.org) 是搜索你想要使用的资源的便捷方式。
+  - 有基于类别、ISA 和 gem5 版本的过滤器，可帮助你根据需求缩小资源范围。
 
 ---
 
-## Resource Versioning
+## 重要类别及其描述
 
-- In gem5, all resources have an `id` and any update to the resource will update the `resource_version`.
-- Each unique resource is represented by its `id` and `resource_version`.
-- When an existing resource is updated the `id` remains the same but the `resource_version` is updated.
-- Each resource also has a field called `gem5_versions` which shows which releases of gem5 the resource is compatible with.
+**内核 (Kernel)**：通过管理系统资源来充当操作系统核心的计算机程序。
+**磁盘镜像 (disk-image)**：包含存储在存储设备上的数据精确副本的文件。
+**二进制文件 (binary)**：用于测试计算机系统性能的程序。
+**引导加载程序 (bootloader)**：在计算机启动时负责将操作系统加载到内存中的小程序。
+**检查点 (checkpoint)**：模拟的快照。
+**simpoint**：此资源存储创建和恢复 Simpoint 所需的所有信息。
+**文件 (file)**：由单个文件组成的资源。
+**工作负载 (workload)**：可以在 gem5 中直接运行的资源包和任何输入参数。
+**套件 (suite)**：工作负载的集合。
+
+---
+
+## 资源版本控制
+
+- 在 gem5 中，所有资源都有一个 `id`，对资源的任何更新都会更新 `resource_version`。
+- 每个唯一资源由其 `id` 和 `resource_version` 表示。
+- 当更新现有资源时，`id` 保持不变，但 `resource_version` 会更新。
+- 每个资源还有一个名为 `gem5_versions` 的字段，显示资源与哪些 gem5 版本兼容。
 
 ![resource version fit bg right](/bootcamp/02-Using-gem5/02-gem5-resouces-imgs/resource_website_version.png)
 
 ---
 
-## Using Resources in gem5 Simulations
+## 在 gem5 模拟中使用资源
 
-To use the resources in gem5, we can use the `obtain_resource` function.
+要在 gem5 中使用资源，我们可以使用 `obtain_resource` 函数。
 
-Let's do an example to use the `x86-hello64-static` binary in an example.
+让我们做一个示例，在示例中使用 `x86-hello64-static` 二进制文件。
 
-Go to the [materials/02-Using-gem5/02-gem5-resources/01-hello-example.py](../../materials/02-Using-gem5/02-gem5-resources/01-hello-example.py)
+转到 [materials/02-Using-gem5/02-gem5-resources/01-hello-example.py](../../materials/02-Using-gem5/02-gem5-resources/01-hello-example.py)
 
-This file builds a basic board and we will use the `x86-hello64-static` resource and run the simulation.
+此文件构建一个基本板子，我们将使用 `x86-hello64-static` 资源并运行模拟。
 
 ---
 
-## Run the hello binary
+## 运行 hello 二进制文件
 
-To get the binary we write the line:
+要获取二进制文件，我们编写以下行：
 
 ```python
 board.set_se_binary_workload(obtain_resource("x86-hello64-static"))
 ```
 
-Let's break down this code
+让我们分解这段代码
 
-- The part `obtain_resource("x86-hello64-static")` gets the binary from gem5 resources <!-- go into detail about the parameters -->
-- The part `board.set_se_binary_workload` tells the board to run the binary that it is given.
+- `obtain_resource("x86-hello64-static")` 部分从 gem5 资源获取二进制文件 <!-- go into detail about the parameters -->
+- `board.set_se_binary_workload` 部分告诉板子运行给定的二进制文件。
 
 Then we run the simulation
 
@@ -79,37 +79,37 @@ gem5 01-hello-example.py
 
 ---
 
-## Workloads
+## 工作负载
 
-A workload is a package of one or more resources that can have pre-defined parameters.
+工作负载是一个或多个资源的包，可以具有预定义的参数。
 
-Let's see the `x86-npb-is-size-s-run` workload.
+让我们看看 `x86-npb-is-size-s-run` 工作负载。
 
-This workload runs the NPB IS benchmark in SE mode.
+此工作负载在 SE 模式下运行 NPB IS 基准测试。
 
-You can see the JSON of the workloads in the [raw](https://resources.gem5.org/resources/x86-npb-is-size-s-run/raw?database=gem5-resources&version=1.0.0) tab on the resources website.
+你可以在资源网站的 [raw](https://resources.gem5.org/resources/x86-npb-is-size-s-run/raw?database=gem5-resources&version=1.0.0) 选项卡中查看工作负载的 JSON。
 
 ![workload se fit bg right](/bootcamp/02-Using-gem5/../02-Using-gem5/02-gem5-resouces-imgs/se_workload_ss.drawio.png)
 
 ---
 
-## Workloads (Conti.)
+## 工作负载（续）
 
-Let's see the `x86-ubuntu-24.04-boot-with-systemd` workload, you can see the [raw](https://resources.gem5.org/resources/x86-ubuntu-24.04-boot-with-systemd/raw?database=gem5-resources&version=1.0.0) tab to see how the resource is made.
+让我们看看 `x86-ubuntu-24.04-boot-with-systemd` 工作负载，你可以查看 [raw](https://resources.gem5.org/resources/x86-ubuntu-24.04-boot-with-systemd/raw?database=gem5-resources&version=1.0.0) 选项卡以了解资源的制作方式。
 
-- The `function` field has the name of the function that the workload calls.
-- The `resources` field contains the resources that the workload uses.
-  - The key of the `resources` field like `kernel`, `disk_image`, etc are named the same as the parameter name in the `function` that the workload calls.
-- The `additional_params` fields contains values of non-resource parameters that we want the workload to have.
-  - We are using the `kernel_args` parameter in the above workload.
+- `function` 字段具有工作负载调用的函数名称。
+- `resources` 字段包含工作负载使用的资源。
+  - `resources` 字段的键（如 `kernel`、`disk_image` 等）与工作负载调用的 `function` 中的参数名称相同。
+- `additional_params` 字段包含我们希望工作负载具有的非资源参数值。
+  - 我们在上面的工作负载中使用 `kernel_args` 参数。
 
 ---
 
-## Suites
+## 套件
 
-Suites are a collection of workloads that can be run in parallel using multiprocessing (this will be shown later).
+套件是工作负载的集合，可以使用多处理并行运行（稍后将显示）。
 
-All workloads in a suite have something called `input_groups` that can be used to filter the suite.
+套件中的所有工作负载都有一个名为 `input_groups` 的内容，可用于过滤套件。
 
 Let's do an example where we will:
 
@@ -183,29 +183,29 @@ simulator.run()
 
 ---
 
-## Local resources
+## 本地资源
 
-You can also use resources that you have created locally in gem5.
+你也可以在 gem5 中使用本地创建的资源。
 
-You can create a local JSON file to use as a data source, then set the:
+你可以创建一个本地 JSON 文件作为数据源，然后设置：
 
-- `GEM5_RESOURCE_JSON` environment variable to point to the JSON, if you want to just use the resources in the JSON.
-- `GEM5_RESOURCE_JSON_APPEND` environment variable to point to the JSON, if you want to use local resources along with gem5 resources.
+- `GEM5_RESOURCE_JSON` 环境变量指向 JSON，如果你只想使用 JSON 中的资源。
+- `GEM5_RESOURCE_JSON_APPEND` 环境变量指向 JSON，如果你想将本地资源与 gem5 资源一起使用。
 
-For more details on how to use local resources, read the [local resources documentation](https://www.gem5.org/documentation/gem5-stdlib/using-local-resources)
+有关如何使用本地资源的更多详细信息，请阅读[本地资源文档](https://www.gem5.org/documentation/gem5-stdlib/using-local-resources)
 
 ---
 
-## Why use local resources
+## 为什么使用本地资源
 
-gem5 has two main ways to use local resources.
+gem5 有两种主要方式使用本地资源。
 
-- Directly create the resource object by passing the local path of the resource.
+- 通过传递资源的本地路径直接创建资源对象。
   - `BinaryResource(local_path=/path/to/binary)`
-  - We can use this method when we are making new resources and want to quickly test the resource.
-- If we are going to use or share the resource that we created, it is better to create a JSON file and update the data source as mentioned in the above slide.
-  - With this method we can use `obtain_resource`.
-  - This method makes the simulations more reproducible and consistent.
+  - 当我们在制作新资源并想快速测试资源时，可以使用此方法。
+- 如果我们要使用或共享我们创建的资源，最好创建一个 JSON 文件并更新数据源，如上面的幻灯片中所述。
+  - 使用此方法，我们可以使用 `obtain_resource`。
+  - 此方法使模拟更具可重现性和一致性。
 
 Let's do an example that creates a local binary and runs that binary in gem5.
 
@@ -288,5 +288,3 @@ We do this by defining `GEM5_RESOURCE_JSON_APPEND` with our JSON resource before
 ```bash
 GEM5_RESOURCE_JSON_APPEND=local_resources.json gem5 04-run-local-resource-json.py
 ```
-
-

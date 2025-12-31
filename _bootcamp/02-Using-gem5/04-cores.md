@@ -1,25 +1,25 @@
 ---
 layout: bootcamp
-title: Modeling CPU cores in gem5
+title: 在 gem5 中建模 CPU 核心
 permalink: /bootcamp/using-gem5/cores
 section: using-gem5
 ---
 <!-- _class: title -->
 
-## Modeling CPU cores in gem5
+## 在 gem5 中建模 CPU 核心
 
 ---
 
-## Outline
+## 大纲
 
-- **Learn about CPU models in gem5​**
-  - AtomicSimpleCPU, TimingSimpleCPU, O3CPU, MinorCPU, KvmCPU​
-- Using the CPU models​
-  - Set up a simple system with two cache sizes and three CPU models​
-- Look at the gem5 generated statistics​
-  - To understand the differences between CPU models
-- Create a custom processor
-  - Change parameters of a processor based on O3CPU
+- **了解 gem5 中的 CPU 模型​**
+  - AtomicSimpleCPU、TimingSimpleCPU、O3CPU、MinorCPU、KvmCPU​
+- 使用 CPU 模型​
+  - 设置一个具有两个缓存大小和三个 CPU 模型的简单系统​
+- 查看 gem5 生成的统计信息​
+  - 了解 CPU 模型之间的差异
+- 创建自定义处理器
+  - 更改基于 O3CPU 的处理器的参数
 
 ---
 

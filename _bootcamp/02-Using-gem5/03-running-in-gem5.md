@@ -1,22 +1,22 @@
 ---
 layout: bootcamp
-title: Running Things on gem5
+title: 在 gem5 上运行程序
 permalink: /bootcamp/using-gem5/running-in-gem5
 section: using-gem5
 ---
 <!-- _class: title -->
 
-## Running Things in gem5
+## 在 gem5 中运行程序
 
 ---
 
-## What we will cover
+## 我们将介绍的内容
 
-- Intro to Syscall Emulation mode
+- 系统调用仿真模式简介
 - m5ops
-- Annotating workloads
-- Cross-compiling workloads
-- Traffic generator
+- 注释工作负载
+- 交叉编译工作负载
+- 流量生成器
 
 ---
 

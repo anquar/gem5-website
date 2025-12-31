@@ -8,7 +8,7 @@ section: using-gem5
 
 ## MultiSim
 
-Multiprocessing support for gem5 simulations.
+gem5 模拟的多处理支持。
 
 ---
 

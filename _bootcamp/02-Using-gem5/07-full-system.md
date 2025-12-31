@@ -1,6 +1,6 @@
 ---
 layout: bootcamp
-title: Full system simulation in gem5
+title: gem5 中的全系统模拟
 permalink: /bootcamp/using-gem5/full-system
 section: using-gem5
 excerpt_separator: "<!--more-->"
@@ -8,17 +8,17 @@ excerpt_separator: "<!--more-->"
 {% raw %}
 <!-- _class: title -->
 
-## Full system simulation in gem5
+## gem5 中的全系统模拟
 
 ---
 
-## What we will cover
+## 我们将介绍的内容
 
-- What is full system simulation?
-- Basics of booting up a real system in gem5
-- Creating disk images using Packer and QEMU
-- Extending/modifying a gem5 disk image
-- Using m5term to interact with a running system
+- 什么是全系统模拟？
+- 在 gem5 中启动真实系统的基础知识
+- 使用 Packer 和 QEMU 创建磁盘镜像
+- 扩展/修改 gem5 磁盘镜像
+- 使用 m5term 与运行中的系统交互
 
 ---
 

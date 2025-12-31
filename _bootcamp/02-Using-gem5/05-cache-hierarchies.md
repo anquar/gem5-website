@@ -1,12 +1,12 @@
 ---
 layout: bootcamp
-title: Modeling caches in gem5
+title: 在 gem5 中建模缓存
 permalink: /bootcamp/using-gem5/cache-hierarchies
 section: using-gem5
 ---
 <!-- _class: title -->
 
-## Modeling caches in gem5
+## 在 gem5 中建模缓存
 
 ---
 

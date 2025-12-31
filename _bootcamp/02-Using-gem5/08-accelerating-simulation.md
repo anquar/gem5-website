@@ -1,14 +1,14 @@
 ---
 layout: bootcamp
-title: Accelerating gem5 simulations
+title: 加速 gem5 模拟
 permalink: /bootcamp/using-gem5/accelerating-simulation
 section: using-gem5
 ---
 <!-- _class: title -->
 
-## Accelerating gem5 simulations
+## 加速 gem5 模拟
 
-In this section, we will cover how to accelerate gem5 simulations using fast-forwarding and checkpointing.
+在本节中，我们将介绍如何使用快进和检查点来加速 gem5 模拟。
 
 ---
 

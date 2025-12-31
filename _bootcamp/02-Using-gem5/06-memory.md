@@ -1,14 +1,14 @@
 ---
 layout: bootcamp
-title: Modeling Memory in gem5
+title: 在 gem5 中建模内存
 permalink: /bootcamp/using-gem5/memory
 section: using-gem5
 ---
 <!-- _class: title -->
 
-## Modeling Memory in gem5
+## 在 gem5 中建模内存
 
-DRAM and other memory devices!
+DRAM 和其他内存设备！
 
 ---
 

@@ -1,20 +1,20 @@
 ---
 layout: bootcamp
-title: Modeling Power in gem5
+title: 在 gem5 中建模功耗
 permalink: /bootcamp/using-gem5/modeling-power
 section: using-gem5
 ---
 <!-- _class: title -->
 
-## Modeling Power in gem5
+## 在 gem5 中建模功耗
 
 ---
 
-## What we will cover
+## 我们将介绍的内容
 
-- Idea behind power modeling
-- The `MathExprPowerModel`
-- An example
+- 功耗建模背后的思想
+- `MathExprPowerModel`
+- 一个示例
 
 ---
 

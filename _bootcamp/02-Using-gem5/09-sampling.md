@@ -1,12 +1,12 @@
 ---
 layout: bootcamp
-title: Sampled simulation with gem5
+title: 使用 gem5 进行采样模拟
 permalink: /bootcamp/using-gem5/sampling
 section: using-gem5
 ---
 <!-- _class: title -->
 
-## Sampled simulation with gem5
+## 使用 gem5 进行采样模拟
 
 ---
 

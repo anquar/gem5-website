@@ -39,7 +39,7 @@
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <!-- Pull navigation from _data/documentation.yml -->
             {% for item in site.data.documentation.docs %}
-              <li><a class="dropdown-item" href="{{ item.items[0].url | prepend: site.baseurl }}">{{ item.title }}</a></li>
+              <li><a class="dropdown-item" href="{{ item.items[0].url | prepend: site.baseurl }}">{{ item.menu_title | default: item.title }}</a></li>
             {% endfor %}
           </ul>
         </li>

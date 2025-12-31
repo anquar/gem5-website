@@ -1,5 +1,7 @@
 # Site Settings
-title: gem5
+title: gem5 (中文)
+description: gem5 模拟器官方中文文档
+lang: zh-CN
 sourceurl: "https://gem5.googlesource.com/public/gem5-website/+/refs/heads/stable/README.md"
 url: "https://www.gem5.org/"
 
@@ -9,12 +11,12 @@ defaults:
       path: ""
     values:
       layout: "page"
-      
+
 # Build Settings
 sass:
   sass_dir: _sass
 
-include: ['_pages']
+include: ['_pages', '_pages/documentation/general_docs/stdlib_api/_static']
 
 kramdown:
   input: GFM

@@ -1,70 +1,41 @@
 ---
 layout: post
-title:  "Town Hall Meeting notes"
+title:  "Town Hall 会议记录"
 author: Bobby R. Bruce
 date:   15-06-2020
 ---
 
-On Wednesday June 3rd the gem5 Workshop Town hall was held.
+6 月 3 日星期三举行了 gem5 研讨会 Town Hall。
 
-This session was recorded and is publicly available for viewing:
+本次会议已录制并公开可供观看：
 
 <iframe width="560" height="315"
 src="https://www.youtube.com/embed/fvCXmMBblZY" frameborder="0"
 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
 allowfullscreen></iframe>
 
-Noted below are the highlights from the meeting:
+下面记录的是会议的亮点：
 
-* A question was raised about minor releases. While we are open to the idea of
-releasing minor versions of gem5, we have no immediate plans to do so in the
-near future. We will continue to focus efforts on the next major version of
-gem5; to be released in the next few months.
-* The project intends to provide "good known configurations" which are
-tested against, and known to be realistic simulations of, real-world hardware.
-* To produce a faster product, it was suggested that gem5 could be
-paralleized. This is considered a task requiring significant engineering
-effort. As such, we have no intention of doing so as part of any foreseeable
-release.
-* The stats package was discussed at length, particularly the fact that its
-output is confusing.
-    * Stats documentation is accepted to be lacking and should be improved.
-    * A suggestion was raised to include a stats parser in the code-base. There
-was general agreement this would be beneficial.
-    * A JSON stats output format is now available, though not all SimObjects
-have been converted for it to function correctly in all cases.
-* Testing SimObjects was raised as a pain-point.
-    * A test harness for SimObjects would be of benefit; one that would
-permit the creation of unit tests for SimObjects.
-    * Better SimObject testing plays into gem5's broader desire to improve
-testing overall.
-* Some complained about gem5's code format checking.
-    * We could provide a clang format checker config as part of the gem5
-code-base.
-    * Some policies could be relaxed, particularly those regarding the C/C++
-header files which are, in some cases, non-standard.
-    * A general move towards more standardized C/C++ code-style standards would
-be beneficial overall.
-* It was noted that the clang address sanitizer should be run more frequently.
-Though these were run prior to the release of gem5-20, regular checks could
-catch bugs earlier in development.
-* Many in the community are are interested in the simulated performance. Going
-forward, this should be noted on the gem5 benchmark page. This data will enable
-us to understand whether our performance is degrading or improving over time.
-    * There were suggestions that simulated performance should be regularly,
-and automatically, tested in order to flag changes that result in degraded
-performance. However, it is unknown how this can be achieved.
-* FlexCPU should be merged into the gem5 code-base.
-* In a discussion regarding O3CPU; it was generally accepted that it is very
-out-of-date and needs considerable improvements.
-* PCI/PCIe support is desired by some but most agreed it should not be a top
-priority.
-* Multicore simulation is agreed to have problems and, generally, needs to be
-better supported.
-* A question was raised asking if SE mode will eventually be dropped. While we
-will continue to improve FS mode, we wish to maintain SE mode as it can be
-used to run faster simulations in cases where full-system simulation is not
-required.
-    * There is on-going engineering efforts to consolidate the SE and FS code
-in order to lessen the maintenance burden associated with supporting both modes
-of usage.
+* 提出了关于次要发布的问题。虽然我们对发布 gem5 的次要版本的想法持开放态度，但我们没有在不久的将来这样做的立即计划。我们将继续专注于下一个主要版本的 gem5；将在未来几个月内发布。
+* 该项目打算提供"已知良好配置"，这些配置经过测试，并已知是对真实硬件的现实模拟。
+* 为了生产更快的产品，有人建议 gem5 可以并行化。这被认为是一项需要大量工程工作的任务。因此，我们不打算将其作为任何可预见的发布的一部分。
+* 详细讨论了统计包，特别是其输出令人困惑的事实。
+    * 统计文档被认为不足，应该改进。
+    * 建议在代码库中包含统计解析器。普遍认为这将是有益的。
+    * 现在可以使用 JSON 统计输出格式，尽管并非所有 SimObject 都已转换以在所有情况下正确运行。
+* 测试 SimObject 被提出为一个痛点。
+    * SimObject 的测试框架将是有益的；一个允许为 SimObject 创建单元测试的框架。
+    * 更好的 SimObject 测试符合 gem5 改进整体测试的更广泛愿望。
+* 一些人对 gem5 的代码格式检查表示不满。
+    * 我们可以提供 clang 格式检查器配置作为 gem5 代码库的一部分。
+    * 可以放宽一些政策，特别是关于 C/C++ 头文件的政策，在某些情况下，这些文件是非标准的。
+    * 总体上向更标准化的 C/C++ 代码风格标准迈进将是有益的。
+* 注意到应该更频繁地运行 clang 地址清理器。尽管这些在 gem5-20 发布之前运行过，但定期检查可以在开发早期捕获错误。
+* 社区中的许多人对模拟性能感兴趣。展望未来，这应该在 gem5 基准测试页面上注明。这些数据将使我们能够了解我们的性能是随时间下降还是改善。
+    * 有建议认为应该定期和自动测试模拟性能，以便标记导致性能下降的更改。然而，尚不清楚如何实现这一点。
+* FlexCPU 应该合并到 gem5 代码库中。
+* 在关于 O3CPU 的讨论中；普遍认为它非常过时，需要大量改进。
+* 一些人希望 PCI/PCIe 支持，但大多数人同意它不应该是最高优先级。
+* 多核模拟被认为存在问题，并且通常需要更好的支持。
+* 提出了一个问题，询问 SE 模式是否最终会被放弃。虽然我们将继续改进 FS 模式，但我们希望保持 SE 模式，因为它可以在不需要全系统模拟的情况下用于运行更快的模拟。
+    * 正在进行工程努力以合并 SE 和 FS 代码，以减轻与支持两种使用模式相关的维护负担。

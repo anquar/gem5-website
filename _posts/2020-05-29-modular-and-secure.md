@@ -1,20 +1,20 @@
 ---
 layout: post
-title:  "A Modular and Secure System Architecture for the IoT"
+title:  "面向物联网的模块化和安全系统架构"
 author: Nils Asmussen, Hermann Härtig, and Gerhard Fettweis
 date:   2020-05-29
 ---
 
-Introduction
+引言
 ------------
 
-The "Internet of Things (IoT)" is already pervasive in industrial production and it is expected to become ubiquitous in many other sectors, too. For example, such connected devices have great potential to better automate and optimize critical infrastructure such as electrical grids and transportation networks and are also promising for health care applications. However, a one-size-fits-all solution for the compute hardware and system software of all these devices is infeasible, primarily due to cost pressure and energy constraints, but also because each domain requires different compute capacity, sensors, and actuators. Instead, customized solutions are needed for both the hardware and the software that drives it. System designers should be able to easily assemble these specialized computers and their operating systems (OSes) from reusable building blocks, requiring modularity at both the hardware and the OS level.
+"物联网 (IoT)" 已经在工业生产中普及，预计也将在许多其他领域变得无处不在。例如，此类连接设备在更好地自动化和优化关键基础设施（如电网和交通网络）方面具有巨大潜力，并且在医疗保健应用中也很有前景。然而，为所有这些设备的计算硬件和系统软件提供一刀切的解决方案是不可行的，主要是由于成本压力和能源限制，但也因为每个领域需要不同的计算能力、传感器和执行器。相反，硬件和驱动它的软件都需要定制解决方案。系统设计人员应该能够从可重用的构建块中轻松组装这些专用计算机及其操作系统 (OS)，这需要在硬件和 OS 级别都具有模块化。
 
-Besides modularity, security is essential due to the interaction of IoT devices with the physical world and their attachment to the Internet, enabling attackers to cause harm to the environment or humans. For that reason, using encypted communication is not sufficient, but the IoT devices themselves need to be secured as well. At the software level, the high complexity and missing isolation between subsystems in monolithic OSes render them an inappropriate choice for this security-critical use case. Instead, microkernel-based systems such as L4 [1] are a promising candidate due to their modular architecture and strong isolation between subsystems. In fact, it has been shown that a microkernel-based system could have at least reduced the severity of 96% of Linux's critical CVEs by restricting the impact to a single subsystem and could have completely eliminated 40% of the CVEs [2].
+除了模块化之外，由于 IoT 设备与物理世界的交互以及它们与互联网的连接，安全性至关重要，这使得攻击者能够对环境或人类造成伤害。因此，使用加密通信是不够的，IoT 设备本身也需要得到保护。在软件层面，单体 OS 中子系统之间的高复杂性和缺乏隔离使它们不适合这种安全关键用例。相反，基于微内核的系统（如 L4 [1]）由于其模块化架构和子系统之间的强隔离而成为有前景的候选者。事实上，已经表明，基于微内核的系统可以通过将影响限制在单个子系统内，至少降低 96% 的 Linux 关键 CVE 的严重性，并且可以完全消除 40% 的 CVE [2]。
 
-We argue that the ideas of microkernel-based systems to split up the system into multiple isolated components can and should also be applied to hardware. For example, system-on-a-chip designers often buy hardware components (IP blocks) from third-party vendors. However, IP blocks such as modems or accelerators can be complex and should therefore not be trusted. Furthermore, the recently found side-channel attacks on modern general-purpose cores such as Meltdown [3], Spectre [4], and ZombieLoad [5] have raised the question whether we should still trust these complex cores to properly enforce isolation boundaries between different software components. Thus, we believe that hardware components such as modems, accelerators, and cores should be strongly separated just as software components are in microkernel-based systems.
+我们认为，基于微内核的系统将系统拆分为多个隔离组件的想法可以也应该应用于硬件。例如，片上系统设计人员经常从第三方供应商购买硬件组件（IP 块）。然而，调制解调器或加速器等 IP 块可能很复杂，因此不应被信任。此外，最近发现的针对现代通用核心的侧信道攻击，如 Meltdown [3]、Spectre [4] 和 ZombieLoad [5]，提出了我们是否仍应信任这些复杂核心来正确执行不同软件组件之间的隔离边界的问题。因此，我们相信硬件组件（如调制解调器、加速器和核心）应该像基于微内核系统中的软件组件一样被强烈分离。
 
-System Architecture
+系统架构
 -------------------
 <p align="center">
   <img src="{{site.url}}/assets/img/blog/modular-and-secure/modular-and-secure-fig-1.png"/>
@@ -22,19 +22,19 @@ System Architecture
 
 
 
-Our system architecture [6], depicted in Figure 1a, builds upon tiled architectures, which already allow to integrate hardware components in a modular way into separate tiles. However, although the tiles are physically separate, typically they still have unrestricted access to the network-on-chip (NoC) that connects the tiles. We are proposing to add a new and simple hardware component between each tile and the NoC that restricts the tile's access to the NoC. This hardware component is called trusted communication unit (TCU). Besides isolating the tiles from each other, the TCU allows to establish and use communication channels between tiles.
+我们的系统架构 [6]，如图 1a 所示，建立在瓦片架构之上，该架构已经允许以模块化方式将硬件组件集成到单独的瓦片中。然而，尽管瓦片在物理上是分离的，但它们通常仍然对连接瓦片的片上网络 (NoC) 具有无限制的访问。我们建议在每个瓦片和 NoC 之间添加一个新的简单硬件组件，以限制瓦片对 NoC 的访问。此硬件组件称为可信通信单元 (TCU)。除了将瓦片彼此隔离之外，TCU 还允许建立和使用瓦片之间的通信通道。
 
-The operating system, called M³ and shown in Figure 1b, is designed as a microkernel-based system and leverages the TCU to isolate hardware and software components, while selectively allowing their communication. The kernel of M³ runs exclusively on a dedicated *kernel tile*, whereas services and applications run on the *user tiles*. The kernel as the only privileged component in the system is the only one that can establish communication channels between tiles. User tiles can afterwards use the established channels to directly communicate with other user tiles without involving the kernel. However, user tiles cannot change or add new channels. Due to the physical separation between tiles, M³ has no specific requirements on the tiles such as user/kernel mode or memory management units. For that reason, not only compute cores, but arbitrary hardware components such as modems, accelerators, or devices can be integrated as a user tile and the kernel can control their communication permissions in a uniform way.
+称为 M³ 的操作系统（如图 1b 所示）被设计为基于微内核的系统，并利用 TCU 来隔离硬件和软件组件，同时有选择地允许它们进行通信。M³ 的内核专门在专用的*内核瓦片*上运行，而服务和应用程序在*用户瓦片*上运行。内核作为系统中唯一的特权组件，是唯一可以在瓦片之间建立通信通道的组件。用户瓦片随后可以使用已建立的通道直接与其他用户瓦片通信，而无需涉及内核。但是，用户瓦片无法更改或添加新通道。由于瓦片之间的物理分离，M³ 对瓦片没有特定要求，例如用户/内核模式或内存管理单元。因此，不仅计算核心，而且任意硬件组件（如调制解调器、加速器或设备）都可以作为用户瓦片集成，内核可以以统一的方式控制它们的通信权限。
 
-Simulation with gem5
+使用 gem5 进行模拟
 --------------------
 
-Besides working on a FPGA-based implementation, we are prototyping the system architecture in gem5 to evaluate its feasibility. To simulate the system architecture we represent each tile as a `System` object and connect the tiles with a `NoncoherentXBar`. The `System` object implements a custom loader for M³ to load the kernel and other components onto the individual tiles. In our simulation we use x86, ARMv7, and RISC-V. However, our hardware implementation will use RISC-V cores due to their simplicity and openness. Since gem5 had only support for system emulation with RISC-V, we contributed full-system support for RISC-V to gem5, which enables us to run our OS and make use of virtual memory.
+除了基于 FPGA 的实现工作外，我们还在 gem5 中构建系统架构原型以评估其可行性。为了模拟系统架构，我们将每个瓦片表示为 `System` 对象，并使用 `NoncoherentXBar` 连接瓦片。`System` 对象为 M³ 实现了自定义加载器，以将内核和其他组件加载到各个瓦片上。在我们的模拟中，我们使用 x86、ARMv7 和 RISC-V。但是，我们的硬件实现将使用 RISC-V 核心，因为它们简单且开放。由于 gem5 仅支持 RISC-V 的系统仿真，我们为 gem5 贡献了 RISC-V 的全系统支持，这使我们能够运行我们的 OS 并利用虚拟内存。
 
-Conclusion
+结论
 ----------
 
-IoT devices that interface with the physical world and the Internet require both security and modularity. We are investigating a new system architecture that takes the ideas from microkernel-based systems for software and apply them to hardware as well. The key idea is to build upon tiled architectures and add a new and simple hardware component called trusted communication unit to each tile for isolation and communication. The microkernel-based OS called M³ builds on top of this hardware platform and establishes communication channels between otherwise isolated tiles. We believe that modularity at both the hardware and software level and the strong isolation between components enables us to deliver a suitable foundation for future IoT devices.
+与物理世界和互联网接口的 IoT 设备需要安全性和模块化。我们正在研究一种新的系统架构，该架构采用基于微内核系统的软件思想，并将其应用于硬件。关键思想是建立在瓦片架构之上，并为每个瓦片添加一个称为可信通信单元的新简单硬件组件，用于隔离和通信。称为 M³ 的基于微内核的 OS 建立在此硬件平台之上，并在原本隔离的瓦片之间建立通信通道。我们相信，硬件和软件级别的模块化以及组件之间的强隔离使我们能够为未来的 IoT 设备提供合适的基础。
 
 Bibliography
 ------------
@@ -51,7 +51,7 @@ Bibliography
 
 [6] Nils Asmussen, Marcus Völp, Benedikt Nöthen, Hermann Härtig, and Gerhard Fettweis. M³: A hardware/operating-system co-design to tame heterogeneous manycores. In Proceedings of the wenty-First International Conference on Architectural Support for Programming Languages and Operating Systems, ASPLOS'16, pages 189–203. ACM, 2016.
 
-Workshop Presentation
+研讨会演示
 ---------------------
 
 <iframe width="960" height="540"

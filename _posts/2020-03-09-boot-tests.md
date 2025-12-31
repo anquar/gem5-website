@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "X86 Linux Boot Status on gem5-19"
+title:  "gem5-19 上的 X86 Linux 启动状态"
 author: Ayaz Akram
 date:   2020-03-09
 categories: project
@@ -8,124 +8,124 @@ categories: project
 
 ![gem5-linux-logo](/assets/img/blog/gem5-linux.png)
 
-The frequency of changes pushed to gem5 is increasing with time.
-This makes it important to have an up-to-date idea of what is working with gem5 and what is not.
-The booting of the Linux kernel is a very important benchmark to ascertain the working status of gem5, considering that gem5 is a full-system simulator which should be able to simulate a modern operating system.
-However, the state of support of latest Linux kernel versions on gem5 is hard to discover, and, previously available Linux kernels or configuration files on gem5 website are quite old.
-[gem5-19](https://www.gem5.org/project/2020/02/25/gem5-19.html) has also been released recently.
+推送到 gem5 的更改频率随时间增加。
+这使得及时了解 gem5 的哪些功能正常工作、哪些不正常变得非常重要。
+考虑到 gem5 是一个全系统模拟器，应该能够模拟现代操作系统，Linux 内核的启动是确定 gem5 工作状态的一个非常重要的基准。
+然而，gem5 对最新 Linux 内核版本的支持状态很难发现，而且 gem5 网站上以前可用的 Linux 内核或配置文件相当旧。
+[gem5-19](https://www.gem5.org/project/2020/02/25/gem5-19.html) 最近也已发布。
 
-We thereby ran tests to discover where gem5-19 stands in terms of its ability to boot the latest releases of the Linux kernel.
-In this post, we will discuss the results of these tests.
+因此，我们运行了测试以发现 gem5-19 在启动最新 Linux 内核版本方面的能力。
+在这篇文章中，我们将讨论这些测试的结果。
 
-## Configuration Space
+## 配置空间
 
-The possible configuration space when simulating a Linux boot on gem5 is large.
-To test gem5-19, we evaluated multiple configurations, taking into account five Linux kernels, four CPU models, two memory systems, two Linux boot types, and four CPU core counts
+在 gem5 上模拟 Linux 启动时，可能的配置空间很大。
+为了测试 gem5-19，我们评估了多种配置，考虑了五个 Linux 内核、四个 CPU 模型、两个内存系统、两种 Linux 启动类型和四个 CPU 核心数量。
 
-We conducted these tests using the X86 ISA.
-Our methodology should extend easily to other ISAs as well, but we haven't run these tests, yet.
-We welcome other contributors to run these tests!
+我们使用 X86 ISA 进行了这些测试。
+我们的方法应该可以轻松扩展到其他 ISA，但我们还没有运行这些测试。
+我们欢迎其他贡献者运行这些测试！
 
-Following are the details of each of these:
+以下是这些配置的详细信息：
 
-### Linux Kernel
+### Linux 内核
 
-We evaluated gem5 using the five latest LTS (long term support) kernels shown below.
-We plan on continuing to test the LTS kernel releases and the most recent kernel on each gem5 release.
+我们使用下面显示的五个最新 LTS（长期支持）内核评估了 gem5。
+我们计划继续测试 LTS 内核版本以及每个 gem5 发布版本的最新内核。
 
-- v4.4.186 (released on 2016-01-10)
-- v4.9.186 (released on 2016-12-11)
-- v4.14.134 (released on 2017-11-12)
-- v4.19.83 (released on 2018-10-22)
-- v5.4 (released on 2019-11-24)
+- v4.4.186（发布于 2016-01-10）
+- v4.9.186（发布于 2016-12-11）
+- v4.14.134（发布于 2017-11-12）
+- v4.19.83（发布于 2018-10-22）
+- v5.4（发布于 2019-11-24）
 
-### CPU Model
+### CPU 模型
 
-We used four CPU models supported in gem5:
+我们使用了 gem5 支持的四种 CPU 模型：
 
-- **kvmCPU:** A CPU that does not do any timing simulation, but rather uses actual hardware to run the simulated code. It is mainly used for fast forwarding.
-- **AtomicSimpleCPU:** This CPU also does not do any timing simulation and uses atomic memory accesses. It is mostly used for fast forwarding and cache warming.
-- **TimingSimpleCPU:** This is a single cycle CPU model except for memory operations (it uses timing memory accesses).
-- **O3CPU:** This is a detailed and highly configurable out of order CPU model (it does timing simulation for both CPU and memory).
+- **kvmCPU：** 不进行任何时序模拟的 CPU，而是使用实际硬件运行模拟代码。它主要用于快速转发。
+- **AtomicSimpleCPU：** 该 CPU 也不进行任何时序模拟，并使用原子内存访问。它主要用于快速转发和缓存预热。
+- **TimingSimpleCPU：** 这是一个单周期 CPU 模型，除了内存操作（它使用时序内存访问）。
+- **O3CPU：** 这是一个详细且高度可配置的乱序 CPU 模型（它对 CPU 和内存都进行时序模拟）。
 
-### Memory System
+### 内存系统
 
-There are two main memory systems supported in gem5 (which are used in these tests):
+gem5 支持两种主要内存系统（在这些测试中使用）：
 
-- **Classic:** The Classic memory system is fast and easily configurable and supports atomic accesses, but lacks cache coherence fidelity and flexibility (it models a simplified coherence protocol).
-- **Ruby:**  The Ruby memory system models a detailed cache memory with detailed cache coherence protocols. However, it does not support atomic accesses and is slower compared to the classic memory system.
+- **Classic：** 经典内存系统速度快且易于配置，支持原子访问，但缺乏缓存一致性保真度和灵活性（它建模了一个简化的 coherence 协议）。
+- **Ruby：** Ruby 内存系统使用详细的缓存一致性协议对详细缓存进行建模。但是，它不支持原子访问，并且与经典内存系统相比速度较慢。
 
-### Boot Type
+### 启动类型
 
-Boot type refers to the kind of process which will take over once the kernel loads.
-We use two different options:
+启动类型是指内核加载后将接管的过程类型。
+我们使用两种不同的选项：
 
-- **init:** A custom init script which exits the system using the m5 exit instruction.
-- **systemd:** Systemd is the default init system that makes the system ready for use by initializing different services and managing user processes.
+- **init：** 使用 m5 exit 指令退出系统的自定义 init 脚本。
+- **systemd：** Systemd 是默认的 init 系统，通过初始化不同的服务和管理用户进程使系统准备就绪。
 
 ## gem5art
 
-We used [gem5art](https://gem5art.readthedocs.io/en/latest/index.html) (library for **a**rtifacts, **r**eproducibility, and **t**esting) to perform these experiments.
-gem5art helps us to conduct gem5 experiments in a more structured and reproducible way.
-We will, however, defer the detailed discussion on gem5art for a future blog post.
-The gem5 configuration scripts used to run these experiments are available in the [gem5art repo](https://github.com/darchr/gem5art/tree/master/docs/gem5-configs/configs-boot-tests/) and the details of how these experiments were run using gem5art can be found in the [gem5art boot tutorial](https://gem5art.readthedocs.io/en/latest/tutorials/boot-tutorial.html).
-The disk image and Linux kernel binaries we used are available from the following links (**warning:** the sizes of these files range from few MBs to 2GB):
+我们使用 [gem5art](https://gem5art.readthedocs.io/en/latest/index.html)（用于**组件**、**可重现性**和**测试**的库）来执行这些实验。
+gem5art 帮助我们以更加结构化和可重现的方式进行 gem5 实验。
+但是，我们将把关于 gem5art 的详细讨论推迟到未来的博客文章。
+用于运行这些实验的 gem5 配置脚本可在 [gem5art 仓库](https://github.com/darchr/gem5art/tree/master/docs/gem5-configs/configs-boot-tests/)中找到，有关如何使用 gem5art 运行这些实验的详细信息可以在 [gem5art 启动教程](https://gem5art.readthedocs.io/en/latest/tutorials/boot-tutorial.html)中找到。
+我们使用的磁盘镜像和 Linux 内核二进制文件可从以下链接获得（**警告：**这些文件的大小从几 MB 到 2GB 不等）：
 
-- [disk image (GZIPPED)](http://dist.gem5.org/dist/current/images/x86/ubuntu-18-04/base.img.gz) (**Note:** /root/.bashrc in this disk image contains `m5 exit`, which will make the guest terminate the simulation as soon as it boots)
+- [磁盘镜像（GZIPPED）](http://dist.gem5.org/dist/current/images/x86/ubuntu-18-04/base.img.gz)（**注意：**此磁盘镜像中的 /root/.bashrc 包含 `m5 exit`，这将使客户机在启动后立即终止模拟）
 - [vmlinux-4.4.186](http://dist.gem5.org/dist/current/kernels/x86/static/vmlinux-4.4.189)
 - [vmlinux-4.9.186](http://dist.gem5.org/dist/current/kernels/x86/static/vmlinux-4.9.186)
 - [vmlinux-4.14.134](http://dist.gem5.org/dist/current/kernels/x86/static/vmlinux-4.14.134)
 - [vmlinux-4.19.83](http://dist.gem5.org/dist/current/kernels/x86/static/vmlinux-4.19.83)
 - [vmlinux-5.4.49](http://dist.gem5.org/dist/current/kernels/x86/static/vmlinux-5.4.49)
 
-## Linux Booting Status
+## Linux 启动状态
 
-Figure 1 and 2 show the results of these experiments with the classic memory system for the init and systemd boot types respectively.
-Figure 3 and 4 show the results of these experiments for the ruby memory system for the init and systemd boot types respectively.
-All possible status outputs (shown in the figures below) are defined as follows:
+图 1 和图 2 分别显示了使用经典内存系统进行 init 和 systemd 启动类型的实验结果。
+图 3 和图 4 分别显示了使用 Ruby 内存系统进行 init 和 systemd 启动类型的实验结果。
+所有可能的状态输出（如下面的图所示）定义如下：
 
-- **timeout:** experiment did not finish in a reasonable amount of time (8 hours: this time was chosen as we found similar successful cases did not exceed this limit on the same host machine).
-- **not-supported:** cases which are not yet supported in gem5.
-- **success:** cases where Linux booted successfully.
-- **sim-crash:** cases where gem5 crashed.
-- **kernel-panic:** cases where kernel went into panic during simulation.
+- **timeout：** 实验在合理的时间内未完成（8 小时：选择此时间是因为我们发现类似的成功案例在同一主机上未超过此限制）。
+- **not-supported：** gem5 中尚未支持的案例。
+- **success：** Linux 成功启动的案例。
+- **sim-crash：** gem5 崩溃的案例。
+- **kernel-panic：** 内核在模拟期间进入 panic 的案例。
 
-When using a classic memory system, KVM and Atomic CPU models always work.
-TimingSimple CPU always works for a single core, but fails to boot the kernel for multiple CPU cores.
-The O3 CPU model fails to simulate kernel booting in most of the cases (the only success is init boot type with two Linux kernel versions).
+使用经典内存系统时，KVM 和 Atomic CPU 模型总是有效。
+TimingSimple CPU 在单核时总是有效，但在多 CPU 核心时无法启动内核。
+O3 CPU 模型在大多数情况下无法模拟内核启动（唯一的成功是使用两个 Linux 内核版本的 init 启动类型）。
 
 ![Linux boot status for classic memory system and init boot](/assets/img/blog/boot_classic_init.png)
 <br>
-*Figure 1: Linux boot status for classic memory system and init boot*
+*图 1：经典内存系统和 init 启动的 Linux 启动状态*
 
 
 ![Linux boot status for classic memory system and systemd boot](/assets/img/blog/boot_classic_systemd.png)
 <br>
-*Figure 2: Linux boot status for classic memory system and systemd boot*
+*图 2：经典内存系统和 systemd 启动的 Linux 启动状态*
 
-As shown in Figure 3 and 4, for Ruby memory system, KVM and Atomic CPU models seem to work except for a couple of cases where even the KVM CPU model times out.
-TimingSimple CPU works up to 2 cores, but fails for 4 and 8 cores.
-The O3 CPU model fails to simulate Linux booting or times out in all cases.
+如图 3 和图 4 所示，对于 Ruby 内存系统，KVM 和 Atomic CPU 模型似乎有效，除了少数情况下即使 KVM CPU 模型也会超时。
+TimingSimple CPU 最多可工作 2 个核心，但在 4 和 8 个核心时失败。
+O3 CPU 模型在所有情况下都无法模拟 Linux 启动或超时。
 
 ![Linux boot status for ruby memory system and init boot](/assets/img/blog/boot_ruby_init.png)
 <br>
-*Figure 3: Linux boot status for ruby memory system and init boot*
+*图 3：Ruby 内存系统和 init 启动的 Linux 启动状态*
 
 ![Linux boot status for ruby memory system and systemd boot](/assets/img/blog/boot_ruby_systemd.png)
 <br>
-*Figure 4: Linux boot status for ruby memory system and systemd boot*
+*图 4：Ruby 内存系统和 systemd 启动的 Linux 启动状态*
 
-The raw data/results of these experiments is available from this [link](http://dist.gem5.org/boot-test-results/boot_tests.zip) (warning: file size of ~40MB).
+这些实验的原始数据/结果可从[此链接](http://dist.gem5.org/boot-test-results/boot_tests.zip)获得（警告：文件大小约 40MB）。
 
-## Moving Forward
+## 前进方向
 
-Researchers mostly fast-forward simulations during Linux boot to avoid the problems seen above or end up using older kernel versions.
-This leads to uncertainty in simulation results and conclusions drawn from such experiments.
-As a community, we should not overlook these problems and try to enable gem5 to successfully run these boot tests.
-There are a few JIRA issues
+研究人员大多在 Linux 启动期间快速转发模拟以避免上述问题，或者最终使用较旧的内核版本。
+这导致模拟结果和从这些实验中得出的结论存在不确定性。
+作为社区，我们不应忽视这些问题，并尝试使 gem5 能够成功运行这些启动测试。
+有几个 JIRA 问题
 ([GEM5-359](https://gem5.atlassian.net/projects/GEM5/issues/GEM5-359), [GEM5-360](https://gem5.atlassian.net/projects/GEM5/issues/GEM5-360))
-open to document these problems with the hope of eventually fixing them.
-A gem5 [issue](https://gem5.googlesource.com/public/gem5/+/de24aafc161f348f678e0e0fc30b1ff2d145043b) related to TimingSimple CPU with Ruby memory system has already been fixed on the develop branch and will be part of gem5-20.
+开放以记录这些问题，希望最终能够修复它们。
+与使用 Ruby 内存系统的 TimingSimple CPU 相关的 gem5 [问题](https://gem5.googlesource.com/public/gem5/+/de24aafc161f348f678e0e0fc30b1ff2d145043b)已在 develop 分支上修复，并将成为 gem5-20 的一部分。
 
-Furthermore, we need to repeat these tests for new releases of gem5, and as new Linux kernels become available.
-We hope to keep the gem5 community up-to-date with the outcome of these tests via a new page on the gem5 website soon.
+此外，我们需要为 gem5 的新版本重复这些测试，并在新的 Linux 内核可用时进行测试。
+我们希望通过 gem5 网站上的新页面尽快让 gem5 社区了解这些测试的结果。

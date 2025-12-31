@@ -1,39 +1,39 @@
 ---
 layout: post
-title:  "Benchmarking Linkers within gem5"
+title:  "在 gem5 中对链接器进行基准测试"
 author: Melissa Jost
 date:   2023-02-16
 categories: project
 ---
-**tl;dr**: Use the [mold linker](<https://github.com/rui314/mold>) for the fastest linking times when building gem5
+**tl;dr**：构建 gem5 时使用 [mold 链接器](<https://github.com/rui314/mold>) 以获得最快的链接时间
 
-People familiar with gem5 are aware of its lengthy compilation time, especially during the linking stage.
-This can become frustrating when even a minor edit necessitates re-linking previously compiled files.
-This can add several minutes to the process.
-Keeping this in mind, we evaluated a range of currently supported linkers with gem5 to determine which one is the most efficient.
+熟悉 gem5 的人都知道它的编译时间很长，尤其是在链接阶段。
+当即使是微小的编辑也需要重新链接先前编译的文件时，这可能会变得令人沮丧。
+这可能会增加几分钟的过程。
+考虑到这一点，我们评估了一系列 gem5 当前支持的链接器，以确定哪一个最有效。
 
-To conduct these tests, we closely examined each of the linkers that gem5 currently supports including the current default linker, "ld".
-The four additional supported linkers evaluated are "lld", "bfd", "gold", and "mold".
+为了进行这些测试，我们仔细检查了 gem5 当前支持的每个链接器，包括当前默认链接器 "ld"。
+评估的四个额外支持的链接器是 "lld"、"bfd"、"gold" 和 "mold"。
 
-Our method for comparing these linkers was as follows: we first built gem5 normally by executing `scons build/ALL/gem5.opt`.
-Once the `gem5.opt` binary was compiled, we deleted it.
-Thus we were left with the compiled object files but no linked binary.
-Then, we compared runs of rebuilding/linking gem5 with each of the linkers using `/usr/bin/time scons build/ALL/gem5.opt -j12 --linker=[linker-option]`, where `/usr/bin/time` measured the duration.
-We ran these tests on a system using an AMD EPYC 7402P 24-Core processor with a 3.35 GHz frequency.
+我们比较这些链接器的方法如下：我们首先通过执行 `scons build/ALL/gem5.opt` 正常构建 gem5。
+一旦 `gem5.opt` 二进制文件被编译，我们删除它。
+因此我们留下了编译的目标文件但没有链接的二进制文件。
+然后，我们使用 `/usr/bin/time scons build/ALL/gem5.opt -j12 --linker=[linker-option]` 比较使用每个链接器重建/链接 gem5 的运行，其中 `/usr/bin/time` 测量持续时间。
+我们在使用 AMD EPYC 7402P 24 核处理器（频率为 3.35 GHz）的系统上运行这些测试。
 
-During these tests, we observed that using a linker other than the default "ld" in our experimental setup forced a recompilation of all of the m5 files.
-However, if we deleted `gem5.opt` binary after this and ran the compilation again, only `gem5.opt` was rebuilt/linked, resulting in two distinct times.
-To compare the times, we needed to take into account the time it took for the first run to build all the m5 files, as well as the time it took for the second run to re-link gem5.opt.
-These are labeled below as "all m5" versus "last few".
-In addition to these two runs, we also compared each run on a networked file system (NFS) and a local SSD to see if the storage type of the files had any impact on the run times.
-Finally, we performed one last run on the local SSD using the 48 available cores on our system to assess if it made any difference.
-Below, we present the elapsed time for each of these runs.
+在这些测试期间，我们观察到在我们的实验设置中使用除默认 "ld" 之外的链接器强制重新编译所有 m5 文件。
+但是，如果我们在之后删除 `gem5.opt` 二进制文件并再次运行编译，只有 `gem5.opt` 被重建/链接，导致两个不同的时间。
+为了比较时间，我们需要考虑第一次运行构建所有 m5 文件所需的时间，以及第二次运行重新链接 gem5.opt 所需的时间。
+这些在下面标记为 "all m5" 与 "last few"。
+除了这两次运行之外，我们还在网络文件系统 (NFS) 和本地 SSD 上比较了每次运行，以查看文件的存储类型是否对运行时间有任何影响。
+最后，我们在本地 SSD 上使用系统上的 48 个可用核心执行了最后一次运行，以评估是否有所不同。
+下面，我们展示了每次运行的经过时间。
 
-We found that among the four linkers we tested, "bfd" was the slowest, and "mold" was the fastest.
-Additionally, the difference between using `-j12` and `-j48` appeared to be insignificant.
+我们发现，在我们测试的四个链接器中，"bfd" 最慢，"mold" 最快。
+此外，使用 `-j12` 和 `-j48` 之间的差异似乎微不足道。
 
-Based on our results, we suggest using "mold" as the linker when working with gem5.
-It's worth noting that using a particular linker had a more significant impact on the time taken than the storage location.
+根据我们的结果，我们建议在使用 gem5 时使用 "mold" 作为链接器。
+值得注意的是，使用特定链接器对所用时间的影响比存储位置更显著。
 
 |           | NFS + all m5  | NFS + last few    | Local SSD + all m5 | Local SSD + last few   | Local SSD + -j48 + last few    |
 | :---:     | :---:         | :---:             | :---:              | :---:                  | :---:                          |
@@ -43,21 +43,21 @@ It's worth noting that using a particular linker had a more significant impact o
 | gold      | 2:30.98       | 1:43.59           | 1:59.41            | 1:19.86                | 1:19.48                        |
 | mold      | 1:48.62       | 1:07.08           | 1:08.18            | 0:28.23                | 0:27.89                        |
 
-In addition to just comparing the build times, we executed 100000000 ticks for each linked compilation to ensure that using these linkers wouldn't cause any issues when actually using gem5, such as increased execution time or functional problems.
+除了仅比较构建时间之外，我们还为每个链接的编译执行了 100000000 个 tick，以确保使用这些链接器在实际使用 gem5 时不会引起任何问题，例如增加执行时间或功能问题。
 
-We achieved this by performing an x86 linux boot with an O3 CPU and a Ruby cache. The command to do so is provided below.
+我们通过使用 O3 CPU 和 Ruby 缓存执行 x86 linux 启动来实现这一点。执行此操作的命令如下所示。
 
-Command:
+命令：
 
 ```sh
 /usr/bin/time build/ALL/gem5.opt -re tests/gem5/configs/x86_boot_exit_run.py --cpu o3 --num-cpus 2 --mem-system mesi_two_level --dram-class DualChannelDDR4_2400 --boot-type init --resource-directory tests/gem5/resources --tick-exit 100000000
 ```
 
-We found none of the linkers had a significant impact on the runtime of any tests and all tests completed successfully.
-This indicates that using linkers should not have any detrimental effects on experiments conducted within gem5.
+我们发现没有任何链接器对任何测试的运行时间有显著影响，所有测试都成功完成。
+这表明使用链接器不应该对在 gem5 内进行的实验产生任何不利影响。
 
-Based on our findings, we can confidently recommend using the [mold linker](<https://github.com/rui314/mold>) to speed up linking times when building gem5.
-If you're interested in using mold, you can follow the instructions [here](<https://github.com/rui314/mold#how-to-build>) to compile it.
-Once it's properly installed, you can use it by passing `--linker=mold` while building gem5.
+根据我们的发现，我们可以自信地推荐使用 [mold 链接器](<https://github.com/rui314/mold>) 来加速构建 gem5 时的链接时间。
+如果您有兴趣使用 mold，可以按照[这里](<https://github.com/rui314/mold#how-to-build>)的说明进行编译。
+一旦正确安装，您可以在构建 gem5 时通过传递 `--linker=mold` 来使用它。
 
-Here's an example command: `scons build/ALL/gem5.opt -j12 --linker=mold`.
+这是一个示例命令：`scons build/ALL/gem5.opt -j12 --linker=mold`。

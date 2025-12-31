@@ -1,36 +1,23 @@
 ---
 layout: post
-title:  "A flexible cache coherency protocol for the Ruby memory system"
+title:  "Ruby 内存系统的灵活缓存一致性协议"
 author: Tiago Mück
 date:   2020-05-29
 ---
 
-Gem5's Ruby memory subsystem provides flexible on-chip network models and
-multiple cache coherency protocols modeled in detail. However, simple
-experiments are sometimes difficult to pull off. For instance, modifying an
-existing configuration by just adding another shared cache level requires
-either:
+gem5 的 Ruby 内存子系统提供了灵活的片上网络模型和详细建模的多种缓存一致性协议。然而，简单的实验有时很难完成。例如，仅通过添加另一个共享缓存级别来修改现有配置需要：
 
-1. switching to an entirely new protocol that models the desired cache hierarchy;
-2. or modify an existing protocol;
+1. 切换到完全新的协议来建模所需的缓存层次结构；
+2. 或修改现有协议；
 
-While (1) is not always an option, (2) is a non-trivial task since Ruby
-protocols can be very complex and hard to debug. This creates a major
-flexibility gap between gem5 "classic" memory sub-system and Ruby.
+虽然 (1) 并不总是可行，但 (2) 是一项非平凡的任务，因为 Ruby 协议可能非常复杂且难以调试。这在 gem5 "经典"内存子系统和 Ruby 之间造成了主要的灵活性差距。
 
-# New protocol implementation
+# 新协议实现
 
-We are working on a new protocol implementation that aims at addressing this
-configurability limitation. Our new protocol provides a single cache controller
-that can be reused at multiple levels of the cache hierarchy and configured to
-model multiple instances of MESI and MOESI cache coherency protocols. This
-implementation is based of [Arm's AMBA 5 CHI specification](
-https://static.docs.arm.com/ihi0050/d/IHI0050D_amba_5_chi_architecture_spec.pdf)
-and provides a scalable framework for the design space exploration of large SoC
-designs.
+我们正在开发一个新的协议实现，旨在解决这种可配置性限制。我们的新协议提供了一个单一的缓存控制器，可以在缓存层次结构的多个级别重用，并配置为建模 MESI 和 MOESI 缓存一致性协议的多个实例。此实现基于 [Arm 的 AMBA 5 CHI 规范](https://static.docs.arm.com/ihi0050/d/IHI0050D_amba_5_chi_architecture_spec.pdf)，并为大型 SoC 设计的设计空间探索提供了可扩展的框架。
 
-# Presentation
+# 演示
 
-To known more please take a look at our workshop presentation:
+要了解更多信息，请查看我们的研讨会演示：
 
 <iframe width="960" height="540" src="https://www.youtube.com/embed/OOEqCZekJbA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="max-width: 960px;"></iframe>

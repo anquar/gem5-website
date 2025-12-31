@@ -1,13 +1,13 @@
 ---
 layout: post
-title:  "Towards full-system discrete GPU simulation"
+title:  "迈向全系统独立 GPU 模拟"
 author: Mattew Poremba, Alexandru Dutu, Gaurav Jain, Pouya Fotouhi, Michael Boyer, and Bradford M. Beckmann.
 date:   2020-06-01
 ---
 
-AMD Research is developing a full system GPU (Graphics Processing Unit) model capable of using the amdgpu Linux kernel driver and the most up to date software stacks. Previously AMD updated the gem5 [1] GPU compute timing model  to execute the GCN (Graphics Core Next) generation 3 machine ISA [2,3], but it still relied on system-call emulation. With full-system support, the model can run the most recent open-source Radeon Open Compute platform (ROCm) stack without modification. This allows users to run a wide variety of applications written in several high-level languages, including C++, HIP, OpenMP, and OpenCL. This provides researchers the ability to evaluate many different types of workloads, from traditional compute applications to emerging modern GPU workloads, such as task parallel and machine learning applications. The resulting AMD gem5 GPU simulator is a cycle-level, flexible research model that is capable of representing many different GPU configurations, on-chip cache hierarchies, and system designs. The model has been used in several top-tier computer architecture publications in the last several years.
+AMD Research 正在开发一个全系统 GPU（图形处理单元）模型，能够使用 amdgpu Linux 内核驱动程序和最新的软件堆栈。此前，AMD 更新了 gem5 [1] GPU 计算时序模型以执行 GCN（Graphics Core Next）第三代机器 ISA [2,3]，但它仍然依赖于系统调用仿真。通过全系统支持，该模型可以在不修改的情况下运行最新的开源 Radeon Open Compute 平台 (ROCm) 堆栈。这允许用户运行用多种高级语言编写的各种应用程序，包括 C++、HIP、OpenMP 和 OpenCL。这为研究人员提供了评估多种不同类型工作负载的能力，从传统的计算应用程序到新兴的现代 GPU 工作负载，如任务并行和机器学习应用程序。由此产生的 AMD gem5 GPU 模拟器是一个周期级、灵活的研究模型，能够表示许多不同的 GPU 配置、片上缓存层次结构和系统设计。该模型在过去几年中被用于多篇顶级计算机体系结构出版物中。
 
-In this presentation, we will describe the capabilities of the AMD gem5 GPU simulator that will be publicly released with a BSD license. We will detail the simulation changes and describe the new execution flow. The presentation will also highlight the new capabilities provided by full-system support. In particular, simulation will be more deterministic and allows the user to run host-side CPU code using KVM fast-forwarding. We will detail the additional support being added including multi-context virtual memory support, system DMA engines, and support for the software interface between them.
+在本演示中，我们将描述 AMD gem5 GPU 模拟器的功能，该模拟器将以 BSD 许可证公开发布。我们将详细介绍模拟更改并描述新的执行流程。演示还将重点介绍全系统支持提供的新功能。特别是，模拟将更加确定性，并允许用户使用 KVM 快速转发运行主机端 CPU 代码。我们将详细介绍正在添加的额外支持，包括多上下文虚拟内存支持、系统 DMA 引擎以及它们之间软件接口的支持。
 
 [1] Binkert, Nate L., et al. “The gem5 Simulator,” In SIGARCH Computer Arch. News, vol. 39, no. 2, pp. 1-7, Aug. 2011.
 

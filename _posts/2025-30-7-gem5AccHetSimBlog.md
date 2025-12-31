@@ -1,64 +1,64 @@
 ---
 layout: post
-title: "ISCA 2025: Toward Full-System Heterogeneous Simulation: Merging gem5-SALAM with Mainline gem5"
+title: "ISCA 2025：迈向全系统异构模拟：将 gem5-SALAM 合并到 gem5 主线"
 author: Akanksha Chaudhari, Matt Sinclair(UW-Madison).
 date:   2025-07-30
 ---
 
-# Towards Full-System Heterogeneous Simulation in gem5
+# 迈向 gem5 中的全系统异构模拟
 
-As SoC architectures grow increasingly heterogeneous, they now integrate not only CPUs and GPUs but also tightly coupled programmable accelerators tailored for specific workloads. These accelerators are critical for emerging domains such as mobile inference, AR/VR, real-time vision, and edge analytics. Unlike traditional CPU-GPU systems, modern heterogeneous platforms demand fine-grained coordination among diverse compute engines, shared memory subsystems, and software-managed execution models. Capturing these interactions requires a cycle-level, full-system simulator.
+随着 SoC 架构变得越来越异构，它们现在不仅集成了 CPU 和 GPU，还集成了为特定工作负载量身定制的紧密耦合的可编程加速器。这些加速器对于移动推理、AR/VR、实时视觉和边缘分析等新兴领域至关重要。与传统的 CPU-GPU 系统不同，现代异构平台需要不同计算引擎、共享内存子系统和软件管理的执行模型之间的细粒度协调。捕获这些交互需要周期级、全系统模拟器。
 
-While gem5 has long supported detailed CPU simulation and, more recently, full-system GPU modeling, support for programmable accelerators remained external via tools like gem5-SALAM—built on gem5 v21.1. Although SALAM added accelerator-specific capabilities such as cycle-level datapath modeling, memory-mapped scratchpads, and hardware synthesis integration, it was isolated from the mainline. As a result, it could not leverage recent ISA, memory system, or configuration infrastructure updates, nor benefit from upstream validation.
+虽然 gem5 长期以来支持详细的 CPU 模拟，并且最近支持全系统 GPU 建模，但对可编程加速器的支持仍然通过 gem5-SALAM 等工具在外部——基于 gem5 v21.1 构建。尽管 SALAM 添加了加速器特定的功能，如周期级数据路径建模、内存映射暂存器和硬件综合集成，但它与主线隔离。因此，它无法利用最近的 ISA、内存系统或配置基础设施更新，也无法从上游验证中受益。
 
-To close this gap, we integrated SALAM’s accelerator infrastructure into gem5 mainline (develop branch v25). This unification elevates accelerators to first-class components alongside CPUs and GPUs, enabling full-system heterogeneous simulation under a single software stack. The result is a unified framework for modeling heterogeneous SoCs with realistic OS support, shared resource contention, and software-controlled task orchestration.
+为了缩小这一差距，我们将 SALAM 的加速器基础设施集成到 gem5 主线（develop 分支 v25）中。这种统一将加速器提升为与 CPU 和 GPU 并列的一流组件，在单个软件堆栈下实现全系统异构模拟。结果是用于建模异构 SoC 的统一框架，具有真实的 OS 支持、共享资源争用和软件控制的任务编排。
 
-## Integration at a Glance
+## 集成概览
 
-We integrated SALAM’s accelerator modeling infrastructure into gem5-develop through a series of architectural, interface, and validation updates.
+我们通过一系列架构、接口和验证更新将 SALAM 的加速器建模基础设施集成到 gem5-develop 中。
 
-We began by integrating key accelerator modeling components from SALAM into gem5. These include the `LLVMInterface`, which executes LLVM IR kernels using a cycle-accurate datapath; the `CommInterface`, which provides software-visible control and interrupt signaling; and a suite of configurable memory components such as scratchpads, DMA engines, and stream buffers. Together, these elements enable detailed and flexible modeling of a wide range of accelerator microarchitectures and memory hierarchies. To support realistic SoC integration, accelerators and local memories can be grouped into an `AccCluster`, reflecting the modular structure of accelerator subsystems commonly found in commercial SoCs. For rapid prototyping, we also integrated and automated SALAM’s hardware profile generator, which converts user-defined timing specifications into executable datapath models -- eliminating the need for manual microarchitectural implementation. Finally, we refactored CACTI-SALAM for compatibility with gem5’s infrastructure, enabling timing and energy estimation for scratchpad memories using CACTI’s file-based configuration methodology. These changes bring cycle-level accelerator modeling, full-system memory interaction, and scalable design space exploration into gem5 mainline.
+我们首先将 SALAM 的关键加速器建模组件集成到 gem5 中。这些包括 `LLVMInterface`，它使用周期精确的数据路径执行 LLVM IR 内核；`CommInterface`，它提供软件可见的控制和中断信号；以及一套可配置的内存组件，如暂存器、DMA 引擎和流缓冲区。这些元素共同实现了对各种加速器微架构和内存层次结构的详细和灵活建模。为了支持真实的 SoC 集成，加速器和本地内存可以分组到 `AccCluster` 中，反映了商业 SoC 中常见的加速器子系统的模块化结构。为了快速原型设计，我们还集成并自动化了 SALAM 的硬件配置文件生成器，它将用户定义的时序规范转换为可执行的数据路径模型——消除了手动微架构实现的需要。最后，我们重构了 CACTI-SALAM 以与 gem5 的基础设施兼容，使用 CACTI 的基于文件的配置方法实现暂存器的时序和能量估计。这些更改将周期级加速器建模、全系统内存交互和可扩展的设计空间探索带入 gem5 主线。
 
-We then updated SALAM’s accelerator infrastructure to match gem5’s latest design conventions. This included refactoring classes to use modern SimObject patterns, replacing unsafe pointer casts in LLVM instruction handling with type-safe 32-bit variables, and switching to gem5’s standardized random number generator for latency modeling. We fixed off-by-one errors in address range definitions to follow gem5’s inclusive-exclusive semantics, aligned environment and ISA configuration with gem5’s current setup, and added dynamic LLVM detection using `llvm-config` to simplify SCons-based compilation for datapath simulation.
+然后，我们更新了 SALAM 的加速器基础设施以匹配 gem5 的最新设计约定。这包括重构类以使用现代 SimObject 模式，用类型安全的 32 位变量替换 LLVM 指令处理中的不安全指针转换，以及切换到 gem5 的标准化随机数生成器进行延迟建模。我们修复了地址范围定义中的差一错误以遵循 gem5 的包含-排除语义，将环境和 ISA 配置与 gem5 的当前设置对齐，并添加了使用 `llvm-config` 的动态 LLVM 检测以简化基于 SCons 的数据路径模拟编译。
 
-Finally, we validated the integrated framework by ensuring it passed gem5’s pre-commit checks and full regression test suite. Additionally, we adapted SALAM’s original system validation tests to run within the unified environment and cross-validated the outputs against the original SALAM baseline to confirm functional equivalence. We plan to upstream these accelerator tests to the gem5-resources repository to support broader validation of the integrated SALAM components within gem5.
+最后，我们通过确保它通过 gem5 的预提交检查和完整回归测试套件来验证集成框架。此外，我们调整了 SALAM 的原始系统验证测试以在统一环境中运行，并将输出与原始 SALAM 基线进行交叉验证以确认功能等价性。我们计划将这些加速器测试上游到 gem5-resources 仓库，以支持在 gem5 内对集成的 SALAM 组件进行更广泛的验证。
 
-## What This Enables
+## 这使什么成为可能
 
-### Broader Heterogeneity Studies
+### 更广泛的异构研究
 
-With accelerators now fully integrated into gem5 mainline, researchers can simulate complete heterogeneous systems comprising CPUs, GPUs, and custom accelerators—co-existing under a single OS kernel and sharing interconnects and memory. This allows detailed studies of performance interference, resource arbitration, and synchronization mechanisms across diverse compute engines, grounded in full-system behavior rather than simplified models.
+随着加速器现在完全集成到 gem5 主线中，研究人员可以模拟完整的异构系统，包括 CPU、GPU 和自定义加速器——在单个 OS 内核下共存并共享互连和内存。这允许对不同计算引擎之间的性能干扰、资源仲裁和同步机制进行详细研究，基于全系统行为而不是简化模型。
 
-### System-Level Exploration
+### 系统级探索
 
-The framework supports rich exploration of architectural tradeoffs at the system level. Users can evaluate different memory organizations—such as private scratchpads, shared LLCs, or DMA-managed SPMs—and compare strategies for offloading, synchronization, and kernel placement. Static vs. dynamic scheduling, locality-aware memory partitioning, and software-managed DMA schemes can all be studied in realistic OS-driven settings.
+该框架支持在系统级别对架构权衡进行丰富的探索。用户可以评估不同的内存组织——如私有暂存器、共享 LLC 或 DMA 管理的 SPM——并比较卸载、同步和内核放置的策略。静态与动态调度、位置感知内存分区和软件管理的 DMA 方案都可以在真实的 OS 驱动设置中进行研究。
 
-### Domain-Specific Workload Support
+### 领域特定工作负载支持
 
-This infrastructure also enables architectural research targeting emerging domains like real-time vision, mobile inference, AR/VR, and edge computing. These applications demand predictable latency, software-accelerator coordination, and careful memory management. The integrated framework allows researchers to model and study these workloads using real software stacks and bootable Linux images, with accelerator behavior simulated at cycle-level fidelity.
+此基础设施还支持针对新兴领域的架构研究，如实时视觉、移动推理、AR/VR 和边缘计算。这些应用程序需要可预测的延迟、软件-加速器协调和仔细的内存管理。集成框架允许研究人员使用真实的软件堆栈和可启动的 Linux 镜像对这些工作负载进行建模和研究，加速器行为以周期级保真度模拟。
 
-### Exploratory Studies in Non-Traditional Regimes
+### 非传统机制的探索性研究
 
-Finally, the toolchain enables exploration of accelerator operation under emerging regimes such as transient overclocking and advanced cooling. In our workshop paper, we use this framework to study one such case of a non-traditional operating regime: multi-GHz frequency scaling in accelerators, enabled by advanced cooling techniques such as immersion and cryogenic systems. We present a preliminary analysis of performance and power upper bounds across this range. The results show how system bottlenecks shift with increasing frequency, highlighting the importance of evaluating accelerator behavior in the context of host latency and memory interactions. Full details of the experimental setup and findings are included in our ISCA ’25 workshop paper.
+最后，该工具链支持在新兴机制下探索加速器操作，如瞬态超频和先进冷却。在我们的研讨会论文中，我们使用此框架研究了一个这样的非传统操作机制案例：加速器中的多 GHz 频率缩放，由先进冷却技术（如浸没和低温系统）实现。我们对此范围内的性能和功率上限进行了初步分析。结果显示系统瓶颈如何随着频率增加而转移，突出了在主机延迟和内存交互的背景下评估加速器行为的重要性。实验设置和发现的完整详细信息包含在我们的 ISCA '25 研讨会论文中。
 
-Users can apply this framework to the use cases discussed above using built-in accelerator models and benchmarks, or extend it further by modeling their own custom accelerators.
+用户可以使用内置的加速器模型和基准测试将此框架应用于上述用例，或通过建模自己的自定义加速器进一步扩展它。
 
-## Modeling Your Own Accelerator
+## 建模您自己的加速器
 
-Creating a new accelerator model in the integrated gem5 framework is simple. You begin by writing the desired accelerator algorithm in C/C++ and compiling to LLVM IR.  A YAML-based hardware profile specifies instruction timing, functional unit latencies, and memory ports. This profile is processed by the hardware-profile generator to produce a cycle-level timing model.
+在集成的 gem5 框架中创建新的加速器模型很简单。您首先用 C/C++ 编写所需的加速器算法并编译为 LLVM IR。基于 YAML 的硬件配置文件指定指令时序、功能单元延迟和内存端口。此配置文件由硬件配置文件生成器处理以生成周期级时序模型。
 
-The user then places the accelerator inside an `AccCluster`, attaches scratchpads or DMAs as needed, and configures the system topology using gem5’s Python interface. A host-side program running in the simulated OS coordinates with the accelerator via memory-mapped control registers and interrupts. The complete system is simulated using `run_system.sh`, producing statistics, optional power reports, and host-side console output.
+然后，用户将加速器放置在 `AccCluster` 内，根据需要附加暂存器或 DMA，并使用 gem5 的 Python 接口配置系统拓扑。在模拟 OS 中运行的主机端程序通过内存映射控制寄存器和中断与加速器协调。使用 `run_system.sh` 模拟完整系统，生成统计信息、可选的功率报告和主机端控制台输出。
 
-## Getting Started
+## 开始使用
 
-To get started, set the following environment variables to your gem5 and benchmark root directories:
+要开始使用，请将以下环境变量设置为您 gem5 和基准测试的根目录：
 
 ```bash
 export M5_PATH=/path/to/gem5
 export ACC_BENCH_PATH=/path/to/benchmarks
 ```
 
-Clone and build gem5:
+克隆并构建 gem5：
 
 ```bash
 git clone https://github.com/akanksha-sc/gem5
@@ -66,36 +66,36 @@ cd gem5
 scons build/ARM/gem5.opt -j$(nproc)
 ```
 
-To generate a custom hardware profile (optional):
+生成自定义硬件配置文件（可选）：
 
 ```bash
 $M5_PATH/tools/hw_generator/HWProfileGenerator.py -b <benchmark_name>
 ```
 
-To run CACTI-SALAM (optional energy/area estimation):
+运行 CACTI-SALAM（可选的能量/面积估计）：
 
 ```bash
 cd $M5_PATH/tools/cacti-SALAM
 ./run_cacti_salam.py --bench-list $ACC_BENCH_PATH/benchmarks.list
 ```
 
-Run a benchmark (custom or built-in like `bfs`):
+运行基准测试（自定义或内置的，如 `bfs`）：
 
 ```bash
 $M5_PATH/tools/run_system.sh --bench <benchmark_name> --bench-path <benchmark_path>
 ```
 
-This boots Linux, launches a user-space driver, and simulates the accelerator. Outputs include `stats.txt` (performance counters), `system.terminal` (host console output), `SALAM_power.csv` (power/area estimates, if CACTI-SALAM is used). Additional examples and documentation included in `src/hwacc/docs`.
+这会启动 Linux，启动用户空间驱动程序，并模拟加速器。输出包括 `stats.txt`（性能计数器）、`system.terminal`（主机控制台输出）、`SALAM_power.csv`（功率/面积估计，如果使用 CACTI-SALAM）。其他示例和文档包含在 `src/hwacc/docs` 中。
 
-## Conclusion
+## 结论
 
-This integration positions gem5 as a unified, full-system simulator for heterogeneous SoCs—combining CPUs, GPUs, and programmable accelerators under one framework with realistic timing, software, and architectural detail. It opens the door to studies ranging from co-scheduling and memory-system tuning to high-frequency accelerator and advanced-cooling analyses. Next steps include merging the support into gem5 mainline, expanding the benchmark suite with domain-specific workloads, and extending full-system accelerator support to additional ISAs. We hope this foundation accelerates heterogeneous-system research across the community.
+此集成将 gem5 定位为异构 SoC 的统一全系统模拟器——在一个框架下结合 CPU、GPU 和可编程加速器，具有真实的时序、软件和架构细节。它为从协同调度和内存系统调整到高频加速器和先进冷却分析的研究打开了大门。下一步包括将支持合并到 gem5 主线，使用领域特定工作负载扩展基准测试套件，并将全系统加速器支持扩展到其他 ISA。我们希望这个基础能够加速整个社区的异构系统研究。
 
-## Acknowledgments
+## 致谢
 
-This work is supported in part by the Semiconductor Research Corporation and by the DOE’s Office of Science, Office of Advanced Scientific Computing Research through EXPRESS: 2023 Exploratory Research for Extreme Scale Science.
+这项工作部分得到了半导体研究公司和 DOE 科学办公室、先进科学计算研究办公室通过 EXPRESS：2023 极端规模科学探索研究的支持。
 
-## References
+## 参考文献
 
-* A. Chaudhari and M. D. Sinclair. “Toward Full-System Heterogeneous Simulation: Merging gem5-SALAM with Mainline gem5.” 6th gem5 Users’ Workshop, June 2025.
+* A. Chaudhari and M. D. Sinclair. "Toward Full-System Heterogeneous Simulation: Merging gem5-SALAM with Mainline gem5." 6th gem5 Users' Workshop, June 2025.
 * S. Rogers, J. Slycord, M. Baharani and H. Tabkhi, "gem5-SALAM: A System Architecture for LLVM-based Accelerator Modeling," 2020 53rd Annual IEEE/ACM International Symposium on Microarchitecture (MICRO), Athens, Greece, 2020, pp. 471-482, doi: 10.1109/MICRO50266.2020.00047.

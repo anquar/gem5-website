@@ -1,21 +1,21 @@
 ---
 layout: post
-title:  "Memory controller updates for new DRAM technologies, NVM interfaces and flexible memory topologies"
+title:  "面向新 DRAM 技术、NVM 接口和灵活内存拓扑的内存控制器更新"
 author: Wendy Elsasser and Nikos Nikoleris
 date:   2020-05-27
 ---
 
-## Adding LPDDR5 support to DRAMCtrl
+## 为 DRAMCtrl 添加 LPDDR5 支持
 
-LPDDR5 is currently in mass production for use in multiple markets including mobile, automotive, AI, and 5G. This technology is expected to become the mainstream Flagship Low-Power DRAM by 2021 with anticipated longevity due to proposed speed grade extensions. The specification defines a flexible architecture and multiple options to optimize across different use cases, trading off power, performance, reliability and complexity.  To evaluate these tradeoffs, the gem5 model has been updated with LPDDR5 configurations and architecture support.
+LPDDR5 目前正在批量生产，用于包括移动、汽车、AI 和 5G 在内的多个市场。由于提议的速度等级扩展，该技术预计将在 2021 年成为主流旗舰低功耗 DRAM，并具有预期的长期性。该规范定义了灵活的架构和多种选项，以在不同用例之间进行优化，权衡功耗、性能、可靠性和复杂性。为了评估这些权衡，gem5 模型已更新为包含 LPDDR5 配置和架构支持。
 
-LPDDR5 is mostly an evolutionary uptick from LPDDR4 with 3 key motivations: flexibility, performance, and power. The specification offers a multitude of options to enable varied use-cases with a user programmable bank architecture and new lower power features to balance power and performance tradeoffs. Similar to previous generations, LPDDR5 increases the data rates and the current version of the specification supports data-rates up to 6.4Gbps (giga-bits per second) for a maximum I/O bandwidth of 12.8GB/s (giga-bytes per second) with a 16-bit channel. A new clocking architecture is defined leveraging concepts from other technologies like GDDR, but with a low-power twist. With the new clocking architecture, commands are transferred at a lower frequency with some commands requiring multiple clock cycles. The new clocking architecture also includes the additional requirement of data clock synchronization, potentially done dynamically as bursts issue. Due to these changes, additional considerations are required to ensure adequate command bandwidth in some high-speed scenarios. These new LPDDR5 features require new checks and optimizations in gem5 to ensure the model integrity when comparing to real hardware.
+LPDDR5 主要是 LPDDR4 的演进升级，有三个关键动机：灵活性、性能和功耗。该规范提供了多种选项，以支持各种用例，具有用户可编程的存储体架构和新的低功耗功能，以平衡功耗和性能权衡。与之前的几代类似，LPDDR5 提高了数据速率，当前版本的规范支持高达 6.4Gbps（每秒千兆位）的数据速率，16 位通道的最大 I/O 带宽为 12.8GB/s（每秒千兆字节）。定义了一个新的时钟架构，利用来自其他技术（如 GDDR）的概念，但具有低功耗的转变。使用新的时钟架构，命令以较低频率传输，某些命令需要多个时钟周期。新的时钟架构还包括数据时钟同步的额外要求，可能在突发发出时动态完成。由于这些更改，需要额外的考虑来确保某些高速场景中的足够命令带宽。这些新的 LPDDR5 功能需要在 gem5 中进行新的检查和优化，以确保在与真实硬件比较时模型的完整性。
 
-Support for multi-cycle commands and lower frequency command transfer motivated a new check in gem5 to verify command bandwidth. The DRAM controller historically did not verify contention on the command bus and assumed unlimited command bandwidth. With the evolution of new technologies this assumption is not always valid. One potential solution is to align all commands to a clock boundary and ensure that two commands are not issued simultaneously. Given that the gem5 model is not a cycle accurate model, this solution was deemed overly complicated. Alternatively, a rolling window has been defined and the model calculates the maximum number of commands that can issue within that window. Prior to issuing a command, the model will verify that the window in which the command will issue still has slots available. If the slots are full, the command will be shifted to the next window. This will be done until a window with a free command slot is found. The window is currently defined by the time required to transfer a burst, which is typically defined by the tBURST parameter.
+对多周期命令和较低频率命令传输的支持促使在 gem5 中进行新的检查以验证命令带宽。DRAM 控制器历史上不验证命令总线上的争用，并假设无限命令带宽。随着新技术的演进，这种假设并不总是有效。一个潜在的解决方案是将所有命令对齐到时钟边界，并确保不同时发出两个命令。鉴于 gem5 模型不是周期精确模型，此解决方案被认为过于复杂。或者，定义了一个滚动窗口，模型计算在该窗口内可以发出的最大命令数。在发出命令之前，模型将验证命令将发出的窗口是否仍有可用插槽。如果插槽已满，命令将转移到下一个窗口。这将持续进行，直到找到具有空闲命令插槽的窗口。窗口目前由传输突发所需的时间定义，通常由 tBURST 参数定义。
 
-At higher data rates, the ability to transfer a burst seamlessly depends on the bank architecture in LPDDR5. When configured using a bank group architecture, which defines a total of 16 banks split across 4 bank groups, a burst of 32 cannot be transferred seamlessly. The data instead will be transferred with gaps in the middle of the burst. Essentially half the burst will be transferred in 2 cycles, followed by a 2-cycle gap, with the second half of the burst transferred after the gap. To mitigate the effect on data bus utilization and IO bandwidth, LPDDR5 supports interleaved bursts. The gem5 model has also been updated to support burst interleaving and with these changes, the model is able to achieve high data bus utilization as expected (and in many cases required).
+在更高的数据速率下，无缝传输突发的能力取决于 LPDDR5 中的存储体架构。当使用存储体组架构配置时，该架构定义了总共 16 个存储体，分布在 4 个存储体组中，32 的突发无法无缝传输。相反，数据将在突发中间有间隙的情况下传输。基本上，突发的一半将在 2 个周期内传输，然后是 2 个周期的间隙，突发的后半部分在间隙之后传输。为了减轻对数据总线利用率和 IO 带宽的影响，LPDDR5 支持交错突发。gem5 模型也已更新以支持突发交错，通过这些更改，模型能够达到预期的高数据总线利用率（在许多情况下是必需的）。
 
-All of these changes will be discussed in the gem5 workshop. In the workshop, we will review LPDDR5 requirements and detail the changes made in gem5. While these changes have been incorporated specifically for LPDDR5, some of them are also applicable to other memory technologies. I look forward to the discussion in the workshop!
+所有这些更改将在 gem5 研讨会中讨论。在研讨会中，我们将回顾 LPDDR5 要求并详细介绍在 gem5 中进行的更改。虽然这些更改是专门为 LPDDR5 合并的，但其中一些也适用于其他内存技术。我期待在研讨会中的讨论！
 
 ### Workshop Presentation
 
@@ -24,31 +24,31 @@ src="https://www.youtube.com/embed/ttJ9_I_Avyc" frameborder="0"
 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
 allowfullscreen style="max-width: 960px"></iframe>
 
-## Refactoring the DRAMCtrl and creating an initial NVM interface
+## 重构 DRAMCtrl 并创建初始 NVM 接口
 
-The gem5 DRAM controller provides the interface to external, user addressable memory, which is traditionally DRAM. The controller consists of 2 main components: the memory controller and the DRAM interface. The memory controller includes the port connecting to the on-chip fabric. It receives command packets from the fabric, enqueues them into the read and write queues and manages the command scheduling algorithm for read and write requests. The DRAM interface contains media specific information that defines the architecture and timing parameters of the DRAM, and manages the media specific operations like activation, precharge, refresh and low power modes.
+gem5 DRAM 控制器提供与外部、用户可寻址内存的接口，传统上是 DRAM。控制器由 2 个主要组件组成：内存控制器和 DRAM 接口。内存控制器包括连接到片上结构的端口。它从结构接收命令包，将它们排入读写队列，并管理读写请求的命令调度算法。DRAM 接口包含定义 DRAM 架构和时序参数的媒体特定信息，并管理媒体特定操作，如激活、预充电、刷新和低功耗模式。
 
-With the advent of SCM (storage class memory), emerging NVM could also exist on a memory interface, potentially alongside DRAM. NVM support could simply be layered on top of the existing DRAM controller with the changes integrated into the current DRAM interface. However, with a more systematic approach, the model could be modified to provide a mechanism that enables easier integration of new interfaces to support future memory technologies. To do this, the memory controller has been refactored. Instead of a single DRAM controller (DRAMCtrl) object, two objects have been defined: DRAMCtrl and DRAMInterface. Memory configurations are now defined as a DRAM interface and the DRAM specific parameters and functions have been moved from the controller to the interface. This includes the DRAM architecture, timing and IDD parameters. To connect the two objects, a new parameter has been defined in the DRAM controller Python object. This parameter, ‘dram’, is a pointer to the DRAM interface.
+随着 SCM（存储类内存）的出现，新兴的 NVM 也可能存在于内存接口上，可能与 DRAM 一起存在。NVM 支持可以简单地分层在现有 DRAM 控制器之上，并将更改集成到当前 DRAM 接口中。然而，通过更系统的方法，可以修改模型以提供一种机制，使新接口更容易集成以支持未来的内存技术。为此，内存控制器已被重构。不是单个 DRAM 控制器 (DRAMCtrl) 对象，而是定义了两个对象：DRAMCtrl 和 DRAMInterface。内存配置现在定义为 DRAM 接口，DRAM 特定参数和函数已从控制器移动到接口。这包括 DRAM 架构、时序和 IDD 参数。为了连接这两个对象，在 DRAM 控制器 Python 对象中定义了一个新参数。此参数 'dram' 是指向 DRAM 接口的指针。
 
 ```
     # Interface to volatile, DRAM media
     dram = Param.DRAMInterface(NULL, "DRAM interface")
 ```
 
-Functions specific to DRAM opcodes have also been pulled out of the controller and moved to the interface. For example, the Rank class and associated functions are now defined within the interface. The DRAM interface is defined as an AbstractMemory, enabling an address range to be defined for the actual media interface instead of the controller. With this change, the controller has been modified to be a ClockedObject.
+特定于 DRAM 操作码的函数也已从控制器中提取并移动到接口。例如，Rank 类和关联函数现在在接口内定义。DRAM 接口定义为 AbstractMemory，允许为实际媒体接口而不是控制器定义地址范围。通过此更改，控制器已修改为 ClockedObject。
 
-Now, the DRAM controller is a generic memory controller and non-DRAM interfaces can be defined and easily connected. In that regard, an initial NVM interface, NVMInterface, has been defined, which mimics the behavior of NVDIMM-P. Similar to the DRAM interface, the NVM interface is defined as an AbstractMemory, with an address range defined for the interface. A new parameter, ‘nvm’, has been defined in Python to connects the controller to the NVM interface when configured.
+现在，DRAM 控制器是通用内存控制器，可以定义并轻松连接非 DRAM 接口。在这方面，已定义了一个初始 NVM 接口 NVMInterface，它模拟 NVDIMM-P 的行为。与 DRAM 接口类似，NVM 接口定义为 AbstractMemory，为接口定义了地址范围。在 Python 中定义了一个新参数 'nvm'，在配置时将控制器连接到 NVM 接口。
 
 ```
     # Interface to non-volatile media
     nvm = Param.NVMInterface(NULL, "NVM interface")
 ```
 
-The NVM interface is media agnostic and simply defines read and write operations. The intent of the interface is to support a wide variety of media types, many less performant than DRAM. While DRAM is accessed with deterministic timing, internal operations within the NVM could create longer tail latency distributions requiring non-deterministic delays. To manage non-determinism, the reads have been split into 2 stages: Read Request and Data Burst. The first stage, the Read Request simply issues a read command and schedules a ReadReady event. The event will be triggered when the read completes and data is available. At that time, the NVM interface will trigger a controller event to issue a data burst.
+NVM 接口是媒体无关的，仅定义读写操作。该接口的意图是支持多种媒体类型，其中许多性能不如 DRAM。虽然 DRAM 以确定性时序访问，但 NVM 内的内部操作可能创建更长的尾部延迟分布，需要非确定性延迟。为了管理非确定性，读取已分为 2 个阶段：读取请求和数据突发。第一阶段，读取请求简单地发出读取命令并调度 ReadReady 事件。当读取完成且数据可用时，将触发该事件。那时，NVM 接口将触发控制器事件以发出数据突发。
 
-While the write latency and write bandwidth of emerging NVM is typically magnitudes faster than FLASH, for many technologies it is not yet on par with DRAM. To mitigate the longer write delay and lower bandwidth, the NVM interface in gem5 models a near NVM write buffer. This buffer offloads write commands and data from the memory controller and provides push-back when full, inhibiting further write command from issuing until an entry is popped. The entries are popped when the write completes, using parameters defined in the NVM Interface.
+虽然新兴 NVM 的写入延迟和写入带宽通常比 FLASH 快几个数量级，但对于许多技术来说，它尚未与 DRAM 相当。为了减轻更长的写入延迟和较低的带宽，gem5 中的 NVM 接口建模了一个近 NVM 写入缓冲区。此缓冲区从内存控制器卸载写入命令和数据，并在满时提供回推，抑制进一步写入命令的发出，直到弹出条目。当写入完成时，使用 NVM 接口中定义的参数弹出条目。
 
-After refactoring the controller and creating unique DRAM and NVM interfaces, a variety of potential memory sub-system topologies are possible in gem5. A system can incorporate NVM and DRAM on a single channel or have dedicated channels defined per media. Configurations can be defined to provide a multitude of scenarios for NVM+DRAM simulations to analyze the tradeoffs of new memory technologies and methods to optimize future memory subsystems.
+在重构控制器并创建唯一的 DRAM 和 NVM 接口后，gem5 中可能出现各种潜在的内存子系统拓扑。系统可以在单个通道上合并 NVM 和 DRAM，或为每个媒体定义专用通道。可以定义配置以提供多种场景用于 NVM+DRAM 模拟，以分析新内存技术的权衡和优化未来内存子系统的方法。
 
 ### Workshop Presentation
 

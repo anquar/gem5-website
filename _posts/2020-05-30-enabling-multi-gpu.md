@@ -1,19 +1,19 @@
 ---
 layout: post
-title:  "Enabling Multi-GPU Support in gem5"
+title:  "在 gem5 中启用多 GPU 支持"
 author: Bobbi W. Yogatama, Matthew D. Sinclair, Michael M. Swift
 date:   2020-05-30
 ---
 
-## Introduction
+## 引言
 
-In the past decade, GPUs have become an important resource for compute-intensive, general-purpose GPU applications such as machine learning, big data analysis, and large-scale simulations. In the future, with the explosion of machine learning and big data, application demands will keep increasing, resulting in more data and computation being pushed to GPUs. However, due to the slowing of Moore's Law and rising manufacturing costs, it is becoming more and more challenging to add compute resources into a single GPU device to improve its throughput. As a result, spreading work across multiple GPUs is popular in data-centric and scientific applications. For example, Facebook uses 8 GPUs per server in their recent machine learning platform.
+在过去十年中，GPU 已成为计算密集型、通用 GPU 应用程序（如机器学习、大数据分析和大规模模拟）的重要资源。未来，随着机器学习和大数据的爆炸式增长，应用程序需求将继续增加，导致更多数据和计算被推送到 GPU。然而，由于摩尔定律的放缓以及制造成本的上升，在单个 GPU 设备中添加计算资源以提高其吞吐量变得越来越具有挑战性。因此，在数据中心和科学应用中，将工作分散到多个 GPU 上很流行。例如，Facebook 在其最近的机器学习平台中每台服务器使用 8 个 GPU。
 
-However, research infrastructure has not kept pace with this trend: most GPU hardware simulators, including gem5, only support a single GPU. Thus, it is hard to study interference between GPUs, communication between GPUs, or work scheduling across GPUs. Our research group has been working to address this shortcoming by adding multi-GPU support to gem5. In this blog post, we discuss the changes that were needed, which included updating the emulated driver, GPU components, and coherence protocol.
+然而，研究基础设施并未跟上这一趋势：大多数 GPU 硬件模拟器，包括 gem5，仅支持单个 GPU。因此，很难研究 GPU 之间的干扰、GPU 之间的通信或跨 GPU 的工作调度。我们的研究小组一直在通过为 gem5 添加多 GPU 支持来解决这一不足。在这篇博客文章中，我们讨论了所需的更改，包括更新仿真驱动程序、GPU 组件和一致性协议。
 
 ## gem5 AMD APU
 
-The recent gem5 AMD APU model extends gem5 with an accurate, high fidelity GPU timing model that executes on top of ROCm (Radeon Open Compute Platform), AMD's framework for GPU-accelerated computing. Figure 1 shows the simulation flow when gem5 simulates a GPU. The application source is compiled by the HCC compiler, generating an application binary which comprises of both x86 code for the CPU and gcn3 code for the GPU that is loaded into the simulated memory.  The compiled program invokes the ROCr runtime library which calls the ROCt user-space driver. This driver makes ioctl() system calls to the kernel fusion driver (ROCk), which is simulated in gem5 since the current GPU support uses syscall emulation (SE) mode.
+最近的 gem5 AMD APU 模型使用在 ROCm（Radeon Open Compute Platform）上执行的准确、高保真 GPU 时序模型扩展了 gem5，ROCm 是 AMD 的 GPU 加速计算框架。图 1 显示了 gem5 模拟 GPU 时的模拟流程。应用程序源代码由 HCC 编译器编译，生成包含 CPU 的 x86 代码和 GPU 的 gcn3 代码的应用程序二进制文件，这些代码被加载到模拟内存中。编译的程序调用 ROCr 运行时库，该库调用 ROCt 用户空间驱动程序。此驱动程序对内核融合驱动程序 (ROCk) 进行 ioctl() 系统调用，由于当前 GPU 支持使用系统调用仿真 (SE) 模式，因此在 gem5 中模拟该驱动程序。
 
 <figure>
     <img src="/assets/img/blog/enabling-multi-gpu/overview.png" alt="Figure 1" width="600"/>
@@ -21,17 +21,17 @@ The recent gem5 AMD APU model extends gem5 with an accurate, high fidelity GPU t
     <em>Figure 1. gem5 Simulation Flow</em>
 </figure>
 
-## Multi-GPU Support in gem5
+## gem5 中的多 GPU 支持
 
-The user-space libraries and drivers in the ROCm framework already provide multi-GPU support.  Thus, we found that we only needed to update gem5's multi-GPU support.  In particular, three main changes were required:
+ROCm 框架中的用户空间库和驱动程序已经提供多 GPU 支持。因此，我们发现只需要更新 gem5 的多 GPU 支持。特别是，需要三个主要更改：
 
-1. Replicating GPU components
-2. Adding emulated driver (ROCk) support for multi-GPU
-3. Enabling writeback support in gem5 coherence protocol
+1. 复制 GPU 组件
+2. 为多 GPU 添加仿真驱动程序 (ROCk) 支持
+3. 在 gem5 一致性协议中启用写回支持
 
-## Replicating GPU Components
+## 复制 GPU 组件
 
-The first step of supporting multi-GPU is to replicate GPU hardware components for each simulated GPU. Figure 2 shows the GPU components that we replicate.  We opted to use a single driver across all of the GPUs since all of the GPUs share a single node.  Accordingly, we added a loop in the configuration script (apu_se.py) and topology script (hsaTopology.py) to instantiate multiple GPU nodes that share a single emulated driver (ROCk). Each GPU has its own command processor, hardware scheduler, packet processor, dispatcher, and compute units. To ensure that each of the GPU components is distinguishable, we also added a unique GPU ID parameter to each component's object class. For components that operate on a specific address range (e.g., packet processor), we also assigned them unique address ranges to avoid overlapping. Finally, we replicated the cache and TLB hierarchy by changing the cache (GPU_VIPER.py) and TLB (GPUTLBConfig.py) configuration scripts.
+支持多 GPU 的第一步是为每个模拟的 GPU 复制 GPU 硬件组件。图 2 显示了我们复制的 GPU 组件。我们选择在所有 GPU 上使用单个驱动程序，因为所有 GPU 共享单个节点。因此，我们在配置脚本 (apu_se.py) 和拓扑脚本 (hsaTopology.py) 中添加了一个循环，以实例化共享单个仿真驱动程序 (ROCk) 的多个 GPU 节点。每个 GPU 都有自己的命令处理器、硬件调度器、包处理器、调度器和计算单元。为了确保每个 GPU 组件可区分，我们还为每个组件的对象类添加了唯一的 GPU ID 参数。对于在特定地址范围上操作的组件（例如，包处理器），我们还为它们分配了唯一的地址范围以避免重叠。最后，我们通过更改缓存 (GPU_VIPER.py) 和 TLB (GPUTLBConfig.py) 配置脚本来复制缓存和 TLB 层次结构。
 
 <figure>
     <img src="/assets/img/blog/enabling-multi-gpu/replicate.png" alt="Figure 2" width="600"/>
@@ -39,14 +39,14 @@ The first step of supporting multi-GPU is to replicate GPU hardware components f
     <em>Figure 2. Replicated GPU Components</em>
 </figure>
 
-## Adding Emulated Driver (ROCk) Support for Multi-GPU
+## 为多 GPU 添加仿真驱动程序 (ROCk) 支持
 
-Since the emulated ROCk in gem5 only supports a single GPU, we needed to add multi-GPU support to ROCk. This required two significant changes:
-1. Managing software queues and sending work to multiple GPUs.
-2. Mapping doorbells to multiple GPUs.
+由于 gem5 中的仿真 ROCk 仅支持单个 GPU，我们需要为 ROCk 添加多 GPU 支持。这需要两个重大更改：
+1. 管理软件队列并向多个 GPU 发送工作。
+2. 将门铃映射到多个 GPU。
 
-### Managing Software Queues and Sending Work to Multiple GPUs.
-Applications typically communicate with the GPU through one or more software queues. These software queues contain the application kernels that will be assigned to a GPU. Figure 3 shows how multiple applications interact with multiple GPUs through software queues: queues are private to an application, but an application may have more than one queue. Since gem5 emulates the ROCk kernel-space driver from Linux, this emulated driver creates and manages the software queues. To create a queue, the user space code makes an ioctl() system call to ROCk to request that a queue be created.  ROCk obtains the GPU ID from the ioctl() arguments and assigns the kernel to the appropriate GPU as specified by the user. While the GPU ID is a parameter when creating a queue, it was not passed to routines that manipulate the queue. Thus, to further manage the queue when multiple GPUs are used, ROCk must know which GPU a queue serves. For example, when a program destroys a queue, ROCk must delete the shared state in the GPU that points to the queue. To resolve this problem, we added a hash table to ROCk to maintain a queue-to-GPU mapping.  Thus, it is now simple and efficient for the emulated ROCk driver to identify the GPU associated with each queue.
+### 管理软件队列并向多个 GPU 发送工作。
+应用程序通常通过一个或多个软件队列与 GPU 通信。这些软件队列包含将分配给 GPU 的应用程序内核。图 3 显示了多个应用程序如何通过软件队列与多个 GPU 交互：队列对应用程序是私有的，但应用程序可能有多个队列。由于 gem5 仿真来自 Linux 的 ROCk 内核空间驱动程序，此仿真驱动程序创建和管理软件队列。要创建队列，用户空间代码对 ROCk 进行 ioctl() 系统调用以请求创建队列。ROCk 从 ioctl() 参数获取 GPU ID，并将内核分配给用户指定的适当 GPU。虽然 GPU ID 是创建队列时的参数，但它没有传递给操作队列的例程。因此，当使用多个 GPU 时，为了进一步管理队列，ROCk 必须知道队列服务于哪个 GPU。例如，当程序销毁队列时，ROCk 必须删除 GPU 中指向该队列的共享状态。为了解决这个问题，我们在 ROCk 中添加了一个哈希表来维护队列到 GPU 的映射。因此，仿真 ROCk 驱动程序现在可以简单高效地识别与每个队列关联的 GPU。
 
 <figure>
     <img src="/assets/img/blog/enabling-multi-gpu/queue.png" alt="Figure 3" width="400"/>
@@ -54,10 +54,10 @@ Applications typically communicate with the GPU through one or more software que
     <em>Figure 3. Applications to GPU Communication</em>
 </figure>
 
-### Mapping Doorbell to Multiple GPUs.
-GPUs use doorbells as a mechanism for user-space software to notify the GPU that there is work to be done. The software places data in mutually agreed-upon memory locations, and "rings the doorbell" by writing to a doorbell region. This act of "ringing the doorbell" notifies the GPU that there is some work ready to be processed. Since we are using multiple GPUs, we also need multiple doorbell regions, one for each GPU. Software accesses the doorbell regions by mapping the region into virtual memory with the mmap() system call.
+### 将门铃映射到多个 GPU。
+GPU 使用门铃作为用户空间软件通知 GPU 有工作要完成的机制。软件将数据放置在相互同意的内存位置，并通过写入门铃区域来"按门铃"。这种"按门铃"的行为通知 GPU 有一些工作准备处理。由于我们使用多个 GPU，我们还需要多个门铃区域，每个 GPU 一个。软件通过使用 mmap() 系统调用将区域映射到虚拟内存来访问门铃区域。
 
-However, the GPU identity was not visible to the mmap() system call, so the emulated ROCk driver did not know which GPU to map to a doorbell region to. We address this issue by encoding the GPU ID into the *offset* parameter passed to mmap(). The encoded offset is returned to user space from the create queue ioctl() call. Thus, the mmap() system call can decode the GPU ID from the offset parameter, and identify the associated GPU doorbell region used for mapping. This mechanism is illustrated in Figure 4.
+然而，GPU 身份对 mmap() 系统调用不可见，因此仿真 ROCk 驱动程序不知道将哪个 GPU 映射到门铃区域。我们通过将 GPU ID 编码到传递给 mmap() 的 *offset* 参数中来解决这个问题。编码的偏移量从创建队列 ioctl() 调用返回到用户空间。因此，mmap() 系统调用可以从 offset 参数解码 GPU ID，并识别用于映射的关联 GPU 门铃区域。此机制如图 4 所示。
 
 <figure>
     <img src="/assets/img/blog/enabling-multi-gpu/mmap.png" alt="Figure 4" width="500"/>

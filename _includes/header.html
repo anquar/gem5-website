@@ -2,8 +2,12 @@
   <div class="container-fluid">
 
     <!-- LOGO -->
-    <a class="navbar-brand" href="{{ '/' | prepend: site.baseurl }}">
+    <a class="navbar-brand" href="{{ '/' | prepend: site.baseurl }}" style="display: flex; align-items: center; gap: 15px;">
       <img src="{{ '/assets/img/gem5ColorLong.gif' | prepend: site.baseurl }}" alt="gem5" height=55px>
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 24px; font-weight: bold; line-height: 1.2;">非官方中文网站</span>
+        <span style="font-size: 12px; color: #666; line-height: 1.2;">每周与官网保持同步更新</span>
+      </div>
     </a>
 
     <!-- When the screen size is small, display a hamburger icon instead of the navbar. -->

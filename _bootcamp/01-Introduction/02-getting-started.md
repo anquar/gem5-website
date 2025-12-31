@@ -1,163 +1,163 @@
 ---
 layout: bootcamp
-title: Getting Started with gem5
+title: gem5 入门
 permalink: /bootcamp/introduction/getting-started
 section: introduction
 author: [Jason Lowe-Power, Bobby R. Bruce]
 ---
 <!-- _class: title -->
 
-## Getting started with gem5
+## gem5 入门
 
-In this section, we will get familiar with the tutorial's codespace environment and run our first gem5 simulation.
-
----
-
-## Let’s hit the ground running
-
-### This example will show
-
-1. How someone obtains gem5.
-2. How you build it.
-3. Running a very basic "Hello World" simulation.
-
-- Getting and compiling gem5 is often the hardest part.
-- There's a lot of complicated things happening behind the scenes. We will explain them later.
+在本节中，我们将熟悉教程的 codespace 环境并运行我们的第一次 gem5 模拟。
 
 ---
 
-## Typical Downloading
+## 让我们开始吧
 
-gem5 is not your typical software project where you can easily download a binary.
-I.e., `apt install gem5` will not work.
+### 此示例将展示
 
-The main way gem5 is distributed is as source code that you have to build.
+1. 如何获取 gem5。
+2. 如何构建它。
+3. 运行一个非常基础的 "Hello World" 模拟。
+
+- 获取和编译 gem5 通常是最困难的部分。
+- 幕后发生了很多复杂的事情。我们稍后会解释。
+
+---
+
+## 典型下载方式
+
+gem5 不是您可以轻松下载二进制文件的典型软件项目。
+也就是说，`apt install gem5` 不会起作用。
+
+gem5 的主要分发方式是源代码，您必须构建它。
 
 ```sh
 git clone https://github.com/gem5/gem5
 cd gem5
 ```
 
-> There are two main branches in the gem5 repository:
-> **stable**: The default branch for gem5. Updated at stable releases. Currently v24.0 (As of August 2024).
-> **develop**: The branch in which new features, improvements, etc. are added regularly for the next release.
+> gem5 仓库中有两个主要分支：
+> **stable**：gem5 的默认分支。在稳定版本发布时更新。目前是 v24.0（截至 2024 年 8 月）。
+> **develop**：定期添加新功能、改进等的分支，用于下一个版本。
 
-In this tutorial we’re going to use codespaces with a repo which includes some example materials. Though all the gem5 code is v24.0.
-
----
-
-## gem5 versions
-
-On the **stable** branch, there are _tags_ for each release.
-
-We release gem5 roughly 2-3 times per year.
-We don't have a strict schedule or feature or bug fix goal for releases.
-
-The releases are named for the year and number.
-
-E.g., the most recent gem5 release, v24.0, was the first release in 2024.
-
-The full version string is `v24.0.0.0`.
-The last two numbers are for
-
-- Minor releases (these happen rarely when a major bug is found).
-- Hotfix releases: These are for "small" bugs that are found after a release.
-
-See [CONTRIBUTING.md](../../gem5/CONTRIBUTING.md#Releases) for more information.
+在本教程中，我们将使用包含一些示例材料的仓库的 codespaces。尽管所有 gem5 代码都是 v24.0。
 
 ---
 
-## Using codespaces
+## gem5 版本
 
-- We will be using the "bootcamp environment"
-  - Note: That's also where the source for these slides are
-  - You will be doing all of your development in the repo found at <https://github.com/gem5bootcamp/2024>.
+在 **stable** 分支上，每个版本都有_标签_。
 
-These slides and are available at <https://bootcamp.gem5.org/> for you to follow along.
-(Note: They will be archived at <https://gem5bootcamp.github.io/2024>)
+我们大约每年发布 2-3 次 gem5。
+我们没有严格的发布时间表或功能或错误修复目标。
 
-> **Step 1:** Go to the classroom <https://classroom.github.com/a/gCcXlgBs>
+版本以年份和编号命名。
 
-You need to be in the GitHub organization (via the classroom) to get free codespaces.
+例如，最新的 gem5 版本 v24.0 是 2024 年的第一个版本。
 
-### We strongly recommend using codespaces for the bootcamp.
+完整版本字符串是 `v24.0.0.0`。
+最后两个数字用于
 
-This guarantees everyone is using the same environment and will make debugging easier.
+- 小版本（当发现重大错误时很少发生）。
+- 热修复版本：这些用于发布后发现的小错误。
+
+更多信息请参见 [CONTRIBUTING.md](../../gem5/CONTRIBUTING.md#Releases)。
 
 ---
 
-## Using codespaces 2
+## 使用 codespaces
 
-**AFTER** joining the classroom, you can go to the repository and click on the green "Code" button.
-Again, note that this is the repo where the slides are.
+- 我们将使用"训练营环境"
+  - 注意：这也是这些幻灯片的源代码所在位置
+  - 您将在 <https://github.com/gem5bootcamp/2024> 找到的仓库中进行所有开发。
+
+这些幻灯片可在 <https://bootcamp.gem5.org/> 获取，供您跟随学习。
+（注意：它们将被归档到 <https://gem5bootcamp.github.io/2024>）
+
+> **步骤 1：** 前往教室 <https://classroom.github.com/a/gCcXlgBs>
+
+您需要加入 GitHub 组织（通过教室）才能获得免费的 codespaces。
+
+### 我们强烈建议在训练营中使用 codespaces。
+
+这保证了每个人都使用相同的环境，并使调试更容易。
+
+---
+
+## 使用 codespaces 2
+
+**加入**教室后，您可以前往仓库并点击绿色的 "Code" 按钮。
+再次提醒，这是幻灯片所在的仓库。
 
 <https://github.com/gem5bootcamp/2024/>
 
-![Screenshot of starting a codespace](/bootcamp/01-Introduction/02-getting-started-imgs/codespaces-screenshot-1.drawio.png)
+![启动 codespace 的截图](/bootcamp/01-Introduction/02-getting-started-imgs/codespaces-screenshot-1.drawio.png)
 
 ---
 
-## Using codespaces 3
+## 使用 codespaces 3
 
-> **Step 3:** Wait for the environment to load.
+> **步骤 3：** 等待环境加载。
 
-You can also open it in your local VS Code if you install the Codespaces extension.
-(If you do this, the extensions will not be installed automatically on your local VS Code.)
+如果您安装了 Codespaces 扩展，也可以在本地 VS Code 中打开它。
+（如果您这样做，扩展不会自动安装在您的本地 VS Code 中。）
 
-![Screenshot of the codespace loaded and ready to use width:1100px](/bootcamp/01-Introduction/02-getting-started-imgs/codespaces-screenshot-2.drawio.png)
+![codespace 已加载并准备使用的截图 width:1100px](/bootcamp/01-Introduction/02-getting-started-imgs/codespaces-screenshot-2.drawio.png)
 
 ---
 
-## Navigating the repository
+## 浏览仓库
 
 - **`gem5/`**
-  - The gem5 source code (v24.0). A sub-repository
+  - gem5 源代码（v24.0）。一个子仓库
 - **`gem5-resources/`**
-  - Source code for gem5's resources (workloads, disks, etc.). Also a sub-repository
+  - gem5 资源的源代码（工作负载、磁盘等）。也是一个子仓库
 - **`slides/`**
-  - Markdown version of these slides. Used to build the website/slides.
-  - You can also preview the slides in VS Code.
+  - 这些幻灯片的 Markdown 版本。用于构建网站/幻灯片。
+  - 您也可以在 VS Code 中预览幻灯片。
 - **`materials/`**
-  - Python scripts and other materials for the tutorial.
-  - Most of the live coding examples will be here.
-  - Completed examples are in the `completed` directories.
-- A few other things for the website, automatic building, VS Code configurations, etc.
+  - 教程的 Python 脚本和其他材料。
+  - 大部分现场编码示例将在这里。
+  - 已完成的示例在 `completed` 目录中。
+- 一些其他内容用于网站、自动构建、VS Code 配置等。
 
-Both the slides and materials are broken down into sections and lessons.
-We use numbering to keep them in order.
+幻灯片和材料都按章节和课程进行分解。
+我们使用编号来保持顺序。
 
 ---
 
-## Building gem5
+## 构建 gem5
 
-> Don't do this right now!
+> 现在不要这样做！
 
 ```sh
 scons build/ALL/gem5.opt -j [number of cores]
 ```
 
-- This takes a while (10-15 minutes with 16 cores, ~1hr on 1 core).
-- If you're using codespaces, we have prebuilt binaries for you.
-- We'll talk more about the build system and options later.
+- 这需要一些时间（16 核需要 10-15 分钟，1 核约需 1 小时）。
+- 如果您使用 codespaces，我们为您准备了预构建的二进制文件。
+- 我们稍后会讨论构建系统和选项。
 
 <script src="https://asciinema.org/a/6rAd24brgGqb3Sj8Kmvy1msaG.js" id="asciicast-6rAd24brgGqb3Sj8Kmvy1msaG" async="true"></script>
 
 ---
 <!-- _class: center-image -->
 
-## Time for a live coding example
+## 现场编码示例时间
 
-While we do this, feel free to follow along in the slides.
+当我们这样做时，请随时在幻灯片中跟随。
 
-The slides (found in `slides/01-Introduction/02-getting-started.md`) contain the code snippets we will be using. You can copy-paste from there if you get behind.
+幻灯片（位于 `slides/01-Introduction/02-getting-started.md`）包含我们将使用的代码片段。如果您落后了，可以从那里复制粘贴。
 
-Press the "Preview" button in VS Code to see a rendered version of the slides locally.
+在 VS Code 中按 "Preview" 按钮以在本地查看渲染的幻灯片版本。
 
-![Where to press the preview button](/bootcamp/01-Introduction/02-getting-started-imgs/preview-button.drawio.png)
+![按预览按钮的位置](/bootcamp/01-Introduction/02-getting-started-imgs/preview-button.drawio.png)
 
 ---
 
-## Let’s start by writing a simulation configuration
+## 让我们开始编写模拟配置
 
 ```python
 from gem5.prebuilt.demo.x86_demo_board import X86DemoBoard
@@ -165,33 +165,33 @@ from gem5.resources.resource import obtain_resource
 from gem5.simulate.simulator import Simulator
 ```
 
-This template code is available in the `materials/01-Introduction/02-getting-started/` directory.
-Open the [`basic.py`](../../materials/01-Introduction/02-getting-started/basic.py) file and start editing.
+此模板代码可在 `materials/01-Introduction/02-getting-started/` 目录中找到。
+打开 [`basic.py`](../../materials/01-Introduction/02-getting-started/basic.py) 文件并开始编辑。
 
-Throughout this bootcamp we will be editing/extending files in the materials directory.
+在整个训练营中，我们将在 materials 目录中编辑/扩展文件。
 
-Links to the code are available in the slides if you're using VS Code.
+如果您使用 VS Code，幻灯片中提供了代码链接。
 
 ---
 
-## Let’s be lazy and use a prebuilt board
+## 让我们偷懒并使用预构建的板子
 
 ```python
 board = X86DemoBoard()
 ```
 
-The X86DemoBoard has the following properties:
+X86DemoBoard 具有以下属性：
 
-- Single Channel DDR3, 2GB Memory.
-- A 4 core 3GHz processor (using gem5’s "timing" model).
-- A MESI Two Level Cache Hierarchy, with 32kB data and instruction case and a 1MB L2 Cache.
-- Will be run as a Full-System simulation.
+- 单通道 DDR3，2GB 内存。
+- 4 核 3GHz 处理器（使用 gem5 的 "timing" 模型）。
+- MESI 两级缓存层次结构，32kB 数据和指令缓存以及 1MB L2 缓存。
+- 将作为全系统模拟运行。
 
-Source is available: [src/python/gem5/prebuilt/demo/x86_demo_board.py](../../gem5/src/python/gem5/prebuilt/demo/x86_demo_board.py).
+源代码可用：[src/python/gem5/prebuilt/demo/x86_demo_board.py](../../gem5/src/python/gem5/prebuilt/demo/x86_demo_board.py)。
 
 ---
 
-## Let's load some software
+## 让我们加载一些软件
 
 ```python
 board.set_workload(
@@ -199,34 +199,34 @@ board.set_workload(
 )
 ```
 
-- `obtain_resource` downloads the files needed to run workload
-  - Boots Ubuntu without systemd then exits the simulation
-  - Downloads disk image, kernel, and sets default parameters
+- `obtain_resource` 下载运行工作负载所需的文件
+  - 启动不带 systemd 的 Ubuntu，然后退出模拟
+  - 下载磁盘镜像、内核并设置默认参数
 
-See the [gem5 resource page](https://resources.gem5.org/resources/x86-ubuntu-24.04-boot-no-systemd?version=1.0.0).
+请参见 [gem5 资源页面](https://resources.gem5.org/resources/x86-ubuntu-24.04-boot-no-systemd?version=1.0.0)。
 
 ---
 
 <!-- _class: center-image -->
 
-## gem5 resources web portal
+## gem5 资源 Web 门户
 
-### [Link](https://resources.gem5.org/resources/x86-ubuntu-24.04-boot-no-systemd?version=1.0.0)
+### [链接](https://resources.gem5.org/resources/x86-ubuntu-24.04-boot-no-systemd?version=1.0.0)
 
-![Screenshot of gem5 resources webpage](/bootcamp/01-Introduction/02-getting-started-imgs/resources-screenshot.drawio.png)
+![gem5 资源网页截图](/bootcamp/01-Introduction/02-getting-started-imgs/resources-screenshot.drawio.png)
 
 ---
 
-## Now, let's create a simulator to actually run
+## 现在，让我们创建一个模拟器来实际运行
 
 ```python
 sim = Simulator(board)
-sim.run(20_000_000_000) # 20 billion ticks or 20 ms
+sim.run(20_000_000_000) # 200 亿个 tick 或 20 毫秒
 ```
 
 ---
 
-## That's it!
+## 就是这样！
 
 ```python
 from gem5.prebuilt.demo.x86_demo_board import X86DemoBoard
@@ -237,10 +237,10 @@ board.set_workload(
     obtain_resource("x86-ubuntu-24.04-boot-no-systemd")
 )
 sim = Simulator(board)
-sim.run(20_000_000_000) # 20 billion ticks or 20 ms
+sim.run(20_000_000_000) # 200 亿个 tick 或 20 毫秒
 ```
 
-To run it:
+运行它：
 
 ```sh
 gem5-mesi basic.py
@@ -248,33 +248,33 @@ gem5-mesi basic.py
 
 ---
 
-## Results
+## 结果
 
-gem5 has a lot of output.
-It's both verbose on stdout, but also writes many files in `m5out/`.
+gem5 有很多输出。
+它在 stdout 上很详细，但也会在 `m5out/` 中写入许多文件。
 
-### gem5's output
+### gem5 的输出
 
-In `m5out/` you'll see:
+在 `m5out/` 中您会看到：
 
-- `stats.txt`: The statistics from the simulation.
-- `board.pc.com_1.device`: The console output from the simulation.
-- `citations.bib`: Citations for the models and resources used.
-- `config.ini/json`: The configuration file used.
-- `config*.pdf/svg`: A visualization of the configuration for the system and the caches.
+- `stats.txt`：模拟的统计信息。
+- `board.pc.com_1.device`：模拟的控制台输出。
+- `citations.bib`：使用的模型和资源的引用。
+- `config.ini/json`：使用的配置文件。
+- `config*.pdf/svg`：系统和缓存配置的可视化。
 
 ---
 
-## Take aways
+## 要点
 
-- `gem5` is a Python interpreter.
-- The *interface* to `gem5` is Python scripts.
-- `gem5` contains many Python libraries.
-  - All of the models in gem5 (e.g., caches, CPUs, etc.).
-  - The standard library (stdlib)
-- The output of gem5 is in `m5out/` by default.
-  - Details of configuration
-  - Other output
-  - **Statistics** (the most important part)
-- The Codespaces environment is configured to make things easy.
-  - You'll need to do some work to set up your own environment.
+- `gem5` 是一个 Python 解释器。
+- `gem5` 的*接口*是 Python 脚本。
+- `gem5` 包含许多 Python 库。
+  - gem5 中的所有模型（例如，缓存、CPU 等）。
+  - 标准库 (stdlib)
+- gem5 的输出默认在 `m5out/` 中。
+  - 配置详细信息
+  - 其他输出
+  - **统计信息**（最重要的部分）
+- Codespaces 环境已配置，使事情变得简单。
+  - 您需要做一些工作来设置自己的环境。

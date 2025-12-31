@@ -1,27 +1,27 @@
 ---
 layout: bootcamp
-title: Computer Architecture Simulation
+title: 计算机体系结构模拟
 permalink: /bootcamp/introduction/simulation-background
 section: introduction
 author: Jason Lowe-Power
 ---
 <!-- _class: title -->
 
-## Computer Architecture Simulation
+## 计算机体系结构模拟
 
 ---
 
-## Outline
+## 大纲
 
-### What is gem5 and a bit of history
+### gem5 是什么以及一些历史
 
-### My perspective on architecture simulation
+### 我对体系结构模拟的看法
 
-### gem5's software architecture
+### gem5 的软件架构
 
 ---
 
-## First there was M5
+## 首先是 M5
 
 ![M5 Logo](/bootcamp/01-Introduction/01-simulation-background-imgs/m5.drawio.svg)
 
@@ -29,135 +29,135 @@ author: Jason Lowe-Power
 
 <!-- _class: center-image -->
 
-## M5 at ISCA 2005
+## ISCA 2005 上的 M5
 
 ![M5 slide from ISCA tutorial height:500px](/bootcamp/01-Introduction/01-simulation-background-imgs/m5-isca-2005.png)
 
 ---
 
-## Then there was GEMS
+## 然后是 GEMS
 
-![Logos for M5 and GEMS](/bootcamp/01-Introduction/01-simulation-background-imgs/m5-gems.drawio.svg)
+![M5 和 GEMS 的 Logo](/bootcamp/01-Introduction/01-simulation-background-imgs/m5-gems.drawio.svg)
 
 ---
 
 <!-- _class: center-image -->
 
-## GEMS at ISCA 2005
+## ISCA 2005 上的 GEMS
 
 ![GEMS slide from ISCA tutorial height:500px](/bootcamp/01-Introduction/01-simulation-background-imgs/gems-isca-2005.png)
 
 ---
 
-## Now, we have two simulators...
+## 现在，我们有两个模拟器...
 
-![Logos for M5 and GEMS](/bootcamp/01-Introduction/01-simulation-background-imgs/m5-gems.drawio.svg)
+![M5 和 GEMS 的 Logo](/bootcamp/01-Introduction/01-simulation-background-imgs/m5-gems.drawio.svg)
 
 ---
 
-## What is gem5?
+## gem5 是什么？
 
-### Michigan m5 + Wisconsin GEMS = gem5
+### 密歇根 m5 + 威斯康星 GEMS = gem5
 
-> "The gem5 simulator is a modular platform for computer-system architecture research, encompassing system-level architecture as well as processor microarchitecture."
+> "gem5 模拟器是一个用于计算机系统体系结构研究的模块化平台，涵盖系统级体系结构以及处理器微体系结构。"
 
-### Citations for gem5
+### gem5 的引用
 
 Lowe-Power et al. The gem5 Simulator: Version 20.0+. ArXiv Preprint ArXiv:2007.03152, 2021. <https://doi.org/10.48550/arXiv.2007.03152>
 
-Nathan Binkert, Bradford Beckmann, Gabriel Black, Steven K. Reinhardt, Ali Saidi, Arkaprava Basu, Joel Hestness, Derek R. Hower, Tushar Krishna, Somayeh Sardashti, Rathijit Sen, Korey Sewell, Muhammad Shoaib, Nilay Vaish, Mark D. Hill, and David A. Wood. 2011. The gem5 simulator. SIGARCH Comput. Archit. News 39, 2 (August 2011), 1-7. DOI=<http://dx.doi.org/10.1145/2024716.2024718>
+Nathan Binkert, Bradford Beckmann, Gabriel Black, Steven K. Reinhardt, Ali Saidi, Arkaprava Basu, Joel Hestness, Derek R. Hower, Tushar Krishna, Somayeh Sardashti, Rathijit Sen, Korey Sewell, Muhammad Shoaib, Nilay Vaish, Mark D. Hill, and David A. Wood. 2011. The gem5 simulator. SIGARCH Comput. Archit. News 39, 2 (August 2011), 1-7. DOI=<http://dx.doi.org/10.1145/2024716.2024718>
 
 ---
 
 <!-- _class: no-logo -->
 
-## gem5-20+: A new era in computer architecture simulation
+## gem5-20+：计算机体系结构模拟的新时代
 
 ![gem5-20+](/bootcamp/01-Introduction/01-simulation-background-imgs/gem5-20plus.drawio.png)
 
 ---
 
-## gem5's goals
+## gem5 的目标
 
-![the computer architecture stack height:500px](/bootcamp/01-Introduction/01-simulation-background-imgs/arch-stack.png)
+![计算机体系结构栈 height:500px](/bootcamp/01-Introduction/01-simulation-background-imgs/arch-stack.png)
 
 ![bg right agile hardware methodology fit](/bootcamp/01-Introduction/01-simulation-background-imgs/agile-hardware.png)
 
 ---
 
-## gem5's goals
+## gem5 的目标
 
-### Anyone (including non-architects) can download and use gem5
+### 任何人（包括非体系结构专家）都可以下载并使用 gem5
 
-### Used for cross-stack research:
+### 用于跨栈研究：
 
-- Change kernel, change runtime, change hardware, all in concert
-- Run full ML stacks, full AR/VR stacks… other emerging apps
+- 同时更改内核、运行时和硬件
+- 运行完整的 ML 栈、完整的 AR/VR 栈……其他新兴应用
 
-### We're close… just a lot of rough edges! You can help!
+### 我们很接近了……只是还有很多粗糙的边缘！您可以提供帮助！
 
 ---
 
 <!-- _class: logo-left -->
 
-## The gem5 community
+## gem5 社区
 
-100s of contributors & 1000s(?) of users
+数百名贡献者和数千名（？）用户
 
-### Aim to meet the needs of
+### 旨在满足以下需求
 
-- Academic research (most of you all!)
-- Industry research and development
-- Classroom use
+- 学术研究（你们中的大多数人！）
+- 工业研发
+- 课堂教学
 
-Code of conduct (see repo)
+行为准则（参见仓库）
 
-### _We want to see the community grow!_
+### _我们希望看到社区成长！_
 
-![A community of worker bees improving low-level computer hardware bg right](/bootcamp/01-Introduction/01-simulation-background-imgs/gem5-community.jpg)
+![一群工蜂改进底层计算机硬件的社区 bg right](/bootcamp/01-Introduction/01-simulation-background-imgs/gem5-community.jpg)
 
 ---
 
 <!-- _class: start -->
 
-## My views on simulation
+## 我对模拟的看法
 
 ---
 
-![computer systems research and scientific method bg left:60% fit](/bootcamp/01-Introduction/01-simulation-background-imgs/systems-research.png)
+![计算机系统研究和科学方法 bg left:60% fit](/bootcamp/01-Introduction/01-simulation-background-imgs/systems-research.png)
 
-From [Computer Architecture Performance Evaluation Methods](https://link.springer.com/book/10.1007/978-3-031-01727-8) by Lieven Eeckhout
+来自 Lieven Eeckhout 的 [Computer Architecture Performance Evaluation Methods](https://link.springer.com/book/10.1007/978-3-031-01727-8)
 
-Highlighted block is where computer architecture simulation fits in
-
----
-
-## Why simulation?
+高亮块是计算机体系结构模拟的适用位置
 
 ---
 
-## Why simulation? (Answer)
-
-- Need a tool to evaluate systems that don't exist (yet)
-  - Performance, power, energy, etc.
-- Very costly to actually make the hardware
-- Computer systems are complex with many interdependent parts
-  - Not easy to be accurate without the full system
-- Simulation can be parameterized
-  - Design-space exploration
-  - Sensitivity analysis
+## 为什么需要模拟？
 
 ---
 
-## Alternatives to cycle-level simulation: Analytical modeling
+## 为什么需要模拟？（答案）
 
-### Amdahl's Law
+- 需要工具来评估尚不存在的系统
+  - 性能、功耗、能耗等
+- 实际制造硬件成本非常高
+- 计算机系统很复杂，有许多相互依赖的部分
+  - 没有完整系统很难做到准确
+- 模拟可以参数化
+  - 设计空间探索
+  - 敏感性分析
+
+---
+
+## 周期级模拟的替代方案：分析建模
+
+### 阿姆达尔定律
 
 $$ S_{latency}(s) = \frac{1}{(1-p) + \frac{p}{s}} $$
 
-### Queuing theory
+### 排队论
 
-![Queuing theory bg auto](/bootcamp/01-Introduction/01-simulation-background-imgs/queuing.png)
+![排队论 bg auto](/bootcamp/01-Introduction/01-simulation-background-imgs/queuing.png)
 
 <br><br> <!-- needed for image above -->
 
@@ -165,205 +165,205 @@ $$ L = \lambda W $$
 
 ---
 
-## Kinds of simulation
+## 模拟的类型
 
-- Functional simulation
-- Instrumentation-based
-- Trace-based
-- Execution-driven
-- Full system
-
----
-
-## Kinds of simulation: details
-
-- Functional simulation
-  - Executes programs correctly. Usually no timing information
-  - Used to validate correctness of compilers, etc.
-  - RISC-V Spike, QEMU, gem5 "atomic" mode
-- Instrumentation-based
-  - Often binary translation. Runs on actual hardware with callbacks
-  - Like trace-based. Not flexible to new ISA. Some things opaque
-  - PIN, NVBit
-- Trace-based simulation
-  - Generate addresses/events and re-execute
-  - Can be fast (no need to do functional simulation). Reuse traces
-  - If execution depends on timing, this will not work!
-  - "Specialized" simulators for single aspect (e.g., just cache hit/miss)
+- 功能模拟
+- 基于插桩的模拟
+- 基于跟踪的模拟
+- 执行驱动模拟
+- 全系统模拟
 
 ---
 
-## Kinds of simulation: Execution-driven and full system
+## 模拟的类型：详细信息
 
-### Execution-driven
-
-- Functional and timing simulation is combined
-- gem5 and many others
-- gem5 is "execute in execute" or "timing directed"
-
-### Full system
-
-- Components modeled with enough fidelity to run mostly unmodified apps
-- Often "Bare metal" simulation
-- All of the program is functionally emulated by the simulator
-- Often means running the OS in the simulator, not faking it
-
-"Full system" simulators are often combine functional and execution-based
-
----
-
-## Nomenclature (VMs)
-
-- **Host:** the actual hardware you're using
-- Running things directly on the hardware:
-  - **Native execution**
-- **Guest:** Code running on top of "fake" hardware
-  - OS in virtual machine is guest OS
-  - Running "on top of" hypervisor
-  - Hypervisor is emulating hardware
-
-![layers of your system and of a virtualized system bg right:45% 90%](/bootcamp/01-Introduction/01-simulation-background-imgs/vm-nomenclature.drawio.svg)
+- 功能模拟
+  - 正确执行程序。通常没有时序信息
+  - 用于验证编译器等的正确性
+  - RISC-V Spike、QEMU、gem5 "atomic" 模式
+- 基于插桩的模拟
+  - 通常是二进制翻译。在实际硬件上运行并带有回调
+  - 类似于基于跟踪的模拟。对新 ISA 不灵活。某些内容不透明
+  - PIN、NVBit
+- 基于跟踪的模拟
+  - 生成地址/事件并重新执行
+  - 可以很快（不需要进行功能模拟）。重用跟踪
+  - 如果执行依赖于时序，这将不起作用！
+  - 针对单个方面的"专用"模拟器（例如，仅缓存命中/未命中）
 
 ---
 
-## Nomenclature (gem5)
+## 模拟的类型：执行驱动和全系统
 
-- **Host:** the actual hardware you're using
-- **Simulator:** Runs on the host
-  - Exposes hardware to the guest
-- **Guest:** Code running on simulated hardware
-  - OS running on gem5 is guest OS
-  - gem5 is simulating hardware
-- **Simulator's code:** Runs natively
-  - executes/emulates the guest code
-- **Guest's code:** (or benchmark, workload, etc.)
-  - Runs on gem5, not on the host.
+### 执行驱动
 
-![layers of your system and of a virtualized system bg right:45% 90%](/bootcamp/01-Introduction/01-simulation-background-imgs/gem5-nomenclature.drawio.svg)
+- 功能模拟和时序模拟相结合
+- gem5 和许多其他模拟器
+- gem5 是"执行中的执行"或"时序导向"
 
----
+### 全系统
 
-## Nomenclature (more gem5)
+- 组件建模具有足够的保真度，可以运行大部分未修改的应用程序
+- 通常是"裸机"模拟
+- 程序的所有部分都由模拟器进行功能仿真
+- 通常意味着在模拟器中运行操作系统，而不是伪造它
 
-- **Host:** the actual hardware you're using
-- **Simulator:** Runs on the host
-  - Exposes hardware to the guest
-- **Simulator's performance:**
-  - Time to run the simulation on host
-  - Wallclock time as you perceive it
-- **Simulated performance:**
-  - Time predicted by the simulator
-  - Time for guest code to run on simulator
-
-![layers of your system and of a virtualized system bg right:45% 90%](/bootcamp/01-Introduction/01-simulation-background-imgs/gem5-nomenclature.drawio.svg)
+"全系统"模拟器通常结合了功能模拟和执行驱动模拟
 
 ---
 
-## Tradeoffs in types of simulation
+## 术语（虚拟机）
 
-- Development time: time to make the simulator/models
-- Evaluation time: wallclock time to run the simulator
-- Accuracy: How close is the simulator to real hardware
-- Coverage: How broadly can the simulator be used?
+- **宿主机 (Host)：** 您正在使用的实际硬件
+- 直接在硬件上运行：
+  - **原生执行 (Native execution)**
+- **客户机 (Guest)：** 在"虚拟"硬件上运行的代码
+  - 虚拟机中的操作系统是客户操作系统
+  - 运行在"虚拟机监控程序之上"
+  - 虚拟机监控程序正在模拟硬件
 
-![Table from Computer Architecture Performance Evaluation Methods](/bootcamp/01-Introduction/01-simulation-background-imgs/tradeoffs.png)
-
----
-
-## What level should we simulate?
-
-- Ask yourself: What fidelity is required for this question?
-  - Example: New register file design
-  - Often, the answer is a mix.
-- gem5 is well suited for this mix
-  - Models with different fidelity
-  - Drop-in replacements for each other
-
-### "Cycle level" vs "cycle accurate"
+![您的系统和虚拟化系统的层次 bg right:45% 90%](/bootcamp/01-Introduction/01-simulation-background-imgs/vm-nomenclature.drawio.svg)
 
 ---
 
-## RTL simulation
+## 术语（gem5）
 
-- RTL: Register transfer level/logic
-  - The "model" is the hardware design
-  - You specify every wire and every register
-  - Close to the actual ASIC
-- This is "cycle accurate" as it should be the same in the model and in an ASIC
-- Very high fidelity, but at the cost of configurability
-  - Need the entire design
-  - More difficult to combine functional and timing
+- **宿主机 (Host)：** 您正在使用的实际硬件
+- **模拟器 (Simulator)：** 在宿主机上运行
+  - 向客户机暴露硬件
+- **客户机 (Guest)：** 在模拟硬件上运行的代码
+  - 在 gem5 上运行的操作系统是客户操作系统
+  - gem5 正在模拟硬件
+- **模拟器的代码：** 原生运行
+  - 执行/仿真客户代码
+- **客户机的代码：**（或基准测试、工作负载等）
+  - 在 gem5 上运行，而不是在宿主机上
+
+![您的系统和虚拟化系统的层次 bg right:45% 90%](/bootcamp/01-Introduction/01-simulation-background-imgs/gem5-nomenclature.drawio.svg)
 
 ---
 
-## Cycle-_level_ simulation
+## 术语（更多 gem5）
 
-- Models the system cycle-by-cycle
-- Often "event-driven" (we'll see this soon)
-- Can be highly accurate
-  - Not the exact same cycle-by-cycle as the ASIC, but similar timing
-- Easily parameterizable
-  - No need for a full hardware design
-- Faster than cycle-accurate
-  - Can "cheat" and functionally emulate some things
+- **宿主机 (Host)：** 您正在使用的实际硬件
+- **模拟器 (Simulator)：** 在宿主机上运行
+  - 向客户机暴露硬件
+- **模拟器的性能：**
+  - 在宿主机上运行模拟所需的时间
+  - 您感知到的挂钟时间
+- **模拟性能：**
+  - 模拟器预测的时间
+  - 客户代码在模拟器上运行的时间
+
+![您的系统和虚拟化系统的层次 bg right:45% 90%](/bootcamp/01-Introduction/01-simulation-background-imgs/gem5-nomenclature.drawio.svg)
+
+---
+
+## 模拟类型的权衡
+
+- 开发时间：制作模拟器/模型所需的时间
+- 评估时间：运行模拟器的挂钟时间
+- 准确性：模拟器与真实硬件的接近程度
+- 覆盖范围：模拟器可以广泛使用的程度？
+
+![来自《计算机体系结构性能评估方法》的表格](/bootcamp/01-Introduction/01-simulation-background-imgs/tradeoffs.png)
+
+---
+
+## 我们应该在什么级别进行模拟？
+
+- 问自己：这个问题需要什么保真度？
+  - 示例：新的寄存器文件设计
+  - 通常，答案是混合的。
+- gem5 非常适合这种混合
+  - 具有不同保真度的模型
+  - 可以相互替换
+
+### "周期级"与"周期精确"
+
+---
+
+## RTL 模拟
+
+- RTL：寄存器传输级/逻辑
+  - "模型"就是硬件设计
+  - 您指定每根线和每个寄存器
+  - 接近实际的 ASIC
+- 这是"周期精确"的，因为它在模型和 ASIC 中应该是相同的
+- 保真度非常高，但以可配置性为代价
+  - 需要完整的设计
+  - 更难结合功能和时序
+
+---
+
+## 周期级模拟
+
+- 逐周期建模系统
+- 通常是"事件驱动"（我们很快就会看到）
+- 可以高度准确
+  - 与 ASIC 的逐周期不完全相同，但时序相似
+- 易于参数化
+  - 不需要完整的硬件设计
+- 比周期精确更快
+  - 可以"作弊"并在功能上模拟某些内容
 
 ---
 
 <!-- _class: start -->
 
-## gem5's software architecture
+## gem5 的软件架构
 
 ---
 
-## Software architectures
+## 软件架构
 
-![diagram of models, stdlib, and simulation control](/bootcamp/01-Introduction/01-simulation-background-imgs/gem5-software-arch.drawio.svg)
-
----
-
-## gem5 architecture: SimObject
-
-### Model
-
-This is the `C++` code in **`src/`**
-
-### Parameters
-
-Python code in **`src/`**
-In SimObject declaration file
-
-### Instance or Configuration
-
-A particular choice for the parameters
-In standard library, your extension, or Python runscript
+![模型、标准库和模拟控制的图表](/bootcamp/01-Introduction/01-simulation-background-imgs/gem5-software-arch.drawio.svg)
 
 ---
 
-## Model vs parameter
+## gem5 架构：SimObject
 
-- **Model:** The `C++` code that does the timing simulation
-  - Generic
-- Expose **parameters** to Python
-- Set **parameters** and connections in Python
+### 模型
 
-![Picture of Sunny Cove architecture from wikichip bg right fit](/bootcamp/01-Introduction/01-simulation-background-imgs/Sunny_cove_block_diagram.png)
+这是 **`src/`** 中的 `C++` 代码
+
+### 参数
+
+**`src/`** 中的 Python 代码
+在 SimObject 声明文件中
+
+### 实例或配置
+
+参数的具体选择
+在标准库、您的扩展或 Python 运行脚本中
 
 ---
 
-## Some nomenclature
+## 模型与参数
 
-### You can **_extend_** a model to model new things
+- **模型：** 执行时序模拟的 `C++` 代码
+  - 通用
+- 向 Python 暴露**参数**
+- 在 Python 中设置**参数**和连接
 
-In this case, you should _inherit_ from the object in C++
+![来自 wikichip 的 Sunny Cove 架构图片 bg right fit](/bootcamp/01-Introduction/01-simulation-background-imgs/Sunny_cove_block_diagram.png)
+
+---
+
+## 一些术语
+
+### 您可以**_扩展_**模型以建模新事物
+
+在这种情况下，您应该在 C++ 中从对象_继承_
 
 ```cpp
 class O3CPU : public BaseCPU
 {
 ```
 
-### You can **_specialize_** a model to model with specific parameters
+### 您可以**_特化_**模型以使用特定参数进行建模
 
-In this case, you should _inherit_ from the object in Python
+在这种情况下，您应该在 Python 中从对象_继承_
 
 ```python
 class i7CPU(O3CPU):
@@ -372,116 +372,116 @@ class i7CPU(O3CPU):
 
 ---
 
-## gem5 architecture: Simulation
+## gem5 架构：模拟
 
-gem5 is a **_discrete event simulator_**
+gem5 是一个**_离散事件模拟器_**
 
-At each timestep, gem5:
+在每个时间步，gem5：
 
-1. Event at the head is dequeued
-2. The event is executed
-3. New events are scheduled
+1. 队首的事件被出队
+2. 执行该事件
+3. 调度新事件
 
-![Example of discrete event simulation bg right:55% fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-1.drawio.svg)
-
----
-
-<!-- _paginate: hold -->
-
-## gem5 architecture: Simulation
-
-gem5 is a **_discrete event simulator_**
-
-At each timestep, gem5:
-
-1. Event at the head is dequeued
-2. The event is executed
-3. New events are scheduled
-
-![Example of discrete event simulation bg right:55% fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-2.drawio.svg)
+![离散事件模拟示例 bg right:55% fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-1.drawio.svg)
 
 ---
 
 <!-- _paginate: hold -->
 
-## gem5 architecture: Simulation
+## gem5 架构：模拟
 
-gem5 is a **_discrete event simulator_**
+gem5 是一个**_离散事件模拟器_**
 
-At each timestep, gem5:
+在每个时间步，gem5：
 
-1. Event at the head is dequeued
-2. The event is executed
-3. New events are scheduled
+1. 队首的事件被出队
+2. 执行该事件
+3. 调度新事件
 
-> **All SimObjects can enqueue events onto the event queue**
-
-![Example of discrete event simulation bg right:55% fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-3.drawio.svg)
-
----
-
-## Discrete event simulation example
-
-![Example of discrete event simulation fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-example-1.drawio.svg)
+![离散事件模拟示例 bg right:55% fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-2.drawio.svg)
 
 ---
 
 <!-- _paginate: hold -->
 
-## Discrete event simulation example
+## gem5 架构：模拟
 
-![Example of discrete event simulation fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-example-2.drawio.svg)
+gem5 是一个**_离散事件模拟器_**
+
+在每个时间步，gem5：
+
+1. 队首的事件被出队
+2. 执行该事件
+3. 调度新事件
+
+> **所有 SimObject 都可以将事件入队到事件队列中**
+
+![离散事件模拟示例 bg right:55% fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-3.drawio.svg)
+
+---
+
+## 离散事件模拟示例
+
+![离散事件模拟示例 fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-example-1.drawio.svg)
 
 ---
 
 <!-- _paginate: hold -->
 
-## Discrete event simulation example
+## 离散事件模拟示例
 
-![Example of discrete event simulation fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-example-3.drawio.svg)
-
-To model things that take time, schedule the _next_ event in the future (latency of current event).
-Can call functions instead of scheduling events, but they occur _in the same tick_.
+![离散事件模拟示例 fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-example-2.drawio.svg)
 
 ---
 
-## Discrete event simulation
+<!-- _paginate: hold -->
 
-"Time" needs a unit.
-In gem5, we use a unit called a "Tick".
+## 离散事件模拟示例
 
-Need to convert a simulation "tick" to user-understandable time
-E.g., seconds.
+![离散事件模拟示例 fit](/bootcamp/01-Introduction/01-simulation-background-imgs/des-example-3.drawio.svg)
 
-This is the global simulation tick rate.
-Usually this is 1 ps per tick or $10^{12}$ ticks per second
+要建模需要时间的事物，请在将来调度_下一个_事件（当前事件的延迟）。
+可以调用函数而不是调度事件，但它们发生在_同一个 tick_中。
+
+---
+
+## 离散事件模拟
+
+"时间"需要一个单位。
+在 gem5 中，我们使用一个称为 "Tick" 的单位。
+
+需要将模拟 "tick" 转换为用户可理解的时间
+例如，秒。
+
+这是全局模拟 tick 速率。
+通常是每个 tick 1 ps 或每秒 $10^{12}$ 个 tick
 
 ---
 
 <!-- _class: center-image -->
 
-## gem5's main abstractions: Memory
+## gem5 的主要抽象：内存
 
-### Memory requests
+### 内存请求
 
-- **Ports** allow you to send requests and receive responses.
-- Ports are unidirectional (two types, request/response).
-- Anything* with a Request port can be connected to any Response port.
-- More on this in [Ports and memory-based SimObjects](../03-Developing-gem5-models/04-ports.md).
+- **端口 (Ports)** 允许您发送请求并接收响应。
+- 端口是单向的（两种类型，请求/响应）。
+- 任何带有请求端口的对象*都可以连接到任何响应端口。
+- 更多内容请参见[端口和基于内存的 SimObject](../03-Developing-gem5-models/04-ports.md)。
 
-![CPU talking to caches with ports](/bootcamp/01-Introduction/01-simulation-background-imgs/abstractions-1.drawio.svg)
+![CPU 通过端口与缓存通信](/bootcamp/01-Introduction/01-simulation-background-imgs/abstractions-1.drawio.svg)
 
 ---
 
 <!-- _class: center-image -->
 
-## gem5's main abstractions: CPU
+## gem5 的主要抽象：CPU
 
-### ISA vs CPU model
+### ISA 与 CPU 模型
 
-- ISAs and CPU models are orthogonal.
-- Any ISA should work with any CPU model.
-- "Execution Context" is the interface.
-- More on this in [modeling cores](../03-Developing-gem5-models/05-modeling-cores.md).
+- ISA 和 CPU 模型是正交的。
+- 任何 ISA 都应该与任何 CPU 模型一起工作。
+- "执行上下文 (Execution Context)" 是接口。
+- 更多内容请参见[建模核心](../03-Developing-gem5-models/05-modeling-cores.md)。
 
-![ISA-CPU interactions and CPU talking to caches with ports](/bootcamp/01-Introduction/01-simulation-background-imgs/abstractions-2.drawio.svg)
+![ISA-CPU 交互以及 CPU 通过端口与缓存通信](/bootcamp/01-Introduction/01-simulation-background-imgs/abstractions-2.drawio.svg)

@@ -1,0 +1,88 @@
+title: 训练营
+
+sections:
+  - title: 介绍
+    id: introduction
+    items:
+      - title: 训练营介绍
+        url: /bootcamp/introduction/introduction-to-bootcamp
+      - title: 模拟器背景
+        url: /bootcamp/introduction/simulation-background
+      - title: 快速开始
+        url: /bootcamp/introduction/getting-started
+      - title: Python 背景知识
+        url: /bootcamp/introduction/python-background
+
+  - title: 使用 gem5
+    id: using-gem5
+    items:
+      - title: gem5 标准库
+        url: /bootcamp/using-gem5/stdlib
+      - title: gem5 资源
+        url: /bootcamp/using-gem5/gem5-resources
+      - title: 在 gem5 中运行程序
+        url: /bootcamp/using-gem5/running-in-gem5
+      - title: 核心模型
+        url: /bootcamp/using-gem5/cores
+      - title: 缓存层次结构
+        url: /bootcamp/using-gem5/cache-hierarchies
+      - title: 内存模型
+        url: /bootcamp/using-gem5/memory
+      - title: 全系统模拟
+        url: /bootcamp/using-gem5/full-system
+      - title: 加速模拟
+        url: /bootcamp/using-gem5/accelerating-simulation
+      - title: 采样模拟
+        url: /bootcamp/using-gem5/sampling
+      - title: 功耗建模
+        url: /bootcamp/using-gem5/modeling-power
+      - title: 多重模拟 (Multisim)
+        url: /bootcamp/using-gem5/multisim
+
+  - title: 开发 gem5 模型
+    id: developing-gem5
+    items:
+      - title: SimObject 入门
+        url: /bootcamp/developing-gem5/sim-objects-intro
+      - title: 调试 gem5
+        url: /bootcamp/developing-gem5/debugging-gem5
+      - title: 事件驱动模拟
+        url: /bootcamp/developing-gem5/event-driven-sim
+      - title: 端口与内存对象
+        url: /bootcamp/developing-gem5/ports
+      - title: 核心建模
+        url: /bootcamp/developing-gem5/modeling-cores
+      - title: 缓存一致性建模
+        url: /bootcamp/developing-gem5/modeling-cache-coherence
+      - title: CHI 协议
+        url: /bootcamp/developing-gem5/chi-protocol
+      - title: Ruby 网络
+        url: /bootcamp/developing-gem5/ruby-network
+      - title: 扩展 gem5 模型
+        url: /bootcamp/developing-gem5/extending-gem5-models
+
+  - title: GPU 模型
+    id: gpu-model
+    items:
+      - title: GPU 模型介绍
+        url: /bootcamp/gpu-model/gpu-model
+
+  - title: 其他模拟器
+    id: other-simulators
+    items:
+      - title: SST 集成
+        url: /bootcamp/other-simulators/sst
+      - title: DRAM 模拟器
+        url: /bootcamp/other-simulators/dram
+      - title: SystemC 集成
+        url: /bootcamp/other-simulators/systemc
+
+  - title: 贡献指南
+    id: contributing
+    items:
+      - title: 贡献流程
+        url: /bootcamp/contributing/contributing
+      - title: 测试
+        url: /bootcamp/contributing/testing
+      - title: 在家运行 gem5
+        url: /bootcamp/contributing/gem5-at-home

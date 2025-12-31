@@ -5,13 +5,6 @@ lang: zh-CN
 sourceurl: "https://gem5.googlesource.com/public/gem5-website/+/refs/heads/stable/README.md"
 url: "https://www.gem5.org/"
 
-defaults:
-  -
-    scope:
-      path: ""
-    values:
-      layout: "page"
-
 # Build Settings
 sass:
   sass_dir: _sass
@@ -26,3 +19,17 @@ kramdown:
 collections:
   pages:
     output: true
+  bootcamp:
+    output: true
+    permalink: /bootcamp/:path/
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "page"
+  - scope:
+      path: "_bootcamp"
+      type: "bootcamp"
+    values:
+      layout: "bootcamp"

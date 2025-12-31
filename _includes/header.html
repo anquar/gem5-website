@@ -37,7 +37,7 @@
         </li>
 
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle {% if page.layout == 'documentation' %}active{% endif %}" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle {% if page.layout == 'documentation' or page.layout == 'bootcamp' %}active{% endif %}" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             文档
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -45,6 +45,8 @@
             {% for item in site.data.documentation.docs %}
               <li><a class="dropdown-item" href="{{ item.items[0].url | prepend: site.baseurl }}">{{ item.menu_title | default: item.title }}</a></li>
             {% endfor %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ '/bootcamp' | prepend: site.baseurl }}">🎓 训练营 (Bootcamp)</a></li>
           </ul>
         </li>
 

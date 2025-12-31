@@ -1,0 +1,46 @@
+---
+layout: default
+---
+<div class="sidenav-top">
+  <div class="sidenav-brand bg-light">
+    <a href="/"><img src="{{ '/assets/img/gem5ColorLong.gif' | prepend: site.baseurl }}" height="55px"></a>
+  </div>
+  <div class="search">
+    <form action="/search" method="get">
+      <input type="text" name="query" placeholder="搜索...">
+      <button type="submit" name="submit"><i class="fa fa-search"></i></button>
+    </form>
+  </div>
+</div>
+<div class="sidenav">
+  {% for section in site.data.bootcamp.sections %}
+    <a class="item" {% if section.items.size > 0 %}data-toggle="collapse" href="#{{ section.id }}"{% else %}href="{{ section.url | prepend: site.baseurl }}"{% endif %} role="button" aria-expanded="{% if page.section == section.id %}true{% else %}false{% endif %}" aria-controls="{{ section.id }}">
+      {{ section.title }}
+    </a>
+    {% if section.items %}
+    <div class="collapse {% if page.section == section.id %}show{% endif %}" id="{{ section.id }}">
+      {% for item in section.items %}
+        <a class="subitem {% if page.url == item.url %}active{% endif %}" href="{{ item.url | prepend: site.baseurl }}">{{ item.title }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<div class="container" id="doc-container">
+  <div class="edit"><a href="https://github.com/gem5bootcamp/2024" target="_blank">查看原始材料</a></div>
+  {% if page.author %}<b>作者：</b> {{ page.author }}<br>{% endif %}
+
+  <br>
+  {{ content }}
+  <br>
+
+  <div class="navbuttons">
+    {% if page.previous.url %}
+      <a class="prev" href="{{page.previous.url}}"><button type="button" class="btn btn-outline-primary">上一页</button></a>
+    {% endif %}
+    {% if page.next.url %}
+     <a class="next" href="{{page.next.url}}"><button type="button" class="btn btn-outline-primary">下一页</button></a>
+    {% endif %}
+  </div>
+</div>

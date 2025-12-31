@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-bundle install --path vendor/bundle --jobs 4 --retry 3
+# Prefer `bundle config set` over `bundle install --path` (deprecated).
+bundle config set --local path 'vendor/bundle'
+bundle install --jobs 4 --retry 3
 bundle exec jekyll serve --config _config.yml,_config_dev.yml
-
-

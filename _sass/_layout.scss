@@ -60,6 +60,11 @@ p code {
   }
 }
 
+/* 当页面有侧边栏时，隐藏导航栏标题文本 */
+body:has(.sidenav-top) .navbar-title-text {
+  display: none !important;
+}
+
 ul.navbar-nav li.dropdown:hover > div.dropdown-menu {
     display: block;
 }

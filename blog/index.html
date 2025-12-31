@@ -10,7 +10,7 @@ layout: default
 				<h3><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h3>
 				<time>{{ post.date | date: "%b %-d, %Y" }}</time>
 				<p>by {{ post.author }}</p>
-				<p>{{ post.content | truncate: 500 }}</p>
+				<p>{{ post.excerpt | strip_html | truncatewords: 60 }}</p>
 				<a href="{{ post.url | prepend: site.baseurl }}"><p>Read more...</p></a>
 				<br><hr><br>
 		{% endfor %}

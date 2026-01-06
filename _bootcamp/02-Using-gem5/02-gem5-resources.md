@@ -70,7 +70,7 @@ board.set_se_binary_workload(obtain_resource("x86-hello64-static"))
 - `obtain_resource("x86-hello64-static")` 部分从 gem5 资源获取二进制文件 <!-- go into detail about the parameters -->
 - `board.set_se_binary_workload` 部分告诉板子运行给定的二进制文件。
 
-Then we run the simulation
+然后我们运行模拟
 
 ```bash
 cd materials/02-Using-gem5/02-gem5-resources
@@ -111,23 +111,23 @@ gem5 01-hello-example.py
 
 套件中的所有工作负载都有一个名为 `input_groups` 的内容，可用于过滤套件。
 
-Let's do an example where we will:
+让我们做一个示例，我们将：
 
-- Print all the workloads in the suite
-- Filter the suite with `input_groups`
-- Run a workload from the suite
+- 打印套件中的所有工作负载
+- 使用 `input_groups` 过滤套件
+- 从套件运行一个工作负载
 
 ---
 
 <!-- _class: code-80-percent -->
 
-## Printing all the workloads in a suite
+## 打印套件中的所有工作负载
 
-The `SuiteResource` class acts as a generator so we can iterate through the workloads.
+`SuiteResource` 类充当生成器，因此我们可以遍历工作负载。
 
-Let's print some workload information from  the `x86-getting-started-benchmark-suite` suite.
+让我们打印 `x86-getting-started-benchmark-suite` 套件中的一些工作负载信息。
 
-Let's modify [02-suite-workload-example.py](../../materials/02-Using-gem5/02-gem5-resources/02-suite-workload-example.py). Below, we get the resource and iterate through the suite, printing the `id` and `version` of each workload. Add this to the bottom of the script:
+让我们修改 [02-suite-workload-example.py](../../materials/02-Using-gem5/02-gem5-resources/02-suite-workload-example.py)。下面，我们获取资源并遍历套件，打印每个工作负载的 `id` 和 `version`。将此添加到脚本的底部：
 
 ```python
 getting_started_suite = obtain_resource("x86-getting-started-benchmark-suite")
@@ -137,7 +137,7 @@ for workload in getting_started_suite:
     print("=========================================")
 ```
 
-Now run:
+现在运行：
 
 ```bash
 gem5 02-suite-workload-example.py
@@ -145,13 +145,13 @@ gem5 02-suite-workload-example.py
 
 ---
 
-## Filtering suites by `input_groups`
+## 按 `input_groups` 过滤套件
 
-Each workload in a suite has one or more `input_groups` that we can filter by.
+套件中的每个工作负载都有一个或多个 `input_groups`，我们可以按此过滤。
 
-Let's print all the unique input groups in the suite.
+让我们打印套件中所有唯一的输入组。
 
-We can do this by using the `get_input_groups()` function:
+我们可以使用 `get_input_groups()` 函数来做到这一点：
 
 ```python
 print("Input groups in the suite")
@@ -162,15 +162,15 @@ print(getting_started_suite.get_input_groups())
 
 <!-- _class: code-80-percent -->
 
-## Running a workload from the suite (single code block)
+## 从套件运行工作负载（单个代码块）
 
-Let's run the NPB IS benchmark in this suite.
+让我们在此套件中运行 NPB IS 基准测试。
 
-First, we need to filter the suite to get this workload. We can do this by filtering to get all workloads that have the input tag `"is"`.
+首先，我们需要过滤套件以获取此工作负载。我们可以通过过滤来获取所有具有输入标签 `"is"` 的工作负载。
 
-We convert the returned object to a list and get the first workload in it. This works because `"is"` is a unique tag that only one workload has, the NPB IS workload we're looking for.
+我们将返回的对象转换为列表并获取其中的第一个工作负载。这有效是因为 `"is"` 是一个唯一标签，只有一个工作负载拥有它，即我们正在寻找的 NPB IS 工作负载。
 
-Let's print the `id` of our workload and then run it with the board we have:
+让我们打印工作负载的 `id`，然后使用我们拥有的板子运行它：
 
 ```python
 npb_is_workload = list(getting_started_suite.with_input_group("is"))[0]
@@ -207,29 +207,29 @@ gem5 有两种主要方式使用本地资源。
   - 使用此方法，我们可以使用 `obtain_resource`。
   - 此方法使模拟更具可重现性和一致性。
 
-Let's do an example that creates a local binary and runs that binary in gem5.
+让我们做一个示例，创建一个本地二进制文件并在 gem5 中运行该二进制文件。
 
 ---
 
-## Let's create a binary
+## 让我们创建一个二进制文件
 
-Let's use [this C program that prints a simple triangle pattern](../../materials/02-Using-gem5/02-gem5-resources/03-local-resources/pattern.c).
+让我们使用[这个打印简单三角形图案的 C 程序](../../materials/02-Using-gem5/02-gem5-resources/03-local-resources/pattern.c)。
 
-Compile this program. This will be the binary that we will run in gem5.
+编译此程序。这将是我们在 gem5 中运行的二进制文件。
 
 ```bash
 gcc -o pattern pattern.c
 ```
 
-Now, let's use the local path method.
+现在，让我们使用本地路径方法。
 
-In [03-run-local-resource-local-path.py](../../materials/02-Using-gem5/02-gem5-resources/03-run-local-resource-local-path.py), create the binary resource object as follows:
+在 [03-run-local-resource-local-path.py](../../materials/02-Using-gem5/02-gem5-resources/03-run-local-resource-local-path.py) 中，按如下方式创建二进制资源对象：
 
 ```python
 binary = BinaryResource(local_path="./pattern")
 ```
 
-Let's run the simulation and see the output
+让我们运行模拟并查看输出
 
 ```bash
 gem5 03-run-local-resource-local-path.py
@@ -239,9 +239,9 @@ gem5 03-run-local-resource-local-path.py
 
 <!-- _class: code-50-percent -->
 
-## Let's create a JSON file for the binary resource
+## 让我们为二进制资源创建一个 JSON 文件
 
-The [JSON resource](../../materials/02-Using-gem5/02-gem5-resources/03-local-resources/local_resources.json) for the binary would look like this:
+二进制文件的 [JSON 资源](../../materials/02-Using-gem5/02-gem5-resources/03-local-resources/local_resources.json) 如下所示：
 
 ```json
 {
@@ -273,17 +273,17 @@ The [JSON resource](../../materials/02-Using-gem5/02-gem5-resources/03-local-res
 
 ---
 
-## Let's get the resource and run the simulation
+## 让我们获取资源并运行模拟
 
-In [04-run-local-resource-json.py](../../materials/02-Using-gem5/02-gem5-resources/04-run-local-resource-json.py), we can get the binary by using obtain resource:
+在 [04-run-local-resource-json.py](../../materials/02-Using-gem5/02-gem5-resources/04-run-local-resource-json.py) 中，我们可以通过使用 obtain_resource 来获取二进制文件：
 
 ```python
 board.set_se_binary_workload(obtain_resource("x86-pattern-print"))
 ```
 
-Let's run the simulation.
+让我们运行模拟。
 
-We do this by defining `GEM5_RESOURCE_JSON_APPEND` with our JSON resource before the usual `gem5` command:
+我们通过在通常的 `gem5` 命令之前定义 `GEM5_RESOURCE_JSON_APPEND` 与我们的 JSON 资源来做到这一点：
 
 ```bash
 GEM5_RESOURCE_JSON_APPEND=local_resources.json gem5 04-run-local-resource-json.py

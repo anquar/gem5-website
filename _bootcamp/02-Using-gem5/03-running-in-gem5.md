@@ -21,42 +21,42 @@ section: using-gem5
 ---
 
 <!-- _class: start -->
-## Intro to Syscall Emulation Mode
+## 系统调用仿真模式简介
 
 ---
 
-## What is Syscall Emulation mode, and when to use/avoid it
+## 什么是系统调用仿真模式，何时使用/避免使用
 
-**Syscall Emulation (SE)** mode does not model all the devices in a system. It focuses on simulating the CPU and memory system. It only emulates Linux system calls, and only models user-mode code.
+**系统调用仿真（SE）**模式不会模拟系统中的所有设备。它专注于模拟 CPU 和内存系统。它只仿真 Linux 系统调用，并且只模拟用户模式代码。
 
-SE mode is a good choice when the experiment does not need to model the OS (such as page table walks), does not need a high fidelity model (emulation is ok), and faster simulation speed is needed.
+当实验不需要模拟操作系统（例如页表遍历）、不需要高保真度模型（仿真即可），并且需要更快的仿真速度时，SE 模式是一个不错的选择。
 
-However, if the experiment needs to model the OS interaction, or needs to model a system in high fidelity, then we should use the full-system (FS) mode. The FS mode will be covered in [07-full-system](07-full-system.md).
+但是，如果实验需要模拟操作系统交互，或者需要高保真度地模拟系统，那么我们应该使用全系统（FS）模式。FS 模式将在 [07-full-system](07-full-system.md) 中介绍。
 
 ---
 
-## Example
+## 示例
 
 ### 00-SE-hello-world
 
-Under `materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world`, there is a small example of an SE simulation.
-[00-SE-hello-world.py](../../materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/00-SE-hello-world.py) will run the [00-SE-hello-world](../../materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/00-SE-hello-world.c) binary with a simple X86 configuration.
-This binary prints the string `Hello, World!`.
-If we use the debug flag `SyscallAll` with it, we will able to see what syscalls are simulated.
-We can do it with the following command:
+在 `materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world` 目录下，有一个 SE 仿真的小例子。
+[00-SE-hello-world.py](../../materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/00-SE-hello-world.py) 将使用简单的 X86 配置运行 [00-SE-hello-world](../../materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/00-SE-hello-world.c) 二进制文件。
+这个二进制文件会打印字符串 `Hello, World!`。
+如果我们使用调试标志 `SyscallAll`，我们将能够看到模拟了哪些系统调用。
+我们可以使用以下命令来执行：
 
 ```bash
 gem5 -re --debug-flags=SyscallAll 00-SE-hello-world.py
 ```
 
-> `-re` is an alias for `--stdout-file` and `--stderr-file` to redirect the output to a file.
-> The default output is in `m5out/simout.txt` and m5out/simerr.txt`.
+> `-re` 是 `--stdout-file` 和 `--stderr-file` 的别名，用于将输出重定向到文件。
+> 默认输出在 `m5out/simout.txt` 和 m5out/simerr.txt` 中。
 
 ---
 
 ## 00-SE-hello-world
 
-Then in [simout.txt](../../materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/m5out/simout.txt), we should see:
+然后在 [simout.txt](../../materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/m5out/simout.txt) 中，我们应该看到：
 
 ```bash
 280945000: board.processor.cores.core: T0 : syscall Calling write(1, 21152, 14)...
@@ -64,10 +64,10 @@ Hello, World!
 280945000: board.processor.cores.core: T0 : syscall Returned 14.
 ```
 
-On the left is the timestamp for the simulation.
-As the timestamp suggests, **SE simulation DOES NOT record the time for the syscall**.
+左侧是仿真的时间戳。
+正如时间戳所示，**SE 仿真不会记录系统调用的时间**。
 
-> Note that in the `simout.txt` file the standard out from the *simulator* and the *guest* are mixed together.
+> 注意，在 `simout.txt` 文件中，来自*仿真器*和*客户机*的标准输出混合在一起。
 
 ---
 
@@ -77,67 +77,67 @@ As the timestamp suggests, **SE simulation DOES NOT record the time for the sysc
 
 ---
 
-## What is m5ops
+## 什么是 m5ops
 
-- The **m5ops** (short for m5 opcodes) provide different functionalities that can be used to communicate between ​the simulated workload and the simulator.
-- The commonly used functionalities are below. More can be found in [the m5ops documentation](https://www.gem5.org/documentation/general_docs/m5ops/):
-  - exit [delay]: Stop the simulation in delay nanoseconds
-  - workbegin: Cause an exit event of type "workbegin" that can be used to mark the beginning of an ROI
-  - workend: Cause and exit event of type "workend" that can be used to mark the ending of an ROI
-  - resetstats [delay[period]]: Reset simulation statistics in delay nanoseconds; repeat this every period nanoseconds
-  - dumpstats [delay[period]]: Save simulation statistics to a file in delay nanoseconds; repeat this every period nanoseconds
-  - checkpoint [delay [period]]: Create a checkpoint in delay nanoseconds; repeat this every period nanoseconds
-  - switchcpu: Cause an exit event of type, “switch cpu,” allowing the Python to switch to a different CPU model if desired
-
----
-
-## IMPORTANT
-
-- **_Not all of the ops do what they say automatically_**
-- Most of these only exit the simulation
-- For example:
-  - exit: Actually exits
-  - workbegin: Only exits if configured in `System`
-  - workend: Only exits if configured in `System`
-  - resetstats: Resets the stats
-  - dumpstats: Dumps the stats
-  - checkpoint: Only exits
-  - switchcpu: Only exits
-- See [gem5/src/sim/pseudo_inst.cc](https://github.com/gem5/gem5/blob/stable/src/sim/pseudo_inst.cc) for details.
-- The gem5 standard library might have default behaviors for some of the m5ops. See [src/python/gem5/simulate/simulator.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/simulator.py#L301) for the default behaviors.
+- **m5ops**（m5 操作码的缩写）提供不同的功能，可用于在模拟工作负载和仿真器之间进行通信。
+- 常用的功能如下。更多信息可以在 [m5ops 文档](https://www.gem5.org/documentation/general_docs/m5ops/) 中找到：
+  - exit [delay]: 在延迟纳秒后停止仿真
+  - workbegin: 触发类型为 "workbegin" 的退出事件，可用于标记 ROI 的开始
+  - workend: 触发类型为 "workend" 的退出事件，可用于标记 ROI 的结束
+  - resetstats [delay[period]]: 在延迟纳秒后重置仿真统计信息；每 period 纳秒重复一次
+  - dumpstats [delay[period]]: 在延迟纳秒后将仿真统计信息保存到文件；每 period 纳秒重复一次
+  - checkpoint [delay [period]]: 在延迟纳秒后创建检查点；每 period 纳秒重复一次
+  - switchcpu: 触发类型为 "switch cpu" 的退出事件，允许 Python 根据需要切换到不同的 CPU 模型
 
 ---
 
-## More about m5ops
+## 重要提示
 
-There are three versions of m5ops:
-
-1. Instruction mode: it only works with simulated CPU models
-2. Address mode: it works with simulated CPU models and the KVM CPU (only supports Arm and X86)
-3. Semihosting: it works with simulated CPU models and the Fast Model
-
-Different modes should be used depending on the CPU type and ISA.
-
-The address mode m5ops will be covered in [07-full-system](07-full-system.md) as gem5-bridge and [08-accelerating-simulation](08-accelerating-simulation.md) after the KVM CPU is introduced.
-**In this session, we will only cover the instruction mode.**
-
----
-
-## When to use m5ops
-
-There are two main ways of using the m5ops:
-
-1. Annotating workloads
-2. Making gem5-bridge calls in disk images
-
-In this session, we will focus on learning how to use the m5ops to annotate workloads.
+- **_并非所有操作都会自动执行它们所说的功能_**
+- 这些操作中的大多数只是退出仿真
+- 例如：
+  - exit: 实际退出
+  - workbegin: 仅在 `System` 中配置时才退出
+  - workend: 仅在 `System` 中配置时才退出
+  - resetstats: 重置统计信息
+  - dumpstats: 转储统计信息
+  - checkpoint: 仅退出
+  - switchcpu: 仅退出
+- 详细信息请参见 [gem5/src/sim/pseudo_inst.cc](https://github.com/gem5/gem5/blob/stable/src/sim/pseudo_inst.cc)。
+- gem5 标准库可能对某些 m5ops 有默认行为。默认行为请参见 [src/python/gem5/simulate/simulator.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/simulator.py#L301)。
 
 ---
 
-## How to use m5ops
+## 关于 m5ops 的更多信息
 
-m5ops provides a library of functions for different functionalities. All functions can be found in [gem5/include/gem5/m5ops.h](https://github.com/gem5/gem5/blob/stable/include/gem5/m5ops.h).
-The commonly used functions (they are matched with the commonly used functionalities above):
+m5ops 有三种版本：
+
+1. 指令模式：仅适用于模拟的 CPU 模型
+2. 地址模式：适用于模拟的 CPU 模型和 KVM CPU（仅支持 Arm 和 X86）
+3. 半主机模式：适用于模拟的 CPU 模型和 Fast Model
+
+应根据 CPU 类型和 ISA 使用不同的模式。
+
+地址模式 m5ops 将在 [07-full-system](07-full-system.md) 中作为 gem5-bridge 介绍，并在 [08-accelerating-simulation](08-accelerating-simulation.md) 中介绍 KVM CPU 后讨论。
+**在本节中，我们只介绍指令模式。**
+
+---
+
+## 何时使用 m5ops
+
+使用 m5ops 主要有两种方式：
+
+1. 注释工作负载
+2. 在磁盘镜像中进行 gem5-bridge 调用
+
+在本节中，我们将重点学习如何使用 m5ops 来注释工作负载。
+
+---
+
+## 如何使用 m5ops
+
+m5ops 提供了一个功能库。所有函数可以在 [gem5/include/gem5/m5ops.h](https://github.com/gem5/gem5/blob/stable/include/gem5/m5ops.h) 中找到。
+常用的函数（它们与上面列出的常用功能对应）：
 
 - `void m5_exit(uint64_t ns_delay)`
 - `void m5_work_begin(uint64_t workid, uint64_t threadid)`
@@ -147,32 +147,32 @@ The commonly used functions (they are matched with the commonly used functionali
 - `void m5_checkpoint(uint64_t ns_delay, uint64_t ns_period)`
 - `void m5_switch_cpu(void)`
 
-In order to call these functions in the workload, we will need to link the m5ops library to the workload.
-So first, we need to build the m5ops library.
+为了在工作负载中调用这些函数，我们需要将 m5ops 库链接到工作负载。
+所以首先，我们需要构建 m5ops 库。
 
 ---
 
-## Building the m5ops library
+## 构建 m5ops 库
 
-The m5 utility is in [gem5/util/m5](https://github.com/gem5/gem5/tree/stable/util/m5) directory.​
-In order to build the m5ops library,
+m5 工具位于 [gem5/util/m5](https://github.com/gem5/gem5/tree/stable/util/m5) 目录中。​
+为了构建 m5ops 库，
 
-1. `cd` into the ```gem5/util/m5``` directory
-2. run ```scons [{TARGET_ISA}.CROSS_COMPILE={TARGET_ISA CROSS COMPILER}] build/{TARGET_ISA}/out/m5​```
-3. the compiled library (`m5` is for command line utility, and `libm5.a` is a C library) will be at ```gem5/util/m5/build/{TARGET_ISA}/out```
+1. `cd` 进入 ```gem5/util/m5``` 目录
+2. 运行 ```scons [{TARGET_ISA}.CROSS_COMPILE={TARGET_ISA CROSS COMPILER}] build/{TARGET_ISA}/out/m5​```
+3. 编译后的库（`m5` 用于命令行工具，`libm5.a` 是 C 库）将位于 ```gem5/util/m5/build/{TARGET_ISA}/out```
 
-### Notes
+### 注意事项
 
-- If the host system ISA does not match with the target ISA, then we will need to use the cross-compiler.
-- `TARGET_ISA` has to be in lower case.
+- 如果主机系统 ISA 与目标 ISA 不匹配，那么我们需要使用交叉编译器。
+- `TARGET_ISA` 必须是小写。
 
 ---
 
-## Hands-on Time!
+## 动手实践！
 
 ### 01-build-m5ops-library
 
-### Let's build the m5ops library for x86 and arm64
+### 让我们为 x86 和 arm64 构建 m5ops 库
 
 ```bash
 cd /workspaces/2024/gem5/util/m5
@@ -180,37 +180,37 @@ scons build/x86/out/m5
 scons arm64.CROSS_COMPILE=aarch64-linux-gnu- build/arm64/out/m5
 ```
 
-> Note: although we are using Scons to build these, it's a different environment from building gem5 with different targets and options.
-> Don't expect things to be similar (e.g., use `arm64` instead of `ARM`).
+> 注意：虽然我们使用 Scons 来构建这些，但这是一个与使用不同目标和选项构建 gem5 不同的环境。
+> 不要期望它们相似（例如，使用 `arm64` 而不是 `ARM`）。
 
 ---
 
-## Linking the m5ops library to C/C++ code​
+## 将 m5ops 库链接到 C/C++ 代码​
 
-After building the m5ops library, we can link them to our workload by:​
+构建 m5ops 库后，我们可以通过以下方式将它们链接到我们的工作负载：​
 
-1. Including **gem5/m5ops.h** in the workload's source file(s) (`<gem5/m5ops.h>`)
+1. 在工作负载的源文件中包含 **gem5/m5ops.h** (`<gem5/m5ops.h>`)
 
-2. Adding **gem5/include** to the compiler's include search path (`-Igem5/include`)
+2. 将 **gem5/include** 添加到编译器的包含搜索路径中 (`-Igem5/include`)
 
-3. Adding **gem5/util/m5/build/{TARGET_ISA}/out** to the linker search path
+3. 将 **gem5/util/m5/build/{TARGET_ISA}/out** 添加到链接器搜索路径中
 (`-Lgem5/util/m5/build/{TARGET_ISA}/out`)
 
-4. Linking against **libm5.a** with (`-lm5`)
+4. 使用 (`-lm5`) 链接 **libm5.a**
 
 ---
 
-## Hands-on Time!
+## 动手实践！
 
 ### 02-annotate-this
 
-### Let's annotate the workload with `m5_work_begin` and `m5_work_end`
+### 让我们使用 `m5_work_begin` 和 `m5_work_end` 来注释工作负载
 
-In `materials/02-Using-gem5/03-running-in-gem5/02-annotate-this`, there is a workload source file called [02-annotate-this.cpp](../../materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/02-annotate-this.cpp) and a [Makefile](../../materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/Makefile).
+在 `materials/02-Using-gem5/03-running-in-gem5/02-annotate-this` 目录中，有一个名为 [02-annotate-this.cpp](../../materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/02-annotate-this.cpp) 的工作负载源文件和一个 [Makefile](../../materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/Makefile)。
 
-The workload mainly does two things:
+工作负载主要做两件事：
 
-1. Write a string to the standard out
+1. 将字符串写入标准输出
 
 ```cpp
 write(1, "This will be output to standard out\n", 36);
@@ -222,7 +222,7 @@ write(1, "This will be output to standard out\n", 36);
 
 ## 02-annotate-this
 
-2. Output all the file and folder names in the current directory
+2. 输出当前目录中所有文件和文件夹的名称
 
 ```cpp
 struct dirent *d;
@@ -245,25 +245,25 @@ std::cout<<std::endl;
 
 ## 02-annotate-this
 
-### Our goal in this exercise
+### 本练习的目标
 
-- Mark ```write(1, "This will be output to standard out\n", 36);``` as our region of interest so we can see the execution trace of the syscall.
+- 将 ```write(1, "This will be output to standard out\n", 36);``` 标记为我们的关注区域，以便我们可以看到系统调用的执行跟踪。
 
-### How do we do that?
+### 我们如何做到这一点？
 
-1. Include the m5ops header file with ```#include <gem5/m5ops.h>```
-2. Call ```m5_work_begin(0, 0);``` right before ```write(1, "This will be output to standard out\n", 36);```.
-3. Call ```m5_work_end(0, 0);``` right after ```write(1, "This will be output to standard out\n", 36);```
-4. Compile the workload with the following requirements:
-    1. Add **gem5/include** to the compiler's include search path
-    2. Add **gem5/util/m5/build/x86/out** to the linker search path
-    3. Link against **libm5.a**
+1. 使用 ```#include <gem5/m5ops.h>``` 包含 m5ops 头文件
+2. 在 ```write(1, "This will be output to standard out\n", 36);``` 之前立即调用 ```m5_work_begin(0, 0);```。
+3. 在 ```write(1, "This will be output to standard out\n", 36);``` 之后立即调用 ```m5_work_end(0, 0);```
+4. 使用以下要求编译工作负载：
+    1. 将 **gem5/include** 添加到编译器的包含搜索路径中
+    2. 将 **gem5/util/m5/build/x86/out** 添加到链接器搜索路径中
+    3. 链接 **libm5.a**
 
 ---
 
 ## 02-annotate-this
 
-For step 4, we can modify the [Makefile](../../materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/Makefile) to have it run
+对于步骤 4，我们可以修改 [Makefile](../../materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/Makefile) 使其运行
 
 ```Makefile
 $(GXX) -o 02-annotate-this 02-annotate-this.cpp \
@@ -272,49 +272,49 @@ $(GXX) -o 02-annotate-this 02-annotate-this.cpp \
   -lm5
 ```
 
-If you are having any troubles, the completed version of everything is under `materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/complete`.
+如果您遇到任何问题，所有内容的完成版本位于 `materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/complete`。
 
 ---
 
 ## 02-annotate-this
 
-If the workload is successfully compiled, we can try to run it with
+如果工作负载编译成功，我们可以尝试运行它
 
 ```bash
 ./02-annotate-this
 ```
 
 <!-- I think ./02-annotate-this is what should go above. It was previously blank.-->
-However, we will see the following error:
+但是，我们将看到以下错误：
 
 ```bash
 Illegal instruction (core dumped)
 ```
 
-This is because the host does not recognize the instruction version of m5ops.
+这是因为主机无法识别指令版本的 m5ops。
 
-This is also the reason why we will need to use the address version of m5ops if we use the KVM CPU for our simulation.
+这也是如果我们在仿真中使用 KVM CPU，我们需要使用地址版本的 m5ops 的原因。
 
 ---
 
-## Hands-on Time!
+## 动手实践！
 
 ### 03-run-x86-SE
 
-### Let's write a handler to handle the m5 exit events
+### 让我们编写一个处理程序来处理 m5 退出事件
 
 <!-- What I want to do in this exercise:
 1. Have people run ```gem5 -re 03-run-x86-SE.py``` without any modification and show them what is the default handler for workbegin and workend in stdlib.
 2. Have people to add a workbegin handler and a workend handler that uses debug.flags["ExecAll] to enable and disable debug flag to see the execution trace of the syscall.
 3. Point out that SE mode do not time the syscall and it can read/write the host directory -->
 
-First, let's see what the default behavior is. Go to the folder `materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE` and run [03-run-x86-SE.py](../../materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/03-run-x86-SE.py) with the following command:
+首先，让我们看看默认行为是什么。进入文件夹 `materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE` 并使用以下命令运行 [03-run-x86-SE.py](../../materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/03-run-x86-SE.py)：
 
 ```bash
 gem5 -re 03-run-x86-SE.py
 ```
 
-After running the simulation, we should see a directory called `m5out` in `materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE`. Open the file `simerr.txt` in `m5out`. We should see two lines that look like this:
+运行仿真后，我们应该在 `materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE` 中看到一个名为 `m5out` 的目录。打开 `m5out` 中的文件 `simerr.txt`。我们应该看到如下两行：
 
 ```text
 warn: No behavior was set by the user for work begin. Default behavior is resetting the stats and continuing.
@@ -326,19 +326,19 @@ warn: No behavior was set by the user for work end. Default behavior is dumping 
 
 ## 03-run-x86-SE
 
-As mentioned before, the gem5 standard library might have default behaviors for some of the m5ops. In here, we can see that it has default behaviors for `m5_work_begin` and `m5_work_end`.
-Let's detour a bit to see how the gem5 standard library recognizes the exit event and assigns it a default exit handler.
-All standard library defined exit events can be found in [src/python/gem5/simulate/exit_event.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/exit_event.py). It uses the exit string of exit events to categorize exit events. For example, both `"workbegin"` and `"m5_workend instruction encountered"` exit strings are categorized as `ExitEvent.WORKBEGIN`.
-All pre-defined exit event handlers can be found in [src/python/gem5/simulate/exit_event_generators.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/exit_event_generators.py).
+如前所述，gem5 标准库可能对某些 m5ops 有默认行为。在这里，我们可以看到它对 `m5_work_begin` 和 `m5_work_end` 有默认行为。
+让我们稍微绕一下，看看 gem5 标准库如何识别退出事件并为其分配默认的退出处理程序。
+所有标准库定义的退出事件可以在 [src/python/gem5/simulate/exit_event.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/exit_event.py) 中找到。它使用退出事件的退出字符串来对退出事件进行分类。例如，`"workbegin"` 和 `"m5_workend instruction encountered"` 退出字符串都被归类为 `ExitEvent.WORKBEGIN`。
+所有预定义的退出事件处理程序可以在 [src/python/gem5/simulate/exit_event_generators.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/exit_event_generators.py) 中找到。
 
-For example, `ExitEvent.WORKBEGIN` defaults to using the `reset_stats_generator`. It means that when we are using the standard library's `Simulator` object, if there is an exit with exit string `"workbegin"` or `"m5_workbegin instruction encountered"`, it will automatically execute `m5.stats.reset()` unless we overwrite the default behavior using the `on_exit_event` parameter in the gem5 stdlib `Simulator` parameter.
+例如，`ExitEvent.WORKBEGIN` 默认使用 `reset_stats_generator`。这意味着当我们使用标准库的 `Simulator` 对象时，如果有退出字符串为 `"workbegin"` 或 `"m5_workbegin instruction encountered"` 的退出，它将自动执行 `m5.stats.reset()`，除非我们使用 gem5 stdlib `Simulator` 参数中的 `on_exit_event` 参数覆盖默认行为。
 
 ---
 <!-- _class: two-col code-70-percent -->
 
 ## 03-run-x86-SE
 
-Let's add custom workbegin and workend handlers, and use the `on_exit_event` parameter in `Simulator` parameter to overwrite the default behavior. To do this, add the following into [03-run-x86-SE.py](../../materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/03-run-x86-SE.py):
+让我们添加自定义的 workbegin 和 workend 处理程序，并使用 `Simulator` 参数中的 `on_exit_event` 参数来覆盖默认行为。为此，将以下内容添加到 [03-run-x86-SE.py](../../materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/03-run-x86-SE.py) 中：
 
 ```python
 # define a workbegin handler
@@ -356,7 +356,7 @@ def workend_handler():
 
 ###
 
-Also, register the handlers using the `on_exit_event` parameter in the `Simulator` object construction.
+此外，在 `Simulator` 对象构造中使用 `on_exit_event` 参数注册处理程序。
 
 ```python
 # setup handler for ExitEvent.WORKBEGIN and ExitEvent.WORKEND
@@ -371,13 +371,13 @@ Also, register the handlers using the `on_exit_event` parameter in the `Simulato
 
 ## 03-run-x86-SE
 
-Let's run this simulation again with the following command
+让我们使用以下命令再次运行此仿真
 
 ```bash
 gem5 -re 03-run-x86-SE.py
 ```
 
-Now, we will see the following in [materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/m5out/simout.txt](../../materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/m5out/simout.txt)
+现在，我们将在 [materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/m5out/simout.txt](../../materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/m5out/simout.txt) 中看到以下内容
 
 ```bash
 3757178000: board.processor.cores.core: A0 T0 : 0x7ffff7c82572 @_end+140737350460442    :   syscall                  : IntAlu :   flags=()
@@ -385,11 +385,11 @@ This will be output to standard out
 3757180000: board.processor.cores.core: A0 T0 : 0x7ffff7c82574 @_end+140737350460444    : cmp	rax, 0xfffffffffffff000
 ```
 
-This shows the log of the debug flag `ExecAll` that we enabled for our ROI using `m5.debug.flags["ExecAll"].enable()`. It shows the entire execution trace for our ROI. As the timestamp on the left suggests again, SE mode **DOES NOT** time the emulated system calls. Also, as the log suggests, we overwrote the default behavior of `m5_work_begin` and `m5_work_end`.
+这显示了我们使用 `m5.debug.flags["ExecAll"].enable()` 为 ROI 启用的调试标志 `ExecAll` 的日志。它显示了我们 ROI 的完整执行跟踪。正如左侧的时间戳再次表明的那样，SE 模式**不会**记录模拟系统调用的时间。此外，正如日志所示，我们覆盖了 `m5_work_begin` 和 `m5_work_end` 的默认行为。
 
 ---
 
-Then, with the output
+然后，通过输出
 
 ```bash
 List of Files & Folders:
@@ -397,17 +397,17 @@ List of Files & Folders:
 Simulation Done
 ```
 
-it indicates that SE mode is able to read files on the host machine. Additionally, SE mode is able to write files on the host machine.
+这表明 SE 模式能够读取主机上的文件。此外，SE 模式能够写入主机上的文件。
 
-However, again, SE mode is **NOT** able to time the emulated system calls.
+但是，再次强调，SE 模式**不能**记录模拟系统调用的时间。
 
 ---
 
 <!-- _class: code-80-percent -->
 
-## Tips on SE mode
+## SE 模式提示
 
-With the gem5 stdlib, we usually use the `set_se_binary_workload` function in the `board` object to set up the workloads. We can pass in files, arguments, environment variables, and output file paths to the `set_se_binary_workload` function using the corresponding parameters.
+使用 gem5 stdlib，我们通常使用 `board` 对象中的 `set_se_binary_workload` 函数来设置工作负载。我们可以使用相应的参数将文件、参数、环境变量和输出文件路径传递给 `set_se_binary_workload` 函数。
 
 ```python
 def set_se_binary_workload(
@@ -423,17 +423,17 @@ def set_se_binary_workload(
 ) -> None:
 ```
 
-For more information, we can look at [src/python/gem5/components/boards/se_binary_workload.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/boards/se_binary_workload.py#L71).
+更多信息，我们可以查看 [src/python/gem5/components/boards/se_binary_workload.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/boards/se_binary_workload.py#L71)。
 
 ---
 
 <!-- _class: start -->
 
-## Cross-compiling
+## 交叉编译
 
 ---
 
-## Cross-compiling from one ISA to another.​
+## 从一个 ISA 交叉编译到另一个 ISA。​
 
 <!-- _class: center-image -->
 
@@ -441,62 +441,62 @@ For more information, we can look at [src/python/gem5/components/boards/se_binar
 
 ---
 
-## Hands-on Time!
+## 动手实践！
 
 ### 04-cross-compile-workload
 
-### Let's cross compile the workload to arm64 statically and dynamically
+### 让我们将工作负载静态和动态交叉编译到 arm64
 <!--
 What I want to do in this exercise:
 
 1. have people to cross compile the workload statically and dynamically by modifying the Makefile
 2. point out the cross compiler and "-static" -->
 
-For static compilation, add the following command to the Makefile in `materials/02-Using-gem5/03-running-in-gem5/04-cross-compile-workload`:
+对于静态编译，将以下命令添加到 `materials/02-Using-gem5/03-running-in-gem5/04-cross-compile-workload` 中的 Makefile：
 
 ```make
 $(GXX) -o 04-cross-compile-this-static 04-cross-compile-this.cpp -static -I$(GEM5_PATH)/include -L$(GEM5_PATH)/util/m5/build/$(ISA)/out -lm5
 ```
 
-For dynamic compilation, add the following command:
+对于动态编译，添加以下命令：
 
 ```make
 $(GXX) -o 04-cross-compile-this-dynamic 04-cross-compile-this.cpp -I$(GEM5_PATH)/include -L$(GEM5_PATH)/util/m5/build/$(ISA)/out -lm5
 ```
 
-Next, run `make` in the same directory as the Makefile.
+接下来，在与 Makefile 相同的目录中运行 `make`。
 
 ---
 
 ## 04-cross-compile-workload
 
-### Notes:
+### 注意事项：
 
-Note that we are using `arm64` as the ISA and `aarch64-linux-gnu-g++` for the cross compiler. This is in contrast to exercise 2, where the ISA was `x86` and the compiler was `g++`.
+注意我们使用 `arm64` 作为 ISA，使用 `aarch64-linux-gnu-g++` 作为交叉编译器。这与练习 2 形成对比，练习 2 中 ISA 是 `x86`，编译器是 `g++`。
 
-Also note that the the static compilation command has the flag `-static`, while the dynamic command has no additional flags.
+还要注意，静态编译命令有 `-static` 标志，而动态命令没有额外的标志。
 
 ---
 
-## Hands-on Time!
+## 动手实践！
 
 ### 05-run-arm-SE
 
-### Let's run the compiled arm64 workloads and see what happens
+### 让我们运行编译好的 arm64 工作负载，看看会发生什么
 
 <!-- What I want to do in this exercise:
 1. first let people run the static one, and let them know this is arm
 2. then let people run the dynamic one which will lead to errors
 3. show people how to redirect lib -->
 
-First, let's run the statically compiled workload. `cd` into the directory `materials/02-Using-gem5/03-running-in-gem5/05-run-arm-SE` and run `05-run-arm-SE.py` using the following command:
+首先，让我们运行静态编译的工作负载。`cd` 进入目录 `materials/02-Using-gem5/03-running-in-gem5/05-run-arm-SE` 并使用以下命令运行 `05-run-arm-SE.py`：
 
 ```bash
 gem5 -re --outdir=static 05-run-arm-SE.py --workload-type=static
 ```
 <!-- Not sure what to say for "and let them know this is arm" -->
 
-Next, let's run the dynamically compiled workload with the following command:
+接下来，让我们使用以下命令运行动态编译的工作负载：
 
 ```bash
 gem5 -re --outdir=dynamic 05-run-arm-SE.py --workload-type=dynamic
@@ -506,7 +506,7 @@ gem5 -re --outdir=dynamic 05-run-arm-SE.py --workload-type=dynamic
 
 ## 05-run-arm-SE
 
-You will see the following error output in `dynamic/simout.txt` from running the dynamically compiled workload:
+运行动态编译的工作负载时，您将在 `dynamic/simout.txt` 中看到以下错误输出：
 
 ```text
 src/base/loader/image_file_data.cc:105: fatal: fatal condition fd < 0 occurred: Failed to open file /lib/ld-linux-aarch64.so.1.
@@ -514,7 +514,7 @@ This error typically occurs when the file path specified is incorrect.
 Memory Usage: 217652 KBytes
 ```
 
-To use the dynamically compiled workload, we will have to redirect the library path. We can do this by adding the following to the configuration script, under `print("Time to redirect the library path")`:
+要使用动态编译的工作负载，我们必须重定向库路径。我们可以通过在配置脚本中的 `print("Time to redirect the library path")` 下添加以下内容来实现：
 
 ```python
 setInterpDir("/usr/aarch64-linux-gnu/")
@@ -525,51 +525,51 @@ board.redirect_paths = [RedirectPath(app_path=f"/lib",
 
 ---
 
-## Summary
+## 总结
 
-### SE mode does NOT implement many things!​
+### SE 模式不实现很多东西！​
 
-- Filesystem​
-- Most system calls
-- I/O devices
-- Interrupts
-- TLB misses
-- Page table walks
-- Context switches
-- multiple threads
-  - You may have a multithreaded execution, but there's no context switches & no spin locks​
+- 文件系统​
+- 大多数系统调用
+- I/O 设备
+- 中断
+- TLB 缺失
+- 页表遍历
+- 上下文切换
+- 多线程
+  - 您可能有多线程执行，但没有上下文切换和自旋锁​
 
 ---
 <!-- _class: start -->
 
-## Traffic Generator in gem5
+## gem5 中的流量生成器
 
 ---
 <!-- _class: center-image -->
 
-## Synthetic Traffic Generation
+## 合成流量生成
 
-Synthetic traffic generation is a technique for driven memory subsystems without requiring the simulation of processor models and running workload programs. We have to note the following about synthetic traffic generation.
+合成流量生成是一种驱动内存子系统的技术，不需要模拟处理器模型和运行工作负载程序。关于合成流量生成，我们必须注意以下几点。
 
-- It can be used for the following: measuring maximum theoretical bandwidth, testing correctness of cache coherency protocol
-- It can not be used for: measuring the execution time of workloads (even if you have their memory trace)
+- 它可以用于以下用途：测量最大理论带宽、测试缓存一致性协议的正确性
+- 它不能用于：测量工作负载的执行时间（即使您有它们的内存跟踪）
 
-Synthetic traffic could follow a certain pattern like `sequential (linear)`, `strided`, and `random`. In this section we will look at tools in gem5 that facilitate synthetic traffic generation.
+合成流量可以遵循某些模式，如 `sequential (linear)`、`strided` 和 `random`。在本节中，我们将了解 gem5 中促进合成流量生成的工具。
 
 ![Traffic generator center](/bootcamp/02-Using-gem5/03-running-in-gem5-imgs/t_gen_diagram.drawio.svg)
 
 ---
 
-## gem5: stdlib Components for Synthetic Traffic Generation
+## gem5：用于合成流量生成的标准库组件
 
-gem5's standard library has a collection of components for generating synthetic traffic. All such components inherit from `AbstractGenerator`, found in `src/python/gem5/components/processors`.
+gem5 的标准库有一组用于生成合成流量的组件。所有这些组件都继承自 `AbstractGenerator`，位于 `src/python/gem5/components/processors`。
 
-- These components simulate memory accesses. They are intended to replace a processor in a system that you configure with gem5.
-- Examples of these components include `LinearGenerator` and `RandomGenerator`.
+- 这些组件模拟内存访问。它们旨在替换您在 gem5 中配置的系统中的处理器。
+- 这些组件的示例包括 `LinearGenerator` 和 `RandomGenerator`。
 
-We will see how to use `LinearGenerator` and `RandomGenerator` to stimulate a memory subsystem. The memory subsystem that we are going to use is going to consist of a cache hierarchy with `private l1 caches and a shared l2 cache` with one channel of `DDR3` memory.
+我们将看到如何使用 `LinearGenerator` 和 `RandomGenerator` 来刺激内存子系统。我们将使用的内存子系统将包括一个具有 `private l1 caches and a shared l2 cache` 的缓存层次结构，以及一个 `DDR3` 内存通道。
 
-In the next slides we will look at `LinearGenerator` and `RandomGenerator` at a high level. We'll see how to write a configuration script that uses them.
+在接下来的幻灯片中，我们将从高层次查看 `LinearGenerator` 和 `RandomGenerator`。我们将看到如何编写使用它们的配置脚本。
 
 ---
 <!-- _class: two-col code-70-percent -->
@@ -616,40 +616,40 @@ class RandomGenerator(AbstractGenerator):
 ---
 <!-- _class: two-col -->
 
-## LinearGenerator/RandomGenerator: Knobs
+## LinearGenerator/RandomGenerator：参数
 
 - **num_cores**
-  - The number of cores in your system
+  - 系统中的核心数
 - **duration**
-  - Length of time to generate traffic
+  - 生成流量的时间长度
 - **rate**
-  - Rate at which to request data from memory
-    - **Note**: This is *NOT* the rate at which memory will respond. This is the **maximum** rate at which requests will be made
+  - 从内存请求数据的速率
+    - **注意**：这不是内存响应的速率。这是发出请求的**最大**速率
 - **block_size**
-  - The number of bytes accessed with each read/write
+  - 每次读/写访问的字节数
 
 ###
 
 - **min_addr**
-  - The lowest memory address for the generator to access (via reads/writes)
+  - 生成器要访问的最低内存地址（通过读/写）
 - **max_addr**
-  - The highest memory address for the generator to access (via reads/writes)
+  - 生成器要访问的最高内存地址（通过读/写）
 - **rd_perc**
-  - The percentage of accesses that should be reads
+  - 应该是读操作的访问百分比
 - **data_limit**
-  - The maximum number of bytes that the generator can access (via reads/writes)
-    - **Note**: if `data_limit` is set to 0, there will be no data limit.
+  - 生成器可以访问的最大字节数（通过读/写）
+    - **注意**：如果 `data_limit` 设置为 0，则没有数据限制。
 
 ---
 <!-- _class: two-col -->
 
-## Traffic Patterns Visualized
+## 流量模式可视化
 
 `min_addr`: 0, `max_addr`: 4, `block_size`: 1
 
-**Linear**: We want to access addresses 0 through 4 so a linear access would mean accessing memory in the following order.
+**Linear（线性）**：我们想要访问地址 0 到 4，所以线性访问意味着按以下顺序访问内存。
 
-**Random**: We want to access addresses 0 through 4 so a random access would mean accessing memory in any order. (In this example, we are showing the order: 1, 3, 2, 0).
+**Random（随机）**：我们想要访问地址 0 到 4，所以随机访问意味着以任何顺序访问内存。（在此示例中，我们显示的顺序是：1, 3, 2, 0）。
 
 ###
 
@@ -659,32 +659,31 @@ class RandomGenerator(AbstractGenerator):
 
 ----
 
-## Hands-on Time!
+## 动手实践！
 
 ### 06-traffic-gen
 
-### Let's run an example on how to use the traffic generator
+### 让我们运行一个关于如何使用流量生成器的示例
 
-Open the following file.
+打开以下文件。
 [`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py`](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py)
 
-Steps:
+步骤：
 
-1. Run with a Linear Traffic Generator.
-2. Run with a Hybrid Traffic Generator.
+1. 使用线性流量生成器运行。
+2. 使用混合流量生成器运行。
 
 ---
 <!-- _class: two-col -->
 
-## 06-traffic-gen: LinearGenerator: Looking at the Code
+## 06-traffic-gen: LinearGenerator：查看代码
 
 
-Go to this section of the code on the right.
+转到右侧的代码部分。
 
-Right now, we have set up a board with a Private L1 Shared L2 Cache Hierarchy (go to [`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/cache_hierarchy.py`](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/cache_hierarchy.py) to see how it's constructed), and a Single Channel memory system.
+现在，我们已经设置了一个具有私有 L1 共享 L2 缓存层次结构的板（转到 [`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/cache_hierarchy.py`](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/cache_hierarchy.py) 查看其构造方式），以及一个单通道内存系统。
 
-Add a traffic generator right below
-`memory = SingleChannelDDR3_1600()` with the following lines.
+在 `memory = SingleChannelDDR3_1600()` 下方立即添加流量生成器，使用以下行。
 
 ```python
 generator = LinearGenerator(num_cores=1, rate="1GB/s")
@@ -708,9 +707,9 @@ motherboard = TestBoard(
 ---
 <!-- _class: two-col code-70-percent -->
 
-## 06-traffic-gen: LinearGenerator: Completed Code
+## 06-traffic-gen: LinearGenerator：完成的代码
 
-The completed code snippet should look like this.
+完成的代码片段应该如下所示。
 
 ```python
 cache_hierarchy = MyPrivateL1SharedL2CacheHierarchy()
@@ -730,9 +729,9 @@ motherboard = TestBoard(
 ---
 <!-- _class: code-100-percent -->
 
-## 06-traffic-gen: LinearGenerator: Running the Code
+## 06-traffic-gen: LinearGenerator：运行代码
 
-### Run the following commands to see a Linear Traffic Generator in action
+### 运行以下命令以查看线性流量生成器的运行情况
 
 ```sh
 cd ./materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/
@@ -741,11 +740,11 @@ gem5 --debug-flags=TrafficGen --debug-end=1000000 \
 simple-traffic-generators.py
 ```
 
-We will see some of the expected output in the following slide.
+我们将在下一张幻灯片中看到一些预期的输出。
 
 ---
 
-## 06-traffic-gen: LinearGenerator Results
+## 06-traffic-gen: LinearGenerator 结果
 
 ```sh
   59605: system.processor.cores.generator: LinearGen::getNextPacket: r to addr 0, size 64
@@ -756,21 +755,21 @@ We will see some of the expected output in the following slide.
  178815: system.processor.cores.generator: Next event scheduled at 238420
 ```
 
-Throughout this output, we see `r to addr --`. This means that the traffic generator is simulating a **read** request to access memory address `0x--`.
+在整个输出中，我们看到 `r to addr --`。这意味着流量生成器正在模拟访问内存地址 `0x--` 的**读**请求。
 
 <!-- Is the sentence above accurate? -->
 
-Above, we see `r to addr 0` in line 1, `r to addr 40` in line 3, and `r to addr 80` in line 5.
+在上面，我们在第 1 行看到 `r to addr 0`，在第 3 行看到 `r to addr 40`，在第 5 行看到 `r to addr 80`。
 
-This is because the Linear Traffic Generator  is simulating requests to access memory addresses 0x0000, 0x0040, 0x0080.
+这是因为线性流量生成器正在模拟访问内存地址 0x0000、0x0040、0x0080 的请求。
 
-As you can see, the simulated requests are very linear. Each new memory access is 0x0040 bytes above the previous one.
+如您所见，模拟的请求非常线性。每次新的内存访问都比前一次高 0x0040 字节。
 
 ---
 
 ## 06-traffic-gen: Random
 
-We are not going to do this right now, but if you swapped `LinearGenerator` with `RandomGenerator` and kept the parameters the same, the output is going to look like below. Notice how the pattern of addresses is not a linear sequence anymore.
+我们现在不会这样做，但如果您将 `LinearGenerator` 替换为 `RandomGenerator` 并保持参数相同，输出将如下所示。请注意地址模式不再是线性序列。
 
 ```sh
   59605: system.processor.cores.generator: RandomGen::getNextPacket: r to addr 2000, size 64
@@ -784,90 +783,90 @@ We are not going to do this right now, but if you swapped `LinearGenerator` with
 ---
 <!-- _class: center-image -->
 
-## Our Focus: LinearGenerator and AbstractGenerator
+## 我们的重点：LinearGenerator 和 AbstractGenerator
 
-- We will be focusing on `LinearGenerator` and `RandomGenerator` generators (and a new one later!).
-  - They are essentially the same, but one performs linear memory accesses and one performs random memory accesses
+- 我们将重点关注 `LinearGenerator` 和 `RandomGenerator` 生成器（稍后还有一个新的！）。
+  - 它们本质上是相同的，但一个执行线性内存访问，另一个执行随机内存访问
 
 ![Different Generators](/bootcamp/02-Using-gem5/03-running-in-gem5-imgs/generator_inheritance.drawio.svg)
 
 ---
 
-## Detailed Look on Some Components
+## 详细查看某些组件
 
-- You can find all generator related standard library components under [`src/python/gem5/components/processors`](https://github.com/gem5/gem5/tree/stable/src/python/gem5/components/processors).
-- Looking at [`AbstractGenerator.__init__`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/processors/abstract_generator.py#L53), you'll see that this class takes a list of `AbstractGeneratorCores` as the input. Example classes that inherit from `AbstractGenerator` are `LinearGenerator` and `RandomGenerator`.
-- We will look at classes that extend `AbstractGeneratorCore` that will will create **synthetic traffic** by using a `SimObject` called `PyTrafficGen`. For more information you can look at `src/cpu/testers/traffic_gen`.
-- `LinearGenerator` can have multiple `LinearGeneratorCores` and `RandomGenerator` can have multiple `RandomGeneratorCores`.
+- 您可以在 [`src/python/gem5/components/processors`](https://github.com/gem5/gem5/tree/stable/src/python/gem5/components/processors) 下找到所有与生成器相关的标准库组件。
+- 查看 [`AbstractGenerator.__init__`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/processors/abstract_generator.py#L53)，您会看到此类接受 `AbstractGeneratorCores` 列表作为输入。继承自 `AbstractGenerator` 的示例类是 `LinearGenerator` 和 `RandomGenerator`。
+- 我们将查看扩展 `AbstractGeneratorCore` 的类，这些类将通过使用名为 `PyTrafficGen` 的 `SimObject` 来创建**合成流量**。更多信息，您可以查看 `src/cpu/testers/traffic_gen`。
+- `LinearGenerator` 可以有多个 `LinearGeneratorCores`，`RandomGenerator` 可以有多个 `RandomGeneratorCores`。
 
-Next we will look at extending `AbstractGenerator` to create `HybridGenerator` that has both `LinearGeneratorCores` and `RandomGeneratorCores`.
-
----
-## Extending AbstractGenerator
-
-gem5 has a lot of tools in its standard library, but if you want to simulate specific memory accesses patterns in your research, there might not be anything in the standard library to do this.
-
-In this case, you would have to extend `AbstractGenerator` to create a concrete generator that is tailored to your needs.
-
-To do this, we will go through an example called `HybridGenerator`.
-
-The goal of `HybridGenerator` is to simultaneously simulate both linear and random memory accesses.
-
-To do this, we need `LinearGeneratorCores` (to simulate linear traffic) and `RandomGeneratorCores` (to simulate random traffic).
+接下来，我们将查看如何扩展 `AbstractGenerator` 以创建同时具有 `LinearGeneratorCores` 和 `RandomGeneratorCores` 的 `HybridGenerator`。
 
 ---
+## 扩展 AbstractGenerator
 
-## 06-traffic-gen: HybridGenerator: A Quick Side Note about LinearGeneratorCores
+gem5 在其标准库中有很多工具，但如果您想在研究中模拟特定的内存访问模式，标准库中可能没有相应的工具。
 
-`LinearGeneratorCores` simulate linear traffic.
+在这种情况下，您必须扩展 `AbstractGenerator` 以创建适合您需求的具体生成器。
 
-When we have multiple `LinearGeneratorCores`, if we configure each one to have the same `min_addr` and `max_addr`, each one will start simulating memory accesses at the same `min_addr` and go up to the same `max_addr`. They will be accessing the same addresses at the same time.
+为此，我们将通过一个名为 `HybridGenerator` 的示例来说明。
 
-We want `LinearGeneratorCore` to simulate a more reasonable accesses pattern.
+`HybridGenerator` 的目标是同时模拟线性和随机内存访问。
 
-Therefore, we will have each `LinearGeneratorCore` simulate accesses to a different chunk of memory. To do this, we will have to split up memory into equal-sized chunks and configure each `LinearGeneratorCore` to simulate accesses to one of these chunks.
+为此，我们需要 `LinearGeneratorCores`（用于模拟线性流量）和 `RandomGeneratorCores`（用于模拟随机流量）。
+
+---
+
+## 06-traffic-gen: HybridGenerator：关于 LinearGeneratorCores 的快速说明
+
+`LinearGeneratorCores` 模拟线性流量。
+
+当我们有多个 `LinearGeneratorCores` 时，如果我们将每个都配置为具有相同的 `min_addr` 和 `max_addr`，每个都将从相同的 `min_addr` 开始模拟内存访问，并上升到相同的 `max_addr`。它们将同时访问相同的地址。
+
+我们希望 `LinearGeneratorCore` 模拟更合理的访问模式。
+
+因此，我们将让每个 `LinearGeneratorCore` 模拟对不同内存块的访问。为此，我们必须将内存分割成大小相等的块，并配置每个 `LinearGeneratorCore` 以模拟对这些块之一的访问。
 
 ---
 <!-- _class: center-image -->
 
-## 06-traffic-gen: HybridGenerator: A Quick Side Note about LinearGeneratorCores Cont.
+## 06-traffic-gen: HybridGenerator：关于 LinearGeneratorCores 的快速说明（续）
 
-Here's a diagram that shows how each `LinearGeneratorCore` should access memory.
+这是一个显示每个 `LinearGeneratorCore` 应该如何访问内存的图表。
 
 ![Linear Generator Core Memory Access Diagram](/bootcamp/02-Using-gem5/03-running-in-gem5-imgs/lin_core_access_diagram.drawio.svg)
 
 
 ---
 
-## 06-traffic-gen: HybridGenerator: Dividing Memory Address Range
+## 06-traffic-gen: HybridGenerator：划分内存地址范围
 
-When we create a `HybridGenerator`, we have to determine which `LinearGeneratorCore` gets what chunk of memory.
+当我们创建 `HybridGenerator` 时，我们必须确定哪个 `LinearGeneratorCore` 获得哪个内存块。
 
-As previously discussed, we need to partition the memory address range into equally sized sections and configure each `LinearGeneratorCore` to simulate accesses to a different section.
+如前所述，我们需要将内存地址范围划分为大小相等的部分，并配置每个 `LinearGeneratorCore` 以模拟对不同部分的访问。
 
-To partition, we will use the `partition_range()` function in [`gem5/src/python/gem5/components/processors/abstract_generator.py`](../../gem5/src/python/gem5/components/processors/abstract_generator.py).
+为了划分，我们将使用 [`gem5/src/python/gem5/components/processors/abstract_generator.py`](../../gem5/src/python/gem5/components/processors/abstract_generator.py) 中的 `partition_range()` 函数。
 
-This function takes the range of `min_addr` to `max_addr` and partitions it into `num_partitions` equal-length pieces.
+此函数接受 `min_addr` 到 `max_addr` 的范围，并将其划分为 `num_partitions` 个等长的片段。
 
-For example, if `min_addr` = 0, `max_addr` = 9, and `num_partitions` = 3, then `partition_range` would return <0,3>, <3,6>, <6,9>.
+例如，如果 `min_addr` = 0，`max_addr` = 9，`num_partitions` = 3，那么 `partition_range` 将返回 <0,3>、<3,6>、<6,9>。
 
 ---
 
-## 06-traffic-gen: HybridGenerator: A quick reminder about RandomGeneratorCores
+## 06-traffic-gen: HybridGenerator：关于 RandomGeneratorCores 的快速提醒
 
-We also have to consider the `RandomGeneratorCores`.
+我们还必须考虑 `RandomGeneratorCores`。
 
-It would be reasonable to assume that we should partition them like the `LinearGeneratorCores`, but this is not the case.
+假设我们应该像 `LinearGeneratorCores` 一样对它们进行分区是合理的，但事实并非如此。
 
-Even if each `RandomGeneratorCore` has the same `min_addr` and `max_addr`, since each one simulates a random memory access, each one will be simulating accesses to different (random) memory addresses.
+即使每个 `RandomGeneratorCore` 具有相同的 `min_addr` 和 `max_addr`，由于每个都模拟随机内存访问，每个都将模拟对不同（随机）内存地址的访问。
 
 ---
 
 <!-- _class: center-image -->
 
-## 06-traffic-gen: HybridGenerator: Dividing Memory Address Range Cont.
+## 06-traffic-gen: HybridGenerator：划分内存地址范围（续）
 
-In the end, this is how each core will simulate memory accesses.
+最后，这就是每个核心将如何模拟内存访问。
 
 ![Linear vs. Random memory accesses](/bootcamp/02-Using-gem5/03-running-in-gem5-imgs/core_access_diagram.drawio.svg)
 
@@ -875,11 +874,11 @@ In the end, this is how each core will simulate memory accesses.
 
 <!-- _class: code-70-percent -->
 
-## 06-traffic-gen: HybridGenerator: Choosing a Distribution of Cores
+## 06-traffic-gen: HybridGenerator：选择核心分布
 
-Now that we know how each core will access memory, next, we need to determine how many `LinearGeneratorCores` and `RandomGeneratorCores` we need.
+既然我们知道每个核心将如何访问内存，接下来，我们需要确定需要多少个 `LinearGeneratorCores` 和 `RandomGeneratorCores`。
 
-There are many correct ways to do this, but we will use the following function to determine the number of `LinearGeneratorCores`.
+有很多正确的方法可以做到这一点，但我们将使用以下函数来确定 `LinearGeneratorCores` 的数量。
 
 ```python
         def get_num_linear_cores(num_cores: int):
@@ -892,22 +891,22 @@ There are many correct ways to do this, but we will use the following function t
                 return 2 ** int(log(num_cores, 2))
 ```
 
-The rest of the cores will be `RandomGeneratorCores`.
+其余的核心将是 `RandomGeneratorCores`。
 
 ---
 
 <!-- _class: two-col code-60-percent -->
 
-## 06-traffic-gen: HybridGenerator Constructor
+## 06-traffic-gen: HybridGenerator 构造函数
 
-Let's start looking at the code!
+让我们开始查看代码！
 
-Make sure you have the following file open.
+确保您已打开以下文件。
 [`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/hybrid_generator.py`](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/hybrid_generator.py)
 
-On the right, you'll see the constructor for `HybridGenerator`.
+在右侧，您将看到 `HybridGenerator` 的构造函数。
 
-When we initialize `HybridGenerator` (via `def __init__`), we will be initializing an `AbstractGenerator` (via `super() __init__`) with the values on the right.
+当我们初始化 `HybridGenerator`（通过 `def __init__`）时，我们将使用右侧的值初始化 `AbstractGenerator`（通过 `super() __init__`）。
 
 ```python
 class HybridGenerator(AbstractGenerator):
@@ -940,27 +939,27 @@ class HybridGenerator(AbstractGenerator):
 
 ---
 
-## 06-traffic-gen: Designing a HybridGenerator
+## 06-traffic-gen: 设计 HybridGenerator
 
-Right now, our `HybridGenerator` class has a constructor, but we need to return a list of cores.
+现在，我们的 `HybridGenerator` 类有一个构造函数，但我们需要返回一个核心列表。
 
-In gem5, the method that returns a list of cores is conventionally named `_create_cores`.
+在 gem5 中，返回核心列表的方法通常命名为 `_create_cores`。
 
-If you look at our file, [`hybrid_generator.py`](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/hybrid_generator.py), you'll see this method called `_create_cores`.
+如果您查看我们的文件 [`hybrid_generator.py`](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/hybrid_generator.py)，您会看到这个名为 `_create_cores` 的方法。
 
 ---
 
-## 06-traffic-gen: HybridGenerator: Initializing Variables
+## 06-traffic-gen: HybridGenerator：初始化变量
 
-Let's define `_create_cores`!
+让我们定义 `_create_cores`！
 
-Let's start by declaring/defining some important variables.
+让我们首先声明/定义一些重要的变量。
 
-First, we'll declare our list of cores.
+首先，我们将声明我们的核心列表。
 
-Then, we'll define the number of `LinearGeneratorCores` and `RandomGeneratorCores`.
+然后，我们将定义 `LinearGeneratorCores` 和 `RandomGeneratorCores` 的数量。
 
-Add the following lines under the comment labeled `(1)`.
+在标记为 `(1)` 的注释下添加以下行。
 
 ```python
 core_list = []
@@ -971,25 +970,25 @@ num_random_cores = num_cores - num_linear_cores
 
 ---
 
-## 06-traffic-gen: HybridGenerator: Partitioning Memory Address Range
+## 06-traffic-gen: HybridGenerator：划分内存地址范围
 
-Next, let's define the memory address range for each `LinearGeneratorCore`.
+接下来，让我们为每个 `LinearGeneratorCore` 定义内存地址范围。
 
-If we want to give each `LinearGeneratorCore` an equal chunk of the given memory address range, we need to partition the range of `min_addr` to `max_addr` into `num_linear_cores` pieces.
+如果我们想给每个 `LinearGeneratorCore` 一个相等的给定内存地址范围块，我们需要将 `min_addr` 到 `max_addr` 的范围划分为 `num_linear_cores` 个片段。
 
-To do this, we need to add the following line to our code under the comment labeled `(2)`.
+为此，我们需要在标记为 `(2)` 的注释下向代码添加以下行。
 
 ```python
 addr_ranges = partition_range(min_addr, max_addr, num_linear_cores)
 ```
 
-`addr_ranges` will be a `num_linear_cores`-long list of equal-length partitions from `min_addr` to `max_addr`.
+`addr_ranges` 将是一个从 `min_addr` 到 `max_addr` 的等长分区的 `num_linear_cores` 长度列表。
 
 ---
 
-## 06-traffic-gen: Partitioning Memory Address Range Cont.
+## 06-traffic-gen: 划分内存地址范围（续）
 
-For example, we have `min_addr=0`, `max_addr=32768`, and `num_cores=16` (8 `LinearGeneratorCores`), then
+例如，我们有 `min_addr=0`、`max_addr=32768` 和 `num_cores=16`（8 个 `LinearGeneratorCores`），那么
 
 ```sh
 addr_ranges=
@@ -997,20 +996,20 @@ addr_ranges=
   (16384, 20480), (20480, 24576), (24576, 28672), (28672, 32768)]
 ```
 
-For the `i`'th `LinearGeneratorCore`, we take the `i`'th entry in `addr_ranges`. `min_addr` is the first value that entry, and `max_addr` is the second value in that entry.
+对于第 `i` 个 `LinearGeneratorCore`，我们取 `addr_ranges` 中的第 `i` 个条目。`min_addr` 是该条目的第一个值，`max_addr` 是该条目中的第二个值。
 
-In this example, `LinearGeneratorCore` 0 gets initialized with `min_addr=0` and `max_addr=4096`, `LinearGeneratorCore` 1 gets initialized with `min_addr=4096` and `max_addr=8192`, etc.
+在此示例中，`LinearGeneratorCore` 0 使用 `min_addr=0` 和 `max_addr=4096` 初始化，`LinearGeneratorCore` 1 使用 `min_addr=4096` 和 `max_addr=8192` 初始化，依此类推。
 
 ---
 <!-- _class: two-col -->
 
-## 06-traffic-gen: HybridGenerator: Creating a List of Cores: LinearGeneratorCore
+## 06-traffic-gen: HybridGenerator：创建核心列表：LinearGeneratorCore
 
-Next, let's start creating our list of cores.
+接下来，让我们开始创建我们的核心列表。
 
-First, let's add all the `LinearGeneratorCores`.
+首先，让我们添加所有 `LinearGeneratorCores`。
 
-Add the lines on the right under the comment labeled `(3)`.
+在标记为 `(3)` 的注释下添加右侧的行。
 
 ```python
 for i in range(num_linear_cores):
@@ -1028,13 +1027,13 @@ for i in range(num_linear_cores):
 ---
 <!-- _class: two-col -->
 
-## 06-traffic-gen: HybridGenerator: Creating a List of Cores Explained: LinearGeneratorCore
+## 06-traffic-gen: HybridGenerator：创建核心列表说明：LinearGeneratorCore
 
-In the for loop, we create `num_linear_cores` `LinearGeneratorCores` and append each one to our `core_list`.
+在 for 循环中，我们创建 `num_linear_cores` 个 `LinearGeneratorCores`，并将每个添加到我们的 `core_list` 中。
 
-Each `LinearGeneratorCore` parameter is initialized with the same values from the constructor, except for `min_addr` and `max_addr`.
+每个 `LinearGeneratorCore` 参数都使用构造函数中的相同值初始化，除了 `min_addr` 和 `max_addr`。
 
-We change `min_addr` and `max_addr` so that each `LinearGeneratorCore` only simulates accesses to a section of the range of `HybridGenerator's` `min_addr` to `max_addr`.
+我们更改 `min_addr` 和 `max_addr`，以便每个 `LinearGeneratorCore` 只模拟对 `HybridGenerator` 的 `min_addr` 到 `max_addr` 范围的一部分的访问。
 
 ###
 
@@ -1054,11 +1053,11 @@ for i in range(num_linear_cores):
 ---
 <!-- _class: two-col -->
 
-## 06-traffic-gen: HybridGenerator: Creating a List of Cores: RandomGeneratorCore
+## 06-traffic-gen: HybridGenerator：创建核心列表：RandomGeneratorCore
 
-Now that we've added the `LinearGeneratorCores`, let's add all the `RandomGeneratorCores`.
+现在我们已经添加了 `LinearGeneratorCores`，让我们添加所有 `RandomGeneratorCores`。
 
-Add the lines on the right under the comment labeled `(4)`.
+在标记为 `(4)` 的注释下添加右侧的行。
 
 ###
 
@@ -1078,13 +1077,13 @@ for i in range(num_random_cores):
 ---
 <!-- _class: two-col -->
 
-## 06-traffic-gen: HybridGenerator: Creating a List of Cores Explained: RandomGeneratorCore
+## 06-traffic-gen: HybridGenerator：创建核心列表说明：RandomGeneratorCore
 
-Once again, in the for loop, we create `num_linear_cores` `RandomGeneratorCores` and append each one to our core_list.
+再次，在 for 循环中，我们创建 `num_linear_cores` 个 `RandomGeneratorCores`，并将每个添加到我们的 core_list 中。
 
-Each `RandomGeneratorCore` parameter is initialized with the same values from the constructor, including `min_addr` and `max_addr`.
+每个 `RandomGeneratorCore` 参数都使用构造函数中的相同值初始化，包括 `min_addr` 和 `max_addr`。
 
-`min_addr` and `max_addr` do not change because each `RandomGeneratorCore` should be able to access the entire range of `HybridGenerator's` `min_addr` to `max_addr`.
+`min_addr` 和 `max_addr` 不会改变，因为每个 `RandomGeneratorCore` 应该能够访问 `HybridGenerator` 的 `min_addr` 到 `max_addr` 的整个范围。
 
 ###
 
@@ -1103,21 +1102,21 @@ for i in range(num_random_cores):
 
 ---
 
-## 06-traffic-gen: HybridGenerator: Returning and Beginning Configuration
+## 06-traffic-gen: HybridGenerator：返回并开始配置
 
-We're almost done with this file!
+我们几乎完成了这个文件！
 
-Let's return our `core_list` by adding the following line under the comment labeled `(5)`.
+让我们通过在标记为 `(5)` 的注释下添加以下行来返回我们的 `core_list`。
 
 ```python
 return core_list
 ```
 
-Now, open the file [materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py).
+现在，打开文件 [materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py)。
 
-Let's replace our `LinearGenerator` with a `HybridGenerator`.
+让我们用 `HybridGenerator` 替换我们的 `LinearGenerator`。
 
-First, add the following line somewhere at the top of your code to import the `HybridGenerator`.
+首先，在代码顶部的某个位置添加以下行以导入 `HybridGenerator`。
 
 ```python
 from components.hybrid_generator import HybridGenerator
@@ -1127,13 +1126,13 @@ from components.hybrid_generator import HybridGenerator
 
 <!-- _class: two-col code-70-percent -->
 
-## 06-traffic-gen: HybridGenerator: Configuring
+## 06-traffic-gen: HybridGenerator：配置
 
-In this section of code to the right, you should currently have a `LinearGenerator`.
+在右侧的这段代码中，您当前应该有一个 `LinearGenerator`。
 
-Let's replace it with a `HybridGenerator`.
+让我们用 `HybridGenerator` 替换它。
 
-Replace the following lines
+将以下行
 
 ```python
 generator = LinearGenerator(
@@ -1141,7 +1140,7 @@ generator = LinearGenerator(
 )
 ```
 
-with
+替换为
 
 ```python
 generator = HybridGenerator(
@@ -1171,9 +1170,9 @@ motherboard = TestBoard(
 ---
 <!-- _class: two-col code-70-percent -->
 
-## 06-traffic-gen: HybridGenerator: Configuring Cont.
+## 06-traffic-gen: HybridGenerator：配置（续）
 
-This is what it should look like now.
+现在它应该如下所示。
 
 ###
 
@@ -1196,15 +1195,15 @@ motherboard = TestBoard(
 
 ---
 
-## 06-traffic-gen: HybridGenerator: Running
+## 06-traffic-gen: HybridGenerator：运行
 
-Now, that we've created a `HybridGenerator`, let's run the program again!
+现在，我们已经创建了一个 `HybridGenerator`，让我们再次运行程序！
 
-Make sure you're in the following directory.
+确保您在以下目录中。
 
 **`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/`**
 
-Now run with the following command.
+现在使用以下命令运行。
 
 ```sh
 gem5 --debug-flags=TrafficGen --debug-end=1000000 \
@@ -1213,9 +1212,9 @@ simple-traffic-generators.py
 
 ---
 
-## 06-traffic-gen: HybridGenerator: Output
+## 06-traffic-gen: HybridGenerator：输出
 
-After running the command, you should see something like below.
+运行命令后，您应该看到类似以下的内容。
 
 ```sh
    7451: system.processor.cores5.generator: RandomGen::getNextPacket: r to addr 80a8, size 8
@@ -1232,25 +1231,25 @@ After running the command, you should see something like below.
    7451: system.processor.cores0.generator: Next event scheduled at 14902
 ```
 
-As you can see, cores 0, 1, 2, and 3 are `LinearGeneratorCores`, and cores 4 and 5 are `RandomGeneratorCores`!
+如您所见，核心 0、1、2 和 3 是 `LinearGeneratorCores`，核心 4 和 5 是 `RandomGeneratorCores`！
 
 ---
 
-## 06-traffic-gen: HybridGenerator: Statistics
+## 06-traffic-gen: HybridGenerator：统计信息
 
-Now, let's look at some of the statistical differences between our `LinearGeneratorCores` and `RandomGeneratorCores`.
+现在，让我们看看 `LinearGeneratorCores` 和 `RandomGeneratorCores` 之间的一些统计差异。
 
-Run the following command to see the miss rate for each core's l1 data cache.
+运行以下命令以查看每个核心的 l1 数据缓存的未命中率。
 
 ```sh
 grep ReadReq.missRate::processor m5out/stats.txt
 ```
 
-On the next slide, you'll see the expected output (with some text removed for readability).
+在下一张幻灯片中，您将看到预期的输出（为便于阅读，删除了一些文本）。
 
 ---
 
-## 06-traffic-gen: HybridGenerator: Statistics Cont.
+## 06-traffic-gen: HybridGenerator：统计信息（续）
 
 ```sh
 system.cache_hierarchy.l1dcaches0.ReadReq.missRate::processor.cores0.generator     0.132345
@@ -1261,13 +1260,13 @@ system.cache_hierarchy.l1dcaches4.ReadReq.missRate::processor.cores4.generator  
 system.cache_hierarchy.l1dcaches5.ReadReq.missRate::processor.cores5.generator     0.875055
 ```
 
-Cores 0, 1, 2, and 3 (`LinearGeneratorCores`) have a miss rate of **0.13309375** (~13.3%) on average.
+核心 0、1、2 和 3（`LinearGeneratorCores`）的平均未命中率为 **0.13309375**（约 13.3%）。
 
-Cores 4 and 5 (`RandomGeneratorCores`) have a miss rate of **0.8757405** (~87.5%) on average.
+核心 4 和 5（`RandomGeneratorCores`）的平均未命中率为 **0.8757405**（约 87.5%）。
 
-This is because `LinearGeneratorCores` access memory linearly. Therefore, they exhibit more locality which in turn results in less misses in the l1dcache.
+这是因为 `LinearGeneratorCores` 线性访问内存。因此，它们表现出更多的局部性，这反过来导致 l1dcache 中的未命中更少。
 
-On the other hand, since the `RandomGeneratorCores` access memory randomly, the caches can't take advantage of locality in the same way.
+另一方面，由于 `RandomGeneratorCores` 随机访问内存，缓存无法以相同的方式利用局部性。
 
 ---
 <!-- Speaker Notes:
@@ -1280,14 +1279,14 @@ Traffic generator can abstract away the details of a data requestor such as CPU 
 
 -->
 
-## Summary
+## 总结
 
-Overall, we discussed two different types of traffic generators: **Linear** and **Random**.
+总的来说，我们讨论了两类流量生成器：**Linear（线性）**和 **Random（随机）**。
 
-`LinearGenerators` simulate linear memory accesses, and `RandomGenerators` simulate random memory accesses.
+`LinearGenerators` 模拟线性内存访问，`RandomGenerators` 模拟随机内存访问。
 
-We looked into how to configure a board that uses these traffic generators.
+我们研究了如何配置使用这些流量生成器的板。
 
-We also extended the `AbstractGenerator` class to create a `HybridGenerator`, which simulates linear and random memory accesses simultaneously.
+我们还扩展了 `AbstractGenerator` 类以创建 `HybridGenerator`，它同时模拟线性和随机内存访问。
 
-Finally, we saw some of the statistical differences between`LinearGeneratorCores` and `RandomGeneratorCores`.
+最后，我们看到了 `LinearGeneratorCores` 和 `RandomGeneratorCores` 之间的一些统计差异。

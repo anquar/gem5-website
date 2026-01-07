@@ -22,56 +22,56 @@ excerpt_separator: "<!--more-->"
 
 ---
 
-## What is Full System Simulation?
+## 什么是全系统模拟？
 
-Full-system simulation is a type of simulation that emulates a complete computer system, including the CPU, memory, I/O devices, and system software like operating systems.
+全系统模拟是一种模拟完整计算机系统的仿真类型，包括 CPU、内存、I/O 设备以及操作系统等系统软件。
 
-It allows for detailed analysis and debugging of hardware and software interactions.
+它允许对硬件和软件交互进行详细分析和调试。
 
-**Components Simulated**:
+**模拟的组件**：
 
-- CPUs (multiple types and configurations)
-- Memory hierarchy (caches, main memory)
-- I/O devices (disk, network interfaces)
-- Entire software stack (OS, drivers, applications)
-
----
-
-## Basics of Booting Up a Real System in gem5
-
-**Overview**: gem5 can simulate the process of booting up a real system, providing insights into the behavior of the hardware and software during startup.
-
-### Steps Involved
-
-1. **Setting Up the Simulation Environment**:
-    - Choose the ISA (e.g., x86, ARM).
-    - Configure the system components (CPU, memory, caches).
-2. **Getting the correct resources such as kernel, bootloader, diskimages, etc.**
-3. **Configuring the Boot Parameters**:
-    - Set kernel command line parameters, if necessary.
-4. **Running the Simulation**:
-    - Start the simulation and monitor the boot process.
+- CPU（多种类型和配置）
+- 内存层次结构（缓存、主内存）
+- I/O 设备（磁盘、网络接口）
+- 完整的软件栈（操作系统、驱动程序、应用程序）
 
 ---
 
-## Let's run a full system simulation in gem5
+## 在 gem5 中启动真实系统的基础知识
 
-The incomplete code already has a board built.
+**概述**：gem5 可以模拟真实系统的启动过程，提供对启动期间硬件和软件行为的深入洞察。
 
-Let's run a full-system workload in gem5.
+### 涉及的步骤
 
-This workload is an Ubuntu 24.04 boot. It will throw three m5 exits at:
-
-- Kernel Booted
-- When `after_boot.sh` runs
-- After run script runs
+1. **设置模拟环境**：
+    - 选择 ISA（例如，x86、ARM）。
+    - 配置系统组件（CPU、内存、缓存）。
+2. **获取正确的资源，如内核、引导加载程序、磁盘镜像等。**
+3. **配置启动参数**：
+    - 如有必要，设置内核命令行参数。
+4. **运行模拟**：
+    - 启动模拟并监控启动过程。
 
 ---
 
-## Obtain the workload and set exit event
+## 让我们在 gem5 中运行全系统模拟
 
-To set the workload, we add the following to
-[materials/02-Using-gem5/07-full-system/x86-fs-kvm-run.py](../../materials/02-Using-gem5/07-full-system/x86-fs-kvm-run.py):
+不完整的代码已经构建了一个板子。
+
+让我们在 gem5 中运行全系统工作负载。
+
+这个工作负载是 Ubuntu 24.04 启动。它将在以下三个时间点触发 m5 退出：
+
+- 内核启动完成
+- 当 `after_boot.sh` 运行时
+- 运行脚本执行后
+
+---
+
+## 获取工作负载并设置退出事件
+
+要设置工作负载，我们将以下内容添加到
+[materials/02-Using-gem5/07-full-system/x86-fs-kvm-run.py](../../materials/02-Using-gem5/07-full-system/x86-fs-kvm-run.py)：
 
 ```python
 workload = obtain_resource("x86-ubuntu-24.04-boot-with-systemd", resource_version="1.0.0")
@@ -82,9 +82,9 @@ board.set_workload(workload)
 
 <!-- _class: code-80-percent -->
 
-## Obtain the workload and set exit event (conti.)
+## 获取工作负载并设置退出事件（续）
 
-Let's make the exit event handler and set it in our simulator's object.
+让我们创建退出事件处理器，并将其设置到我们的模拟器对象中。
 
 ```python
 def exit_event_handler():
@@ -106,93 +106,93 @@ simulator.run()
 
 ---
 
-## Viewing the terminal/serial output with m5term
+## 使用 m5term 查看终端/串口输出
 
-Before booting this workload, let's build the `m5term` application so we can connect to the running system.
+在启动此工作负载之前，让我们构建 `m5term` 应用程序，以便我们可以连接到正在运行的系统。
 
 ```bash
 cd /workspaces/2024/gem5/util/term
 make
 ```
 
-Now you have a binary `m5term`.
+现在您有了一个 `m5term` 二进制文件。
 
 ---
 
-## Watch gem5's output
+## 查看 gem5 的输出
 
-Now, let's run the workload and connect to the terminal of the disk image boot using `m5term`.
+现在，让我们运行工作负载并使用 `m5term` 连接到磁盘镜像启动的终端。
 
-Run gem5 with:
+使用以下命令运行 gem5：
 
 ```bash
 gem5 x86-fs-kvm-run.py
 ```
 
-In another terminal window, run the following command to connect to the disk image boot's terminal:
+在另一个终端窗口中，运行以下命令以连接到磁盘镜像启动的终端：
 
 ```bash
 m5term 3456
 ```
 
-3456 is the port number on which the terminal is running.
-You will see this printed in the gem5 output.
+3456 是终端运行的端口号。
+您将在 gem5 输出中看到此信息。
 
-If you run multiple gem5 instances, they will have sequential port numbers.
-If you are running in a non-interactive environment, there will be no ports to connect to.
+如果您运行多个 gem5 实例，它们将具有连续的端口号。
+如果您在非交互式环境中运行，将没有端口可以连接。
 
 ---
 
 <!-- _class: start -->
 
-## Creating your own disk images
+## 创建您自己的磁盘镜像
 
 ---
 
-## Creating disk images using Packer and QEMU
+## 使用 Packer 和 QEMU 创建磁盘镜像
 
-To create a generic Ubuntu disk image that we can use in gem5, we will use:
+为了创建一个可以在 gem5 中使用的通用 Ubuntu 磁盘镜像，我们将使用：
 
-- Packer: This will automate the disk image creation process.
-- QEMU: We will use a QEMU plugin in Packer to actually create the disk image.
-- Ubuntu autoinstall: We will use autoinstall to automate the Ubuntu install process.
+- Packer：这将自动化磁盘镜像创建过程。
+- QEMU：我们将在 Packer 中使用 QEMU 插件来实际创建磁盘镜像。
+- Ubuntu autoinstall：我们将使用 autoinstall 来自动化 Ubuntu 安装过程。
 
-gem5 resources already has code that can create a generic Ubuntu image using the aforementioned method.
+gem5 resources 已经有代码可以使用上述方法创建通用 Ubuntu 镜像。
 
-- Path to code: [`gem5-resources/src/x86-ubuntu`](../../gem5-resources/src/x86-ubuntu)
+- 代码路径：[`gem5-resources/src/x86-ubuntu`](../../gem5-resources/src/x86-ubuntu)
 
-Let's go through the important parts of the creation process.
-
----
-
-## Getting the ISO and the user-data file
-
-As we are using Ubuntu autoinstall, we need a live server install ISO.
-
-- This can be found online from the Ubuntu website: [iso](https://releases.ubuntu.com/noble/)
-
-We also need the user-data file that will tell Ubuntu autoinstall how to install Ubuntu.
-
-- The user-data file on gem5-resources specifies all default options with a minimal server installation.
+让我们浏览创建过程的重要部分。
 
 ---
 
-## How to get our own user-data file
+## 获取 ISO 和 user-data 文件
 
-To get a user-data file from scratch, you need to install Ubuntu on a machine.
+由于我们使用 Ubuntu autoinstall，我们需要一个实时服务器安装 ISO。
 
-- Post-installation, we can retrieve the `autoinstall-user-data` from `/var/log/installer/autoinstall-user-data` after the system's first reboot.
+- 这可以从 Ubuntu 网站在线找到：[iso](https://releases.ubuntu.com/noble/)
 
-You can install Ubuntu on your own VM and get the user-data file.
+我们还需要 user-data 文件，它将告诉 Ubuntu autoinstall 如何安装 Ubuntu。
+
+- gem5-resources 上的 user-data 文件指定了所有默认选项，采用最小服务器安装。
 
 ---
 
-## Using QEMU to get the user-data file
+## 如何获取我们自己的 user-data 文件
 
-We can also use QEMU to install Ubuntu and get the aforementioned file.
+要从头开始获取 user-data 文件，您需要在机器上安装 Ubuntu。
 
-- First, we need to create an empty disk image in QEMU with the command: `qemu-img create -f raw ubuntu-22.04.2.raw 5G`
-- Then we use QEMU to boot the diskimage:
+- 安装后，我们可以在系统首次重启后从 `/var/log/installer/autoinstall-user-data` 检索 `autoinstall-user-data`。
+
+您可以在自己的 VM 上安装 Ubuntu 并获取 user-data 文件。
+
+---
+
+## 使用 QEMU 获取 user-data 文件
+
+我们也可以使用 QEMU 安装 Ubuntu 并获取上述文件。
+
+- 首先，我们需要使用以下命令在 QEMU 中创建一个空磁盘镜像：`qemu-img create -f raw ubuntu-22.04.2.raw 5G`
+- 然后我们使用 QEMU 启动磁盘镜像：
 
 ```bash
 qemu-system-x86_64 -m 2G \
@@ -202,15 +202,15 @@ qemu-system-x86_64 -m 2G \
       -net user,hostfwd=tcp::2222-:22
 ```
 
-After installing Ubuntu, we can use ssh to get the user-data file.
+安装 Ubuntu 后，我们可以使用 ssh 获取 user-data 文件。
 
 ---
 
-## Important parts of the Packer script
+## Packer 脚本的重要部分
 
-Let's go over the Packer file.
+让我们浏览 Packer 文件。
 
-- **bootcommand**:
+- **bootcommand**：
 
   ```hcl
   "e<wait>",
@@ -220,16 +220,16 @@ Let's go over the Packer file.
   "<f10><wait>"
   ```
 
-  This boot command opens the GRUB menu to edit the boot command, then removes the `---` and adds the  autoinstall command.
+  此启动命令打开 GRUB 菜单以编辑启动命令，然后删除 `---` 并添加 autoinstall 命令。
 
-- **http_directory**: This directory points to the directory with the user-data file and an empty file named meta-data. These files are used to install Ubuntu.
+- **http_directory**：此目录指向包含 user-data 文件和一个名为 meta-data 的空文件的目录。这些文件用于安装 Ubuntu。
 
 ---
 
-## Important parts of the Packer script (Conti.)
+## Packer 脚本的重要部分（续）
 
-- **qemu_args**: We need to provide Packer with the QEMU arguments we will be using to boot the image.
-  - For example, the QEMU command that the Packer script will use will be:
+- **qemu_args**：我们需要向 Packer 提供我们将用于启动镜像的 QEMU 参数。
+  - 例如，Packer 脚本将使用的 QEMU 命令将是：
 
   ```bash
   qemu-system-x86_64 -vnc 127.0.0.1:32 -m 8192M \
@@ -239,26 +239,26 @@ Let's go over the Packer file.
   -machine type=pc,accel=kvm -netdev user,id=user.0,hostfwd=tcp::3873-:22
   ```
 
-- **File provisioners**: These commands allow us to move files from the  host machine to the QEMU image.
+- **File provisioners**：这些命令允许我们将文件从主机移动到 QEMU 镜像。
 
-- **Shell provisioner**: This allows us to run bash scripts that can run the post installation commands.
+- **Shell provisioner**：这允许我们运行可以执行后安装命令的 bash 脚本。
 
 ---
 
 <!-- _class: no-logo -->
 
-## Let's use the base Ubuntu image to create a disk image with the GAPBS benchmarks
+## 让我们使用基础 Ubuntu 镜像创建包含 GAPBS 基准测试的磁盘镜像
 
-Update the [x86-ubuntu.pkr.hcl](../../materials/02-Using-gem5/07-full-system/x86-ubuntu-gapbs/x86-ubuntu.pkr.hcl) file.
+更新 [x86-ubuntu.pkr.hcl](../../materials/02-Using-gem5/07-full-system/x86-ubuntu-gapbs/x86-ubuntu.pkr.hcl) 文件。
 
-The general structure of the Packer file would be the same but with a few key changes:
+Packer 文件的一般结构将相同，但有一些关键更改：
 
-- We will now add an argument in the `source "qemu" "initialize"` block.
-  - `diskimage = true` : This will let Packer know that we are using a base disk image and not an iso from which we will install Ubuntu.
-- Remove the `http_directory   = "http"` directory as we no longer need to use autoinstall.
-- Change the `iso_checksum` and `iso_urls` to that of our base image.
+- 我们现在将在 `source "qemu" "initialize"` 块中添加一个参数。
+  - `diskimage = true`：这将让 Packer 知道我们使用的是基础磁盘镜像，而不是我们将从中安装 Ubuntu 的 iso。
+- 删除 `http_directory   = "http"` 目录，因为我们不再需要使用 autoinstall。
+- 将 `iso_checksum` 和 `iso_urls` 更改为我们的基础镜像。
 
-    Let's get the base Ubuntu 24.04 image from gem5 resources and unzip it.
+    让我们从 gem5 resources 获取基础 Ubuntu 24.04 镜像并解压缩它。
 
     ```bash
     wget https://storage.googleapis.com/dist.gem5.org/dist/develop/images/x86/ubuntu-24-04/x86-ubuntu-24-04.gz
@@ -269,15 +269,15 @@ The general structure of the Packer file would be the same but with a few key ch
 
 <!-- _class: code-80-percent  -->
 
-`iso_checksum` is the `sha256sum` of the iso file that we are using. To get the `sha256sum` run the following in the linux terminal.
+`iso_checksum` 是我们正在使用的 iso 文件的 `sha256sum`。要获取 `sha256sum`，请在 linux 终端中运行以下命令。
 
 ```bash
 sha256sum ./x86-ubuntu-24-04.gz
 ```
 
 
-- **Update the file and shell provisioners:** Let's remove the file provisioners as we dont need to transfer the files again.
-- **Boot command:** As we are not installing Ubuntu, we can write the commands to login along with any other commands we need (e.g. setting up network or ssh). Let's update the boot command to login and enable network:
+- **更新文件和 shell provisioners：** 让我们删除文件 provisioners，因为我们不需要再次传输文件。
+- **启动命令：** 由于我们不安装 Ubuntu，我们可以编写登录命令以及我们需要的任何其他命令（例如，设置网络或 ssh）。让我们更新启动命令以登录并启用网络：
 
 ```hcl
 "<wait30>",
@@ -291,11 +291,11 @@ sha256sum ./x86-ubuntu-24-04.gz
 
 ---
 
-## Changes to the post installation script
+## 对后安装脚本的更改
 
-For this post installation script we need to get the dependencies and build the GAPBS benchmarks.
+对于此后安装脚本，我们需要获取依赖项并构建 GAPBS 基准测试。
 
-Add this to the [post-installation.sh](../../materials/02-Using-gem5/07-full-system/x86-ubuntu-gapbs/scripts/post-installation.sh) script
+将此添加到 [post-installation.sh](../../materials/02-Using-gem5/07-full-system/x86-ubuntu-gapbs/scripts/post-installation.sh) 脚本
 
 ```bash
 git clone https://github.com/sbeamer/gapbs
@@ -303,7 +303,7 @@ cd gapbs
 make
 ```
 
-Let's run the Packer script and use this disk image in gem5!
+让我们运行 Packer 脚本并在 gem5 中使用此磁盘镜像！
 
 ```bash
 cd /workspaces/2024/materials/02-Using-gem5/07-full-system
@@ -311,25 +311,25 @@ x86-ubuntu-gapbs/build.sh
 ```
 ---
 
-## Let's use our built disk image in gem5
+## 让我们在 gem5 中使用我们构建的磁盘镜像
 
-Let's add the md5sum and the path to our [local JSON ](../../materials/02-Using-gem5/07-full-system/completed/local-gapbs-resource.json).
+让我们将 md5sum 和路径添加到我们的 [local JSON ](../../materials/02-Using-gem5/07-full-system/completed/local-gapbs-resource.json)。
 
-Let's run the [gem5 GAPBS config](../../materials/02-Using-gem5/07-full-system/completed/x86-fs-gapbs-kvm-run.py).
+让我们运行 [gem5 GAPBS config](../../materials/02-Using-gem5/07-full-system/completed/x86-fs-gapbs-kvm-run.py)。
 
 ```bash
 GEM5_RESOURCE_JSON_APPEND=./completed/local-gapbs-resource.json gem5 x86-fs-gapbs-kvm-run.py
 ```
 
-This script should run the bfs benchmark.
+此脚本应该运行 bfs 基准测试。
 
 ---
 
-## Let's see how we can access the terminal using m5term
+## 让我们看看如何使用 m5term 访问终端
 
-- We are going to run the same [gem5 GAPBS config](../../materials/02-Using-gem5/07-full-system/x86-fs-gapbs-kvm-run.py) but with a small change.
+- 我们将运行相同的 [gem5 GAPBS config](../../materials/02-Using-gem5/07-full-system/x86-fs-gapbs-kvm-run.py)，但有一个小更改。
 
-Let's change the last `yield True` to `yield False` so that the simulation doesn't exit and we can access the simulation.
+让我们将最后一个 `yield True` 更改为 `yield False`，这样模拟就不会退出，我们可以访问模拟。
 
 ```python
 def exit_event_handler():
@@ -343,9 +343,9 @@ def exit_event_handler():
 
 ---
 
-## Again, let's use m5term
+## 再次，让我们使用 m5term
 
-Now let's connect to our simulation by using the `m5term` binary
+现在让我们使用 `m5term` 二进制文件连接到我们的模拟
 
 ```bash
 m5term 3456

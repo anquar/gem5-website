@@ -12,15 +12,15 @@ section: using-gem5
 
 <!-- _class: center-image -->
 
-## What if the ROI is large
+## 如果 ROI 很大怎么办
 
-### We now know how to skip the "unimportant" part of the simulation, but what if the important part of the simulation is too large?
+### 我们现在知道如何跳过模拟中"不重要"的部分，但如果模拟中重要的部分太大怎么办？
 
-What if we are not facing this
+如果我们面对的不是这种情况
 
 ![](/bootcamp/02-Using-gem5/08-accelerating-simulation-img/skipable-experiment.drawio.svg)
 
-but actually facing this
+而是实际上面对这种情况
 
 ![](/bootcamp/02-Using-gem5/08-accelerating-simulation-img/roi-too-large.drawio.svg)
 
@@ -28,84 +28,84 @@ but actually facing this
 
 <!-- _class: start -->
 
-## Sampling
+## 采样
 
 ---
 
-## What is sampling?
+## 什么是采样？
 
-There are two major types of sampling:
+采样主要有两种类型：
 
-1. Targeted sampling
-2. Statistical sampling
+1. 目标采样（Targeted sampling）
+2. 统计采样（Statistical sampling）
 
 ---
 
-## Targeted Sampling
+## 目标采样
 
-Representative methodologies: SimPoint, LoopPoint
+代表性方法：SimPoint、LoopPoint
 <!-- _class: center-image -->
 ![width:950](/bootcamp/02-Using-gem5/09-sampling-img/targeted_sampling.png)
 
-Targeted sampling selects samples based on specific characteristics that are discovered by analysis.
+目标采样根据分析发现的特定特征来选择样本。
 
 ---
 
-## More About Targeted Sampling
+## 关于目标采样的更多信息
 
-Well-known simulation sampling methods that use the targeted sampling approach include **SimPoint** and **LoopPoint**.​
+使用目标采样方法的知名模拟采样方法包括 **SimPoint** 和 **LoopPoint**。
 
-Both methods divide the whole program execution into regions that each execute a fixed number of instructions.
+这两种方法都将整个程序执行划分为多个区域，每个区域执行固定数量的指令。
 
-They use **basic block vectors**, which are recordings of the execution pattern of basic blocks within a region (period) of execution. A basic block vector can be used as the signature of the program behavior of the region. Here is an example of a basic block vector.
+它们使用**基本块向量**，这是执行区域内基本块执行模式的记录。基本块向量可以用作该区域程序行为的特征。下面是一个基本块向量的示例。
 <!-- _class: center-image -->
 ![basic block vector ](/bootcamp/02-Using-gem5/09-sampling-img/basic_block_vecotr.png)
 
-They use the basic block vectors to cluster and find the representative regions. They will predict the overall performance of the program by collecting only the representative regions' performance and sum them with weights.
+它们使用基本块向量进行聚类并找到代表性区域。它们通过仅收集代表性区域的性能并加权求和来预测程序的整体性能。
 
 ---
 
-## Statistical Sampling
+## 统计采样
 <!-- _class: center-image -->
-Representative methodologies: SMARTS, FSA
+代表性方法：SMARTS、FSA
 
 ![width:950](/bootcamp/02-Using-gem5/09-sampling-img/statical_sampling.png)
 
-Statistical sampling, as the name suggests, statistically selects its sampling units.
+统计采样，顾名思义，以统计方式选择其采样单元。
 
 ---
 
-## More About Statistical Sampling
+## 关于统计采样的更多信息
 
-The representative simulation sampling methods in statistical sampling include **SMARTS** and **FSA**.
+统计采样中的代表性模拟采样方法包括 **SMARTS** 和 **FSA**。
 
-​Both methods periodically or randomly simulate in detail for a small amount of execution throughout the whole program execution and fast-forward between the detailed simulations.
+这两种方法在整个程序执行过程中定期或随机地对少量执行进行详细模拟，并在详细模拟之间进行快进。
 
-They use the performance of the randomly distributed samples to predict the overall performance of the whole program execution.
+它们使用随机分布样本的性能来预测整个程序执行的总体性能。
 
 ---
 
-## What we should know before we apply the techniques
+## 应用这些技术前我们应该了解什么
 
 <!-- warn people that different types of samplings guarantee different things -->
-### No matter how great a tool or a technique is, misusing it can be DANGEROUS
+### 无论工具或技术多么优秀，误用都可能是危险的
 
-Before using any of the sampling techniques, we need to make sure the sampling technique works for our experiments.
-For example, SimPoint is designed to work with single-threaded workloads only, so **if our experiments require multi-threaded workloads, we should NOT use SimPoint with them.**
+在使用任何采样技术之前，我们需要确保该采样技术适用于我们的实验。
+例如，SimPoint 仅设计用于单线程工作负载，因此**如果我们的实验需要多线程工作负载，我们不应该对它们使用 SimPoint**。
 <!-- _class: center-image -->
 ![width:500](/bootcamp/02-Using-gem5/09-sampling-img/misuse_tool.png)
 
 ---
 
-## What gem5 offers
+## gem5 提供的功能
 
-In gem5, we have the infrastructure for
+在 gem5 中，我们提供了以下基础设施：
 
-1. SimPoint ([paper](https://cseweb.ucsd.edu/~calder/papers/ASPLOS-02-SimPoint.pdf))
-2. LoopPoint ([paper](https://alenks.github.io/pdf/looppoint_hpca2022.pdf))
-3. ELFie ([paper](https://heirman.net/papers/patil2021elfies.pdf))
-4. SMARTS ([paper](https://web.eecs.umich.edu/~twenisch/papers/isca03.pdf))
-5. FSA ([paper](https://ieeexplore.ieee.org/document/7314164)) (Might not be supported officially)
+1. SimPoint ([论文](https://cseweb.ucsd.edu/~calder/papers/ASPLOS-02-SimPoint.pdf))
+2. LoopPoint ([论文](https://alenks.github.io/pdf/looppoint_hpca2022.pdf))
+3. ELFie ([论文](https://heirman.net/papers/patil2021elfies.pdf))
+4. SMARTS ([论文](https://web.eecs.umich.edu/~twenisch/papers/isca03.pdf))
+5. FSA ([论文](https://ieeexplore.ieee.org/document/7314164))（可能未正式支持）
 
 ---
 
@@ -115,11 +115,11 @@ In gem5, we have the infrastructure for
 
 ---
 
-## Targeted Sampling in gem5
+## gem5 中的目标采样
 
-- gem5 provides infrastructure for **SimPoint** and **LoopPoint** to analyze the program, take checkpoints for the representative regions, and run the representative regions.
-Note that LoopPoint analysis support is not currently supported in gem5 v24.0 but is tested and prepared to be upstream in gem5 v24.1.
-- gem5 also provides the infrastructure for **ELFies** to be executed in SE mode, but gem5 does not support creating ELFie files and weight information.
+- gem5 为 **SimPoint** 和 **LoopPoint** 提供基础设施，用于分析程序、为代表区域创建检查点并运行代表区域。
+请注意，LoopPoint 分析支持目前在 gem5 v24.0 中不受支持，但已测试并准备在 gem5 v24.1 中上游。
+- gem5 还为在 SE 模式下执行 **ELFies** 提供基础设施，但 gem5 不支持创建 ELFie 文件和权重信息。
 
 ---
 
@@ -131,101 +131,101 @@ Note that LoopPoint analysis support is not currently supported in gem5 v24.0 bu
 
 ## SimPoint
 
-As mentioned before, there are three steps to using SimPoint:
+如前所述，使用 SimPoint 有三个步骤：
 
-1. Analysis
-2. Taking checkpoints
-3. Running the regions
+1. 分析
+2. 创建检查点
+3. 运行区域
 
-There are two key files related to using SimPoint in gem5:
+在 gem5 中使用 SimPoint 有两个关键文件：
 1. [src/python/gem5/utils/simpoint.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/utils/simpoint.py)
 2. [src/cpu/simple/probes/SimPoint.py](https://github.com/gem5/gem5/blob/stable/src/cpu/simple/probes/SimPoint.py)
 
-We will be seeing them throughout this section.
+我们将在本节中看到它们。
 
 ---
 
-## SimPoint Analysis
+## SimPoint 分析
 
-In gem5, we use the `SimPoint` probe listener object to collect the information SimPoint needs to cluster the regions.
-This object is defined in [src/cpu/simple/probes/SimPoint.py](https://github.com/gem5/gem5/blob/stable/src/cpu/simple/probes/SimPoint.py).
+在 gem5 中，我们使用 `SimPoint` 探针监听器对象来收集 SimPoint 聚类区域所需的信息。
+该对象定义在 [src/cpu/simple/probes/SimPoint.py](https://github.com/gem5/gem5/blob/stable/src/cpu/simple/probes/SimPoint.py) 中。
 
-The `SimPoint` probe listener has two parameters: [interval](https://github.com/gem5/gem5/blob/stable/src/cpu/simple/probes/SimPoint.py#L47) and [profile_file](https://github.com/gem5/gem5/blob/stable/src/cpu/simple/probes/SimPoint.py#L48).
+`SimPoint` 探针监听器有两个参数：[interval](https://github.com/gem5/gem5/blob/stable/src/cpu/simple/probes/SimPoint.py#L47) 和 [profile_file](https://github.com/gem5/gem5/blob/stable/src/cpu/simple/probes/SimPoint.py#L48)。
 
-- The `interval` takes a length as our definition of a region. It means that every time we execute `n` number of instructions, we see it as the end of a region. The default length is 100,000,000.
-- The `profile_file` takes a name for the output zip file. The default name is `simpoint.bb.gz`.
+- `interval` 接受一个长度作为我们对区域的定义。这意味着每次我们执行 `n` 条指令时，我们将其视为一个区域的结束。默认长度为 100,000,000。
+- `profile_file` 接受输出 zip 文件的名称。默认名称是 `simpoint.bb.gz`。
 
-In order to use this probe listener object, we need to attach it to an ATOMIC CPU. It will start collecting information as soon as the simulation starts and will stop when the simulation ends.
-After exiting the simulation, there will be a zip file with the basic block vector information for each region under the simulation outdir directory.
+为了使用此探针监听器对象，我们需要将其附加到 ATOMIC CPU。它将在模拟开始时立即开始收集信息，并在模拟结束时停止。
+退出模拟后，在模拟输出目录下会有一个包含每个区域基本块向量信息的 zip 文件。
 
 ---
 
-## Hands-On Time!
+## 实践时间！
 
 ### 01-simpoint
 
-All materials can be found under [materials/02-Using-gem5/09-sampling/01-simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint). The completed version is under [materials/02-Using-gem5/09-sampling/01-simpoint/complete](../../materials/02-Using-gem5/09-sampling/01-simpoint/complete).
-In this exercise, we will only run scripts without modifying them.
-We will only work with [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py) and [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh).
+所有材料可以在 [materials/02-Using-gem5/09-sampling/01-simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/01-simpoint/complete](../../materials/02-Using-gem5/09-sampling/01-simpoint/complete) 下。
+在本练习中，我们只运行脚本而不修改它们。
+我们只使用 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py) 和 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh)。
 
-### Goal
+### 目标
 
-1. Run the SimPoint analysis
-2. Process the data to get the representative regions and their weights
+1. 运行 SimPoint 分析
+2. 处理数据以获得代表性区域及其权重
 
 ---
 
 ## 01-simpoint
 
-Because the profiling and getting the baseline performance might take a while, we will first run the simulation  with the following command.
+由于性能分析和获取基线性能可能需要一些时间，我们将首先使用以下命令运行模拟。
 
 ```bash
 gem5 -re --outdir=full-detailed-run-m5out full-detailed-run.py
 gem5 -re --outdir=simpoint-analysis-m5out simpoint-analysis.py
 ```
 
-In this exercise, we are trying to create SimPoints for a simple workload.
-The source code of the simple workload can be found in [materials/02-Using-gem5/09-sampling/01-simpoint/workload/simple_workload.c](../../materials/02-Using-gem5/09-sampling/01-simpoint/workload/simple_workload.c).
+在本练习中，我们尝试为一个简单的工作负载创建 SimPoints。
+简单工作负载的源代码可以在 [materials/02-Using-gem5/09-sampling/01-simpoint/workload/simple_workload.c](../../materials/02-Using-gem5/09-sampling/01-simpoint/workload/simple_workload.c) 找到。
 
-This simple workload allocates an array of one thousand 64 bit elements, assigns each a number, then sums it all up with one thousand iterations.
-We can expect the program behavior of this workload to be really repetitive.
+这个简单的工作负载分配一个包含一千个 64 位元素的数组，为每个元素分配一个数字，然后通过一千次迭代将它们全部求和。
+我们可以预期这个工作负载的程序行为会非常重复。
 
 ---
 
 ## 01-simpoint
 
-The script [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py) uses the `SimPoint` probe listener object that we introduced earlier to collect basic block information for this simple workload.
-It connects the ATOMIC CPU core to the `SimPoint` probe listener using
+脚本 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py) 使用我们之前介绍的 `SimPoint` 探针监听器对象来收集这个简单工作负载的基本块信息。
+它使用以下方式将 ATOMIC CPU 核心连接到 `SimPoint` 探针监听器：
 
 ```python
 processor.get_cores()[0].core.addSimPointProbe(1_000_000)
 ```
 
-The definition of this `addSimPointProbe()` function can be found under [src/cpu/simple/BaseAtomicSimpleCPU.py](https://github.com/gem5/gem5/blob/stable/src/cpu/simple/BaseAtomicSimpleCPU.py#L65).
+这个 `addSimPointProbe()` 函数的定义可以在 [src/cpu/simple/BaseAtomicSimpleCPU.py](https://github.com/gem5/gem5/blob/stable/src/cpu/simple/BaseAtomicSimpleCPU.py#L65) 下找到。
 
-In this example, we set the `interval_length` as 1,000,000, which means that we define a region as 1,000,000 instructions executed (committed).
+在这个例子中，我们将 `interval_length` 设置为 1,000,000，这意味着我们将一个区域定义为执行（提交）了 1,000,000 条指令。
 
 ---
 
 ## 01-simpoint
 
-After the simulation finishes, we will see a zip file named `simpoint.bb.gz` under the [simpoint-analysis-m5out](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis-m5out) folder.
-We can unzip it with the following command:
+模拟完成后，我们将在 [simpoint-analysis-m5out](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis-m5out) 文件夹下看到一个名为 `simpoint.bb.gz` 的 zip 文件。
+我们可以使用以下命令解压它：
 
 ```bash
 gzip -d -k simpoint.bb.gz
 ```
 
-After unzipping it, we can look at the `simpoint.bb` file.
-This file contains all basic block vector information for the simple workload.
-There are 9 regions found in this workload.
-Each region has a basic block vector, which starts with a `T`.
+解压后，我们可以查看 `simpoint.bb` 文件。
+该文件包含简单工作负载的所有基本块向量信息。
+在这个工作负载中发现了 9 个区域。
+每个区域都有一个基本块向量，以 `T` 开头。
 
 ---
 
 ## 01-simpoint
 
-As we can see, regions 2 to 9 have almost identical basic block vectors.
+正如我们所看到的，区域 2 到 9 具有几乎相同的基本块向量。
 
 ```bash
 T:1900:222 :1901:222 :1902:999216 :1903:333
@@ -238,31 +238,31 @@ T:1900:222 :1901:222 :1902:999225 :1903:333
 T:1900:222 :1901:222 :1902:999225 :1903:333
 ```
 
-The similar basic block vectors indicate that program behavior for regions 2 to 9 are very similar. Therefore, we can expect to cluster regions 2 to 9 together and pick one region out of it to be our representative region. This region will represent the performance of all regions from region 2 to region 9.
+相似的基本块向量表明区域 2 到 9 的程序行为非常相似。因此，我们可以预期将区域 2 到 9 聚类在一起，并从中选择一个区域作为我们的代表区域。该区域将代表从区域 2 到区域 9 的所有区域的性能。
 
 ---
 
 ## 01-simpoint
 
-Let's further understand what this line means.
+让我们进一步理解这一行的含义。
 
 ```bash
 T:1900:222 :1901:222 :1902:999216 :1903:333
 ```
 
-- `T` means the start of the region's basic block vector.
-- `:1900:222` means that basic block 1900 executed (committed) 222 instructions. The key here is that 222 is NOT the number of times the basic block has been executed, but the number of times the basic block has been executed multiplied by the total instructions in the basic block . If we sum up all the instructions that have been executed by the basic blocks, we will get roughly the length of the region. $222+222+999216+333=999993$.
+- `T` 表示区域基本块向量的开始。
+- `:1900:222` 表示基本块 1900 执行（提交）了 222 条指令。这里的关键是，222 不是基本块执行的次数，而是基本块执行的次数乘以基本块中的总指令数。如果我们将所有基本块执行的指令相加，我们将大致得到区域的长度。$222+222+999216+333=999993$。
 
-The next step is to use this information to cluster the regions and find the representative regions.
+下一步是使用这些信息对区域进行聚类并找到代表性区域。
 
-There are many methods to do it. In this exercise, we will be using the SimPoint3.2 tool that was provided by the SimPoint paper's authors. [Link](https://cseweb.ucsd.edu/~calder/simpoint/) to the tool.
+有很多方法可以做到这一点。在本练习中，我们将使用 SimPoint 论文作者提供的 SimPoint3.2 工具。工具的[链接](https://cseweb.ucsd.edu/~calder/simpoint/)。
 
 ---
 
 ## 01-simpoint
 
-The tool is already compiled under [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint).
-We also provided a runscript with the following command in [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh).
+该工具已在 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint) 下编译。
+我们还在 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh) 中提供了一个包含以下命令的运行脚本。
 
 ```bash
 /workspaces/2024/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint \
@@ -270,16 +270,16 @@ We also provided a runscript with the following command in [materials/02-Using-g
     results.simpts -saveSimpointWeights results.weights
 ```
 
-Let's look at this command.
-It passes in `simpoint.bb.gz` to the tool.
-It sets the number of clusters expected to 5 using `-k 5`.
-It saves the SimPoint information in `results.simpts` and their weights in `results.weight`.
+让我们看看这个命令。
+它将 `simpoint.bb.gz` 传递给工具。
+它使用 `-k 5` 将期望的聚类数设置为 5。
+它将 SimPoint 信息保存在 `results.simpts` 中，将它们的权重保存在 `results.weight` 中。
 
 ---
 
 ## 01-simpoint
 
-After running the command with `./simpoint3.2-cmd.sh`, we will see the following.
+使用 `./simpoint3.2-cmd.sh` 运行命令后，我们将看到以下内容。
 
 ```bash
 #results.simpts             # results.weights
@@ -288,38 +288,38 @@ After running the command with `./simpoint3.2-cmd.sh`, we will see the following
 0 3                         0.111111 3
 ```
 
-This means that it found 3 SimPoints out of this program.
-Region 2 is SimPoint 0, which has a weight of 0.666667.
-Region 1 is SimPoint 1, which has a weight of 0.222222.
-Region 0 is SimPoint 3, which has a weight of 0.111111.
+这意味着它在这个程序中找到了 3 个 SimPoints。
+区域 2 是 SimPoint 0，权重为 0.666667。
+区域 1 是 SimPoint 1，权重为 0.222222。
+区域 0 是 SimPoint 3，权重为 0.111111。
 
-There are not 5 clusters because the algorithm found that 3 clusters are enough to represent all the program behaviors.
-The SimPoint tag number might not be continuous because it is the tag number for the cluster.
-
----
-
-## SimPoint Checkpoint
-
-Now that we have the representative regions and their weights, we will need to find a way to get to those SimPoints.
-
-As introduced in [08-accelerating-simulation](08-accelerating-simulation.md), there are two methods to get to the region of interest. With SimPoint, we usually use checkpointing.
-
-To do it in gem5, we will be using [set_se_simpoint_workoad](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/boards/se_binary_workload.py#L166C9-L166C33), the [SimPoint class](https://github.com/gem5/gem5/blob/stable/src/python/gem5/utils/simpoint.py#L41), and the [simpoints_save_checkpoint_generator](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/exit_event_generators.py#L146).
+没有 5 个聚类是因为算法发现 3 个聚类足以代表所有程序行为。
+SimPoint 标签号可能不连续，因为它是聚类的标签号。
 
 ---
 
-## Hands-On Time!
+## SimPoint 检查点
+
+现在我们有了代表性区域及其权重，我们需要找到一种方法来到达这些 SimPoints。
+
+如 [08-accelerating-simulation](08-accelerating-simulation.md) 中介绍，有两种方法可以到达感兴趣的区域。对于 SimPoint，我们通常使用检查点。
+
+要在 gem5 中做到这一点，我们将使用 [set_se_simpoint_workoad](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/boards/se_binary_workload.py#L166C9-L166C33)、[SimPoint 类](https://github.com/gem5/gem5/blob/stable/src/python/gem5/utils/simpoint.py#L41) 和 [simpoints_save_checkpoint_generator](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/exit_event_generators.py#L146)。
+
+---
+
+## 实践时间！
 
 ## 01-simpoint
 
-All materials can be found under [materials/02-Using-gem5/09-sampling/01-simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint). The completed version is under [materials/02-Using-gem5/09-sampling/01-simpoint/complete](../../materials/02-Using-gem5/09-sampling/01-simpoint/complete).
-We will not be modifying any scripts.
+所有材料可以在 [materials/02-Using-gem5/09-sampling/01-simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/01-simpoint/complete](../../materials/02-Using-gem5/09-sampling/01-simpoint/complete) 下。
+我们不会修改任何脚本。
 
-### Goal
+### 目标
 
-- Use the output file from the SimPoint3.2 tool to create checkpoints for all 3 SimPoints
+- 使用 SimPoint3.2 工具的输出文件为所有 3 个 SimPoints 创建检查点
 
-Because it might take some time to take the checkpoints, let's start by taking checkpoints with the following command:
+因为创建检查点可能需要一些时间，让我们先使用以下命令创建检查点：
 
 ```bash
 gem5 -re --outdir=simpoint-checkpoint-m5out simpoint-checkpoint.py
@@ -329,9 +329,9 @@ gem5 -re --outdir=simpoint-checkpoint-m5out simpoint-checkpoint.py
 
 ## 01-simpoint
 
-Let's look at [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint.py).
+让我们看看 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint.py)。
 
-There are three key parts:
+有三个关键部分：
 
 ```python
 # key 1: pass in the representative regions information
@@ -360,7 +360,7 @@ simulator = Simulator(
 
 ## 01-simpoint
 
-Let's zoom in to key 1.
+让我们仔细看看 key 1。
 
 ```python
 from gem5.utils.simpoint import SimPoint
@@ -372,72 +372,72 @@ simpoint_info = SimPoint(
 )
 ```
 
-The name of the parameters for `simpoint_interval`, `simpoint_file_path`, and `weight_file_path` should speak for themselves, but `warmup_interval` is new to us in this section.
-As mentioned in [08-accelerating-simulation](08-accelerating-simulation.md), we should expect most of the micro-architectural states to be cold when restoring a checkpoint. Therefore, we need to reserve a warm up period for our region of interest to warm up the micro-architectural states of the system.
-As such, we need to set up a `warmup_interval` value here, so when we restore the checkpoint, we can expect to have this length of simulation to warm up our micro-architectural states.
+`simpoint_interval`、`simpoint_file_path` 和 `weight_file_path` 的参数名称应该是不言自明的，但 `warmup_interval` 在本节中对我们来说是新的。
+如 [08-accelerating-simulation](08-accelerating-simulation.md) 中所述，我们应该预期在恢复检查点时，大多数微架构状态都是冷的。因此，我们需要为感兴趣的区域保留一个预热期，以预热系统的微架构状态。
+因此，我们需要在这里设置一个 `warmup_interval` 值，这样当我们恢复检查点时，我们可以预期有这段长度的模拟来预热我们的微架构状态。
 
 ---
 
 ## 01-simpoint
 
-The SimPoint class can also detect how much space we have for the warm up period. If there is not enough space, it will automatically shrink the warm up period of that SimPoint to the space available. For example, if we have a SimPoint that starts at the beginning of the program, then the warm up period for it should be 0 instructions.
+SimPoint 类还可以检测我们有多少空间用于预热期。如果没有足够的空间，它会自动将该 SimPoint 的预热期缩小到可用空间。例如，如果我们有一个从程序开始处开始的 SimPoint，那么它的预热期应该是 0 条指令。
 
-The SimPoint class also automatically sorts the SimPoints based on when they start in terms of instructions.
+SimPoint 类还会根据 SimPoints 在指令方面的开始时间自动对它们进行排序。
 
-It also provides getter functions that might be helpful, such as `get_weight_list()` that returns the list of the weights for each SimPoint.
+它还提供可能有用的 getter 函数，例如 `get_weight_list()`，它返回每个 SimPoint 的权重列表。
 
-More information can be found in the [SimPoint](https://github.com/gem5/gem5/blob/stable/src/python/gem5/utils/simpoint.py) class definition.
-
----
-
-## 01-simpoint
-
-Let's just trust keys 2 and 3 because they both rely on the information passed in from the `SimPoint` object.
-
-We can declare where we want to store the SimPoint checkpoints by passing in the destination path to the `simpoints_save_checkpoint_generator` as a parameter. For more details, we can find the generator in [src/python/gem5/simulate/exit_event_generators.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/exit_event_generators.py#L146).
+更多信息可以在 [SimPoint](https://github.com/gem5/gem5/blob/stable/src/python/gem5/utils/simpoint.py) 类定义中找到。
 
 ---
 
 ## 01-simpoint
 
-After we finish checkpointing, we should find all of the SimPoint checkpoints under [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint) because we pass in `simpoint-checkpoint` to the `simpoints_save_checkpoint_generator` as our directory to save the SimPoint checkpoints.
+让我们相信 keys 2 和 3，因为它们都依赖于从 `SimPoint` 对象传入的信息。
 
-There should be three checkpoint folders called `cpt.SimPoint0`, `cpt.SimPoint1`, and `cpt.SimPoint2`.
-
-We can now use them to run our SimPoints for the simple workload.
+我们可以通过将目标路径作为参数传递给 `simpoints_save_checkpoint_generator` 来声明我们想要存储 SimPoint 检查点的位置。更多详细信息，我们可以在 [src/python/gem5/simulate/exit_event_generators.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/exit_event_generators.py#L146) 中找到生成器。
 
 ---
 
-## Running SimPoint
+## 01-simpoint
 
-Now we have the representative SimPoint checkpoint, we can run them with the systems we want to measure and predict the overall performance of running the whole simple workload.
+完成检查点创建后，我们应该在 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint) 下找到所有 SimPoint 检查点，因为我们将 `simpoint-checkpoint` 作为保存 SimPoint 检查点的目录传递给 `simpoints_save_checkpoint_generator`。
 
-SimPoint relies on the weights we got from the analysis stage to do the prediction.
-The weight is calculated with
+应该有三个名为 `cpt.SimPoint0`、`cpt.SimPoint1` 和 `cpt.SimPoint2` 的检查点文件夹。
+
+我们现在可以使用它们来运行简单工作负载的 SimPoints。
+
+---
+
+## 运行 SimPoint
+
+现在我们有了代表性 SimPoint 检查点，我们可以使用我们想要测量的系统运行它们，并预测运行整个简单工作负载的整体性能。
+
+SimPoint 依赖于我们从分析阶段获得的权重来进行预测。
+权重通过以下公式计算：
 
 $$
-\text{Weight of cluster } i = \frac{\text{Number of regions in cluster } i}{\text{Total number of regions in the workload execution}}
+\text{聚类 } i \text{ 的权重} = \frac{\text{聚类 } i \text{ 中的区域数}}{\text{工作负载执行中的区域总数}}
 $$
 
-For example, if we want to calculate the predicted IPC, we should use
+例如，如果我们想计算预测的 IPC，我们应该使用：
 $$
-\text{Predicted IPC} = \sum_{i=1}^{n} (\text{Weight of cluster } i \times \text{IPC of cluster } i)
+\text{预测的 IPC} = \sum_{i=1}^{n} (\text{聚类 } i \text{ 的权重} \times \text{聚类 } i \text{ 的 IPC})
 $$
 
 ---
 
 ## 01-simpoint
 
-All materials can be found under [materials/02-Using-gem5/09-sampling/01-simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint). The completed version is under [materials/02-Using-gem5/09-sampling/01-simpoint/complete](../../materials/02-Using-gem5/09-sampling/01-simpoint/complete).
-We will still not modify any scripts.
+所有材料可以在 [materials/02-Using-gem5/09-sampling/01-simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/01-simpoint/complete](../../materials/02-Using-gem5/09-sampling/01-simpoint/complete) 下。
+我们仍然不会修改任何脚本。
 
-Unlike the simple systems we used for SimPoint analysis and SimPoint checkpointing, we now need to use the systems for which we actually want to measure the performance.
+与我们用于 SimPoint 分析和 SimPoint 检查点的简单系统不同，我们现在需要使用我们实际想要测量性能的系统。
 
-We will be using [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py) to run our SimPoints.
-For our baseline, we are using [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py), which runs the whole simple workload with the detailed system.
+我们将使用 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py) 来运行我们的 SimPoints。
+对于我们的基线，我们使用 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py)，它使用详细系统运行整个简单工作负载。
 
-Let's start by running the SimPoints before explaining how it works due to time constraints.
-We provided a runscript to run all three in [materials/02-Using-gem5/09-sampling/01-simpoint/run-all-simpoint.sh](../../materials/02-Using-gem5/09-sampling/01-simpoint/run-all-simpoint.sh)
+由于时间限制，让我们先运行 SimPoints，然后再解释它的工作原理。
+我们在 [materials/02-Using-gem5/09-sampling/01-simpoint/run-all-simpoint.sh](../../materials/02-Using-gem5/09-sampling/01-simpoint/run-all-simpoint.sh) 中提供了一个运行脚本来运行所有三个
 
 ```bash
 ./run-all-simpoint.sh
@@ -447,9 +447,9 @@ We provided a runscript to run all three in [materials/02-Using-gem5/09-sampling
 
 ## 01-simpoint
 
-Let's look at [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py). It has a detailed system that matches the one that is used in our baseline [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py).
+让我们看看 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py)。它有一个详细系统，与我们基线中使用的 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py) 相匹配。
 
-There are a few key points that we want to look at. Let's start with the ones we are familiar with.
+有几个关键点我们想要查看。让我们从我们熟悉的部分开始。
 
 ```python
 # key 1:
@@ -468,7 +468,7 @@ board.set_se_simpoint_workload(
 )
 ```
 
-Here, we pass in the SimPoint information and use it to set up a workload that restores the checkpoint with our target SimPoint id.
+在这里，我们传入 SimPoint 信息并使用它来设置一个工作负载，该工作负载使用我们的目标 SimPoint id 恢复检查点。
 
 ---
 
@@ -501,8 +501,8 @@ simulator = Simulator(
 )
 ```
 
-Here is an exit event handler we defined for handling the warm up period and detailed simulation period.
-It schedules an end for the SimPoint after the warm up period. It also dumps and resets the stats for detailed measurement.
+这是我们定义的用于处理预热期和详细模拟期的退出事件处理器。
+它在预热期后为 SimPoint 安排结束时间。它还转储并重置统计信息以进行详细测量。
 
 ---
 
@@ -523,26 +523,26 @@ print("Simulation Done")
 print(f"Ran SimPoint {args.sid} with weight {board.get_simpoint().get_weight_list()[args.sid]}")
 ```
 
-Before the starting the simulation, we need to set up an exit event to indicate the end of the warm up period.
-We use the `simulator.schedule_max_insts()` function to do so.
-We can use `get_warmup_list()` from the `SimPoint` object to get the warm up period length for each SimPoint.
-Here is one limitation of the `simulator.schedule_max_insts()` function. If it gets the value `0`, there won't be any exit event scheduled, so if the warm up period length is `0`, we have to set it to `1`.
+在开始模拟之前，我们需要设置一个退出事件来指示预热期的结束。
+我们使用 `simulator.schedule_max_insts()` 函数来做到这一点。
+我们可以使用 `SimPoint` 对象的 `get_warmup_list()` 来获取每个 SimPoint 的预热期长度。
+这是 `simulator.schedule_max_insts()` 函数的一个限制。如果它得到值 `0`，则不会安排任何退出事件，因此如果预热期长度为 `0`，我们必须将其设置为 `1`。
 
 ---
 
 ## 01-simpoint
 
-After setting up the above keys, the script is ready to run the SimPoint. Note that each simulation can only run one SimPoint.
+设置上述键后，脚本就可以运行 SimPoint 了。请注意，每次模拟只能运行一个 SimPoint。
 
-After the running the SimPoints, we should see the output folder `simpoint0-run`, `simpoint1-run`, and `simpoint2-run`.
+运行 SimPoints 后，我们应该看到输出文件夹 `simpoint0-run`、`simpoint1-run` 和 `simpoint2-run`。
 
-Also, we should have the baseline output in `full-detailed-run-m5out`.
+此外，我们应该在 `full-detailed-run-m5out` 中有基线输出。
 
-Let's try to use the SimPoints' performance to predict the overall IPC!
+让我们尝试使用 SimPoints 的性能来预测整体 IPC！
 
-We have a Python script ready to do the prediction in [materials/02-Using-gem5/09-sampling/01-simpoint/predict_overall_ipc.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/predict_overall_ipc.py).
+我们在 [materials/02-Using-gem5/09-sampling/01-simpoint/predict_overall_ipc.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/predict_overall_ipc.py) 中准备了一个 Python 脚本来进行预测。
 
-We can run it with
+我们可以使用以下命令运行它：
 
 ```python
 python3 predict_overall_ipc.py
@@ -552,7 +552,7 @@ python3 predict_overall_ipc.py
 
 ## 01-simpoint
 
-We should see something like this
+我们应该看到类似这样的内容
 
 ```bash
 predicted IPC: 1.2577933618669999
@@ -560,31 +560,31 @@ actual IPC: 1.247741
 relative error: 0.8056449108428648%
 ```
 
-The Python script reads the IPC from our baseline.
-It also reads the detailed simulation period's IPC from all our SimPoints' stats files.
-Then it performs the calculation with
+Python 脚本从我们的基线读取 IPC。
+它还从所有 SimPoints 的统计文件中读取详细模拟期的 IPC。
+然后它使用以下计算：
 
 ```python
 predicted_ipc = 0.0
 for i in range(num_simpoints):
     predicted_ipc += simpoint_ipcs[i] * simpoint_weights[i]
 ```
-As the output suggests, the relative error between the predicted IPC and the actual baseline IPC is around 0.81%.
+正如输出所示，预测的 IPC 和实际基线 IPC 之间的相对误差约为 0.81%。
 
 ---
 
-## Summary in SimPoint
+## SimPoint 总结
 
-Congratulations! We walked through the whole process of sampling with the SimPoint method.
+恭喜！我们完成了使用 SimPoint 方法进行采样的整个过程。
 
-Let's recap what we did:
+让我们回顾一下我们所做的：
 
-1. Analyzing the program
-2. Checkpointing the representative regions
-3. Running the regions and predicting the performance
+1. 分析程序
+2. 为代表区域创建检查点
+3. 运行区域并预测性能
 
-Good news: this process is very similar for the majority of the methods in targeted sampling.
-Therefore, if we know how to do sampling with the SimPoint method, it should not be hard for us to use other methods, such as LoopPoint, which enable multi-threaded workload sampling.
+好消息：对于目标采样中的大多数方法，这个过程非常相似。
+因此，如果我们知道如何使用 SimPoint 方法进行采样，那么使用其他方法（例如支持多线程工作负载采样的 LoopPoint）应该不会太难。
 
 ---
 
@@ -594,51 +594,51 @@ Therefore, if we know how to do sampling with the SimPoint method, it should not
 
 ---
 
-## LoopPoint and ELFies
+## LoopPoint 和 ELFies
 
-LoopPoint is similar to SimPoint with some key differences.
+LoopPoint 与 SimPoint 相似，但有一些关键差异。
 
-LoopPoint uses the number of times a loop is executed to mark the regions instead of using instructions executed.
-Therefore, we need to collect the loop execution information in the analysis stage in addition to the basic block execution information.
-Other than this, it is very similar to SimPoint in terms of the process (the 3 step process we did in 01-simpoint).
+LoopPoint 使用循环执行的次数来标记区域，而不是使用执行的指令数。
+因此，除了基本块执行信息外，我们还需要在分析阶段收集循环执行信息。
+除此之外，它在过程方面与 SimPoint 非常相似（我们在 01-simpoint 中做的 3 步过程）。
 
 ---
 
-## LoopPoint and ELFies
+## LoopPoint 和 ELFies
 
-ELFies is a checkpointing method that creates checkpoint executables out of a large workload execution. It can be used with LoopPoint to create executables of the representative regions.
+ELFies 是一种检查点方法，它从大型工作负载执行中创建检查点可执行文件。它可以与 LoopPoint 一起使用来创建代表性区域的可执行文件。
 
-Like LoopPoint, it uses the number of times a loop has been executed to mark the beginning and the end of the region of interest, so we need that information to execute ELFies in gem5.
+与 LoopPoint 一样，它使用循环执行的次数来标记感兴趣区域的开始和结束，因此我们需要该信息在 gem5 中执行 ELFies。
 
-[Link](https://looppoint.github.io/hpca2023/) for more information about LoopPoint and ELFies.
+有关 LoopPoint 和 ELFies 的更多信息，请参见[链接](https://looppoint.github.io/hpca2023/)。
 
 ---
 
 ## ELFies
 
-gem5 does not produce ELFies, but we have support to run ELFies in SE mode.
-All the weights and loop information should come with the ELFies workload.
+gem5 不生成 ELFies，但我们支持在 SE 模式下运行 ELFies。
+所有权重和循环信息应该随 ELFies 工作负载一起提供。
 
-We can run ELFies with the [ELFieInfo class](https://github.com/gem5/gem5/blob/stable/src/python/gem5/resources/elfie.py#L36).
+我们可以使用 [ELFieInfo 类](https://github.com/gem5/gem5/blob/stable/src/python/gem5/resources/elfie.py#L36) 运行 ELFies。
 
-There is an example in [materials/02-Using-gem5/09-sampling/02-elfies/run-elfies.py](../../materials/02-Using-gem5/09-sampling/02-elfies/run-elfies.py)
+在 [materials/02-Using-gem5/09-sampling/02-elfies/run-elfies.py](../../materials/02-Using-gem5/09-sampling/02-elfies/run-elfies.py) 中有一个示例。
 
-We can run it with the following command but it is not suggested because it will take too long.
+我们可以使用以下命令运行它，但不建议这样做，因为它会花费太长时间。
 
 ```bash
 gem5 -re run-elfies.py
 ```
 
-It is a 8-threaded experiment with a detailed system that might run for eight hundred million instructions so it will take some time to finish.
-We have a completed m5out under the [materials/02-Using-gem5/09-sampling/02-elfies/complete/m5out](../../materials/02-Using-gem5/09-sampling/02-elfies/complete/m5out) if you are interested in looking at the output.
+这是一个 8 线程实验，使用详细系统，可能运行八亿条指令，因此需要一些时间才能完成。
+如果您有兴趣查看输出，我们在 [materials/02-Using-gem5/09-sampling/02-elfies/complete/m5out](../../materials/02-Using-gem5/09-sampling/02-elfies/complete/m5out) 下有一个完整的 m5out。
 
 ---
 
-## ELFies Example
+## ELFies 示例
 
-We provide some ELFie workloads, such as [wrf-s.1_globalr13](https://resources.gem5.org/resources/wrf-s.1_globalr13?version=1.0.0), in gem5 resources. Its marker (loop execution) information can be found in [elfie-info-wrf-s.1_globalr13](https://resources.gem5.org/resources/elfie-info-wrf-s.1_globalr13/raw?database=gem5-resources&version=1.0.0).
+我们在 gem5 资源中提供了一些 ELFie 工作负载，例如 [wrf-s.1_globalr13](https://resources.gem5.org/resources/wrf-s.1_globalr13?version=1.0.0)。其标记（循环执行）信息可以在 [elfie-info-wrf-s.1_globalr13](https://resources.gem5.org/resources/elfie-info-wrf-s.1_globalr13/raw?database=gem5-resources&version=1.0.0) 中找到。
 
-We can set up the ELFies workload as a normal executable.
+我们可以将 ELFies 工作负载设置为普通可执行文件。
 
 ```python
 board.set_se_binary_workload(
@@ -646,7 +646,7 @@ board.set_se_binary_workload(
 )
 ```
 
-Then, we can set up the beginning and end markers with
+然后，我们可以使用以下方式设置开始和结束标记：
 
 ```python
 from gem5.resources.elfie import ELFieInfo
@@ -658,10 +658,10 @@ elfie.setup_processor(
 
 ---
 
-## ELFies Example
+## ELFies 示例
 <!-- _class: code-60-percent -->
 
-After getting to the beginning and end markers, the simulator will raise a  `SIMPOINT_BEGIN` exit event. However, there is no default exit event handler for this, so we will need to define our own.
+到达开始和结束标记后，模拟器将引发一个 `SIMPOINT_BEGIN` 退出事件。但是，没有默认的退出事件处理器，因此我们需要定义自己的处理器。
 
 ```python
 def start_end_handler():
@@ -691,11 +691,11 @@ simulator = Simulator(
 
 ---
 
-## Summary of LoopPoint and ELFies
+## LoopPoint 和 ELFies 总结
 
-After we finish running all of the ELFies for a macro-benchmark, we can use the weights provided by the ELFie files to predict the overall performance like we did for the SimPoint example.
+完成宏基准测试的所有 ELFies 运行后，我们可以使用 ELFie 文件提供的权重来预测整体性能，就像我们在 SimPoint 示例中所做的那样。
 
-Now we covered all the targeted sampling methods that are supported in gem5, let's dive into statistical sampling!
+现在我们已经涵盖了 gem5 中支持的所有目标采样方法，让我们深入了解统计采样！
 
 ---
 
@@ -707,50 +707,50 @@ Now we covered all the targeted sampling methods that are supported in gem5, let
 
 ## SMARTS
 
-SMARTS is one of the statical sampling methods.
+SMARTS 是统计采样方法之一。
 
-It uses a statistical model to predict the overall performance with randomly or periodically selected samples.
-We use small samples distributed throughout the whole program execution to predict the average performance. We can also use the average performance to predict the overall performance, such as runtime.
+它使用统计模型通过随机或定期选择的样本来预测整体性能。
+我们使用分布在整个程序执行过程中的小样本来预测平均性能。我们还可以使用平均性能来预测整体性能，例如运行时间。
 
-Before running the simulation, we need to decide a few statistical parameters.
+在运行模拟之前，我们需要确定几个统计参数。
 
-- `n`: the number of the samples. It is a number of count.
-- `k`: the systematic sampling interval. It is a number of count.
-- `U`: the sampling unit size. It is a number of instructions to execute.
-- `W`: the length of the detailed warm up period. It is a number of instructions to execute.
+- `n`：样本数量。这是一个计数。
+- `k`：系统采样间隔。这是一个计数。
+- `U`：采样单元大小。这是要执行的指令数。
+- `W`：详细预热期的长度。这是要执行的指令数。
 
 <!-- add a visualization here -->
 
 ---
 
-## Hands-On Time
+## 实践时间
 
 ### 03-SMARTS
 
-All materials can be found under [materials/02-Using-gem5/09-sampling/03-SMARTS](../../materials/02-Using-gem5/09-sampling/03-SMARTS). The completed version is under [materials/02-Using-gem5/09-sampling/03-SMARTS/complete](../../materials/02-Using-gem5/09-sampling/03-SMARTS/complete).
-We will not modify any scripts.
+所有材料可以在 [materials/02-Using-gem5/09-sampling/03-SMARTS](../../materials/02-Using-gem5/09-sampling/03-SMARTS) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/03-SMARTS/complete](../../materials/02-Using-gem5/09-sampling/03-SMARTS/complete) 下。
+我们不会修改任何脚本。
 
-[materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py) is an example of how to use exit event handlers to perform SMARTS.
+[materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py) 是一个如何使用退出事件处理器执行 SMARTS 的示例。
 
-We can run it with the following command
+我们可以使用以下命令运行它：
 
 ```bash
 gem5 -re SMARTS.py
 ```
 
-This script will use SMARTS on the workload from 01-simpoint, so we can use the baseline performance from [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py) to validate our predicted performance using SMARTS.
+此脚本将在来自 01-simpoint 的工作负载上使用 SMARTS，因此我们可以使用来自 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py) 的基线性能来验证我们使用 SMARTS 预测的性能。
 
 ---
 
 ## 03-SMARTS
 
-Let's look at the `smarts_generator` with the statistical parameters.
+让我们看看带有统计参数的 `smarts_generator`。
 
-- `n`: the number of the samples. It is a number of count.
-- `k`: the systematic sampling interval. It is a number of count.
+- `n`：样本数量。这是一个计数。
+- `k`：系统采样间隔。这是一个计数。
 
-- `U`: the sampling unit size. It is a number of instructions executed.
-- `W`: the length of the detailed warm up period. It is a number of instructions executed.
+- `U`：采样单元大小。这是执行的指令数。
+- `W`：详细预热期的长度。这是执行的指令数。
 
 ![](/bootcamp/02-Using-gem5/09-sampling-img/smarts-statistical-model.drawio.svg)
 
@@ -758,10 +758,10 @@ Let's look at the `smarts_generator` with the statistical parameters.
 
 ## 03-SMARTS
 
-In order to determine `k` and `W`, we first need to determine our ideal `n`.
-In the SMARTS paper, they define a large sample size as $n > 30$. For this exercise, let's set our ideal `n` as 50.
-After setting up the ideal `n`, we can use it with the instructions executed in the workload to determine the ideal `k`.
-Here is an example of how it can be done in Python.
+为了确定 `k` 和 `W`，我们首先需要确定理想的 `n`。
+在 SMARTS 论文中，他们将大样本量定义为 $n > 30$。在本练习中，让我们将理想的 `n` 设置为 50。
+设置理想的 `n` 后，我们可以将其与工作负载中执行的指令一起使用来确定理想的 `k`。
+以下是在 Python 中如何完成的示例。
 
 ```python
 program_length = 9115640
@@ -771,18 +771,18 @@ ideal_k = math.ceil(ideal_region_length/ideal_U)
 ideal_W = 2 * ideal_U
 ```
 
-With these parameters, we will have about 50 samples. Each sample has a gap $(k-1)*U=182000$ instructions from each other. Each sample has 1000 instructions in detailed measurement and 2000 instructions of warm up period.
+使用这些参数，我们将有大约 50 个样本。每个样本之间的间隔为 $(k-1)*U=182000$ 条指令。每个样本在详细测量中有 1000 条指令，预热期有 2000 条指令。
 
 ---
 
 ## 03-SMARTS
 
-This SMARTS exit generator only works with SwitchableProcessor.
-When it reaches the start of the detailed warmup part, it resets the stats; then it switches the core type and schedules for the end of the warmup part and the end of the interval.
+此 SMARTS 退出生成器仅适用于 SwitchableProcessor。
+当它到达详细预热部分的开始时，它会重置统计信息；然后它切换核心类型并安排预热部分结束和间隔结束。
 
-When it reaches the end of the detailed warmup, it resets the stats.
+当它到达详细预热结束时，它会重置统计信息。
 
-When it reaches the end of the detailed simulation, it dumps the stats; then it switches the core type and schedules for the start of the next detailed warmup part.
+当它到达详细模拟结束时，它会转储统计信息；然后它切换核心类型并安排下一个详细预热部分的开始。
 
 ![](/bootcamp/02-Using-gem5/09-sampling-img/smarts-generator-model.drawio.svg)
 
@@ -790,17 +790,17 @@ When it reaches the end of the detailed simulation, it dumps the stats; then it 
 
 ## 03-SMARTS
 
-Now we understand what the `smarts_generator` will do, let's look at the system we are using in [materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py).
+现在我们了解了 `smarts_generator` 将做什么，让我们看看我们在 [materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py) 中使用的系统。
 
-It uses exactly the same system as  [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py), except that it uses a `SimpleSwitchableProcessor` to switch between ATOMIC CPU and O3 CPU for fast-forwarding and detailed simulation.
+它使用与 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py) 完全相同的系统，除了它使用 `SimpleSwitchableProcessor` 在 ATOMIC CPU 和 O3 CPU 之间切换以进行快进和详细模拟。
 
-If the simulation is run with
+如果使用以下命令运行模拟：
 
 ```bash
 gem5 -re SMARTS.py
 ```
 
-we can run [materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py) to predict the overall IPC and calculate the relative error with the baseline IPC.
+我们可以运行 [materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py) 来预测整体 IPC 并计算与基线 IPC 的相对误差。
 
 ```bash
 python3 predict_ipc.py
@@ -810,11 +810,11 @@ python3 predict_ipc.py
 
 ## 03-SMARTS
 
-What [materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py) does is read the IPC from each sample, sum the IPCs, and divide by the total number of samples to calculate the average IPC of the program.
+[materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py) 所做的是从每个样本读取 IPC，对 IPC 求和，然后除以样本总数来计算程序的平均 IPC。
 
-$\text{Average IPC} = \frac{\sum_{i=1}^{n} \text{IPC}_i}{n}$
+$\text{平均 IPC} = \frac{\sum_{i=1}^{n} \text{IPC}_i}{n}$
 
-Here is what we expect to see
+这是我们期望看到的内容：
 
 ```bash
 Number of samples: 50
@@ -822,21 +822,21 @@ Predicted Overall IPC: 1.2563117400000001
 Actual Overall IPC: 1.247741
 Relative Error: 0.6869005667041583%
 ```
-As the output suggests, the relative error between the predicted IPC and the actual baseline IPC is around 0.69%.
+正如输出所示，预测的 IPC 和实际基线 IPC 之间的相对误差约为 0.69%。
 
 ---
 
-## Summary
+## 总结
 <!-- _class: center-image -->
 
-Now we experimented both targeted and statistical sampling in gem5, let's end it with the trade-offs.
+现在我们已经实验了 gem5 中的目标采样和统计采样，让我们以权衡来结束。
 
 ![width:1100](/bootcamp/02-Using-gem5/09-sampling-img/tradeoff-table.png)
 
 ---
 
-## Question in Mind
+## 思考中的问题
 
-### When we run the SimPoints, we need to run a separate simulation for each SimPoint. What if we could do it all in one simulation?
+### 当我们运行 SimPoints 时，我们需要为每个 SimPoint 运行一个单独的模拟。如果我们能在一个模拟中完成所有操作会怎样？
 
 <!-- throw a hook to 11-multisim.md -->

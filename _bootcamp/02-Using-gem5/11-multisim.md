@@ -12,101 +12,101 @@ gem5 模拟的多处理支持。
 
 ---
 
-## The problem
+## 问题
 
-The gem5 simulator is single-threaded.
+gem5 模拟器是单线程的。
 
-This is baked into the core design and is unlikely to change due to the high cost of converting the entire codebase.
+这是核心设计的一部分，由于转换整个代码库的高成本，不太可能改变。
 
-**Therefore, we cannot "speed up" your work with more cores and threads**.
-
----
-
-## The insight
-
-The gem5 simulator is used for experimentation.
-
-Experimentation involves exploring how variables of interest change the behavior of a system when all other variables are held constant. As such, experimentation using the gem5 simulator requires multiple runs of the simulator.
-**Multiple instances of gem5 can be run in parallel**.
-
-_If not a singular gem5 process utilizing multiple threads, why not multiple gem5 processes, each single threaded?_
-
-((This is really handy for us as we don't need to worry about the complexities of multi-threading: memory consistency, etc.))
+**因此，我们无法通过更多的核心和线程来"加速"您的工作**。
 
 ---
 
-## People already do this... kind of...
+## 洞察
 
-Go to the [`materials/02-Using-gem5/11-multisim/01-multiprocessing-via-script`](../../materials/02-Using-gem5/11-multisim/01-multiprocessing-via-script/) directory to see a completed example of how **NOT** to run multiple gem5 processes.
+gem5 模拟器用于实验。
 
-This is typical but not recommended.
+实验涉及探索当所有其他变量保持不变时，感兴趣的变量如何改变系统的行为。因此，使用 gem5 模拟器进行实验需要多次运行模拟器。
+**可以并行运行多个 gem5 实例**。
 
-Writing a script to run multiple gem5 processes:
+_如果不是使用多线程的单一 gem5 进程，为什么不使用多个 gem5 进程，每个都是单线程的呢？_
 
-1. Requires the user to write the script.
-    1. Increases the barrier to entry.
-    2. Increases the likelihood of errors.
-    3. Requires the user to manage output files.
-2. Non-standard (everyone does it differently).
-    1. Hard to share with others.
-    2. Hard to reproduce.
-    3. No built-in support now or in the future.
+（（这对我们来说非常方便，因为我们不需要担心多线程的复杂性：内存一致性等。））
 
 ---
 
-## A better way
+## 人们已经在这样做...某种程度上...
 
-**MultiSim** is a gem5 feature that allows users to run multiple gem5 processes from a single gem5 configuration script.
+前往 [`materials/02-Using-gem5/11-multisim/01-multiprocessing-via-script`](../../materials/02-Using-gem5/11-multisim/01-multiprocessing-via-script/) 目录查看一个完整的示例，展示如何**不**运行多个 gem5 进程。
 
-This script outlines the simulations to run.
-The parent gem5 process (the process directly spawned by the user) spawns gem5 child processes, each capable of running these simulations.
+这是典型的做法，但不推荐。
 
-Via the Python `multiprocessing` module, the parent gem5 process queues up simulations ("jobs"), for child gem5 processes ("workers") to execute.
+编写脚本来运行多个 gem5 进程：
 
----
-
-Multisim has several advantages over simply writing a script to run multiple gem5 processes:
-
-1. We (the gem5 devs) handle this for you.
-    1. Lower barrier to entry.
-    2. Lower likelihood of errors.
-    3. Multisim will handle the output files automatically.
-2. Standardized.
-    1. Easy to share with others (just send the script).
-    2. Easy to reproduce (just run the script).
-    3. Allows for future support (orchestration, etc).
+1. 需要用户编写脚本。
+    1. 增加了入门门槛。
+    2. 增加了出错的可能性。
+    3. 需要用户管理输出文件。
+2. 非标准化（每个人的做法都不同）。
+    1. 难以与他人分享。
+    2. 难以重现。
+    3. 现在或将来都没有内置支持。
 
 ---
 
-### Some caveats (it's new: be patient)
+## 更好的方法
 
-This features is new as of version 24.0.
+**MultiSim** 是 gem5 的一个功能，允许用户从单个 gem5 配置脚本运行多个 gem5 进程。
 
-It is not fully mature and still lacks tooling and library support which will allow for greater flexibility and ease of use.
-However, this short tutorial should give you a good idea of how to use it going forward.
+该脚本概述了要运行的模拟。
+父 gem5 进程（用户直接启动的进程）会生成 gem5 子进程，每个子进程都能够运行这些模拟。
+
+通过 Python `multiprocessing` 模块，父 gem5 进程将模拟（"作业"）排队，供子 gem5 进程（"工作线程"）执行。
 
 ---
 
-## Let's go through an example
+与简单地编写脚本来运行多个 gem5 进程相比，Multisim 有几个优势：
 
-Start by opening [`materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py`](../../materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py).
+1. 我们（gem5 开发者）为您处理这些。
+    1. 降低入门门槛。
+    2. 降低出错的可能性。
+    3. Multisim 会自动处理输出文件。
+2. 标准化。
+    1. 易于与他人分享（只需发送脚本）。
+    2. 易于重现（只需运行脚本）。
+    3. 允许未来的支持（编排等）。
 
-This configuration script is almost identical to the script in the previous example but with the argparse code removed and the multisim import added:
+---
 
-### To start:  Declare the maximum number of processors
+### 一些注意事项（这是新功能：请耐心等待）
+
+此功能自版本 24.0 起是新的。
+
+它还不完全成熟，仍然缺乏工具和库支持，这些支持将允许更大的灵活性和易用性。
+然而，这个简短的教程应该能让您对如何继续使用它有一个很好的了解。
+
+---
+
+## 让我们看一个例子
+
+首先打开 [`materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py`](../../materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py)。
+
+此配置脚本与上一个示例中的脚本几乎相同，但移除了 argparse 代码并添加了 multisim 导入：
+
+### 开始：声明最大处理器数量
 
 ```python
 # Sets the maximum number of concurrent processes to be 2.
 multisim.set_num_processes(2)
 ```
 
-If this is not set gem5 will default to consume all available threads.
-We **strongly** recommend setting this value to avoid overconsuming your system's resources.
-Put this line near the top of your configuration script.
+如果未设置，gem5 将默认消耗所有可用线程。
+我们**强烈**建议设置此值以避免过度消耗系统资源。
+将此行放在配置脚本的顶部附近。
 
 ---
 
-## Use simple Python constructs to define multiple simulations
+## 使用简单的 Python 结构定义多个模拟
 
 ```python
 for data_cache_size in ["8kB","16kB"]:
@@ -117,16 +117,15 @@ for data_cache_size in ["8kB","16kB"]:
         )
 ```
 
-Replace the cache hierarchy in [`multisim-experiment.py`](../../materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py) with this  and indent the code after the cache hierarchy so all of it is within the inner for loop (`for instruction_cache_size ...`).
+用此代码替换 [`multisim-experiment.py`](../../materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py) 中的缓存层次结构，并缩进缓存层次结构之后的代码，使其全部位于内部 for 循环（`for instruction_cache_size ...`）内。
 
 ---
 
-## Create and add the simulation to the MultiSim object
+## 创建模拟并将其添加到 MultiSim 对象
 
-The key difference: The simulator object is passed to the
-MultiSim module via the `add_simulator` function.
+关键区别：模拟器对象通过 `add_simulator` 函数传递给 MultiSim 模块。
 
-The `run` function is not called here. Instead it is involved in the MultiSim module's execution.
+这里不调用 `run` 函数。相反，它参与 MultiSim 模块的执行。
 
 ```python
 multisim.add_simulator(
@@ -137,35 +136,35 @@ multisim.add_simulator(
 )
 ```
 
-The `id` parameter is used to identify the simulation. Setting this is strongly encouraged. Each output directory will be named after the `id` parameter.
+`id` 参数用于标识模拟。强烈建议设置此参数。每个输出目录将根据 `id` 参数命名。
 
 ---
 
-## Execute multiple simulations
+## 执行多个模拟
 
-A completed example can be found at [`materials/02-Using-gem5/11-multisim/completed/02-multiprocessing-via-multisim/multisim-experiment.py`](../../materials/02-Using-gem5/11-multisim/completed/02-multiprocessing-via-multisim/multisim-experiment.py).
+可以在 [`materials/02-Using-gem5/11-multisim/completed/02-multiprocessing-via-multisim/multisim-experiment.py`](../../materials/02-Using-gem5/11-multisim/completed/02-multiprocessing-via-multisim/multisim-experiment.py) 找到完整的示例。
 
 ```shell
 cd /workspaces/2024/materials/02-Using-gem5/11-multisim/completed/02-multiprocessing-via-multisim
 gem5 -m gem5.utils.multisim multisim-experiment.py
 ```
 
-Check the "m5out" directory to see the segregated output files for each simulation.
+检查 "m5out" 目录以查看每个模拟的分离输出文件。
 
 ---
 
-## Execute single simulations from a MultiSim config
+## 从 MultiSim 配置执行单个模拟
 
-You can also execute a single simulation from a MultiSim configuration script.
-To do so just pass the configuration script directly to gem5 (i.e., do not use `-m gem5.multisim multisim-experiment.py`).
+您也可以从 MultiSim 配置脚本执行单个模拟。
+为此，只需将配置脚本直接传递给 gem5（即，不要使用 `-m gem5.multisim multisim-experiment.py`）。
 
-To list the IDs of the simulations in a MultiSim configuration script:
+要列出 MultiSim 配置脚本中模拟的 ID：
 
 ```shell
 gem5 {config} --list
 ```
 
-To execute a single simulation, pass the ID:
+要执行单个模拟，传递 ID：
 
 ```shell
 gem5 {config} {id}

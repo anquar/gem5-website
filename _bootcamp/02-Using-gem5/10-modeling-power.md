@@ -18,63 +18,63 @@ section: using-gem5
 
 ---
 
-## Power modeling
+## 功耗建模
 
-- gem5 supports "activation count" based power models
-- This is kind of like McPAT/Wattch/etc. but it can be done from gem5
-- The correct constants are difficult to find
-  - CACTI is one possibility, but...
+- gem5 支持基于"激活计数"的功耗模型
+- 这类似于 McPAT/Wattch 等工具，但可以在 gem5 中完成
+- 正确的常数很难找到
+  - CACTI 是一种可能，但是...
 
-For instance
+例如
 
 $$P = \frac{N_{cache\_accesses} * 18 \mu J + N_{cache\_misses} * 1 \mu J}{s}$$
 
-> We are building *power* models, not energy models. So, don't forget to convert to *Watts* not *Joules*.
+> 我们构建的是*功耗*模型，而不是能量模型。因此，不要忘记转换为*瓦特*而不是*焦耳*。
 
 ---
 
-## Power models in gem5
+## gem5 中的功耗模型
 
-gem5 has a generic power model that exposes `getDynamicPower` and `getStaticPower` to python
+gem5 有一个通用的功耗模型，向 Python 暴露 `getDynamicPower` 和 `getStaticPower` 接口
 
-Each SimObject can have different power models for different power states (e.g., on, off, clock gated, and SRAM retention)
+每个 SimObject 可以为不同的功耗状态（例如，开启、关闭、时钟门控和 SRAM 保持）设置不同的功耗模型
 
-There is also a thermal model which uses a RC circuit model.
-We won't talk about the thermal model today.
+还有一个使用 RC 电路模型的热模型。
+今天我们不会讨论热模型。
 
-See [`gem5/src/sim/power/`](../../gem5/src/sim/power/)
+参见 [`gem5/src/sim/power/`](../../gem5/src/sim/power/)
 
-We will use `MathExprPowerModel`, but you can also make your own models.
-There should be a new `PythonFunction` power model coming soon.
+我们将使用 `MathExprPowerModel`，但你也可以创建自己的模型。
+应该很快会有一个新的 `PythonFunction` 功耗模型。
 
 ---
 
 ## MathExprPowerModel
 
-We will be using the `MathExprPowerModel`
-See [`gem5/src/sim/power/MathExprPowerModel.py`](../../gem5/src/sim/power/MathExprPowerModel.py)
+我们将使用 `MathExprPowerModel`
+参见 [`gem5/src/sim/power/MathExprPowerModel.py`](../../gem5/src/sim/power/MathExprPowerModel.py)
 
-This let's you specify a math expression like we saw previously for the power model.
+这允许你为功耗模型指定一个数学表达式，就像我们之前看到的那样。
 
-You can use statistics, voltage, and information from your thermal model.
+你可以使用统计信息、电压以及来自热模型的信息。
 
-The voltage comes from the voltage domain for the object (specified in the `ClockedObject`).
+电压来自对象的电压域（在 `ClockedObject` 中指定）。
 
-### Some caveats before we get into the example
+### 在进入示例之前的一些注意事项
 
-We (currently) don't provide any constants.
+我们（目前）不提供任何常数。
 
-We're going to see some hacks because the stdlib doesn't support power models.
+我们将看到一些变通方法，因为标准库不支持功耗模型。
 
-### This can't be emphasized enough: Be careful when using power models!
+### 这一点再怎么强调都不为过：使用功耗模型时要小心！
 
 ---
 
-## L3 cache power model
+## L3 缓存功耗模型
 
-Let's start with the L3 cache that we made previously using the classic caches.
+让我们从之前使用经典缓存创建的 L3 缓存开始。
 
-Here's some code that we provided
+以下是我们提供的一些代码
 
 ```python
 from m5.objects import PowerModel, MathExprPowerModel
@@ -93,7 +93,7 @@ class L3PowerModel(PowerModel):
 
 ---
 
-## Add the power model for the "on" state
+## 为"开启"状态添加功耗模型
 
 ```python
 class L3PowerOn(MathExprPowerModel):
@@ -104,19 +104,19 @@ class L3PowerOn(MathExprPowerModel):
         self.st = "(voltage * 3)/10"
 ```
 
-This power model uses the equation from the earlier slide.
+这个功耗模型使用了前面幻灯片中的方程。
 
-We get the "overallAccesses" stat and the "overallMisses" stat from the cache.
+我们从缓存中获取 "overallAccesses" 统计信息和 "overallMisses" 统计信息。
 
-You can look at the stats.txt file for all of the stats you can use.
+你可以查看 stats.txt 文件以了解所有可以使用的统计信息。
 
-We also divide by the number of seconds simulated to calculate the *watts* instead of *joules*. (If you want to get a delta time... good luck)
+我们还除以模拟的秒数来计算*瓦特*而不是*焦耳*。（如果你想获得增量时间...祝你好运）
 
 ---
 
-## Adding the power model
+## 添加功耗模型
 
-Add the following code to your `cache_hierarchy`.
+将以下代码添加到你的 `cache_hierarchy` 中。
 
 ```python
     def add_power_model(self):
@@ -124,21 +124,21 @@ Add the following code to your `cache_hierarchy`.
         self.l3_cache.power_model = L3PowerModel(self.l3_cache.path())
 ```
 
-> This needs to be called after `board._pre_instantiate` but before `m5.instantiate`. This is currently not supported in the standard library.
+> 这需要在 `board._pre_instantiate` 之后但在 `m5.instantiate` 之前调用。标准库目前不支持此功能。
 
-You need to get the "Path" to the L3 cache so that you can get the stat.
-The path is the "full name" for the object.
-The `SimObject` has a function to get the path, but it's only valid after creating the `Root` object.
+你需要获取 L3 缓存的"路径"，以便获取统计信息。
+路径是对象的"完整名称"。
+`SimObject` 有一个获取路径的函数，但它只在创建 `Root` 对象后有效。
 
 ---
 
-## Run the code
+## 运行代码
 
 ```sh
 gem5 test-cache.py
 ```
 
-See the output from `stats.txt`
+查看 `stats.txt` 的输出
 
 ```sh
 grep power_model m5out/stats.txt
@@ -153,4 +153,4 @@ board.cache_hierarchy.l3_cache.power_model.pm1.dynamicPower            0
 board.cache_hierarchy.l3_cache.power_model.pm1.staticPower            0
 ```
 
-> **2 KW for the cache?????** that seems wrong...
+> **缓存 2 千瓦？？？？？** 这似乎不对...

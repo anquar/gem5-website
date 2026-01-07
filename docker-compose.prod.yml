@@ -1,9 +1,0 @@
-services:
-  jekyll-prod:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
-    ports:
-      - "80:80"
-    environment:
-      - NGINX_PORT=80

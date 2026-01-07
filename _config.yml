@@ -9,6 +9,13 @@ url: "https://www.gem5.org/"
 sass:
   sass_dir: _sass
 
+plugins:
+  - jekyll-relative-links
+
+relative_links:
+  enabled: true
+  collections: true
+
 include: ['_pages', '_pages/documentation/general_docs/stdlib_api/_static']
 
 kramdown:

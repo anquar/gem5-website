@@ -248,3 +248,21 @@ author: John
 date: yyyy-mm-dd
 ---
 ```
+
+## Docker 部署
+
+本网站支持使用 Docker 部署。详细操作请参阅 [Docker-README.md](Docker-README.md)。
+
+使用 Docker Compose 快速启动：
+```bash
+docker compose up --build
+```
+
+网站将在 http://localhost:4000 访问。
+
+生产环境部署方法：
+```bash
+docker compose -f docker-compose.prod.yml up --build
+```
+
+生产环境下可通过 http://localhost 访问网站。

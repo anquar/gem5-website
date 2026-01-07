@@ -1,0 +1,11 @@
+services:
+  jekyll:
+    build: .
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/app
+      - /app/_site # Prevent _site from being mounted
+    environment:
+      - JEKYLL_ENV=development
+    command: bundle exec jekyll serve --host=0.0.0.0 --port=4000 --watch --incremental --config=_config.yml,_config_dev.yml

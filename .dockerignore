@@ -1,6 +1,8 @@
 # Dependencies
 Gemfile.lock
 node_modules
+vendor/
+.bundle/
 
 # Jekyll generated files
 _site/
@@ -28,4 +30,9 @@ Thumbs.db
 # Environment variables
 .env
 
+# Docker files
 *.tar.gz
+Dockerfile
+docker-compose.yml
+.dockerignore
+Docker-README.md

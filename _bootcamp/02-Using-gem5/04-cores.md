@@ -176,7 +176,7 @@ fetchQueueSize = Param.Unsigned(
 
 ### 首先打开以下文件
 
-[materials/02-Using-gem5/04-cores/cores.py](../../materials/02-Using-gem5/04-cores/cores.py)
+[materials/02-Using-gem5/04-cores/cores.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/04-cores/cores.py)
 
 ### 步骤
 
@@ -191,7 +191,7 @@ fetchQueueSize = Param.Unsigned(
 
 ## 让我们使用原子 CPU 配置一个简单系统
 
-[materials/02-Using-gem5/04-cores/cores.py](../../materials/02-Using-gem5/04-cores/cores.py)
+[materials/02-Using-gem5/04-cores/cores.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/04-cores/cores.py)
 
 ```python
 from gem5.components.boards.simple_board import SimpleBoard
@@ -405,9 +405,9 @@ timing-small-cache/stats.txt:board.processor.cores0.core.numCycles         96494
 
 ## 使用的材料
 
-[materials/02-Using-gem5/04-cores/cores-complex.py](../../materials/02-Using-gem5/04-cores/cores-complex.py)
+[materials/02-Using-gem5/04-cores/cores-complex.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/04-cores/cores-complex.py)
 
-[materials/02-Using-gem5/04-cores/components/processors.py](../../materials/02-Using-gem5/04-cores/components/processors.py)
+[materials/02-Using-gem5/04-cores/components/processors.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/04-cores/components/processors.py)
 
 ### 步骤
 
@@ -442,7 +442,7 @@ timing-small-cache/stats.txt:board.processor.cores0.core.numCycles         96494
 ## 配置 Big
 
 打开以下文件：
-[materials/02-Using-gem5/04-cores/components/processors.py](../../materials/02-Using-gem5/04-cores/components/processors.py)
+[materials/02-Using-gem5/04-cores/components/processors.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/04-cores/components/processors.py)
 
 在右侧，您将看到 `class Big` 当前的样子。
 
@@ -499,7 +499,7 @@ class Little(O3CPU):
 ## 使用 Big 处理器运行
 
 我们将运行以下文件。
-[materials/02-Using-gem5/04-cores/cores-complex.py](../../materials/02-Using-gem5/04-cores/cores-complex.py)
+[materials/02-Using-gem5/04-cores/cores-complex.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/04-cores/cores-complex.py)
 
 首先，我们将使用 `Big` 处理器运行 matrix-multiply。
 

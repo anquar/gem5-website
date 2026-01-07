@@ -754,7 +754,7 @@ class GoodByeSimObject(SimObject):
 
 ## 当前版本：SConscript
 
-这是 [SConscript](../../materials/03-Developing-gem5-models/03-event-driven-sim/step-2/src/bootcamp/hello-sim-object/SConscript) 在更改后应该看起来的样子。
+这是 [SConscript](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/03-event-driven-sim/step-2/src/bootcamp/hello-sim-object/SConscript) 在更改后应该看起来的样子。
 
 ```python
 Import("*")
@@ -776,7 +776,7 @@ CompoundFlag("GreetFlag", ["HelloExampleFlag", "GoodByeExampleFlag"])
 
 在我们的设计中，让 `GoodByeSimObject` 调试打印一个 `GoodBye ...` 语句。它将在调用 `sayGoodBye` 函数时执行此操作，该函数将调度一个 `event` 来说 GoodBye。
 
-在接下来的幻灯片中，您可以找到 [src/bootcamp/hello-sim-object/goodbye_sim_object.hh](../../materials/03-Developing-gem5-models/03-event-driven-sim/step-2/src/bootcamp/hello-sim-object/goodbye_sim_object.hh) 和 [src/bootcamp/hello-sim-object/goodbye_sim_object.cc](../../materials/03-Developing-gem5-models/03-event-driven-sim/step-2/src/bootcamp/hello-sim-object/goodbye_sim_object.cc) 的完成版本。
+在接下来的幻灯片中，您可以找到 [src/bootcamp/hello-sim-object/goodbye_sim_object.hh](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/03-event-driven-sim/step-2/src/bootcamp/hello-sim-object/goodbye_sim_object.hh) 和 [src/bootcamp/hello-sim-object/goodbye_sim_object.cc](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/03-event-driven-sim/step-2/src/bootcamp/hello-sim-object/goodbye_sim_object.cc) 的完成版本。
 
 **重要提示**：我不会详细介绍这些文件的细节，请仔细查看此文件，并确保您理解每一行应该做什么。
 
@@ -926,7 +926,7 @@ HelloSimObject::processNextHelloEvent()
 
 ## 当前版本：HelloSimObject：头文件
 
-这是 [src/bootcamp/hello-sim-object/hello_sim_object.hh](/../../materials/03-Developing-gem5-models/03-event-driven-sim/step-2/src/bootcamp/hello-sim-object/hello_sim_object.hh) 在更改后应该看起来的样子。
+这是 [src/bootcamp/hello-sim-object/hello_sim_object.hh](/https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/03-event-driven-sim/step-2/src/bootcamp/hello-sim-object/hello_sim_object.hh) 在更改后应该看起来的样子。
 
 ```cpp
 #ifndef __BOOTCAMP_HELLO_SIM_OBJECT_HELLO_SIM_OBJECT_HH__
@@ -964,7 +964,7 @@ class HelloSimObject: public SimObject
 
 ## 当前版本：HelloSimObject：源文件
 
-这是 [src/bootcamp/hello-sim-object/hello_sim_object.cc](../../materials/03-Developing-gem5-models/03-event-driven-sim/step-2/src/bootcamp/hello-sim-object/hello_sim_object.cc) 在更改后应该看起来的样子。
+这是 [src/bootcamp/hello-sim-object/hello_sim_object.cc](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/03-event-driven-sim/step-2/src/bootcamp/hello-sim-object/hello_sim_object.cc) 在更改后应该看起来的样子。
 
 ```cpp
 #include "bootcamp/hello-sim-object/hello_sim_object.hh"

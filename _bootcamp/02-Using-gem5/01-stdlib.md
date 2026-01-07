@@ -70,7 +70,7 @@ gem5 模型是细粒度的概念，我们进一步将其划分为子模型或硬
 
 <!-- _class: code-80-percent -->
 
-在 [`materials/02-Using-gem5/01-stdlib/01-components.py`](../../materials/02-Using-gem5/01-stdlib/01-components.py) 中，你会看到已经为你包含了一些导入。
+在 [`materials/02-Using-gem5/01-stdlib/01-components.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/01-stdlib/01-components.py) 中，你会看到已经为你包含了一些导入。
 
 ```python
 from gem5.components.boards.simple_board import SimpleBoard
@@ -450,7 +450,7 @@ FS 模式可以做 SE 模式所做的一切（甚至更多！），但可能需�
 
 ## 如何使用标准库指定 FS 模式
 
-转到 [`materials/02-Using-gem5/01-stdlib/01-02-fs-mode.py`](../../materials/02-Using-gem5/01-stdlib/01-02-fs-mode.py) 并处理此示例。
+转到 [`materials/02-Using-gem5/01-stdlib/01-02-fs-mode.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/01-stdlib/01-02-fs-mode.py) 并处理此示例。
 
 ---
 
@@ -694,7 +694,7 @@ simulator.run()
 
 ## 让我们创建一个具有乱序核心的处理器
 
-使用 [`materials/02-Using-gem5/01-stdlib/02-processor.py`](../../materials/02-Using-gem5/01-stdlib/02-processor.py) 作为起点。
+使用 [`materials/02-Using-gem5/01-stdlib/02-processor.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/01-stdlib/02-processor.py) 作为起点。
 
 与上一个示例基本相同，但现在我们有以下代码，而不是使用 `SimpleProcessor`：
 

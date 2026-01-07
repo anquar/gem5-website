@@ -110,7 +110,7 @@ ISA 定义了：
 
 在这个例子中，我们将使用 GDB 来跟踪 gem5 中指令的执行。
 
-首先，我们将通过 GDB 运行 [materials/03-Developing-gem5-models/05-modeling-cores/01-inst-trace.py](../../materials/03-Developing-gem5-models/05-modeling-cores/01-inst-trace.py) 中的脚本。
+首先，我们将通过 GDB 运行 [materials/03-Developing-gem5-models/05-modeling-cores/01-inst-trace.py](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/05-modeling-cores/01-inst-trace.py) 中的脚本。
 
 使用 GDB，我们将在 `Add::Add` 函数和 `Add::execute` 函数上添加断点。
 
@@ -276,7 +276,7 @@ Decoder::decode(ExtMachInst mach_inst, Addr addr)
 `decodeInst` 函数是回溯中的下一个函数，但它是_生成的_。
 
 `decideInst` 函数是生成的代码，只有在你构建 gem5（`scons build/ALL/gem5.opt -j$(nproc)`）时才会可用。
-这些生成文件的副本已添加到 [materials/03-Developing-gem5-models/05-modeling-cores/build-riscv-generated-files](../../materials/03-Developing-gem5-models/05-modeling-cores/build-riscv-generated-files/) 供你参考。
+这些生成文件的副本已添加到 [materials/03-Developing-gem5-models/05-modeling-cores/build-riscv-generated-files](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/05-modeling-cores/build-riscv-generated-files/) 供你参考。
 
 ---
 
@@ -702,9 +702,9 @@ ADD16, Rs1, Rs2
 
 ---
 
-让我们运行 [materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction](../../materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction/add16_test.py)
+让我们运行 [materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction/add16_test.py)
 
-这个文件运行 [add16_test.c](../../materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction/src/add16_test.c) 的二进制文件。这是一个执行 `add 16` 指令的 C 程序。
+这个文件运行 [add16_test.c](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction/src/add16_test.c) 的二进制文件。这是一个执行 `add 16` 指令的 C 程序。
 
 我们还没有在 gem5 中实现这条指令。让我们运行这个脚本来查看输出。
 
@@ -750,7 +750,7 @@ Program aborted at tick 18616032
 尝试自己将 `ADD16` 指令实现到 gem5 中。
 当遇到困难时，最好的建议是找到类似的指令并尝试理解它们的工作原理。
 
-可以找到帮助你入门的资源在 [materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction](../../materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction/)。
+可以找到帮助你入门的资源在 [materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction/)。
 值得注意的是，这包含一个编译了 ADD16 指令的二进制文件，以及一个在 RISC-V 系统中运行二进制文件的配置文件。
 这个配置会让你知道你是否正确实现了指令。
 
@@ -847,7 +847,7 @@ decode QUADRANT default Unknown::unknown() {
 
 ---
 
-现在让我们再次运行 [materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction/add16_test.py](../../materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction/add16_test.py) 脚本并查看输出。
+现在让我们再次运行 [materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction/add16_test.py](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/05-modeling-cores/02-add16-instruction/add16_test.py) 脚本并查看输出。
 
 首先，让我们使用我们的更改构建 gem5。
 

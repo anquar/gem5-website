@@ -174,7 +174,7 @@ MessageBuffer * forwardFromDir, network="From", virtual_network="1", vnet_type="
 
 ## 实践：编写和调试协议
 
-参见 [`materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md`](../../materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md)
+参见 [`materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md`](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md)
 
 你将：
 
@@ -493,7 +493,7 @@ transition({IM_AD, SM_AD}, {DataDirNoAcks, DataOwner}, M) {
 
 代码现在应该已经编译好了！
 
-参见 [`materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md`](../../materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md)
+参见 [`materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md`](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md)
 
 你将：
 

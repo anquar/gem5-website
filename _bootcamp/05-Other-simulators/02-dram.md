@@ -57,7 +57,7 @@ scons build/NULL/gem5.opt -j$(nproc)
 要配置 gem5 使用 DRAMSys，您可以使用标准库。
 DRAMSys 可以作为 `MemorySystem` 使用，就像 `SingleChannel` 或 `MultiChannel` 内存一样。
 
-打开 [`materials/05-Other-simulators/02-dram/dramsys-example.py`](../../materials/05-Other-simulators/02-dram/dramsys-example.py)。
+打开 [`materials/05-Other-simulators/02-dram/dramsys-example.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/05-Other-simulators/02-dram/dramsys-example.py)。
 
 添加以下行以使用 DRAMSys 创建带有 DDR4 的内存系统
 

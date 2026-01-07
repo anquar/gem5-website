@@ -99,7 +99,7 @@ gem5 内存通常配置的主要方式是通道数和通道/rank/bank/行/列位
 
 ## 使用标准库运行示例
 
-打开 [`materials/02-Using-gem5/06-memory/run-mem.py`](../../materials/02-Using-gem5/06-memory/run-mem.py)
+打开 [`materials/02-Using-gem5/06-memory/run-mem.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/06-memory/run-mem.py)
 
 该文件使用流量生成器（在[之前](03-running-in-gem5.md)见过）在 64GiB 处生成内存流量。
 
@@ -193,7 +193,7 @@ SingleChannelDDR4_2400()
 
 ## 添加新的通道化内存
 
-- 打开 [`materials/02-Using-gem5/06-memory/lpddr2.py`](../../materials/02-Using-gem5/06-memory/lpddr2.py)
+- 打开 [`materials/02-Using-gem5/06-memory/lpddr2.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/06-memory/lpddr2.py)
 - 如果我们想在标准库中添加 LPDDR2 作为新内存，我们首先确保在 [`dram_interfaces` 目录](../../gem5/src/python/gem5/components/memory/dram_interfaces/lpddr2.py)中有它的 DRAM 接口
 - 然后我们需要通过在 `lpddr2.py` 的顶部添加以下内容来确保导入它：
 ```python

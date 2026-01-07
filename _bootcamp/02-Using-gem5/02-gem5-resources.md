@@ -51,7 +51,7 @@ section: using-gem5
 
 让我们做一个示例，在示例中使用 `x86-hello64-static` 二进制文件。
 
-转到 [materials/02-Using-gem5/02-gem5-resources/01-hello-example.py](../../materials/02-Using-gem5/02-gem5-resources/01-hello-example.py)
+转到 [materials/02-Using-gem5/02-gem5-resources/01-hello-example.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/02-gem5-resources/01-hello-example.py)
 
 此文件构建一个基本板子，我们将使用 `x86-hello64-static` 资源并运行模拟。
 
@@ -127,7 +127,7 @@ gem5 01-hello-example.py
 
 让我们打印 `x86-getting-started-benchmark-suite` 套件中的一些工作负载信息。
 
-让我们修改 [02-suite-workload-example.py](../../materials/02-Using-gem5/02-gem5-resources/02-suite-workload-example.py)。下面，我们获取资源并遍历套件，打印每个工作负载的 `id` 和 `version`。将此添加到脚本的底部：
+让我们修改 [02-suite-workload-example.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/02-gem5-resources/02-suite-workload-example.py)。下面，我们获取资源并遍历套件，打印每个工作负载的 `id` 和 `version`。将此添加到脚本的底部：
 
 ```python
 getting_started_suite = obtain_resource("x86-getting-started-benchmark-suite")
@@ -213,7 +213,7 @@ gem5 有两种主要方式使用本地资源。
 
 ## 让我们创建一个二进制文件
 
-让我们使用[这个打印简单三角形图案的 C 程序](../../materials/02-Using-gem5/02-gem5-resources/03-local-resources/pattern.c)。
+让我们使用[这个打印简单三角形图案的 C 程序](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/02-gem5-resources/03-local-resources/pattern.c)。
 
 编译此程序。这将是我们在 gem5 中运行的二进制文件。
 
@@ -223,7 +223,7 @@ gcc -o pattern pattern.c
 
 现在，让我们使用本地路径方法。
 
-在 [03-run-local-resource-local-path.py](../../materials/02-Using-gem5/02-gem5-resources/03-run-local-resource-local-path.py) 中，按如下方式创建二进制资源对象：
+在 [03-run-local-resource-local-path.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/02-gem5-resources/03-run-local-resource-local-path.py) 中，按如下方式创建二进制资源对象：
 
 ```python
 binary = BinaryResource(local_path="./pattern")
@@ -241,7 +241,7 @@ gem5 03-run-local-resource-local-path.py
 
 ## 让我们为二进制资源创建一个 JSON 文件
 
-二进制文件的 [JSON 资源](../../materials/02-Using-gem5/02-gem5-resources/03-local-resources/local_resources.json) 如下所示：
+二进制文件的 [JSON 资源](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/02-gem5-resources/03-local-resources/local_resources.json) 如下所示：
 
 ```json
 {
@@ -275,7 +275,7 @@ gem5 03-run-local-resource-local-path.py
 
 ## 让我们获取资源并运行模拟
 
-在 [04-run-local-resource-json.py](../../materials/02-Using-gem5/02-gem5-resources/04-run-local-resource-json.py) 中，我们可以通过使用 obtain_resource 来获取二进制文件：
+在 [04-run-local-resource-json.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/02-gem5-resources/04-run-local-resource-json.py) 中，我们可以通过使用 obtain_resource 来获取二进制文件：
 
 ```python
 board.set_se_binary_workload(obtain_resource("x86-pattern-print"))

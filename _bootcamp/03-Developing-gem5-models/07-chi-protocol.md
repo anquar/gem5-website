@@ -18,7 +18,7 @@ section: developing-gem5
 <!-- - Extend this to allow for multiple L2s (banked by address) -->
 <!-- - Multiple memory controllers as well -->
 
-代码位于 [`materials/03-Developing-gem5-models/07-chi-protocol`](../../materials/03-Developing-gem5-models/07-chi-protocol/)。
+代码位于 [`materials/03-Developing-gem5-models/07-chi-protocol`](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/07-chi-protocol/)。
 
 ---
 
@@ -189,7 +189,7 @@ board.processor.cores3.generator.writeBW 948724311.716480
 ## 现在，让我们运行全系统仿真
 
 让我们创建一个脚本来运行 NPB 中的 IS。
-只需将以下内容添加到 [`materials/03-Developing-gem5-models/07-chi-protocol/run-is.py`](../../materials/03-Developing-gem5-models/07-chi-protocol/run-is.py/) 中的模板。
+只需将以下内容添加到 [`materials/03-Developing-gem5-models/07-chi-protocol/run-is.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/07-chi-protocol/run-is.py/) 中的模板。
 
 ```python
 from hierarchy import PrivateL1SharedL2CacheHierarchy

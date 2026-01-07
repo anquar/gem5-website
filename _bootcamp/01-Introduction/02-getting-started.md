@@ -166,7 +166,7 @@ from gem5.simulate.simulator import Simulator
 ```
 
 此模板代码可在 `materials/01-Introduction/02-getting-started/` 目录中找到。
-打开 [`basic.py`](../../materials/01-Introduction/02-getting-started/basic.py) 文件并开始编辑。
+打开 [`basic.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/02-getting-started/basic.py) 文件并开始编辑。
 
 在整个训练营中，我们将在 materials 目录中编辑/扩展文件。
 

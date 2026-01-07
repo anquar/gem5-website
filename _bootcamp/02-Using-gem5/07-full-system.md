@@ -71,7 +71,7 @@ excerpt_separator: "<!--more-->"
 ## 获取工作负载并设置退出事件
 
 要设置工作负载，我们将以下内容添加到
-[materials/02-Using-gem5/07-full-system/x86-fs-kvm-run.py](../../materials/02-Using-gem5/07-full-system/x86-fs-kvm-run.py)：
+[materials/02-Using-gem5/07-full-system/x86-fs-kvm-run.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/07-full-system/x86-fs-kvm-run.py)：
 
 ```python
 workload = obtain_resource("x86-ubuntu-24.04-boot-with-systemd", resource_version="1.0.0")
@@ -249,7 +249,7 @@ qemu-system-x86_64 -m 2G \
 
 ## 让我们使用基础 Ubuntu 镜像创建包含 GAPBS 基准测试的磁盘镜像
 
-更新 [x86-ubuntu.pkr.hcl](../../materials/02-Using-gem5/07-full-system/x86-ubuntu-gapbs/x86-ubuntu.pkr.hcl) 文件。
+更新 [x86-ubuntu.pkr.hcl](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/07-full-system/x86-ubuntu-gapbs/x86-ubuntu.pkr.hcl) 文件。
 
 Packer 文件的一般结构将相同，但有一些关键更改：
 
@@ -295,7 +295,7 @@ sha256sum ./x86-ubuntu-24-04.gz
 
 对于此后安装脚本，我们需要获取依赖项并构建 GAPBS 基准测试。
 
-将此添加到 [post-installation.sh](../../materials/02-Using-gem5/07-full-system/x86-ubuntu-gapbs/scripts/post-installation.sh) 脚本
+将此添加到 [post-installation.sh](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/07-full-system/x86-ubuntu-gapbs/scripts/post-installation.sh) 脚本
 
 ```bash
 git clone https://github.com/sbeamer/gapbs
@@ -313,9 +313,9 @@ x86-ubuntu-gapbs/build.sh
 
 ## 让我们在 gem5 中使用我们构建的磁盘镜像
 
-让我们将 md5sum 和路径添加到我们的 [local JSON ](../../materials/02-Using-gem5/07-full-system/completed/local-gapbs-resource.json)。
+让我们将 md5sum 和路径添加到我们的 [local JSON ](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/07-full-system/completed/local-gapbs-resource.json)。
 
-让我们运行 [gem5 GAPBS config](../../materials/02-Using-gem5/07-full-system/completed/x86-fs-gapbs-kvm-run.py)。
+让我们运行 [gem5 GAPBS config](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/07-full-system/completed/x86-fs-gapbs-kvm-run.py)。
 
 ```bash
 GEM5_RESOURCE_JSON_APPEND=./completed/local-gapbs-resource.json gem5 x86-fs-gapbs-kvm-run.py
@@ -327,7 +327,7 @@ GEM5_RESOURCE_JSON_APPEND=./completed/local-gapbs-resource.json gem5 x86-fs-gapb
 
 ## 让我们看看如何使用 m5term 访问终端
 
-- 我们将运行相同的 [gem5 GAPBS config](../../materials/02-Using-gem5/07-full-system/x86-fs-gapbs-kvm-run.py)，但有一个小更改。
+- 我们将运行相同的 [gem5 GAPBS config](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/07-full-system/x86-fs-gapbs-kvm-run.py)，但有一个小更改。
 
 让我们将最后一个 `yield True` 更改为 `yield False`，这样模拟就不会退出，我们可以访问模拟。
 

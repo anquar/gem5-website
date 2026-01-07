@@ -164,9 +164,9 @@ section: using-gem5
 
 ### 01-simpoint
 
-所有材料可以在 [materials/02-Using-gem5/09-sampling/01-simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/01-simpoint/complete](../../materials/02-Using-gem5/09-sampling/01-simpoint/complete) 下。
+所有材料可以在 [materials/02-Using-gem5/09-sampling/01-simpoint](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/01-simpoint/complete](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/complete) 下。
 在本练习中，我们只运行脚本而不修改它们。
-我们只使用 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py) 和 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh)。
+我们只使用 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py) 和 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh)。
 
 ### 目标
 
@@ -185,7 +185,7 @@ gem5 -re --outdir=simpoint-analysis-m5out simpoint-analysis.py
 ```
 
 在本练习中，我们尝试为一个简单的工作负载创建 SimPoints。
-简单工作负载的源代码可以在 [materials/02-Using-gem5/09-sampling/01-simpoint/workload/simple_workload.c](../../materials/02-Using-gem5/09-sampling/01-simpoint/workload/simple_workload.c) 找到。
+简单工作负载的源代码可以在 [materials/02-Using-gem5/09-sampling/01-simpoint/workload/simple_workload.c](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/workload/simple_workload.c) 找到。
 
 这个简单的工作负载分配一个包含一千个 64 位元素的数组，为每个元素分配一个数字，然后通过一千次迭代将它们全部求和。
 我们可以预期这个工作负载的程序行为会非常重复。
@@ -194,7 +194,7 @@ gem5 -re --outdir=simpoint-analysis-m5out simpoint-analysis.py
 
 ## 01-simpoint
 
-脚本 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py) 使用我们之前介绍的 `SimPoint` 探针监听器对象来收集这个简单工作负载的基本块信息。
+脚本 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis.py) 使用我们之前介绍的 `SimPoint` 探针监听器对象来收集这个简单工作负载的基本块信息。
 它使用以下方式将 ATOMIC CPU 核心连接到 `SimPoint` 探针监听器：
 
 ```python
@@ -209,7 +209,7 @@ processor.get_cores()[0].core.addSimPointProbe(1_000_000)
 
 ## 01-simpoint
 
-模拟完成后，我们将在 [simpoint-analysis-m5out](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis-m5out) 文件夹下看到一个名为 `simpoint.bb.gz` 的 zip 文件。
+模拟完成后，我们将在 [simpoint-analysis-m5out](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-analysis-m5out) 文件夹下看到一个名为 `simpoint.bb.gz` 的 zip 文件。
 我们可以使用以下命令解压它：
 
 ```bash
@@ -261,8 +261,8 @@ T:1900:222 :1901:222 :1902:999216 :1903:333
 
 ## 01-simpoint
 
-该工具已在 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint) 下编译。
-我们还在 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh) 中提供了一个包含以下命令的运行脚本。
+该工具已在 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint) 下编译。
+我们还在 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint3.2-cmd.sh) 中提供了一个包含以下命令的运行脚本。
 
 ```bash
 /workspaces/2024/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint \
@@ -312,7 +312,7 @@ SimPoint 标签号可能不连续，因为它是聚类的标签号。
 
 ## 01-simpoint
 
-所有材料可以在 [materials/02-Using-gem5/09-sampling/01-simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/01-simpoint/complete](../../materials/02-Using-gem5/09-sampling/01-simpoint/complete) 下。
+所有材料可以在 [materials/02-Using-gem5/09-sampling/01-simpoint](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/01-simpoint/complete](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/complete) 下。
 我们不会修改任何脚本。
 
 ### 目标
@@ -329,7 +329,7 @@ gem5 -re --outdir=simpoint-checkpoint-m5out simpoint-checkpoint.py
 
 ## 01-simpoint
 
-让我们看看 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint.py)。
+让我们看看 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint.py)。
 
 有三个关键部分：
 
@@ -400,7 +400,7 @@ SimPoint 类还会根据 SimPoints 在指令方面的开始时间自动对它们
 
 ## 01-simpoint
 
-完成检查点创建后，我们应该在 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint) 下找到所有 SimPoint 检查点，因为我们将 `simpoint-checkpoint` 作为保存 SimPoint 检查点的目录传递给 `simpoints_save_checkpoint_generator`。
+完成检查点创建后，我们应该在 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-checkpoint) 下找到所有 SimPoint 检查点，因为我们将 `simpoint-checkpoint` 作为保存 SimPoint 检查点的目录传递给 `simpoints_save_checkpoint_generator`。
 
 应该有三个名为 `cpt.SimPoint0`、`cpt.SimPoint1` 和 `cpt.SimPoint2` 的检查点文件夹。
 
@@ -428,16 +428,16 @@ $$
 
 ## 01-simpoint
 
-所有材料可以在 [materials/02-Using-gem5/09-sampling/01-simpoint](../../materials/02-Using-gem5/09-sampling/01-simpoint) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/01-simpoint/complete](../../materials/02-Using-gem5/09-sampling/01-simpoint/complete) 下。
+所有材料可以在 [materials/02-Using-gem5/09-sampling/01-simpoint](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/01-simpoint/complete](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/complete) 下。
 我们仍然不会修改任何脚本。
 
 与我们用于 SimPoint 分析和 SimPoint 检查点的简单系统不同，我们现在需要使用我们实际想要测量性能的系统。
 
-我们将使用 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py) 来运行我们的 SimPoints。
-对于我们的基线，我们使用 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py)，它使用详细系统运行整个简单工作负载。
+我们将使用 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py) 来运行我们的 SimPoints。
+对于我们的基线，我们使用 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py)，它使用详细系统运行整个简单工作负载。
 
 由于时间限制，让我们先运行 SimPoints，然后再解释它的工作原理。
-我们在 [materials/02-Using-gem5/09-sampling/01-simpoint/run-all-simpoint.sh](../../materials/02-Using-gem5/09-sampling/01-simpoint/run-all-simpoint.sh) 中提供了一个运行脚本来运行所有三个
+我们在 [materials/02-Using-gem5/09-sampling/01-simpoint/run-all-simpoint.sh](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/run-all-simpoint.sh) 中提供了一个运行脚本来运行所有三个
 
 ```bash
 ./run-all-simpoint.sh
@@ -447,7 +447,7 @@ $$
 
 ## 01-simpoint
 
-让我们看看 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py)。它有一个详细系统，与我们基线中使用的 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py) 相匹配。
+让我们看看 [materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/simpoint-run.py)。它有一个详细系统，与我们基线中使用的 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py) 相匹配。
 
 有几个关键点我们想要查看。让我们从我们熟悉的部分开始。
 
@@ -540,7 +540,7 @@ print(f"Ran SimPoint {args.sid} with weight {board.get_simpoint().get_weight_lis
 
 让我们尝试使用 SimPoints 的性能来预测整体 IPC！
 
-我们在 [materials/02-Using-gem5/09-sampling/01-simpoint/predict_overall_ipc.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/predict_overall_ipc.py) 中准备了一个 Python 脚本来进行预测。
+我们在 [materials/02-Using-gem5/09-sampling/01-simpoint/predict_overall_ipc.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/predict_overall_ipc.py) 中准备了一个 Python 脚本来进行预测。
 
 我们可以使用以下命令运行它：
 
@@ -621,7 +621,7 @@ gem5 不生成 ELFies，但我们支持在 SE 模式下运行 ELFies。
 
 我们可以使用 [ELFieInfo 类](https://github.com/gem5/gem5/blob/stable/src/python/gem5/resources/elfie.py#L36) 运行 ELFies。
 
-在 [materials/02-Using-gem5/09-sampling/02-elfies/run-elfies.py](../../materials/02-Using-gem5/09-sampling/02-elfies/run-elfies.py) 中有一个示例。
+在 [materials/02-Using-gem5/09-sampling/02-elfies/run-elfies.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/02-elfies/run-elfies.py) 中有一个示例。
 
 我们可以使用以下命令运行它，但不建议这样做，因为它会花费太长时间。
 
@@ -630,7 +630,7 @@ gem5 -re run-elfies.py
 ```
 
 这是一个 8 线程实验，使用详细系统，可能运行八亿条指令，因此需要一些时间才能完成。
-如果您有兴趣查看输出，我们在 [materials/02-Using-gem5/09-sampling/02-elfies/complete/m5out](../../materials/02-Using-gem5/09-sampling/02-elfies/complete/m5out) 下有一个完整的 m5out。
+如果您有兴趣查看输出，我们在 [materials/02-Using-gem5/09-sampling/02-elfies/complete/m5out](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/02-elfies/complete/m5out) 下有一个完整的 m5out。
 
 ---
 
@@ -727,10 +727,10 @@ SMARTS 是统计采样方法之一。
 
 ### 03-SMARTS
 
-所有材料可以在 [materials/02-Using-gem5/09-sampling/03-SMARTS](../../materials/02-Using-gem5/09-sampling/03-SMARTS) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/03-SMARTS/complete](../../materials/02-Using-gem5/09-sampling/03-SMARTS/complete) 下。
+所有材料可以在 [materials/02-Using-gem5/09-sampling/03-SMARTS](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/03-SMARTS) 下找到。完整版本在 [materials/02-Using-gem5/09-sampling/03-SMARTS/complete](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/03-SMARTS/complete) 下。
 我们不会修改任何脚本。
 
-[materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py) 是一个如何使用退出事件处理器执行 SMARTS 的示例。
+[materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py) 是一个如何使用退出事件处理器执行 SMARTS 的示例。
 
 我们可以使用以下命令运行它：
 
@@ -738,7 +738,7 @@ SMARTS 是统计采样方法之一。
 gem5 -re SMARTS.py
 ```
 
-此脚本将在来自 01-simpoint 的工作负载上使用 SMARTS，因此我们可以使用来自 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py) 的基线性能来验证我们使用 SMARTS 预测的性能。
+此脚本将在来自 01-simpoint 的工作负载上使用 SMARTS，因此我们可以使用来自 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py) 的基线性能来验证我们使用 SMARTS 预测的性能。
 
 ---
 
@@ -790,9 +790,9 @@ ideal_W = 2 * ideal_U
 
 ## 03-SMARTS
 
-现在我们了解了 `smarts_generator` 将做什么，让我们看看我们在 [materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py) 中使用的系统。
+现在我们了解了 `smarts_generator` 将做什么，让我们看看我们在 [materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/03-SMARTS/SMARTS.py) 中使用的系统。
 
-它使用与 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](../../materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py) 完全相同的系统，除了它使用 `SimpleSwitchableProcessor` 在 ATOMIC CPU 和 O3 CPU 之间切换以进行快进和详细模拟。
+它使用与 [materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/01-simpoint/full-detailed-run.py) 完全相同的系统，除了它使用 `SimpleSwitchableProcessor` 在 ATOMIC CPU 和 O3 CPU 之间切换以进行快进和详细模拟。
 
 如果使用以下命令运行模拟：
 
@@ -800,7 +800,7 @@ ideal_W = 2 * ideal_U
 gem5 -re SMARTS.py
 ```
 
-我们可以运行 [materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py) 来预测整体 IPC 并计算与基线 IPC 的相对误差。
+我们可以运行 [materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py) 来预测整体 IPC 并计算与基线 IPC 的相对误差。
 
 ```bash
 python3 predict_ipc.py
@@ -810,7 +810,7 @@ python3 predict_ipc.py
 
 ## 03-SMARTS
 
-[materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py](../../materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py) 所做的是从每个样本读取 IPC，对 IPC 求和，然后除以样本总数来计算程序的平均 IPC。
+[materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/09-sampling/03-SMARTS/predict_ipc.py) 所做的是从每个样本读取 IPC，对 IPC 求和，然后除以样本总数来计算程序的平均 IPC。
 
 $\text{平均 IPC} = \frac{\sum_{i=1}^{n} \text{IPC}_i}{n}$
 

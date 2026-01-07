@@ -93,7 +93,7 @@ for ri in self.routers:
 
 ## 创建拓扑文件
 
-打开 [../../materials/03-Developing-gem5-models/08-ruby-network/ring.py](../../materials/03-Developing-gem5-models/08-ruby-network/ring.py)
+打开 [https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/08-ruby-network/ring.py](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/08-ruby-network/ring.py)
 
 注意：这段代码中有很多奇怪的地方。大部分内容，你只需要相信我的话...
 

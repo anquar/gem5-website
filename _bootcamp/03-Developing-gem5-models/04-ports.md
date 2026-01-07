@@ -1245,7 +1245,7 @@ void InspectorGaget::processNextRespRetryEvent();
 void InspectorGaget::scheduleNextRespSendEvent(Tick when);
 ```
 
-To find the definition for all these functions please look at the [complete version](../../materials/03-Developing-gem5-models/04-ports/step-1/src/bootcamp/inspector-gadget/inspector_gadget.cc) of `inspector_gadget.cc`. You can search for `Too-Much-Code` to find these functions.
+To find the definition for all these functions please look at the [complete version](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/04-ports/step-1/src/bootcamp/inspector-gadget/inspector_gadget.cc) of `inspector_gadget.cc`. You can search for `Too-Much-Code` to find these functions.
 
 ---
 

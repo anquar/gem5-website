@@ -40,7 +40,7 @@ section: using-gem5
 ### 00-SE-hello-world
 
 在 `materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world` 目录下，有一个 SE 仿真的小例子。
-[00-SE-hello-world.py](../../materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/00-SE-hello-world.py) 将使用简单的 X86 配置运行 [00-SE-hello-world](../../materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/00-SE-hello-world.c) 二进制文件。
+[00-SE-hello-world.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/00-SE-hello-world.py) 将使用简单的 X86 配置运行 [00-SE-hello-world](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/00-SE-hello-world.c) 二进制文件。
 这个二进制文件会打印字符串 `Hello, World!`。
 如果我们使用调试标志 `SyscallAll`，我们将能够看到模拟了哪些系统调用。
 我们可以使用以下命令来执行：
@@ -56,7 +56,7 @@ gem5 -re --debug-flags=SyscallAll 00-SE-hello-world.py
 
 ## 00-SE-hello-world
 
-然后在 [simout.txt](../../materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/m5out/simout.txt) 中，我们应该看到：
+然后在 [simout.txt](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/00-SE-hello-world/m5out/simout.txt) 中，我们应该看到：
 
 ```bash
 280945000: board.processor.cores.core: T0 : syscall Calling write(1, 21152, 14)...
@@ -206,7 +206,7 @@ scons arm64.CROSS_COMPILE=aarch64-linux-gnu- build/arm64/out/m5
 
 ### 让我们使用 `m5_work_begin` 和 `m5_work_end` 来注释工作负载
 
-在 `materials/02-Using-gem5/03-running-in-gem5/02-annotate-this` 目录中，有一个名为 [02-annotate-this.cpp](../../materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/02-annotate-this.cpp) 的工作负载源文件和一个 [Makefile](../../materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/Makefile)。
+在 `materials/02-Using-gem5/03-running-in-gem5/02-annotate-this` 目录中，有一个名为 [02-annotate-this.cpp](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/02-annotate-this.cpp) 的工作负载源文件和一个 [Makefile](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/Makefile)。
 
 工作负载主要做两件事：
 
@@ -263,7 +263,7 @@ std::cout<<std::endl;
 
 ## 02-annotate-this
 
-对于步骤 4，我们可以修改 [Makefile](../../materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/Makefile) 使其运行
+对于步骤 4，我们可以修改 [Makefile](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/02-annotate-this/Makefile) 使其运行
 
 ```Makefile
 $(GXX) -o 02-annotate-this 02-annotate-this.cpp \
@@ -308,7 +308,7 @@ Illegal instruction (core dumped)
 2. Have people to add a workbegin handler and a workend handler that uses debug.flags["ExecAll] to enable and disable debug flag to see the execution trace of the syscall.
 3. Point out that SE mode do not time the syscall and it can read/write the host directory -->
 
-首先，让我们看看默认行为是什么。进入文件夹 `materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE` 并使用以下命令运行 [03-run-x86-SE.py](../../materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/03-run-x86-SE.py)：
+首先，让我们看看默认行为是什么。进入文件夹 `materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE` 并使用以下命令运行 [03-run-x86-SE.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/03-run-x86-SE.py)：
 
 ```bash
 gem5 -re 03-run-x86-SE.py
@@ -338,7 +338,7 @@ warn: No behavior was set by the user for work end. Default behavior is dumping 
 
 ## 03-run-x86-SE
 
-让我们添加自定义的 workbegin 和 workend 处理程序，并使用 `Simulator` 参数中的 `on_exit_event` 参数来覆盖默认行为。为此，将以下内容添加到 [03-run-x86-SE.py](../../materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/03-run-x86-SE.py) 中：
+让我们添加自定义的 workbegin 和 workend 处理程序，并使用 `Simulator` 参数中的 `on_exit_event` 参数来覆盖默认行为。为此，将以下内容添加到 [03-run-x86-SE.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/03-run-x86-SE.py) 中：
 
 ```python
 # define a workbegin handler
@@ -377,7 +377,7 @@ def workend_handler():
 gem5 -re 03-run-x86-SE.py
 ```
 
-现在，我们将在 [materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/m5out/simout.txt](../../materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/m5out/simout.txt) 中看到以下内容
+现在，我们将在 [materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/m5out/simout.txt](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/03-run-x86-SE/m5out/simout.txt) 中看到以下内容
 
 ```bash
 3757178000: board.processor.cores.core: A0 T0 : 0x7ffff7c82572 @_end+140737350460442    :   syscall                  : IntAlu :   flags=()
@@ -666,7 +666,7 @@ class RandomGenerator(AbstractGenerator):
 ### 让我们运行一个关于如何使用流量生成器的示例
 
 打开以下文件。
-[`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py`](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py)
+[`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py)
 
 步骤：
 
@@ -681,7 +681,7 @@ class RandomGenerator(AbstractGenerator):
 
 转到右侧的代码部分。
 
-现在，我们已经设置了一个具有私有 L1 共享 L2 缓存层次结构的板（转到 [`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/cache_hierarchy.py`](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/cache_hierarchy.py) 查看其构造方式），以及一个单通道内存系统。
+现在，我们已经设置了一个具有私有 L1 共享 L2 缓存层次结构的板（转到 [`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/cache_hierarchy.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/cache_hierarchy.py) 查看其构造方式），以及一个单通道内存系统。
 
 在 `memory = SingleChannelDDR3_1600()` 下方立即添加流量生成器，使用以下行。
 
@@ -902,7 +902,7 @@ gem5 在其标准库中有很多工具，但如果您想在研究中模拟特定
 让我们开始查看代码！
 
 确保您已打开以下文件。
-[`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/hybrid_generator.py`](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/hybrid_generator.py)
+[`materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/hybrid_generator.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/hybrid_generator.py)
 
 在右侧，您将看到 `HybridGenerator` 的构造函数。
 
@@ -945,7 +945,7 @@ class HybridGenerator(AbstractGenerator):
 
 在 gem5 中，返回核心列表的方法通常命名为 `_create_cores`。
 
-如果您查看我们的文件 [`hybrid_generator.py`](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/hybrid_generator.py)，您会看到这个名为 `_create_cores` 的方法。
+如果您查看我们的文件 [`hybrid_generator.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/components/hybrid_generator.py)，您会看到这个名为 `_create_cores` 的方法。
 
 ---
 
@@ -1112,7 +1112,7 @@ for i in range(num_random_cores):
 return core_list
 ```
 
-现在，打开文件 [materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py](../../materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py)。
+现在，打开文件 [materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/03-running-in-gem5/06-traffic-gen/simple-traffic-generators.py)。
 
 让我们用 `HybridGenerator` 替换我们的 `LinearGenerator`。
 

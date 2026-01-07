@@ -107,7 +107,7 @@ def _setup_board(self) -> None:
 ### 01-annotate-this
 
 材料位于 [materials/02-Using-gem5/08-accelerating-simulation/01-annotate-this](/materials/02-Using-gem5/08-accelerating-simulation/01-annotate-this/)。
-[`01-annotate-this.cpp`](../../materials/02-Using-gem5/08-accelerating-simulation/01-annotate-this/01-annotate-this.cpp) 是我们在 [03-running-in-gem5](03-running-in-gem5.md) 中使用的相同工作负载，但这次我们需要使用地址版本的 m5ops 来注释它。
+[`01-annotate-this.cpp`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/08-accelerating-simulation/01-annotate-this/01-annotate-this.cpp) 是我们在 [03-running-in-gem5](03-running-in-gem5.md) 中使用的相同工作负载，但这次我们需要使用地址版本的 m5ops 来注释它。
 
 我们首先需要从 m5ops 库中获取所需的函数。
 
@@ -190,7 +190,7 @@ def _setup_board(self) -> None:
 1. 将 **`gem5/util/m5/src`** 添加到编译器的包含搜索路径
 2. 添加 `-no-pie` 以不生成位置无关的可执行文件
 
-For our [Makefile](../../materials/02-Using-gem5/08-accelerating-simulation/01-annotate-this/Makefile), we have the following compiler command:
+For our [Makefile](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/08-accelerating-simulation/01-annotate-this/Makefile), we have the following compiler command:
 
 ```Makefile
 $(GXX) -o 01-annotate-this 01-annotate-this.cpp -no-pie \
@@ -246,7 +246,7 @@ board.set_workload(obtain_resource("npb-ep-a"))
 
 所有材料都可以在 [materials/02-Using-gem5/08-accelerating-simulation/02-kvm-time](/materials/02-Using-gem5/08-accelerating-simulation/02-kvm-time) 中找到。
 
-我们将编辑 [`02-kvm-time.py`](../../materials/02-Using-gem5/08-accelerating-simulation/02-kvm-time/02-kvm-time.py)
+我们将编辑 [`02-kvm-time.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/08-accelerating-simulation/02-kvm-time/02-kvm-time.py)
 
 ### 目标
 
@@ -528,7 +528,7 @@ simTicks                                   1000000000
 ## 03-checkpoint-and-restore
 
 所有材料都可以在 [materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore](/materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore) 下找到。
-我们将首先编辑 [`03-take-a-checkpoint.py`](../../materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-take-a-checkpoint.py) 以创建检查点。我们将其称为检查点脚本。
+我们将首先编辑 [`03-take-a-checkpoint.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-take-a-checkpoint.py) 以创建检查点。我们将其称为检查点脚本。
 
 在检查点脚本中，让我们首先为系统提供最简单的缓存层次结构，即根本没有缓存。
 
@@ -632,7 +632,7 @@ Simulation Done
 
 我们将使用与 02-kvm-time 中完全相同的系统来恢复我们刚刚创建的检查点。
 
-恢复脚本是 [`materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-restore-the-checkpoint.py`](../../materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-restore-the-checkpoint.py)。
+恢复脚本是 [`materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-restore-the-checkpoint.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-restore-the-checkpoint.py)。
 
 我们可以将检查点的路径作为参数传递给 `simulator` 对象。
 我们也可以使用 `board` 对象传递路径。更多详细信息可以在[这里](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/boards/kernel_disk_workload.py#L142)找到。
@@ -660,9 +660,9 @@ simulator.run(1_000_000_000)
 
 为此，我们需要使用不带参数的 `simulator.run()` 和一个 workend 退出事件处理程序。可以在 [`gem5/configs/example/gem5_library/x86-npb-benchmarks.py`](/gem5/configs/example/gem5_library/x86-npb-benchmarks.py) 找到一个示例。
 
-除了 `simulator` 和 `processor` 是不可切换的 SimpleProcessor 之外，其他所有内容都与我们在 [`02-kvm-time.py`](../../materials/02-Using-gem5/08-accelerating-simulation/02-kvm-time/02-kvm-time.py) 中使用的脚本相同。
+除了 `simulator` 和 `processor` 是不可切换的 SimpleProcessor 之外，其他所有内容都与我们在 [`02-kvm-time.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/08-accelerating-simulation/02-kvm-time/02-kvm-time.py) 中使用的脚本相同。
 
-我们可以运行此[恢复脚本](../../materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-restore-the-checkpoint.py)
+我们可以运行此[恢复脚本](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-restore-the-checkpoint.py)
 
 ```bash
 gem5 -re --outdir=restore-m5-out 03-restore-the-checkpoint.py
@@ -672,7 +672,7 @@ gem5 -re --outdir=restore-m5-out 03-restore-the-checkpoint.py
 
 ## 03-checkpoint-and-restore
 
-模拟完成后，我们应该在 [`simerr.txt`](../../materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/restore-m5-out/simerr.txt) 中看到
+模拟完成后，我们应该在 [`simerr.txt`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/restore-m5-out/simerr.txt) 中看到
 
 ```bash
 src/sim/simulate.cc:199: info: Entering event queue @ 14788319800411.  Starting simulation...
@@ -682,7 +682,7 @@ build/ALL/arch/x86/generated/exec-ns.cc.inc:27: warn: instruction 'verw_Mw_or_Rv
 
 与从头开始的模拟不同，恢复检查点的模拟将从创建检查点时的 Tick 开始。
 
-如果我们在检查点文件夹下的 [`m5.cpt`](../../materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-cpt/m5.cpt) 文件中搜索 `curTick`，我们将看到创建检查点时的 Tick。它可能与这里显示的示例不完全相同，因为 KVM 会给 Ticks 带来变化，但恢复模拟中的起始 Tick 应该与 `m5.cpt` 文件中的 `curTick` 匹配。
+如果我们在检查点文件夹下的 [`m5.cpt`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-cpt/m5.cpt) 文件中搜索 `curTick`，我们将看到创建检查点时的 Tick。它可能与这里显示的示例不完全相同，因为 KVM 会给 Ticks 带来变化，但恢复模拟中的起始 Tick 应该与 `m5.cpt` 文件中的 `curTick` 匹配。
 
 ```bash
 curTick=14788319800411

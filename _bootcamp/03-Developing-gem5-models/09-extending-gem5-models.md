@@ -336,14 +336,14 @@ scons build/X86/gem5.fast -j$(nproc)
 
 ## 01-local-inst-tracker
 
-构建完成后，我们可以使用 [materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/simple-sim.py](../../materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/simple-sim.py) 测试我们的 `LocalInstTracker`
+构建完成后，我们可以使用 [materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/simple-sim.py](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/simple-sim.py) 测试我们的 `LocalInstTracker`
 
 ```bash
 cd /workspaces/2024/materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker
 /workspaces/2024/gem5/build/X86/gem5.fast -re --outdir=simple-sim-m5out simple-sim.py
 ```
 
-此 SE 脚本运行一个简单的 openmp 工作负载，对数字数组求和。此工作负载的源代码可以在 [materials/03-Developing-gem5-models/09-extending-gem5-models/simple-omp-workload/simple_workload.c](../../materials/03-Developing-gem5-models/09-extending-gem5-models/simple-omp-workload/simple_workload.c) 中找到。
+此 SE 脚本运行一个简单的 openmp 工作负载，对数字数组求和。此工作负载的源代码可以在 [materials/03-Developing-gem5-models/09-extending-gem5-models/simple-omp-workload/simple_workload.c](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/09-extending-gem5-models/simple-omp-workload/simple_workload.c) 中找到。
 
 ```c
 m5_work_begin(0, 0);
@@ -696,7 +696,7 @@ scons build/X86/gem5.fast -j$(nproc)
 
 ## 02-global-inst-tracker
 
-在 [materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/simple-sim.py](../../materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/simple-sim.py) 中有一个简单的 SE 脚本。
+在 [materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/simple-sim.py](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/simple-sim.py) 中有一个简单的 SE 脚本。
 
 我们可以使用以下命令测试我们的 `GlobalInstTracker`
 
@@ -737,7 +737,7 @@ for core in processor.get_cores():
 此外，我们在 workbegin 时重置统计信息，以便我们可以验证 `GlobalInstTracker` 是否真正完成了它的工作。
 
 如果仿真完成，我们可以统计统计信息。
-有一个辅助 Python 文件 [materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/count_commited_inst.py](../../materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/count_commited_inst.py)，可以帮助我们轻松计算所有 8 个核心的总已提交指令数。
+有一个辅助 Python 文件 [materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/count_commited_inst.py](https://github.com/gem5bootcamp/2024/blob/main/materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/count_commited_inst.py)，可以帮助我们轻松计算所有 8 个核心的总已提交指令数。
 
 让我们运行它
 ```python

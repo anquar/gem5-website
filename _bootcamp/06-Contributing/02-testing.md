@@ -276,7 +276,7 @@ TestUID:tests/gem5/m5_util/test_exit.py:m5_exit_test-ALL-x86_64-opt:m5_exit_test
 
 ## 练习：创建 TestLib 测试
 
-转到 [materials/06-Contributing/02-testing/01-testlib-example](../../materials/06-Contributing/)。
+转到 [materials/06-Contributing/02-testing/01-testlib-example](https://github.com/gem5bootcamp/2024/blob/main/materials/06-Contributing/)。
 
 将 "01-testlib-example" 移动到 gem5 仓库中的 "tests/gem5/"。
 

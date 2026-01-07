@@ -37,7 +37,7 @@ _如果不是使用多线程的单一 gem5 进程，为什么不使用多个 gem
 
 ## 人们已经在这样做...某种程度上...
 
-前往 [`materials/02-Using-gem5/11-multisim/01-multiprocessing-via-script`](../../materials/02-Using-gem5/11-multisim/01-multiprocessing-via-script/) 目录查看一个完整的示例，展示如何**不**运行多个 gem5 进程。
+前往 [`materials/02-Using-gem5/11-multisim/01-multiprocessing-via-script`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/11-multisim/01-multiprocessing-via-script/) 目录查看一个完整的示例，展示如何**不**运行多个 gem5 进程。
 
 这是典型的做法，但不推荐。
 
@@ -89,7 +89,7 @@ _如果不是使用多线程的单一 gem5 进程，为什么不使用多个 gem
 
 ## 让我们看一个例子
 
-首先打开 [`materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py`](../../materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py)。
+首先打开 [`materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py)。
 
 此配置脚本与上一个示例中的脚本几乎相同，但移除了 argparse 代码并添加了 multisim 导入：
 
@@ -117,7 +117,7 @@ for data_cache_size in ["8kB","16kB"]:
         )
 ```
 
-用此代码替换 [`multisim-experiment.py`](../../materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py) 中的缓存层次结构，并缩进缓存层次结构之后的代码，使其全部位于内部 for 循环（`for instruction_cache_size ...`）内。
+用此代码替换 [`multisim-experiment.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/11-multisim/02-multiprocessing-via-multisim/multisim-experiment.py) 中的缓存层次结构，并缩进缓存层次结构之后的代码，使其全部位于内部 for 循环（`for instruction_cache_size ...`）内。
 
 ---
 
@@ -142,7 +142,7 @@ multisim.add_simulator(
 
 ## 执行多个模拟
 
-可以在 [`materials/02-Using-gem5/11-multisim/completed/02-multiprocessing-via-multisim/multisim-experiment.py`](../../materials/02-Using-gem5/11-multisim/completed/02-multiprocessing-via-multisim/multisim-experiment.py) 找到完整的示例。
+可以在 [`materials/02-Using-gem5/11-multisim/completed/02-multiprocessing-via-multisim/multisim-experiment.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/11-multisim/completed/02-multiprocessing-via-multisim/multisim-experiment.py) 找到完整的示例。
 
 ```shell
 cd /workspaces/2024/materials/02-Using-gem5/11-multisim/completed/02-multiprocessing-via-multisim

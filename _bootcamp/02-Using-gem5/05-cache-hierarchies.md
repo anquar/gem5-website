@@ -98,7 +98,7 @@ gem5 中有两种缓存模型：
 
 ## 步骤 1：声明层次结构
 
-打开 [`materials/02-Using-gem5/05-cache-hierarchies/three_level.py`](../../materials/02-Using-gem5/05-cache-hierarchies/three_level.py)
+打开 [`materials/02-Using-gem5/05-cache-hierarchies/three_level.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/05-cache-hierarchies/three_level.py)
 
 构造函数已经提供。
 
@@ -289,7 +289,7 @@ if board.has_coherent_io():
 
 ## 测试我们的缓存层次结构
 
-参见 [`materials/02-Using-gem5/05-cache-hierarchies/test-cache.py`](../../materials/02-Using-gem5/05-cache-hierarchies/test-cache.py)。
+参见 [`materials/02-Using-gem5/05-cache-hierarchies/test-cache.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/05-cache-hierarchies/test-cache.py)。
 
 运行测试脚本以查看缓存层次结构是否正常工作。
 
@@ -402,7 +402,7 @@ parallel_for (int i=0; i < length; i++) {
 
 我们可以使用 Ruby 来查看这些实现之间缓存行为的差异。
 
-运行脚本 [`materials/02-Using-gem5/05-cache-hierarchies/ruby-example/run.py`](../../materials/02-Using-gem5/05-cache-hierarchies/test-ruby.py)。
+运行脚本 [`materials/02-Using-gem5/05-cache-hierarchies/ruby-example/run.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/05-cache-hierarchies/test-ruby.py)。
 
 ```bash
 gem5-mesi --outdir=m5out/naive run.py naive

@@ -105,7 +105,7 @@ gem5 mysim.py
 
 ## 基本类型：整数
 
-[`materials/01-Introduction/03-python-background/02-primitives-int.py`](../../materials/01-Introduction/03-python-background/02-primitives-int.py) 可以用作基本整数用法的参考。
+[`materials/01-Introduction/03-python-background/02-primitives-int.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/02-primitives-int.py) 可以用作基本整数用法的参考。
 本教程将涵盖基础知识。
 
 ### 声明整数
@@ -137,7 +137,7 @@ print(f"a: {a}, b: {b}, c: {c}, d: {d}")
 
 ## 基本类型：浮点数
 
-[`materials/01-Introduction/03-python-background/03-primitives-float.py`](../../materials/01-Introduction/03-python-background/03-primitives-float.py) 可以用作基本浮点数用法的参考。
+[`materials/01-Introduction/03-python-background/03-primitives-float.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/03-primitives-float.py) 可以用作基本浮点数用法的参考。
 
 ### 声明浮点数
 
@@ -180,7 +180,7 @@ print(f"Value of div_xy: {div_xy}")
 
 ## 基本类型：字符串
 
-[`materials/01-Introduction/03-python-background/04-primitives-string.py`](../../materials/01-Introduction/03-python-background/04-primitives-string.py) 可以用作基本字符串用法的参考。
+[`materials/01-Introduction/03-python-background/04-primitives-string.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/04-primitives-string.py) 可以用作基本字符串用法的参考。
 
 字符串是 Python 中的基本数据类型。它们是字符序列，声明方式如下。这里我们声明一个变量 `x` 并将其赋值为字面值 `"Hello World!"`。
 
@@ -216,7 +216,7 @@ print(z)
 
 ## 基本类型：布尔值
 
-[`materials/01-Introduction/03-python-background/05-primitives-bool.py`](../../materials/01-Introduction/03-python-background/05-primitives-bool.py) 可以用作基本布尔值用法的参考。
+[`materials/01-Introduction/03-python-background/05-primitives-bool.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/05-primitives-bool.py) 可以用作基本布尔值用法的参考。
 
 布尔值是 Python 中的基本数据类型。它们是 "True" 或 "False"，声明方式如下。这里我们声明一个变量 `x` 并将其赋值为字面值 `True`。
 
@@ -289,7 +289,7 @@ Python 有许多内置的集合类型，但最常用的是列表、字典和集�
 a_list = [1, 1, 2]
 ```
 
-更多关于列表的内容可以在 [`materials/01-Introduction/03-python-background/06-collections-list.py`](../../materials/01-Introduction/03-python-background/06-collections-list.py) 找到
+更多关于列表的内容可以在 [`materials/01-Introduction/03-python-background/06-collections-list.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/06-collections-list.py) 找到
 
 ### 集合
 
@@ -300,7 +300,7 @@ a_list = [1, 1, 2]
 a_set = {"one", "two", "three", "four", "five"}
 ```
 
-更多关于集合的示例可以在 [`materials/01-Introduction/03-python-background/07-collections-set.py`](../../materials/01-Introduction/03-python-background/07-collections-set.py) 找到。
+更多关于集合的示例可以在 [`materials/01-Introduction/03-python-background/07-collections-set.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/07-collections-set.py) 找到。
 
 ---
 
@@ -312,7 +312,7 @@ a_set = {"one", "two", "three", "four", "five"}
 a_dict = {1: "one", 2: "two"}
 ```
 
-更多关于字典的示例可以在 [`materials/01-Introduction/03-python-background/08-collections-dict.py`](../../materials/01-Introduction/03-python-background/08-collections-dict.py) 找到。
+更多关于字典的示例可以在 [`materials/01-Introduction/03-python-background/08-collections-dict.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/08-collections-dict.py) 找到。
 
 ---
 
@@ -464,7 +464,7 @@ else:
     print("The condition is False")
 ```
 
-[`materials/01-Introduction/03-python-background/09-if-statements.py`](../../materials/01-Introduction/03-python-background/09-if-statements.py) 可以用作基本 `if` 用法的参考。
+[`materials/01-Introduction/03-python-background/09-if-statements.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/09-if-statements.py) 可以用作基本 `if` 用法的参考。
 
 - Python 不使用大括号来定义代码块。相反，它使用缩进。
 - `print` 语句被缩进以显示它们是 `if` 块的一部分（例如，"The condition is True" `print` 只有在 `condition` 为 `True` 时才会执行）。
@@ -484,7 +484,7 @@ for value in [1, 2, 3]:
 
 同样，`print` 语句被缩进以显示它是 `for` 的一部分。
 
-[`materials/01-Introduction/03-python-background/10-for-loops.py`](../../materials/01-Introduction/03-python-background/10-for-loops.py) 可以用作基本 `for` 用法的参考。
+[`materials/01-Introduction/03-python-background/10-for-loops.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/10-for-loops.py) 可以用作基本 `for` 用法的参考。
 
 ---
 
@@ -499,7 +499,7 @@ while counter < 3:
     counter += 1
 ```
 
-[`materials/01-Introduction/03-python-background/11-while-loop.py`](../../materials/01-Introduction/03-python-background/11-while-loop.py) 可以用作基本 `while` 用法的参考。
+[`materials/01-Introduction/03-python-background/11-while-loop.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/11-while-loop.py) 可以用作基本 `while` 用法的参考。
 
 > **注意：** `counter += 1` 行是 `counter = counter + 1` 的简写。
 这会将计数器值设置为当前计数器值加 1。例如，
@@ -532,7 +532,7 @@ def my_function(arg1: int, arg2: int) -> int:
 
 我们强烈建议在函数中使用类型提示。这提高了代码可读性并有助于捕获错误。
 
-[`materials/01-Introduction/03-python-background/12-function.py`](../../materials/01-Introduction/03-python-background/12-function.py) 可以用作基本函数用法的参考。
+[`materials/01-Introduction/03-python-background/12-function.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/12-function.py) 可以用作基本函数用法的参考。
 
 > 幻灯片中的示例以及大部分材料都不使用类型提示以节省空间。这不是推荐的做法。
 
@@ -575,7 +575,7 @@ print(multiply(3,3))
 from math_dir.math_funcs import add, subtract, multiply
 ```
 
-完整和扩展的示例可以在 [`13-importing-code.py`](../../materials/01-Introduction/03-python-background/13-importing-code.py) 找到。
+完整和扩展的示例可以在 [`13-importing-code.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/13-importing-code.py) 找到。
 
 ---
 
@@ -629,7 +629,7 @@ gem5 利用面向对象设计 (OOD) 来建模计算机系统的组件。这是�
 
 ## Python 中的基本面向对象设计
 
-此示例的代码可以在 [`materials/01-Introduction/03-python-background/14-basic-class-and-object.py`](../../materials/01-Introduction/03-python-background/14-basic-class-and-object.py) 找到。
+此示例的代码可以在 [`materials/01-Introduction/03-python-background/14-basic-class-and-object.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/14-basic-class-and-object.py) 找到。
 
 让我们创建一个简单的类和一些对象实例化。
 
@@ -733,7 +733,7 @@ feed_animal(cat)
 
 ## 继承示例
 
-此部分的代码可以在 [`materials/01-Introduction/03-python-background/15-inheritance.py`](../../materials/01-Introduction/03-python-background/15-inheritance.py) 找到
+此部分的代码可以在 [`materials/01-Introduction/03-python-background/15-inheritance.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/15-inheritance.py) 找到
 
 ```python
 class Elephant(Animal):
@@ -835,7 +835,7 @@ Python 中的 `abc` 模块提供了可以继承以创建抽象基类的 `ABC` �
 
 ## 抽象类示例
 
-此部分的代码可以在 [`materials/01-Introduction/03-python-background/16-inheritance-with-abstract-base.py`](../..//materials/01-Introduction/03-python-background/16-inheritance-with-abstract-base.py) 找到
+此部分的代码可以在 [`materials/01-Introduction/03-python-background/16-inheritance-with-abstract-base.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/16-inheritance-with-abstract-base.py) 找到
 
 ```python
 from abc import ABC, abstractmethod
@@ -951,7 +951,7 @@ gem5 理想情况下应该**对扩展开放但对修改封闭**。
 以下显示了特化 gem5 SimObject 以创建抽象
 L1 缓存的示例。然后将其用作 L1 指令缓存的基类。
 
-以下示例的代码也可以在 [`materials/01-Introduction/03-python-background/17-inheriting-from-a-simobject.py`](../../materials/01-Introduction/03-python-background/17-inheriting-from-a-simobject.py) 找到
+以下示例的代码也可以在 [`materials/01-Introduction/03-python-background/17-inheriting-from-a-simobject.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/01-Introduction/03-python-background/17-inheriting-from-a-simobject.py) 找到
 
 ---
 

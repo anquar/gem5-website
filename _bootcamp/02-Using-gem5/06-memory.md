@@ -14,12 +14,12 @@ DRAM 和其他内存设备！
 
 <!-- _class: center-image -->
 
-## Memory System
+## 内存系统
 
-### gem5's memory system consists of two main components
+### gem5 的内存系统由两个主要组件组成
 
-1. Memory Controller
-2. Memory Interface(s)
+1. 内存控制器
+2. 内存接口
 
 ![Diagram of the gem5 memory system](/bootcamp/02-Using-gem5/06-memory-imgs/memory-system.drawio.svg)
 
@@ -27,12 +27,12 @@ DRAM 和其他内存设备！
 
 <!-- _class: center-image -->
 
-## Memory Controller
+## 内存控制器
 
-### When `MemCtrl` receives packets...
+### 当 `MemCtrl` 接收到数据包时...
 
-1. Packets enqueued into the read and/or write queues
-2. Applies **scheduling algorithm** (FCFS, FR-FCFS, ...) to issue read and write requests
+1. 数据包被排入读队列和/或写队列
+2. 应用**调度算法**（FCFS、FR-FCFS 等）来发出读写请求
 
 ![Diagram of the gem5 memory controller queues](/bootcamp/02-Using-gem5/06-memory-imgs/memory-controller-queues.drawio.svg)
 
@@ -40,10 +40,10 @@ DRAM 和其他内存设备！
 
 <!-- _class: center-image -->
 
-## Memory Interface
+## 内存接口
 
-- The memory interface implements the **architecture** and **timing parameters** of the chosen memory type.
-- It manages the **media specific operations** like activation, pre-charge, refresh and low-power modes, etc.
+- 内存接口实现了所选内存类型的**架构**和**时序参数**。
+- 它管理**介质特定的操作**，如激活、预充电、刷新和低功耗模式等。
 
 ![Diagram of the gem5 memory interface](/bootcamp/02-Using-gem5/06-memory-imgs/memory-interface.drawio.svg)
 
@@ -51,7 +51,7 @@ DRAM 和其他内存设备！
 
 <!-- _class: center-image -->
 
-## gem5's Memory Controllers
+## gem5 的内存控制器
 
 ![Hierarchy of gem5 memory controller classes](/bootcamp/02-Using-gem5/06-memory-imgs/memory-controller-classes.drawio.svg)
 
@@ -59,57 +59,57 @@ DRAM 和其他内存设备！
 
 <!-- _class: center-image -->
 
-## gem5's Memory Interfaces
+## gem5 的内存接口
 
 ![Hierarchy of gem5 memory interface classes](/bootcamp/02-Using-gem5/06-memory-imgs/memory-interface-classes.drawio.svg)
 
 ---
 
-## How the memory model works
+## 内存模型的工作原理
 
-- The memory controller is responsible for scheduling and issuing read and write requests
-- It obeys the timing parameters of the memory interface
-  - `tCAS`, `tRAS`, etc. are tracked *per bank* in the memory interface
-  - Use gem5 *events* ([more later](../03-Developing-gem5-models/03-event-driven-sim.md)) to schedule when banks are free
+- 内存控制器负责调度和发出读写请求
+- 它遵循内存接口的时序参数
+  - `tCAS`、`tRAS` 等在内存接口中按*每个 bank* 进行跟踪
+  - 使用 gem5 的*事件*（[稍后详述](../03-Developing-gem5-models/03-event-driven-sim.md)）来调度 bank 何时空闲
 
-The model isn't "cycle accurate," but it's *cycle level* and quite accurate compared to other DRAM simulators such as DRAMSim and DRAMSys.
+该模型不是"周期精确的"，但它是*周期级别*的，与 DRAMSim 和 DRAMSys 等其他 DRAM 模拟器相比相当准确。
 
-You can extend the interface for new kinds of memory devices (e.g., DDR6), but usually you will use interfaces that have already been implemented.
+你可以为新型内存设备（例如 DDR6）扩展接口，但通常你会使用已经实现的接口。
 
-The main way gem5's memory is normally configured is the number of channels and the channel/rank/bank/row/column bits since systems rarely use bespoke memory devices.
-
----
-
-## Memory in the standard library
-
-The standard library wraps the DRAM/memory models into `MemorySystem`s.
-
-Many examples are already implemented in the standard library for you.
-
-See [`gem5/src/python/gem5/components/memory/multi_channel.py`](../../gem5/src/python/gem5/components/memory/multi_channel.py) and [`gem5/src/python/gem5/components/memory/single_channel.py`](../../gem5/src/python/gem5/components/memory/single_channel.py) for examples.
-
-Additionally,
-
-- `SimpleMemory()` allows the user to not worry about timing parameters and instead, just give the desired latency, bandwidth, and latency variation.
-- `ChanneledMemory()` encompasses a whole memory system (both the controller and the interface).
-- ChanneledMemory provides a simple way to use multiple memory channels.
-- ChanneledMemory handles things like scheduling policy and interleaving for you.
+gem5 内存通常配置的主要方式是通道数和通道/rank/bank/行/列位数，因为系统很少使用定制内存设备。
 
 ---
 
-## Running an example with the standard library
+## 标准库中的内存
 
-Open [`materials/02-Using-gem5/06-memory/run-mem.py`](../../materials/02-Using-gem5/06-memory/run-mem.py)
+标准库将 DRAM/内存模型封装到 `MemorySystem` 中。
 
-This file uses traffic generators (seen [previously](03-running-in-gem5.md)) to generate memory traffic at 64GiB.
+标准库中已经为你实现了很多示例。
 
-Let's see what happens when we use a simple memory. Add the following line for the memory system.
+请参阅 [`gem5/src/python/gem5/components/memory/multi_channel.py`](../../gem5/src/python/gem5/components/memory/multi_channel.py) 和 [`gem5/src/python/gem5/components/memory/single_channel.py`](../../gem5/src/python/gem5/components/memory/single_channel.py) 作为示例。
+
+此外，
+
+- `SimpleMemory()` 允许用户不必担心时序参数，只需提供所需的延迟、带宽和延迟变化。
+- `ChanneledMemory()` 包含整个内存系统（控制器和接口）。
+- ChanneledMemory 提供了一种使用多个内存通道的简单方法。
+- ChanneledMemory 为你处理调度策略和交错等事务。
+
+---
+
+## 使用标准库运行示例
+
+打开 [`materials/02-Using-gem5/06-memory/run-mem.py`](../../materials/02-Using-gem5/06-memory/run-mem.py)
+
+该文件使用流量生成器（在[之前](03-running-in-gem5.md)见过）在 64GiB 处生成内存流量。
+
+让我们看看使用简单内存时会发生什么。为内存系统添加以下行。
 
 ```python
 memory = SingleChannelSimpleMemory(latency="50ns", bandwidth="32GiB/s", size="8GiB", latency_var="10ns")
 ```
 
-Run with the following. Use `-c <LinearGenerator,RandomGenerator>` to specify the traffic generators and `-r <read percentage>` to specify the percentage of reads.
+使用以下命令运行。使用 `-c <LinearGenerator,RandomGenerator>` 指定流量生成器，使用 `-r <read percentage>` 指定读取百分比。
 
 ```sh
 gem5 run-mem.py
@@ -117,11 +117,11 @@ gem5 run-mem.py
 
 ---
 
-## Vary the latency and bandwidth
+## 改变延迟和带宽
 
-Results for running with 16 GiB/s, 32 GiB/s, 64 GiB/s, and 100% reads and 50% reads.
+使用 16 GiB/s、32 GiB/s、64 GiB/s，以及 100% 读取和 50% 读取的运行结果。
 
-| Bandwidth | Read Percentage | Linear Speed (GB/s) | Random Speed (GB/s) |
+| 带宽 | 读取百分比 | 线性速度 (GB/s) | 随机速度 (GB/s) |
 |-----------|-----------------|---------------------|---------------------|
 | 16 GiB/s  | 100%            | 17.180288           | 17.180288           |
 |           | 50%             | 17.180288           | 17.180288           |
@@ -130,14 +130,14 @@ Results for running with 16 GiB/s, 32 GiB/s, 64 GiB/s, and 100% reads and 50% re
 | 64 GiB/s  | 100%            | 34.351296           | 34.351296           |
 |           | 50%             | 34.351296           | 34.351296           |
 
-With the `SimpleMemory` you don't see any complex behavior in the memory model (but it **is** fast).
+使用 `SimpleMemory` 时，你不会看到内存模型中的任何复杂行为（但它**确实**很快）。
 
 ---
 
-## Running Channeled Memory
+## 运行通道化内存
 
-- Open [`gem5/src/python/gem5/components/memory/single_channel.py`](../../gem5/src/python/gem5/components/memory/single_channel.py)
-- We see `SingleChannel` memories such as:
+- 打开 [`gem5/src/python/gem5/components/memory/single_channel.py`](../../gem5/src/python/gem5/components/memory/single_channel.py)
+- 我们看到 `SingleChannel` 内存，例如：
 
 ```python
 def SingleChannelDDR4_2400(
@@ -149,53 +149,53 @@ def SingleChannelDDR4_2400(
     return ChanneledMemory(DDR4_2400_8x8, 1, 64, size=size)
 ```
 
-- We see the `DRAMInterface=DDR4_2400_8x8`, the number of channels=1, interleaving_size=64, and the size.
+- 我们看到 `DRAMInterface=DDR4_2400_8x8`，通道数=1，交错大小=64，以及大小。
 
 ---
 
-## Running Channeled Memory
+## 运行通道化内存
 
-- Lets go back to our script and replace the SingleChannelSimpleMemory with this!
+- 让我们回到脚本，用这个替换 SingleChannelSimpleMemory！
 
-Replace
+替换
 
 ```python
 SingleChannelSimpleMemory(latency="50ns", bandwidth="32GiB/s", size="8GiB", latency_var="10ns")
 ```
 
-with
+为
 
 ```python
 SingleChannelDDR4_2400()
 ```
 
-### Let's see what happens when we run our test
+### 让我们看看运行测试时会发生什么
 
 ---
 
-## Vary the latency and bandwidth
+## 改变延迟和带宽
 
-Results for running with 16 GiB/s, 32 GiB/s, and 100% reads and 50% reads.
+使用 16 GiB/s、32 GiB/s，以及 100% 读取和 50% 读取的运行结果。
 
-| Bandwidth | Read Percentage | Linear Speed (GB/s) | Random Speed (GB/s) |
+| 带宽 | 读取百分比 | 线性速度 (GB/s) | 随机速度 (GB/s) |
 |-----------|-----------------|---------------------|---------------------|
 | 16 GiB/s  | 100%            | 13.85856            | 14.557056           |
 |           | 50%             | 13.003904           | 13.811776           |
 | 32 GiB/s  | 100%            | 13.85856            | 14.541312           |
 |           | 50%             | 13.058112           | 13.919488           |
 
-As expected, because of read-to-write turn around, reading 100% is more efficient than 50% reads.
-Also as expected, the bandwidth is lower than the SimpleMemory (only about 75% utilization).
+正如预期的那样，由于读转写的转换，100% 读取比 50% 读取更高效。
+同样如预期，带宽低于 SimpleMemory（仅约 75% 利用率）。
 
-Somewhat surprising, the memory modeled has enough banks to handle random traffic efficiently.
+有点令人惊讶的是，建模的内存有足够的 bank 来高效处理随机流量。
 
 ---
 
-## Adding a new channeled memory
+## 添加新的通道化内存
 
-- Open [`materials/02-Using-gem5/06-memory/lpddr2.py`](../../materials/02-Using-gem5/06-memory/lpddr2.py)
-- If we wanted to add LPDDR2 as a new memory in the standard library, we first make sure there's a DRAM interface for it in the [`dram_interfaces` directory](../../gem5/src/python/gem5/components/memory/dram_interfaces/lpddr2.py)
-- Then we need to make sure we import it by adding the following to the top of your `lpddr2.py`:
+- 打开 [`materials/02-Using-gem5/06-memory/lpddr2.py`](../../materials/02-Using-gem5/06-memory/lpddr2.py)
+- 如果我们想在标准库中添加 LPDDR2 作为新内存，我们首先确保在 [`dram_interfaces` 目录](../../gem5/src/python/gem5/components/memory/dram_interfaces/lpddr2.py)中有它的 DRAM 接口
+- 然后我们需要通过在 `lpddr2.py` 的顶部添加以下内容来确保导入它：
 ```python
 from gem5.components.memory.abstract_memory_system import AbstractMemorySystem
 from gem5.components.memory.dram_interfaces.lpddr2 import LPDDR2_S4_1066_1x32
@@ -205,9 +205,9 @@ from typing import Optional
 
 ---
 
-## Adding a new channeled memory
+## 添加新的通道化内存
 
-Then add the following to the body of `lpddr2.py`:
+然后在 `lpddr2.py` 的主体中添加以下内容：
 
 ```python
 def SingleChannelLPDDR2(
@@ -216,33 +216,33 @@ def SingleChannelLPDDR2(
     return ChanneledMemory(LPDDR2_S4_1066_1x32, 1, 64, size=size)
 ```
 
-Then we import this new class to our script with:
+然后我们通过以下方式将此类导入到脚本中：
 
 ```python
 from lpddr2 import SingleChannelLPDDR2
 ```
 
-### Let's test this again!
+### 让我们再次测试这个！
 
 ---
 
-## Vary the latency and bandwidth
+## 改变延迟和带宽
 
-Results for running with 16 GiB/s, and 100% reads and 50% reads.
+使用 16 GiB/s，以及 100% 读取和 50% 读取的运行结果。
 
-| Bandwidth | Read Percentage | Linear Speed (GB/s) | Random Speed (GB/s) |
+| 带宽 | 读取百分比 | 线性速度 (GB/s) | 随机速度 (GB/s) |
 |-----------|-----------------|---------------------|---------------------|
 | 16 GiB/s  | 100%            | 4.089408            | 4.079552            |
 |           | 50%             | 3.65664             | 3.58816             |
 
-LPDDR2 doesn't perform as well as DDR4.
+LPDDR2 的性能不如 DDR4。
 
 ---
 
 ## CommMonitor
 
-- SimObject monitoring communication happening between two ports
-- Does not have any effect on timing
+- 监控两个端口之间通信的 SimObject
+- 对时序没有任何影响
 - [`gem5/src/mem/CommMonitor.py`](../../gem5/src/mem/CommMonitor.py)
 
 ---
@@ -251,14 +251,14 @@ LPDDR2 doesn't perform as well as DDR4.
 
 ## CommMonitor
 
-### Simple system to modify
+### 要修改的简单系统
 
 ![Simple system diagram](/bootcamp/02-Using-gem5/06-memory-imgs/comm-monitor-0.drawio.svg)
 
-### Let's simulate:
+### 让我们进行模拟：
 
 <!-- >    > gem5-x86 –outdir=results/simple materials/extra-topics/02-monitor-and-trace/simple.py -->
-Run
+运行
 
 ```sh
 gem5 comm_monitor.py
@@ -270,7 +270,7 @@ gem5 comm_monitor.py
 
 ## CommMonitor
 
-### Let's add the CommMonitor
+### 让我们添加 CommMonitor
 
 ![Simple system with CommMonitor diagram](/bootcamp/02-Using-gem5/06-memory-imgs/comm-monitor-1.drawio.svg)
 
@@ -283,62 +283,62 @@ gem5 comm_monitor.py
 
 ## CommMonitor
 
-- Remove the line:
+- 删除以下行：
 ```python
 system.l1cache.mem_side = system.membus.cpu_side_ports
 ```
 
-- Add the following block under the comment `# Insert CommMonitor here`:
+- 在注释 `# Insert CommMonitor here` 下添加以下代码块：
 ```python
 system.comm_monitor = CommMonitor()
 system.comm_monitor.cpu_side_port = system.l1cache.mem_side
 system.comm_monitor.mem_side_port = system.membus.cpu_side_ports
 ```
 
-- Run:
+- 运行：
 ```sh
 gem5 comm_monitor.py
 ```
 
 ---
 
-## Address Interleaving
+## 地址交错
 
-### Idea: we can parallelize memory accesses
+### 想法：我们可以并行化内存访问
 
-- For example, we can access multiple banks/channels/etc at the same time
-- Use part of the address as a selector to choose which bank/channel to access
-- Allows contiguous address ranges to interleave between banks/channels
+- 例如，我们可以同时访问多个 bank/通道等
+- 使用地址的一部分作为选择器来选择要访问的 bank/通道
+- 允许连续地址范围在 bank/通道之间交错
 
 ---
 
 <!-- _class: center-image -->
 
-## Address Interleaving
+## 地址交错
 
-### For example...
+### 例如...
 
 ![Diagram showing an example of address interleaving](/bootcamp/02-Using-gem5/06-memory-imgs/address-interleaving.drawio.svg)
 
 ---
 
-## Address Interleaving
+## 地址交错
 
-### Using address interleaving in gem5
+### 在 gem5 中使用地址交错
 
-- We can use AddrRange constructors to define a selector function
+- 我们可以使用 AddrRange 构造函数来定义选择器函数
   - [`src/base/addr_range.hh`](../../gem5/src/base/addr_range.hh)
 
-- Example: standard library's multi-channel memory
+- 示例：标准库的多通道内存
   - [`gem5/src/python/gem5/components/memory/multi_channel.py`](../../gem5/src/python/gem5/components/memory/multi_channel.py)
 
 ---
 
-## Address Interleaving
+## 地址交错
 
-### There are two constructors
+### 有两个构造函数
 
-Constructor 1:
+构造函数 1：
 
 ```cpp
 AddrRange(Addr _start,
@@ -347,15 +347,15 @@ AddrRange(Addr _start,
           uint8_t _intlv_match)
 ```
 
-`_masks`: an array of masks, where bit `k` of selector is the XOR of all bits specified by `masks[k]`
+`_masks`：掩码数组，其中选择器的第 `k` 位是由 `masks[k]` 指定的所有位的异或
 
 ---
 
-## Address Interleaving
+## 地址交错
 
-### There are two constructors
+### 有两个构造函数
 
-Constructor 2 (legacy):
+构造函数 2（旧版）：
 
 ```cpp
 AddrRange(Addr _start,
@@ -366,7 +366,7 @@ AddrRange(Addr _start,
           uint8_t _intlv_match)
 ```
 
-Selector defined as two ranges:
+选择器定义为两个范围：
 
 ```code
 addr[_intlv_high_bit:_intlv_low_bit] XOR addr[_xor_high_bit:_xor_low_bit]

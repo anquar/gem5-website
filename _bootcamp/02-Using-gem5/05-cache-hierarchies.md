@@ -12,95 +12,95 @@ section: using-gem5
 
 <!-- _class: two-col -->
 
-## Cache Hierarchy in gem5
+## gem5 中的缓存层次结构
 
-One of the main types of components in gem5 is the **cache hierarchy**.
+gem5 中的主要组件类型之一是**缓存层次结构**。
 
-In the standard library, the cache hierarchy has the `Processor` (with multiple cores) on one side and the `Memory` on the other side.
+在标准库中，缓存层次结构一侧是 `Processor`（具有多个核心），另一侧是 `Memory`。
 
-Between the cores and the caches (and the memory controllers and caches) are `Ports`.
+核心和缓存之间（以及内存控制器和缓存之间）是 `Ports`。
 
-**`Ports`** allow models in gem5 to send *Packets* to each other (more on this in [Modeling memory objects in gem5: Ports](../03-Developing-gem5-models/04-ports.md)).
+**`Ports`** 允许 gem5 中的模型相互发送 *Packets*（更多信息请参见 [在 gem5 中建模内存对象：Ports](../03-Developing-gem5-models/04-ports.md)）。
 
 ###
 
-![Placement of the Cache Hierarchy in gem5](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/CPU_CacheHierarchy_MemCtrl.svg)
+![gem5 中缓存层次结构的位置](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/CPU_CacheHierarchy_MemCtrl.svg)
 
 ---
 
-## Types of caches in gem5
+## gem5 中的缓存类型
 
-There are two types of cache models in gem5:
+gem5 中有两种缓存模型：
 
-1. **Classic Cache**: Simplified, faster, and less flexible
-2. **Ruby**: Models cache coherence in detail
+1. **Classic Cache**：简化、快速，但灵活性较低
+2. **Ruby**：详细建模缓存一致性
 
-This is a historical quirk of the combination of *GEMS* which had Ruby and *m5* whose cache model we now call "classic" caches.
+这是 *GEMS*（包含 Ruby）和 *m5*（其缓存模型我们现在称为"classic"缓存）合并的历史遗留问题。
 
-**Ruby** is a highly-detailed model with many different coherence protocols (specified in a language called "SLICC")
-More on Ruby in [Modeling Cache Coherence in gem5](../03-Developing-gem5-models/06-modeling-cache-coherence.md).
+**Ruby** 是一个高度详细的模型，具有许多不同的一致性协议（使用名为"SLICC"的语言指定）
+更多关于 Ruby 的信息请参见 [在 gem5 中建模缓存一致性](../03-Developing-gem5-models/06-modeling-cache-coherence.md)。
 
-**Classic** caches are simpler and faster, but less flexible and detailed. The coherence protocol is not parameterized and the hierarchies and topologies are fixed.
+**Classic** 缓存更简单、更快，但灵活性和详细程度较低。一致性协议不可参数化，层次结构和拓扑结构是固定的。
 
 ---
 
-## Outline
+## 大纲
 
-- Background on cache coherency
+- 缓存一致性背景
 - Simple Cache
-  - Coherency protocol in simple cache
-  - How to use simple cache
-- Ruby cache
-  - Ruby components
-  - Example of MESI two level protocol
+  - Simple cache 中的一致性协议
+  - 如何使用 simple cache
+- Ruby 缓存
+  - Ruby 组件
+  - MESI 两级协议示例
 
 ---
 
-## What is Coherency
+## 什么是一致性
 
-A coherence problem can arise if multiple cores have access to multiple copies of a data (e.g., in multiple caches) and at least one access is a write
+如果多个核心可以访问数据的多个副本（例如，在多个缓存中），并且至少有一个访问是写操作，则可能出现一致性问题
 
-![Cores and Coherency across caches](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/cache_line_1.svg)
-
----
-
-## What is Coherency
-
-A coherence problem can arise if multiple cores have access to multiple copies of a data (e.g., in multiple caches) and at least one access is a write
-
-![Cores and Coherency across caches with write request](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/cache_line_2.svg)
+![核心和跨缓存的一致性](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/cache_line_1.svg)
 
 ---
 
-## What is Coherency
+## 什么是一致性
 
-A coherence problem can arise if multiple cores have access to multiple copies of a data (e.g., in multiple caches) and at least one access is a write
+如果多个核心可以访问数据的多个副本（例如，在多个缓存中），并且至少有一个访问是写操作，则可能出现一致性问题
 
-![Cores and Coherency across caches with write request](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/cache_line_2.svg)
-
----
-
-## Classic Cache: Hierarchy of crossbars
-
-![Categories of Crossbars](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/crossbar.drawio.svg)
+![带有写请求的核心和跨缓存的一致性](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/cache_line_2.svg)
 
 ---
 
-## Classic Cache: Coherent Crossbar
+## 什么是一致性
 
-Each crossbar can connect *n* cpu-side ports and *m* memory-side ports.
+如果多个核心可以访问数据的多个副本（例如，在多个缓存中），并且至少有一个访问是写操作，则可能出现一致性问题
 
-![Example 3 level hierarchy with private L1s, private L2s, and a shared L3 connected to multiple memory channels bg right 85%](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/classic_hierarchy.drawio.svg)
-
-Let's create a three level hierarchy with private L1s, private L2s, and a shared L3 connected to multiple memory channels.
+![带有写请求的核心和跨缓存的一致性](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/cache_line_2.svg)
 
 ---
 
-## Step 1: declare the hierarchy
+## Classic Cache：交叉开关层次结构
 
-Open [`materials/02-Using-gem5/05-cache-hierarchies/three_level.py`](../../materials/02-Using-gem5/05-cache-hierarchies/three_level.py)
+![交叉开关类别](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/crossbar.drawio.svg)
 
-The constructor is already provided.
+---
+
+## Classic Cache：一致性交叉开关
+
+每个交叉开关可以连接 *n* 个 CPU 侧端口和 *m* 个内存侧端口。
+
+![具有私有 L1、私有 L2 和连接到多个内存通道的共享 L3 的三级层次结构示例 bg right 85%](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/classic_hierarchy.drawio.svg)
+
+让我们创建一个三级层次结构，包含私有 L1、私有 L2 和连接到多个内存通道的共享 L3。
+
+---
+
+## 步骤 1：声明层次结构
+
+打开 [`materials/02-Using-gem5/05-cache-hierarchies/three_level.py`](../../materials/02-Using-gem5/05-cache-hierarchies/three_level.py)
+
+构造函数已经提供。
 
 ```python
 class PrivateL1PrivateL2SharedL3CacheHierarchy(AbstractClassicCacheHierarchy):
@@ -118,35 +118,35 @@ class PrivateL1PrivateL2SharedL3CacheHierarchy(AbstractClassicCacheHierarchy):
 
 ---
 
-## Add a membus
+## 添加内存总线
 
 ```python
 self.membus = SystemXBar(width=64)
 ```
 
-This will be what connects the cache to memory.
+这将用于连接缓存和内存。
 
-We will make it 64 Bytes wide (as wide as the cache line) so that it's maximum bandwidth.
+我们将其设置为 64 字节宽（与缓存行一样宽），以实现最大带宽。
 
 ---
 
-## Implement the hierarchy interface
+## 实现层次结构接口
 
-The board needs to be able to get the port to connect to memory.
+主板需要能够获取端口以连接到内存。
 
 ```python
 def get_mem_side_port(self):
     return self.membus.mem_side_ports
 ```
 
-The "cpu_side_port" is used for coherent IO access from the board.
+"cpu_side_port" 用于从主板进行一致性 IO 访问。
 
 ```python
 def get_cpu_side_port(self):
     return self.membus.cpu_side_ports
 ```
 
-The main function is **`incorporate_cache`** which is called by the board after the `Processor` and `Memory` are ready to be connected together.
+主要函数是 **`incorporate_cache`**，它在 `Processor` 和 `Memory` 准备好连接在一起后由主板调用。
 
 ```python
 def incorporate_cache(self, board):
@@ -154,12 +154,12 @@ def incorporate_cache(self, board):
 
 ---
 
-## Incorporate the caches
+## 整合缓存
 
-In the `incorporate_cache` function, we will create the caches and connect them together.
+在 `incorporate_cache` 函数中，我们将创建缓存并将它们连接在一起。
 
-First, connect the system port (for functional accesses) and connect the memory to the membus.
-We will also go ahead and create the L3 crossbar based on the L2 crossbar parameters.
+首先，连接系统端口（用于功能访问）并将内存连接到内存总线。
+我们还将根据 L2 交叉开关参数创建 L3 交叉开关。
 
 ```python
 board.connect_system_port(self.membus.cpu_side_ports)
@@ -176,10 +176,10 @@ self.l3_bus = L2XBar()
 
 <!-- _class: code-80-percent  -->
 
-## Creating core clusters
+## 创建核心集群
 
-Since each core is going to have many private caches, let's create a cluster.
-In this cluster, we will create L1I/D and L2 caches, the L2 crossbar and connect things.
+由于每个核心将拥有许多私有缓存，让我们创建一个集群。
+在这个集群中，我们将创建 L1I/D 和 L2 缓存、L2 交叉开关并连接它们。
 
 ```python
 def _create_core_cluster(self, core, l3_bus, isa):
@@ -205,11 +205,11 @@ def _create_core_cluster(self, core, l3_bus, isa):
 
 <!-- _class: code-60-percent  -->
 
-## Full-system specific things
+## 全系统特定内容
 
-You have been given some code to set up other caches, interrupts, etc. that are needed for full system simulation in x86 and Arm.
+您已经获得了一些代码来设置其他缓存、中断等，这些是 x86 和 Arm 全系统仿真所需的。
 
-You can ignore this for now.
+您现在可以忽略这部分。
 
 ```python
 cluster.iptw_cache = MMUCache(size="8KiB", writeback_clean=False)
@@ -234,9 +234,9 @@ return cluster
 
 ---
 
-## Back to incorporate_cache
+## 回到 incorporate_cache
 
-Now that we have the cluster, we can create the clusters.
+现在我们有了集群，我们可以创建集群了。
 
 ```python
 self.clusters = [
@@ -249,9 +249,9 @@ self.clusters = [
 
 ---
 
-## The L3 cache
+## L3 缓存
 
-For the L1/L2 caches we used pre-configured caches from the standard library. For the L3, we will create our own configuration. We need to specify the values for the parameters in [Cache](../../gem5/src/mem/cache/Cache.py).
+对于 L1/L2 缓存，我们使用了标准库中的预配置缓存。对于 L3，我们将创建自己的配置。我们需要指定 [Cache](../../gem5/src/mem/cache/Cache.py) 中参数的值。
 
 ```python
 class L3Cache(Cache):
@@ -270,9 +270,9 @@ class L3Cache(Cache):
 
 ---
 
-## Connect the L3 cache
+## 连接 L3 缓存
 
-Now, we can finish `incorporate_cache` by connecting the L3 cache to the L3 crossbar.
+现在，我们可以通过将 L3 缓存连接到 L3 交叉开关来完成 `incorporate_cache`。
 
 ```python
 self.l3_cache = L3Cache(size=self._l3_size, assoc=self._l3_assoc)
@@ -287,41 +287,41 @@ if board.has_coherent_io():
 
 ---
 
-## Testing our cache hierarchy
+## 测试我们的缓存层次结构
 
-See [`materials/02-Using-gem5/05-cache-hierarchies/test-cache.py`](../../materials/02-Using-gem5/05-cache-hierarchies/test-cache.py).
+参见 [`materials/02-Using-gem5/05-cache-hierarchies/test-cache.py`](../../materials/02-Using-gem5/05-cache-hierarchies/test-cache.py)。
 
-Run the test script to see if the cache hierarchy is working.
+运行测试脚本以查看缓存层次结构是否正常工作。
 
 ```bash
 gem5 test-cache.py
 ```
 
-This uses linear traffic, though we could also use your traffic generator from the previous section.
+这使用线性流量，尽管我们也可以使用上一节中的流量生成器。
 
-You can also run a real workload with the cache hierarchy.
+您还可以使用缓存层次结构运行真实工作负载。
 
 ```bash
 gem5 run-is.py
 ```
 
-This has both full-system (with x86) and SE mode (with Arm).
+这包括全系统模式（使用 x86）和 SE 模式（使用 Arm）。
 
 ---
 
-## Classic Cache: Parameters
+## Classic Cache：参数
 
 - src/mem/cache/Cache.py
   - src/mem/cache/cache.cc
   - src/mem/cache/noncoherent_cache.cc
 
-Parameters:
+参数：
 
-- size
-- associativity
-- number of miss status handler register (MSHR) entries
-- prefetcher
-- replacement policy
+- size（大小）
+- associativity（关联度）
+- number of miss status handler register (MSHR) entries（未命中状态处理寄存器条目数）
+- prefetcher（预取器）
+- replacement policy（替换策略）
 
 ---
 
@@ -331,42 +331,42 @@ Parameters:
 
 ---
 
-## Ruby Cache
+## Ruby 缓存
 
-1. Coherence Controller
-2. Caches + Interface
-3. Interconnect
+1. 一致性控制器
+2. 缓存 + 接口
+3. 互连
 
-![System with Ruby Caches bg right fit](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/ruby_cache.drawio.svg)
+![使用 Ruby 缓存的系统 bg right fit](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/ruby_cache.drawio.svg)
 
 ---
 
 ## Ruby
 
-![ On chip interconnect + controllers bg 60%](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/ruby.drawio.svg)
+![片上互连 + 控制器 bg 60%](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/ruby.drawio.svg)
 
 ---
 
-## Ruby Components
+## Ruby 组件
 
-- **Controller models** (cache controller, directory controller)
-- **Controller topology** (Mesh, all-to-all, etc.)
-- **Network models**
-- **Interface** (classic ports)
+- **控制器模型**（缓存控制器、目录控制器）
+- **控制器拓扑**（Mesh、全连接等）
+- **网络模型**
+- **接口**（classic 端口）
 
-### Ruby Cache: Controller Models
+### Ruby 缓存：控制器模型
 
-Code for controllers is "generated" via SLICC compilers
+控制器代码通过 SLICC 编译器"生成"
 
-We'll see much more detail in [Modeling Cache Coherence in gem5](../03-Developing-gem5-models/06-modeling-cache-coherence.md).
+我们将在 [在 gem5 中建模缓存一致性](../03-Developing-gem5-models/06-modeling-cache-coherence.md) 中看到更多详细信息。
 
 ---
 
-## Ruby Cache: Example
+## Ruby 缓存：示例
 
-Let's do an example using the MESI protocol and see what new stats we can get with Ruby.
+让我们使用 MESI 协议做一个示例，看看使用 Ruby 可以获得哪些新统计信息。
 
-We're going to look at some different implementations of a parallel algorithm (summing an array).
+我们将查看并行算法（数组求和）的一些不同实现。
 
 ```c
 parallel_for (int i=0; i < length; i++) {
@@ -376,33 +376,33 @@ parallel_for (int i=0; i < length; i++) {
 
 ---
 
-## Different implementations: Naive
+## 不同实现：朴素方法
 
-Three different implementations: Naive, false sharing on the output, and chunking with no false sharing.
+三种不同的实现：朴素方法、输出上的伪共享，以及无伪共享的分块方法。
 
-### "Naive" implementation
+### "朴素"实现
 
 ![naive](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/parallel-alg-1.png)
 
 ---
 
-## False sharing
+## 伪共享
 
 ![false_sharing](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/parallel-alg-4.png)
 
 ---
 
-## Chunking and no false sharing
+## 分块和无伪共享
 
 ![blocking](/bootcamp/02-Using-gem5/05-cache-hierarchies-img/parallel-alg-6.png)
 
 ---
 
-## Using Ruby
+## 使用 Ruby
 
-We can use Ruby to see the difference in cache behavior between these implementations.
+我们可以使用 Ruby 来查看这些实现之间缓存行为的差异。
 
-Run the script [`materials/02-Using-gem5/05-cache-hierarchies/ruby-example/run.py`](../../materials/02-Using-gem5/05-cache-hierarchies/test-ruby.py).
+运行脚本 [`materials/02-Using-gem5/05-cache-hierarchies/ruby-example/run.py`](../../materials/02-Using-gem5/05-cache-hierarchies/test-ruby.py)。
 
 ```bash
 gem5-mesi --outdir=m5out/naive run.py naive
@@ -418,25 +418,25 @@ gem5-mesi --outdir=m5out/chunking run.py chunking
 
 ---
 
-## Stats to compare
+## 要比较的统计信息
 
-Compare the following stats:
+比较以下统计信息：
 
-The time it took in simulation and the read/write sharing
+仿真所花费的时间以及读/写共享
 
-- `board.cache_hierarchy.ruby_system.L1Cache_Controller.Fwd_GETS`: Number of times things were read-shared
-- `board.cache_hierarchy.ruby_system.L1Cache_Controller.Fwd_GETX`: Number of times things were write-shared
+- `board.cache_hierarchy.ruby_system.L1Cache_Controller.Fwd_GETS`：数据被读共享的次数
+- `board.cache_hierarchy.ruby_system.L1Cache_Controller.Fwd_GETX`：数据被写共享的次数
 
-(Note: Ignore the first thing in the array for these stats. It's a long story...)
+（注意：对于这些统计信息，忽略数组中的第一项。说来话长...）
 
-We'll cover more about how to configure Ruby in [Modeling Cache Coherence in gem5](../03-Developing-gem5-models/06-modeling-cache-coherence.md).
+我们将在 [在 gem5 中建模缓存一致性](../03-Developing-gem5-models/06-modeling-cache-coherence.md) 中介绍更多关于如何配置 Ruby 的内容。
 
 ---
 
-## Summary
+## 总结
 
-- Cache hierarchies are a key part of gem5
-- Classic caches are simpler and faster
-- Classic caches are straightforward to configure and use
-- Ruby caches are more detailed and can model cache coherence
-- We can use Ruby to compare different cache behaviors
+- 缓存层次结构是 gem5 的关键部分
+- Classic 缓存更简单、更快
+- Classic 缓存配置和使用简单直接
+- Ruby 缓存更详细，可以建模缓存一致性
+- 我们可以使用 Ruby 来比较不同的缓存行为

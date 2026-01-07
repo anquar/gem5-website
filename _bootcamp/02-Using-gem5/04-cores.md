@@ -23,7 +23,7 @@ section: using-gem5
 
 ---
 
-## gem5 CPU Models
+## gem5 CPU 模型
 
 ![width:1150px Diagram to show inheritance for gem5 CPU Models](/bootcamp/02-Using-gem5/04-cores-imgs/Summary-of-models.drawio.svg)
 
@@ -31,61 +31,61 @@ section: using-gem5
 
 <!-- _class: start --->
 
-## Simple CPU
+## 简单 CPU
 
 ---
 
 ## SimpleCPU
 
-### Atomic
+### 原子（Atomic）
 
-Sequence of nested calls
-Use: Warming up, fast-forwarding
+嵌套调用序列
+用途：预热、快进
 
-### Functional
+### 功能（Functional）
 
-Backdoor access to mem.
-(loading binaries)
-No effect on coherency states
+内存的后门访问
+（加载二进制文件）
+不影响一致性状态
 
-### Timing
+### 时序（Timing）
 
-Split transactions
-Models queuing delay and
-resource contention
+分离事务
+建模排队延迟和
+资源竞争
 
 ![bg auto width:1250px Diagram to show different CPU Model Timings](/bootcamp/02-Using-gem5/04-cores-imgs/Simple-CPU.drawio.svg)
 
 ---
 
-## Other Simple CPUs
+## 其他简单 CPU
 
 ### AtomicSimpleCPU
 
-- Uses **_Atomic_** memory accesses
-  - No resource contentions or queuing delay
-  - Mostly used for fast-forwarding and warming of caches
+- 使用 **_原子（Atomic）_** 内存访问
+  - 无资源竞争或排队延迟
+  - 主要用于快进和缓存预热
 
 ### TimingSimpleCPU
 
-- Uses **_Timing_** memory accesses
-  - Execute non-memory operations in one cycle
-  - Models the timing of memory accesses in detail
+- 使用 **_时序（Timing）_** 内存访问
+  - 在一个周期内执行非内存操作
+  - 详细建模内存访问的时序
 
 ---
 
 <!-- _class: center-image -->
 
-## O3CPU (Out of Order CPU Model)
+## O3CPU（乱序 CPU 模型）
 
-- **_Timing_** memory accesses _execute-in-execute_ semantics
-- Time buffers between stages
+- **_时序（Timing）_** 内存访问，_执行中执行_ 语义
+- 阶段之间的时间缓冲区
 
 ![width:1000px O3CPU](/bootcamp/02-Using-gem5/04-cores-imgs/O3CPU.drawio.svg)
 
 ---
 
-## The O3CPU Model has many parameters
+## O3CPU 模型具有许多参数
 
 [src/cpu/o3/BaseO3CPU.py](../../gem5/src/cpu/o3/BaseO3CPU.py)
 
@@ -101,8 +101,8 @@ fetchQueueSize = Param.Unsigned(
 ...
 ```
 
-Remember, do not update the parameters directly in the file. Instead, create a new _stdlib component_ and extend the model with new values for parameters.
-We will do this soon.
+请记住，不要直接在文件中更新参数。相反，创建一个新的 _stdlib 组件_，并使用新的参数值扩展模型。
+我们很快就会这样做。
 
 ---
 
@@ -116,80 +116,80 @@ We will do this soon.
 
 ## KvmCPU
 
-- KVM – Kernel-based virtual machine
-- Used for native execution on x86 and ARM host platforms
-- Guest and the host need to have the same ISA
-- Very useful for functional tests and fast-forwarding
+- KVM – 基于内核的虚拟机
+- 用于在 x86 和 ARM 主机平台上进行原生执行
+- 客户机和主机需要具有相同的 ISA
+- 对功能测试和快进非常有用
 
 ---
 
-## Summary of gem5 CPU Models
+## gem5 CPU 模型总结
 
 ### BaseKvmCPU
 
-- Very fast
-- No timing
-- No caches, BP
+- 非常快
+- 无时序
+- 无缓存、BP
 
 ### BaseSimpleCPU
 
-- Fast
-- Some timing
-- Caches, limited BP
+- 快
+- 部分时序
+- 缓存、有限的 BP
 
-### DerivO3CPU and MinorCPU
+### DerivO3CPU 和 MinorCPU
 
-- Slow
-- Timing
-- Caches, BP
+- 慢
+- 时序
+- 缓存、BP
 
 ![bg width:1250px Diagram to show different CPU Models](/bootcamp/02-Using-gem5/04-cores-imgs/Summary-of-models-bg.drawio.svg)
 
 ---
 
-## Interaction of CPU model with other parts of gem5
+## CPU 模型与 gem5 其他部分的交互
 
 ![bg auto width:1050px Diagram to show CPU Model Interactions](/bootcamp/02-Using-gem5/04-cores-imgs/CPU-interaction-model.drawio.svg)
 
 ---
 
-## Outline
+## 大纲
 
-- Learn about CPU models in gem5
-  - AtomicSimpleCPU, TimingSimpleCPU, O3CPU, MinorCPU, KvmCPU​
-- **Using the CPU models​**
-  - Set up a simple system with two cache sizes and three CPU models​
-- Look at the gem5 generated statistics​
-  - To understand differences among CPU models
-- Create a custom processor
-  - Change parameters of a processor based on O3CPU
+- 了解 gem5 中的 CPU 模型
+  - AtomicSimpleCPU、TimingSimpleCPU、O3CPU、MinorCPU、KvmCPU​
+- **使用 CPU 模型​**
+  - 设置一个具有两个缓存大小和三个 CPU 模型的简单系统​
+- 查看 gem5 生成的统计信息​
+  - 了解 CPU 模型之间的差异
+- 创建自定义处理器
+  - 更改基于 O3CPU 的处理器的参数
 
 ---
 
 <!-- _class: start -->
 
-## Let's use these CPU Models!
+## 让我们使用这些 CPU 模型！
 
 ---
 
-## Material to use
+## 使用的材料
 
-### Start by opening the following file
+### 首先打开以下文件
 
 [materials/02-Using-gem5/04-cores/cores.py](../../materials/02-Using-gem5/04-cores/cores.py)
 
-### Steps
+### 步骤
 
-1. Configure a simple system with Atomic CPU
-2. Configure the same system with Timing CPU
-3. Reduce the cache size
-4. Change the CPU type back to Atomic
+1. 使用原子 CPU 配置一个简单系统
+2. 使用时序 CPU 配置相同的系统
+3. 减小缓存大小
+4. 将 CPU 类型改回原子
 
-We will be running a workload called matrix-multiply on **different CPU types and cache sizes**.
+我们将在**不同的 CPU 类型和缓存大小**上运行一个名为 matrix-multiply 的工作负载。
 
 ---
 
-## Let's configure a simple system with Atomic CPU
+## 让我们使用原子 CPU 配置一个简单系统
 
 [materials/02-Using-gem5/04-cores/cores.py](../../materials/02-Using-gem5/04-cores/cores.py)
 
@@ -204,133 +204,133 @@ from gem5.resources.resource import obtain_resource
 from gem5.simulate.simulator import Simulator
 
 
-# A simple script to test with different CPU models
-# We will run a simple application (matrix-multiply) with AtomicSimpleCPU and TimingSimpleCPU
-# using two different cache sizes
+# 一个用于测试不同 CPU 模型的简单脚本
+# 我们将使用 AtomicSimpleCPU 和 TimingSimpleCPU 运行一个简单应用程序（matrix-multiply）
+# 使用两种不同的缓存大小
 ...
 ```
 
 ---
 
-## Let's start with Atomic CPU
+## 让我们从原子 CPU 开始
 
-`cpu_type` in cores.py should already be set to Atomic.
+`cores.py` 中的 `cpu_type` 应该已经设置为原子。
 
 ```python
-# By default, use Atomic CPU
+# 默认情况下，使用原子 CPU
 cpu_type = CPUTypes.ATOMIC
 
-# Uncomment for steps 2 and 3
+# 对于步骤 2 和 3，取消注释
 # cpu_type = CPUTypes.TIMING
 ```
 
-Let's run it!
+让我们运行它！
 
 ```sh
 cd /workspaces/2024/materials/02-Using-gem5/04-cores
 gem5 --outdir=atomic-normal-cache cores.py
 ```
 
-Make sure the out directory is set to **atomic-normal-cache**.
+确保输出目录设置为 **atomic-normal-cache**。
 
 ---
 
-## Next, try Timing CPU
+## 接下来，尝试时序 CPU
 
-Change `cpu_type` in cores.py to Timing.
+将 `cores.py` 中的 `cpu_type` 更改为时序。
 
 ```python
-# By default, use Atomic CPU
+# 默认情况下，使用原子 CPU
 # cpu_type = CPUTypes.ATOMIC
 
-# Uncomment for steps 2 and 3
+# 对于步骤 2 和 3，取消注释
 cpu_type = CPUTypes.TIMING
 ```
 
-Let's run it!
+让我们运行它！
 
 ```sh
 gem5 --outdir=timing-normal-cache cores.py
 ```
 
-Make sure the out directory is set to **timing-normal-cache**.
+确保输出目录设置为 **timing-normal-cache**。
 
 ---
 
-## Now, try changing the Cache Size
+## 现在，尝试更改缓存大小
 
-Go to this line of code.
+转到这行代码。
 
 ```python
 cache_hierarchy = PrivateL1CacheHierarchy(l1d_size="32KiB", l1i_size="32KiB")
 ```
 
-Change `l1d_size` and `l1i_size` to 1KiB.
+将 `l1d_size` 和 `l1i_size` 更改为 1KiB。
 
 ```python
 cache_hierarchy = PrivateL1CacheHierarchy(l1d_size="1KiB", l1i_size="1KiB")
 ```
 
-Let's run it!
+让我们运行它！
 
 ```sh
 gem5 --outdir=timing-small-cache ./materials/02-Using-gem5/04-cores/cores.py
 ```
 
-Make sure the out directory is set to **timing-small-cache**.
+确保输出目录设置为 **timing-small-cache**。
 
 ---
 
-## Now let's try a Small Cache with Atomic CPU
+## 现在让我们尝试使用原子 CPU 的小缓存
 
-Set `cpu_type` in cores.py to Atomic.
+将 `cores.py` 中的 `cpu_type` 设置为原子。
 
 ```python
-# By default, use Atomic CPU
+# 默认情况下，使用原子 CPU
 cpu_type = CPUTypes.ATOMIC
 
-# Uncomment for steps 2 and 3
+# 对于步骤 2 和 3，取消注释
 # cpu_type = CPUTypes.TIMING
 ```
 
-Let's run it!
+让我们运行它！
 
 ```sh
 gem5 --outdir=atomic-small-cache cores.py
 ```
 
-Make sure the out directory is set to **atomic-small-cache**.
+确保输出目录设置为 **atomic-small-cache**。
 
 ---
 
-## Outline
+## 大纲
 
-- Learn about CPU models in gem5
-  - AtomicSimpleCPU, TimingSimpleCPU, O3CPU, MinorCPU, KvmCPU
-- Using the CPU models​
-  - Set-up a simple system with two cache sizes and three CPU models​
-- **Look at the gem5 generated statistics​**
-  - To understand differences among CPU models
-- Create a custom processor
-  - Change parameters of a processor based on O3CPU
+- 了解 gem5 中的 CPU 模型
+  - AtomicSimpleCPU、TimingSimpleCPU、O3CPU、MinorCPU、KvmCPU
+- 使用 CPU 模型​
+  - 设置一个具有两个缓存大小和三个 CPU 模型的简单系统​
+- **查看 gem5 生成的统计信息​**
+  - 了解 CPU 模型之间的差异
+- 创建自定义处理器
+  - 更改基于 O3CPU 的处理器的参数
 
 ---
 
 <!-- _class: start -->
 
-## Statistics
+## 统计信息
 
 ---
 
-## Look at the Number of Operations
+## 查看操作数量
 
-Run the following command.
+运行以下命令。
 
 ```sh
 grep -ri "simOps" *cache
 ```
 
-Here are the expected results. (Note: Some text is removed for readability.)
+以下是预期结果。（注意：为便于阅读，已删除部分文本。）
 
 ```sh
 atomic-normal-cache/stats.txt:simOps                                       33954560
@@ -339,20 +339,20 @@ timing-normal-cache/stats.txt:simOps                                       33954
 timing-small-cache/stats.txt:simOps                                        33954560
 ```
 
-> "Ops" may be different from "Instructions" because gem5 breaks instructions down into "micro-ops."
-> x86 is highly microcoded, all ISAs have some microcoded instructions in gem5.
+> "Ops" 可能与 "Instructions" 不同，因为 gem5 将指令分解为"微操作"。
+> x86 高度微码化，所有 ISA 在 gem5 中都有一些微码指令。
 
 ---
 
-## Look at the Number of Execution Cycles
+## 查看执行周期数
 
-Run the following command.
+运行以下命令。
 
 ```sh
 grep -ri "cores0.*numCycles" *cache
 ```
 
-Here are the expected results. (Note: Some text is removed for readability.)
+以下是预期结果。（注意：为便于阅读，已删除部分文本。）
 
 ```sh
 atomic-normal-cache/stats.txt:board.processor.cores0.core.numCycles        38157549
@@ -361,92 +361,92 @@ timing-normal-cache/stats.txt:board.processor.cores0.core.numCycles        62838
 timing-small-cache/stats.txt:board.processor.cores0.core.numCycles         96494522
 ```
 
-Note that for Atomic CPU, the number of cycles is the **same** for a large cache _and_ a small cache.
+请注意，对于原子 CPU，大缓存_和_小缓存的周期数是**相同的**。
 
-This is because Atomic CPU ignores memory access latency.
+这是因为原子 CPU 忽略了内存访问延迟。
 
 ---
 
-## Extra Notes about gem5 Statistics
+## 关于 gem5 统计信息的额外说明
 
-When you specify the out-directory for the stats file (when you use the flag `--outdir=<outdir-name>`), go to **`<outdir-name>/stats.txt`** to look at the entire statistics file.
+当您为统计文件指定输出目录时（当您使用标志 `--outdir=<outdir-name>`），请转到 **`<outdir-name>/stats.txt`** 查看完整的统计文件。
 
-For example, to look at the statistics file for the Atomic CPU with a small cache, go to **`atomic-small-cache/stats.txt`**.
+例如，要查看具有小缓存的原子 CPU 的统计文件，请转到 **`atomic-small-cache/stats.txt`**。
 
-In general, if you don't specify the out-directory, it will be **`m5out/stats.txt`**.
+通常，如果您不指定输出目录，它将是 **`m5out/stats.txt`**。
 
-### Other statistics to look at
+### 其他要查看的统计信息
 
-- Simulated time (time simulated by gem5)
+- 模拟时间（gem5 模拟的时间）
   - `simSeconds`
-- Host time (time taken by gem5 to run your simulation)
+- 主机时间（gem5 运行模拟所花费的时间）
   - `hostSeconds`
 
 ---
 
-## Outline
+## 大纲
 
-- Learn about CPU models in gem5
-  - AtomicSimpleCPU, TimingSimpleCPU, O3CPU, MinorCPU, KvmCPU​
-- Using the CPU models​
-  - Set-up a simple system with two cache sizes and three CPU models​
-- Look at the gem5 generated statistics​
-  - To understand differences among CPU models
-- **Create a custom processor**
-  - Change parameters of a processor based on O3CPU
+- 了解 gem5 中的 CPU 模型
+  - AtomicSimpleCPU、TimingSimpleCPU、O3CPU、MinorCPU、KvmCPU​
+- 使用 CPU 模型​
+  - 设置一个具有两个缓存大小和三个 CPU 模型的简单系统​
+- 查看 gem5 生成的统计信息​
+  - 了解 CPU 模型之间的差异
+- **创建自定义处理器**
+  - 更改基于 O3CPU 的处理器的参数
 
 ---
 
 <!-- _class: start -->
 
-## Let's configure a custom processor!
+## 让我们配置一个自定义处理器！
 
 ---
 
-## Material to use
+## 使用的材料
 
 [materials/02-Using-gem5/04-cores/cores-complex.py](../../materials/02-Using-gem5/04-cores/cores-complex.py)
 
 [materials/02-Using-gem5/04-cores/components/processors.py](../../materials/02-Using-gem5/04-cores/components/processors.py)
 
-### Steps
+### 步骤
 
-1. Update class Big(O3CPU) and Little(O3CPU)
-2. Run with Big processor
-3. Run with Little processor
-4. Compare statistics
+1. 更新类 Big(O3CPU) 和 Little(O3CPU)
+2. 使用 Big 处理器运行
+3. 使用 Little 处理器运行
+4. 比较统计信息
 
-We will be running the same workload (matrix-multiply) on **two custom processors**.
+我们将在**两个自定义处理器**上运行相同的工作负载（matrix-multiply）。
 
 ---
 
-## Configuring two processors
+## 配置两个处理器
 
-We will make one fast processor (**_Big_**) and one slow processor (**_Little_**).
+我们将创建一个快速处理器（**_Big_**）和一个慢速处理器（**_Little_**）。
 
-To do this, we will change **4** parameters in each processor.
+为此，我们将在每个处理器中更改 **4** 个参数。
 
 - **width**
-  - Width of fetch, decode, rename, issue, wb, and commit stages
+  - 取指、解码、重命名、发射、写回和提交阶段的宽度
 - **rob_size**
-  - The number of entries in the reorder buffer
+  - 重排序缓冲区中的条目数
 - **num_int_regs**
-  - The number of physical integer registers
+  - 物理整数寄存器的数量
 - **num_fp_regs**
-  - The number of physical vector/floating point registers
+  - 物理向量/浮点寄存器的数量
 
 ---
 
 <!-- _class: two-col -->
 
-## Configuring Big
+## 配置 Big
 
-Open the following file:
+打开以下文件：
 [materials/02-Using-gem5/04-cores/components/processors.py](../../materials/02-Using-gem5/04-cores/components/processors.py)
 
-On the right, you'll see what `class Big` currently looks like.
+在右侧，您将看到 `class Big` 当前的样子。
 
-Change the parameter values so that they are as follows:
+将参数值更改为以下值：
 
 - `width=10`
 - `rob_size=40`
@@ -470,11 +470,11 @@ class Big(O3CPU):
 
 <!-- _class: two-col -->
 
-## Configuring Little
+## 配置 Little
 
-Now, on the right, you'll see what `class Little` currently looks like.
+现在，在右侧，您将看到 `class Little` 当前的样子。
 
-Change the parameter values so that they are as follows:
+将参数值更改为以下值：
 
 - `width=2`
 - `rob_size=30`
@@ -496,46 +496,46 @@ class Little(O3CPU):
 
 ---
 
-## Run with Big processor
+## 使用 Big 处理器运行
 
-We will be running the following file.
+我们将运行以下文件。
 [materials/02-Using-gem5/04-cores/cores-complex.py](../../materials/02-Using-gem5/04-cores/cores-complex.py)
 
-First, we will run matrix-multiply with our `Big` processor.
+首先，我们将使用 `Big` 处理器运行 matrix-multiply。
 
-Run with the following command:
+使用以下命令运行：
 
 ```sh
 gem5 --outdir=big-proc cores-complex.py -p big
 ```
 
-Make sure the out directory is set to **`big-proc`**.
+确保输出目录设置为 **`big-proc`**。
 
 ---
 
-## Run with Little processor
+## 使用 Little 处理器运行
 
-Next, we will run matrix-multiply with our `Little` processor.
+接下来，我们将使用 `Little` 处理器运行 matrix-multiply。
 
-Run with the following command:
+使用以下命令运行：
 
 ```sh
 gem5 --outdir=little-proc cores-complex.py -p little
 ```
 
-Make sure the out directory is set to **`little-proc`**.
+确保输出目录设置为 **`little-proc`**。
 
 ---
 
-## Comparing Big and Little processors
+## 比较 Big 和 Little 处理器
 
-Run the following command.
+运行以下命令。
 
 ```sh
 grep -ri "simSeconds" *proc && grep -ri "numCycles" *proc
 ```
 
-Here are the expected results. (Note: Some text is removed for readability.)
+以下是预期结果。（注意：为便于阅读，已删除部分文本。）
 
 ```sh
 big-proc/stats.txt:simSeconds                                           0.028124
@@ -544,7 +544,7 @@ big-proc/stats.txt:board.processor.cores.core.numCycles                 56247195
 little-proc/stats.txt:board.processor.cores.core.numCycles              73430220
 ```
 
-Our `Little` processor takes more time and more cycles than our `Big` processor.
+我们的 `Little` 处理器比 `Big` 处理器花费更多的时间和更多的周期。
 
 <!-- This is likely mostly because our Little processor has to access the cache more times since it has less physical registers to work with
 

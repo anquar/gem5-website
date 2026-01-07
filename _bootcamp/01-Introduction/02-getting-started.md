@@ -63,7 +63,7 @@ cd gem5
 - 小版本（当发现重大错误时很少发生）。
 - 热修复版本：这些用于发布后发现的小错误。
 
-更多信息请参见 [CONTRIBUTING.md](../../gem5/CONTRIBUTING.md#Releases)。
+更多信息请参见 [CONTRIBUTING.md](../06-Contributing/01-contributing.md)。
 
 ---
 

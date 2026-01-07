@@ -1,33 +1,33 @@
 ---
 layout: bootcamp
-title: Debugging and Debug Flags
+title: 调试和调试标志
 permalink: /bootcamp/developing-gem5/debugging-gem5
 section: developing-gem5
 ---
 <!-- _class: title -->
 
-## DebugFlags: Debugging and Logging in gem5
+## DebugFlags：gem5 中的调试和日志记录
 
-***IMPORTANT***: This slide deck builds on top of what has already been developed in [Introduction to SimObjects](01-sim-objects-intro.md).
+***重要提示***：本幻灯片基于 [SimObjects 简介](01-sim-objects-intro.md) 中已开发的内容。
 
 ---
 
 ## DebugFlags
 
-`DebugFlags` help with debug printing. Debug printing is useful for debugging models in gem5 and logging.
+`DebugFlags` 有助于调试打印。调试打印对于在 gem5 中调试模型和记录日志非常有用。
 
 <!-- logging what? -->
 
-Each `DebugFlag` enables printing certain statements within the gem5 code base. Run the following commands to see all the available `DebugFlags` in gem5.
+每个 `DebugFlag` 可以启用 gem5 代码库中某些语句的打印。运行以下命令以查看 gem5 中所有可用的 `DebugFlags`。
 
 ```sh
 cd gem5
 ./build/NULL/gem5.opt --debug-help
 ```
 
-This command will show you a list of all the `DebugFlags`. You can choose to use a specific `DebugFlag`, like `Activity`, or you can choose a class of `DebugFlags`, like `Registers`, which will enable the following `DebugFlags`: `IntRegs`, `FloatRegs`, `VecRegs`, `VecPredRegs`, `MatRegs`, `CCRegs`, `MiscRegs`.
+此命令将显示所有 `DebugFlags` 的列表。您可以选择使用特定的 `DebugFlag`，例如 `Activity`，或者选择一类 `DebugFlags`，例如 `Registers`，这将启用以下 `DebugFlags`：`IntRegs`、`FloatRegs`、`VecRegs`、`VecPredRegs`、`MatRegs`、`CCRegs`、`MiscRegs`。
 
-In the following slide, you will see the expected output.
+在下一张幻灯片中，您将看到预期的输出。
 
 ---
 
@@ -36,40 +36,40 @@ In the following slide, you will see the expected output.
 ---
 <!-- _class: start -->
 
-## Step 1: SimObject with DebugFlags
+## 步骤 1：带 DebugFlags 的 SimObject
 
 ---
 <!-- _class: code-70-percent -->
 
-## DebugFlags: HelloExampleFlag
+## DebugFlags：HelloExampleFlag
 
-To define a new `DebugFlag` in gem5, you just have to define it in **any** `SConscript` in the gem5 directory. However, it is convention that `DebugFlags` are defined in the same `SConscript` that registers `SimObjects` that are relevant to the `DebugFlag`.
+要在 gem5 中定义新的 `DebugFlag`，您只需在 gem5 目录中的**任何** `SConscript` 中定义它。但是，按照惯例，`DebugFlags` 应在注册与该 `DebugFlag` 相关的 `SimObjects` 的同一个 `SConscript` 中定义。
 
-To define a new `DebugFlag` that we will use to print debug/log statement in `HelloSimObject`, open `src/bootcamp/hello-sim-object/SConscript` in your editor of choice and add the following line.
+要定义一个新的 `DebugFlag`，我们将在 `HelloSimObject` 中使用它来打印调试/日志语句，请在您选择的编辑器中打开 `src/bootcamp/hello-sim-object/SConscript` 并添加以下行。
 
 ```python
 DebugFlag("HelloExampleFlag")
 ```
 
-Adding this line will create a new **auto-generated** header file (with the same name as the `DebugFlag`) that defines the `DebugFlag` in C++.
+添加此行将创建一个新的**自动生成**的头文件（与 `DebugFlag` 同名），该文件在 C++ 中定义 `DebugFlag`。
 
 ---
 <!-- _class: code-50-percent -->
 
-## DebugFlags: Using HelloExampleFlag in Code
+## DebugFlags：在代码中使用 HelloExampleFlag
 
-One of the functions in gem5 that allows for debug printing is `DPRINTF`, which will let you print a formatted string if a certain `DebugFlag` is enabled (more on how to enable `DebugFlags` later). `DPRINTF` is defined in `src/base/trace.hh`. Make sure to include it every time you want to use `DPRINTF`.
+gem5 中允许调试打印的函数之一是 `DPRINTF`，如果启用了某个 `DebugFlag`，它将允许您打印格式化的字符串（稍后将详细介绍如何启用 `DebugFlags`）。`DPRINTF` 定义在 `src/base/trace.hh` 中。每次要使用 `DPRINTF` 时，请确保包含它。
 
-Now let's get to actually adding `HelloExampleFlag` in C++. As I mentioned, the header files for `DebugFlags` are auto-generated. For now, trust that the header file for `HelloExampleFlag` will be in `build/NULL/debug/HelloExampleFlag.hh` when we recompile gem5.
+现在让我们实际在 C++ 中添加 `HelloExampleFlag`。正如我提到的，`DebugFlags` 的头文件是自动生成的。现在，请相信当我们重新编译 gem5 时，`HelloExampleFlag` 的头文件将在 `build/NULL/debug/HelloExampleFlag.hh` 中。
 
-Let's include the header files in `hello_sim_object.cc` by adding the following lines. Remember to follow the conventional order of includes!
+让我们通过在 `hello_sim_object.cc` 中添加以下行来包含头文件。请记住遵循包含文件的常规顺序！
 
 ```cpp
 #include "base/trace.hh"
 #include "debug/HelloExampleFlag.hh
 ```
 
-Now let's add a simple `DPRINTF` statement inside the constructor of `HelloSimObject` to print `Hello from ...`. Do it by adding the following line after the `for-loop`. **NOTE**: `__func__` will return the name of the function we're in as a string.
+现在让我们在 `HelloSimObject` 的构造函数中添加一个简单的 `DPRINTF` 语句来打印 `Hello from ...`。通过在 `for-loop` 之后添加以下行来实现。**注意**：`__func__` 将返回我们所在函数的名称作为字符串。
 
 ```cpp
     DPRINTF(HelloExampleFlag, "%s: Hello from HelloSimObject's constructor!\n", __func__);
@@ -78,9 +78,9 @@ Now let's add a simple `DPRINTF` statement inside the constructor of `HelloSimOb
 ---
 <!-- _class: two-col -->
 
-## DebugFlags: How Files Look Like
+## DebugFlags：文件应该是什么样子
 
-Below is how `src/bootcamp/hello-sim-object/SConscript` should look after the changes.
+以下是更改后 `src/bootcamp/hello-sim-object/SConscript` 应该的样子。
 
 ```python
 Import("*")
@@ -92,9 +92,9 @@ Source("hello_sim_object.cc")
 DebugFlag("HelloExampleFlag")
 ```
 
-To the right is how `src/bootcamp/hello-sim-object/hello_sim_object.cc` should look after the changes.
+右侧是更改后 `src/bootcamp/hello-sim-object/hello_sim_object.cc` 应该的样子。
 
-### Continued
+### 续
 
 ```cpp
 #include "bootcamp/hello-sim-object/hello_sim_object.hh"
@@ -122,20 +122,20 @@ HelloSimObject::HelloSimObject(const HelloSimObjectParams& params):
 
 ---
 
-## Let's Recompile
+## 让我们重新编译
 
-Now, let's recompile gem5 with the command below. After compilation is done, you should be able to find the header file in `build/NULL/debug/HelloExampleFlag.hh`.
+现在，让我们使用下面的命令重新编译 gem5。编译完成后，您应该能够在 `build/NULL/debug/HelloExampleFlag.hh` 中找到头文件。
 
 ```sh
 scons build/NULL/gem5.opt -j$(nproc)
 ```
 
-Continued on the next slide.
+在下一张幻灯片中继续。
 
 ---
 <!-- _class: code-50-percent -->
 
-And here is a snippet of the contents of `build/NULL/debug/HelloExampleFlag.hh`.
+这里是 `build/NULL/debug/HelloExampleFlag.hh` 内容的片段。
 
 ```cpp
 /**
@@ -177,24 +177,24 @@ inline constexpr const auto& HelloExampleFlag =
 
 ---
 
-## DebugFlags: After Adding HelloExampleFlag
+## DebugFlags：添加 HelloExampleFlag 之后
 
-Now, our `HelloExampleFlag` should be listed whenever we print debug help from gem5. Let's run the following command in the base gem5 directory to verify that our `DebugFlag` is added.
+现在，每当我们从 gem5 打印调试帮助时，我们的 `HelloExampleFlag` 应该被列出。让我们在 gem5 基础目录中运行以下命令以验证我们的 `DebugFlag` 已添加。
 
 ```sh
 ./build/NULL/gem5.opt --debug-help
 ```
 
-Below is the expected output.
+以下是预期的输出。
 
 <script src="https://asciinema.org/a/J0TmNzOj29N74la4qOxdBLV6H.js" id="asciicast-J0TmNzOj29N74la4qOxdBLV6H" async="true"></script>
 
 ---
 <!-- _class: code-70-percent -->
 
-## Enabling DebugFlags: Using Configuration Script
+## 启用 DebugFlags：使用配置脚本
 
-To enable a `DebugFlag` you can import `flags` from `m5.debug` and access the flag by indexing `flags`. You can enable and disable flags by calling `enable` and `disable` methods. Below is an example of what your `second-hello-example.py` would look like if you wanted to enable `HelloExampleFlag`. **CAUTION**: Do **not** make this change in your configuration script for now.
+要启用 `DebugFlag`，您可以从 `m5.debug` 导入 `flags`，并通过索引 `flags` 来访问标志。您可以通过调用 `enable` 和 `disable` 方法来启用和禁用标志。下面是一个示例，说明如果您想启用 `HelloExampleFlag`，您的 `second-hello-example.py` 应该是什么样子。**注意**：现在**不要**在您的配置脚本中进行此更改。
 
 ```python
 import m5
@@ -217,9 +217,9 @@ print(f"Exited simulation because: {exit_event.getCause()}.")
 
 ---
 
-## Enabling DebugFlags: Using Command Line
+## 启用 DebugFlags：使用命令行
 
-Alternatively you can pass `--debug-flags=[comma-separated list of DebugFlags]` to your gem5 binary when running your configuration script. As an example, below is a shell command that you can use to enable `HelloExampleFlag` (like always, run it in the base gem5 directory).
+或者，您可以在运行配置脚本时向 gem5 二进制文件传递 `--debug-flags=[逗号分隔的 DebugFlags 列表]`。例如，下面是一个 shell 命令，您可以使用它来启用 `HelloExampleFlag`（一如既往，在 gem5 基础目录中运行它）。
 
 ```sh
 ./build/NULL/gem5.opt --debug-flags=HelloExampleFlag configs/bootcamp/hello-sim-object/second-hello-example.py
@@ -227,48 +227,48 @@ Alternatively you can pass `--debug-flags=[comma-separated list of DebugFlags]` 
 
 ---
 
-## Simulate: Without HelloExampleFlag
+## 模拟：不使用 HelloExampleFlag
 
-Now let's simulate `second-hello-example.py` with and without `DebugFlags` and compare the output.
+现在让我们使用和不使用 `DebugFlags` 来模拟 `second-hello-example.py`，并比较输出。
 
-Run the following command to simulate `second-hello-example.py` without `DebugFlags`.
+运行以下命令以在不使用 `DebugFlags` 的情况下模拟 `second-hello-example.py`。
 
 ```sh
 ./build/NULL/gem5.opt configs/bootcamp/hello-sim-object/second-hello-example.py
 ```
 
-Below is a recording of my terminal when doing this.
+以下是我执行此操作时终端的录制。
 
 <script src="https://asciinema.org/a/pKOaIXfzYQUXTsA7VSEvcMHQp.js" id="asciicast-pKOaIXfzYQUXTsA7VSEvcMHQp" async="true"></script>
 
 ---
 
-## Simulate: With HelloExampleFlag
+## 模拟：使用 HelloExampleFlag
 
-Run the following command to simulate `second-hello-example.py` with `HelloExampleFlag`.
+运行以下命令以使用 `HelloExampleFlag` 模拟 `second-hello-example.py`。
 
 ```sh
 ./build/NULL/gem5.opt --debug-flags=HelloExampleFlag configs/bootcamp/hello-sim-object/second-hello-example.py
 ```
 
-Below is a recording of my terminal when doing this.
+以下是我执行此操作时终端的录制。
 
 <script src="https://asciinema.org/a/4c7TuxpxfMNR9i89olMr3HITB.js" id="asciicast-4c7TuxpxfMNR9i89olMr3HITB" async="true"></script>
 
 ---
 <!-- _class: start -->
 
-## End of Step 1
+## 步骤 1 结束
 
 ---
 
 <!-- _class: code-80-percent -->
 
-## Assertions in gem5
+## gem5 中的断言
 
-I strongly recommend using [`assert`](https://www.geeksforgeeks.org/assertions-cc/) and [`static_assert`](https://www.geeksforgeeks.org/understanding-static_assert-c-11/) when developing for gem5. They will help you find untrue assumptions you've made, and they will help you find any development mistakes early. `assert` and `static_assert` are standard C++ functions that you can (and are strongly encouraged to) use while developing in gem5.
+我强烈建议在为 gem5 开发时使用 [`assert`](https://www.geeksforgeeks.org/assertions-cc/) 和 [`static_assert`](https://www.geeksforgeeks.org/understanding-static_assert-c-11/)。它们将帮助您发现您做出的错误假设，并帮助您及早发现任何开发错误。`assert` 和 `static_assert` 是标准的 C++ 函数，您可以在 gem5 开发中使用（强烈建议使用）。
 
-`fatal`, `fatal_if`, `panic`, and `panic_if` are gem5's specific assert-like functions that allow you to print error messages. gem5 convention is to use `fatal` and `fatal_if` to assert assumptions on user inputs (similar to `ValueError`). As an example, if a user tries to configure your SimObject with negative capacity you can use `fatal` or `fatal_if` in your `SimObject` to let the user (most probably yourself) know their mistake. Below shows an example of doing this with `fatal` and `fatal_if`.
+`fatal`、`fatal_if`、`panic` 和 `panic_if` 是 gem5 特定的类似断言函数，允许您打印错误消息。gem5 的约定是使用 `fatal` 和 `fatal_if` 来断言用户输入的假设（类似于 `ValueError`）。例如，如果用户尝试使用负容量配置您的 SimObject，您可以在 `SimObject` 中使用 `fatal` 或 `fatal_if` 来让用户（很可能是您自己）知道他们的错误。下面显示了使用 `fatal` 和 `fatal_if` 执行此操作的示例。
 
 <!-- What is capacity in this concept?
 Maybe a better example would be negative num_hellos -->
@@ -279,51 +279,50 @@ if (capacity < 0) { fatal("capacity can not be negative.\n"); }
 fatal_if(capacity < 0, "capacity can not be negative.\n");
 ```
 
-You should use `panic`, and `panic_if` to catch developer mistakes. We will see some examples in [Ports](04-ports.md).
+您应该使用 `panic` 和 `panic_if` 来捕获开发者的错误。我们将在 [Ports](04-ports.md) 中看到一些示例。
 
 ---
 
-### Other Debugging Facilities in gem5
+### gem5 中的其他调试设施
 
-- Most `DebugFlags` require that there is a `name()` function in in the current scope (called from a `SimObject` member function).
-- Only use the `DebugFlags` if you are using `gem5.opt` or `gem5.debug`.
+- 大多数 `DebugFlags` 要求当前作用域中存在 `name()` 函数（从 `SimObject` 成员函数调用）。
+- 仅在使用 `gem5.opt` 或 `gem5.debug` 时使用 `DebugFlags`。
 
 ```cpp
 DPRINTF(Flag, __VA_ARGS__)
 ```
 
-- Takes a flag, and a format string +  format parameters.
-- Prints the formatted string only when the `Flag` is enabled.
+- 接受一个标志、一个格式字符串和格式参数。
+- 仅在启用 `Flag` 时打印格式化的字符串。
 
 ```cpp
 DPRINTFR(Flag, __VA_ARGS__)
 ```
 
-- Outputs debug statements without printing a name.
-- Useful for using debug statements in object that are not `SimObjects` that do not have a `name()` function.
+- 输出调试语句而不打印名称。
+- 对于在没有 `name()` 函数的非 `SimObjects` 对象中使用调试语句很有用。
 
 -----
-### Other Debugging Facilities in gem5
+### gem5 中的其他调试设施
 
 ```cpp
 DPRINTFS(Flag, SimObject, __VA_ARGS__)
 ```
 
-- Useful for debugging from private subclass of a `SimObject` that has a pointer to its owner.
+- 对于从具有指向其所有者的指针的 `SimObject` 的私有子类进行调试很有用。
 
 ```cpp
 DPRINTFN(__VA_ARGS__)
 DPRINTFNR(__VA_ARGS__)
 ```
 
-- These don't take a flag as a parameter, will always print whenever debugging is enabled.
+- 这些不接受标志作为参数，只要启用了调试就会始终打印。
 
 ```cpp
 DDUMP(Flag, data, count)
 ```
 
-- Prints binary `data` of length `count` bytes.
-- Formatted in user-readable hex.
+- 打印长度为 `count` 字节的二进制 `data`。
+- 格式化为用户可读的十六进制。
 
-Learn more at: https://www.gem5.org/documentation/learning_gem5/part2/debugging/
-
+了解更多信息：https://www.gem5.org/documentation/learning_gem5/part2/debugging/

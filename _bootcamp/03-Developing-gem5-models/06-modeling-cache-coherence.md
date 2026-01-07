@@ -1,44 +1,44 @@
 ---
 layout: bootcamp
-title: Modeling Cache Coherence in gem5
+title: 在 gem5 中建模缓存一致性
 permalink: /bootcamp/developing-gem5/modeling-cache-coherence
 section: developing-gem5
 ---
 <!-- _class: title -->
 
-## Modeling Cache Coherence in gem5
+## 在 gem5 中建模缓存一致性
 
 ---
 
-## Outline
+## 大纲
 
-- A bit of history and coherence reminder
-- Components of a SLICC protocol
-- Debugging protocols
-- Where to find things in Ruby
-- Included protocols
+- 一点历史和一致性提醒
+- SLICC 协议的组件
+- 调试协议
+- 在 Ruby 中查找内容的位置
+- 包含的协议
 
-### What we're not going to do
+### 我们不会做的事情
 
-Write a new protocol from scratch (we will fill in a few missing pieces, though)
+从头编写新协议（不过我们会填补一些缺失的部分）
 
 ---
 
-## gem5 history
+## gem5 历史
 
 M5 + GEMS = gem5
 
-**M5**: "Classic" caches, CPU model, requestor/responder port interface
+**M5**: "经典"缓存、CPU 模型、请求者/响应者端口接口
 
-**GEMS**: Ruby + network
+**GEMS**: Ruby + 网络
 
 ---
 
 <!-- _class: center-image -->
 
-## Cache Coherence Reminder
+## 缓存一致性提醒
 
-Single-Writer Multiple-Reader (SWMR) invariant
+单写多读（SWMR）不变性
 
 ![cache coherence example](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/cache-coherence-example-1.drawio.svg)
 
@@ -47,9 +47,9 @@ Single-Writer Multiple-Reader (SWMR) invariant
 <!-- _paginate: hold -->
 <!-- _class: center-image -->
 
-## Cache Coherence Reminder
+## 缓存一致性提醒
 
-Single-Writer Multiple-Reader (SWMR) invariant
+单写多读（SWMR）不变性
 
 ![cache coherence example](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/cache-coherence-example-2.drawio.svg)
 
@@ -57,136 +57,136 @@ Single-Writer Multiple-Reader (SWMR) invariant
 
 <!-- _class: center-image -->
 
-## Ruby Architecture
+## Ruby 架构
 
-![ruby architecture: classic ports on each side of a black box](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/ruby-architecture.drawio.svg)
+![ruby 架构：黑盒两侧的经典端口](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/ruby-architecture.drawio.svg)
 
 ---
 
 <!-- _class: center-image -->
 
-## Ruby Inside the Black Box
+## 黑盒内部的 Ruby
 
-![Inside Ruby: controllers around an interconnect model cloud](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/ruby-inside.drawio.svg)
-
----
-
-## Ruby Components
-
-- **Controller Models** *(e.g, caches)*: Manage coherence state and issue requests
-- **Controller Topology** *(how the caches are connected)*: Determines how messages are routed
-- **Interconnect Model** *(e.g., on-chip routers)*: Determines performance of routing
-- **Interface** *(how to get messages in/out of Ruby)*
-
-> **Note**: The main goal of Ruby is ***flexibility***, not ***usability***.
+![Ruby 内部：互连模型云周围的控制器](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/ruby-inside.drawio.svg)
 
 ---
 
-## Controller Models
+## Ruby 组件
 
-- Implemented in "SLICC"
-  - **S**pecification **L**anguage for **I**ncluding **C**ache **C**oherence
-- SLICC is a domain-specific language
-  - Describes the coherence protocol
-  - Generates C++ code
-  - See `build/.../mem/ruby/protocol` for generated files (but you really don't want to read these.)
+- **控制器模型** *（例如，缓存）*：管理一致性状态并发出请求
+- **控制器拓扑** *（缓存如何连接）*：决定消息如何路由
+- **互连模型** *（例如，片上路由器）*：决定路由性能
+- **接口** *（如何将消息传入/传出 Ruby）*
+
+> **注意**：Ruby 的主要目标是 ***灵活性***，而不是 ***可用性***。
 
 ---
 
-## Cache coherence example to implement
+## 控制器模型
 
-- **MSI**: Modified, Shared, Invalid
-- From Nagarajan, Sorin, Hill, and Wood. [A Primer on Memory Consistency and Cache Coherence](https://link.springer.com/book/10.1007/978-3-031-01764-3).
-- [Excerpt of 8.2 download](https://www.gem5.org/pages/static/external/Sorin_et-al_Excerpt_8.2.pdf)
+- 在 "SLICC" 中实现
+  - **S**pecification **L**anguage for **I**ncluding **C**ache **C**oherence（包含缓存一致性的规范语言）
+- SLICC 是一种领域特定语言
+  - 描述一致性协议
+  - 生成 C++ 代码
+  - 查看 `build/.../mem/ruby/protocol` 中的生成文件（但你真的不想读这些。）
+
+---
+
+## 要实现的缓存一致性示例
+
+- **MSI**：Modified（已修改）、Shared（共享）、Invalid（无效）
+- 来自 Nagarajan、Sorin、Hill 和 Wood 的 [A Primer on Memory Consistency and Cache Coherence](https://link.springer.com/book/10.1007/978-3-031-01764-3)。
+- [8.2 节摘录下载](https://www.gem5.org/pages/static/external/Sorin_et-al_Excerpt_8.2.pdf)
 
 ![MSI state diagramo table](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/msi-table.drawio.svg)
 
 ---
 
-## SLICC Original Purpose
+## SLICC 的原始目的
 
-- Create these tables
+- 创建这些表格
 
-> Actual output!
+> 实际输出！
 
 ![MSI state diagram table from SLICC](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/msi-table-slicc.drawio.svg)
 
 ---
 
-## How auto generated code works
+## 自动生成代码的工作原理
 
-> **IMPORTANT** Never modify these files!
+> **重要** 永远不要修改这些文件！
 
 ![Structure of auto-generated code](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/auto-generated-code.drawio.svg)
 
 ---
 
-## Cache state machine outline
+## 缓存状态机概述
 
-- **Parameters**: These are the `SimObject` parameters (and some special things)
-  - **Cache memory**: Where the data is stored
-  - **Message buffers**: Sending and receiving messages from the network
-- **State declarations**: The stable and transient states
-- **Event declarations**: State machine events that will be "triggered"
-- **Other structures and functions**: Entries, TBEs, get/setState, etc.
-- **In ports**: Trigger events based on incoming messages
-- **Actions**: Execute single operations on cache structures
-- **Transitions**: Move from state to state and execute actions
+- **参数**：这些是 `SimObject` 参数（以及一些特殊的东西）
+  - **缓存内存**：存储数据的地方
+  - **消息缓冲区**：从网络发送和接收消息
+- **状态声明**：稳定状态和瞬态
+- **事件声明**：将被"触发"的状态机事件
+- **其他结构和函数**：条目、TBE、get/setState 等
+- **输入端口**：基于传入消息触发事件
+- **动作**：在缓存结构上执行单个操作
+- **转换**：从状态移动到状态并执行动作
 
-**In ports** read **Cache memory** then *trigger* **Events**.
-**Events** cause **Transitions** based on the **State** which execute **Actions**.
-**Actions** can update **Cache memory** and send **Messages** via **Message buffers**.
-
----
-
-## Cache memory
-
-- See `src/mem/ruby/structures/CacheMemory`
-- Stores the cache data (in an `Entry` as defined in the SLICC file)
-- Can use the function `cacheProbe()` to get the replacement address when a cache miss occurs
-  - Interacts with replacement policies in `src/mem/cache/replacement_policies`
-
-> **IMPORTANT**: Always call `setMRU()` when you access an `Entry` otherwise the replacement policy won't work.
-
-(You should never have to modify `CacheMemory` unless you're modifying Ruby itself.)
+**输入端口**读取**缓存内存**，然后*触发***事件**。
+**事件**根据**状态**导致**转换**，这些转换执行**动作**。
+**动作**可以更新**缓存内存**并通过**消息缓冲区**发送**消息**。
 
 ---
 
-## Message buffers
+## 缓存内存
+
+- 参见 `src/mem/ruby/structures/CacheMemory`
+- 存储缓存数据（在 SLICC 文件中定义的 `Entry` 中）
+- 可以使用函数 `cacheProbe()` 在发生缓存未命中时获取替换地址
+  - 与 `src/mem/cache/replacement_policies` 中的替换策略交互
+
+> **重要**：访问 `Entry` 时始终调用 `setMRU()`，否则替换策略将不起作用。
+
+（除非你正在修改 Ruby 本身，否则你永远不需要修改 `CacheMemory`。）
+
+---
+
+## 消息缓冲区
 
 ```c++
 MessageBuffer * requestToDir, network="To", virtual_network="0", vnet_type="request";
 MessageBuffer * forwardFromDir, network="From", virtual_network="1", vnet_type="forward";
 ```
 
-- Declaring message buffers is quite confusing.
-- The to/from declares them as either "in_port" type or "out_port" type.
-- Virtual network is required when some messages have higher priority than others.
-- `vnet_type` is the message type. "Response" means that the message carries data and is used in Garnet for counting buffer credits.
-- Message buffers have the following interface
-  - `peek()`: Get the head message
-  - `pop()`: Remove the head message (Don't forget this or you'll have deadlock!)
-  - `isReady()`: Check if there is a message to read
-  - `recycle()`: Take the head message and put it on the tail (useful to get blocking messages out of the way)
-  - `stallAndWait()`: Move the head message to a separate queue (don't forget to call `wakeUpDependents()` later!)
+- 声明消息缓冲区相当令人困惑。
+- to/from 将它们声明为 "in_port" 类型或 "out_port" 类型。
+- 当某些消息的优先级高于其他消息时，需要虚拟网络。
+- `vnet_type` 是消息类型。"Response" 表示消息携带数据，并在 Garnet 中用于计算缓冲区信用。
+- 消息缓冲区具有以下接口
+  - `peek()`：获取头部消息
+  - `pop()`：移除头部消息（不要忘记这个，否则会出现死锁！）
+  - `isReady()`：检查是否有消息可读
+  - `recycle()`：获取头部消息并将其放在尾部（用于让阻塞消息移开）
+  - `stallAndWait()`：将头部消息移动到单独的队列（稍后不要忘记调用 `wakeUpDependents()`！）
 
 ---
 
-## Hands-on: Writing and debugging protocols
+## 实践：编写和调试协议
 
-See [`materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md`](../../materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md)
+参见 [`materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md`](../../materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md)
 
-You will:
+你将：
 
-1. Declare the protocol for the compiler
-2. Fill in the message types
-3. Complete the message buffers
-4. Test the protocol
-5. Find a bug
-6. Fix the bug
-7. Test with the ruby random tester
+1. 为编译器声明协议
+2. 填写消息类型
+3. 完成消息缓冲区
+4. 测试协议
+5. 找到一个 bug
+6. 修复 bug
+7. 使用 ruby 随机测试器进行测试
 
-Step 0: Copy the template
+步骤 0：复制模板
 
 ```sh
 cp -r materials/03-Developing-gem5-models/06-modeling-cache-coherence/MyMSI* gem5/src/mem/ruby/protocol
@@ -194,14 +194,14 @@ cp -r materials/03-Developing-gem5-models/06-modeling-cache-coherence/MyMSI* gem
 
 ---
 
-## Declaring a protocol
+## 声明协议
 
-Modify [`src/mem/ruby/protocol/MyMSI.slicc`](../../gem5/src/mem/ruby/protocol/MyMSI.slicc)
+修改 [`src/mem/ruby/protocol/MyMSI.slicc`](../../gem5/src/mem/ruby/protocol/MyMSI.slicc)
 
-- Need to tell Scons about the state machine files
-- In a file called `<protocol>.slicc`
-- You can use the same state machine (`.sm`) files for multiple protocols
-- Usually, you want to do this in the [`src/mem/ruby/protocol`](../../gem5/src/mem/ruby/protocol/) directory.
+- 需要告诉 Scons 状态机文件
+- 在名为 `<protocol>.slicc` 的文件中
+- 可以将相同状态机（`.sm`）文件用于多个协议
+- 通常，你希望在 [`src/mem/ruby/protocol`](../../gem5/src/mem/ruby/protocol/) 目录中执行此操作。
 
 ```text
 protocol "MyMSI";
@@ -211,57 +211,57 @@ include "MyMSI-cache.sm";
 include "MyMSI-dir.sm";
 ```
 
-> Remember the caveat that each protocol must be compiled separately.
-> Hopefully this isn't a requirement forever.
+> 记住每个协议必须单独编译的注意事项。
+> 希望这不是永久要求。
 
 ---
 
-## Declaring the message types
+## 声明消息类型
 
-Modify [`src/mem/ruby/protocol/MyMSI-msg.sm`](../../gem5/src/mem/ruby/protocol/MyMSI-msg.sm)
+修改 [`src/mem/ruby/protocol/MyMSI-msg.sm`](../../gem5/src/mem/ruby/protocol/MyMSI-msg.sm)
 
 ```c++
-enumeration(CoherenceRequestType, desc="Types of request messages") {
-    GetS,       desc="Request from cache for a block with read permission";
-    GetM,       desc="Request from cache for a block with write permission";
-    PutS,       desc="Sent to directory when evicting a block in S (clean WB)";
-    PutM,       desc="Sent to directory when evicting a block in M";
+enumeration(CoherenceRequestType, desc="请求消息类型") {
+    GetS,       desc="缓存请求具有读权限的块";
+    GetM,       desc="缓存请求具有写权限的块";
+    PutS,       desc="在 S 状态驱逐块时发送到目录（干净写回）";
+    PutM,       desc="在 M 状态驱逐块时发送到目录";
     ...
 }
-enumeration(CoherenceResponseType, desc="Types of response messages") {
-    Data,       desc="Contains the most up-to-date data";
-    InvAck,     desc="Message from another cache that they have inv. the blk";
+enumeration(CoherenceResponseType, desc="响应消息类型") {
+    Data,       desc="包含最新的数据";
+    InvAck,     desc="来自另一个缓存的消息，表示它们已使该块无效";
 }
 ```
 
 ---
 
-## Message buffers for the directory
+## 目录的消息缓冲区
 
-Modify [`src/mem/ruby/protocol/MyMSI-dir.sm`](../../gem5/src/mem/ruby/protocol/MyMSI-dir.sm)
+修改 [`src/mem/ruby/protocol/MyMSI-dir.sm`](../../gem5/src/mem/ruby/protocol/MyMSI-dir.sm)
 
 ```c++
-    // Forwarding requests from the directory *to* the caches.
+    // 从目录*到*缓存的转发请求。
     MessageBuffer *forwardToCache, network="To", virtual_network="1",
           vnet_type="forward";
-    // Response from the directory *to* the cache.
+    // 从目录*到*缓存的响应。
     MessageBuffer *responseToCache, network="To", virtual_network="2",
           vnet_type="response";
 
-    // Requests *from* the cache to the directory
+    // 从缓存*到*目录的请求
     MessageBuffer *requestFromCache, network="From", virtual_network="0",
           vnet_type="request";
 
-    // Responses *from* the cache to the directory
+    // 从缓存*到*目录的响应
     MessageBuffer *responseFromCache, network="From", virtual_network="2",
           vnet_type="response";
 ```
 
 ---
 
-## Compile your new protocol
+## 编译你的新协议
 
-First, register the protocol with the `Kconfig` builder. Modify [`src/mem/ruby/protocol/Kconfig`](../../gem5/src/mem/ruby/protocol/Kconfig).
+首先，在 `Kconfig` 构建器中注册协议。修改 [`src/mem/ruby/protocol/Kconfig`](../../gem5/src/mem/ruby/protocol/Kconfig)。
 
 ```Kconfig
 config PROTOCOL
@@ -278,14 +278,14 @@ cont_choice "Ruby protocol"
 
 ---
 
-## Run scons to compile
+## 运行 scons 进行编译
 
-Create a new build directory for the gem5 binary with your protocol. Let's start with the configuration from `build_opts/ALL` and modify it. You need to change the protocol, and you should enable the HTML output.
+为带有你的协议的 gem5 二进制文件创建一个新的构建目录。让我们从 `build_opts/ALL` 的配置开始并修改它。你需要更改协议，并且应该启用 HTML 输出。
 
 ```sh
 scons defconfig build/ALL_MyMSI build_opts/ALL
 ```
-Install the necessary locale and launch menuconfig.
+安装必要的语言环境并启动 menuconfig。
 ```
 apt-get update && apt-get install locales
 locale-gen en_US.UTF-8
@@ -300,25 +300,25 @@ scons -j$(nproc) build/ALL_MyMSI/gem5.opt PROTOCOL=MyMSI
 
 ---
 
-## Create a run script
+## 创建运行脚本
 
-Modify [`configs/learning_gem5/part3/msi_caches.py`](../../gem5/configs/learning_gem5/part3/msi_caches.py) to use your new protocol.
-This file sets up the Ruby protocol for the MSI caches already in gem5's codebase. We'll use it for simplicity.
+修改 [`configs/learning_gem5/part3/msi_caches.py`](../../gem5/configs/learning_gem5/part3/msi_caches.py) 以使用你的新协议。
+此文件为 gem5 代码库中已有的 MSI 缓存设置 Ruby 协议。为了简单起见，我们将使用它。
 
 ```sh
 build/ALL_MyMSI/gem5.opt configs/learning_gem5/part3/simple_ruby.py
 ```
 
-While we're waiting on the compilation, let's look at some of the details of the code.
-(It is way too much code to write all yourself today... so let's just read it)
+在等待编译时，让我们看一下代码的一些细节。
+（今天自己编写所有代码太多了...所以让我们只是阅读它）
 
 ---
 
 <!-- _class: code-60-percent -->
 
-## Let's look at some code: In-port definition
+## 让我们看一些代码：输入端口定义
 
-From [`gem5/src/learning_gem5/part3/MSI-cache.sm`](../../gem5/src/learning_gem5/part3/MSI-cache.sm)
+来自 [`gem5/src/learning_gem5/part3/MSI-cache.sm`](../../gem5/src/learning_gem5/part3/MSI-cache.sm)
 
 ```c++
 in_port(mandatory_in, RubyRequest, mandatoryQueue) {
@@ -351,80 +351,80 @@ in_port(mandatory_in, RubyRequest, mandatoryQueue) {
 
 ---
 
-## State declarations
+## 状态声明
 
-See [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](../../gem5/src/mem/ruby/protocol/MSI-cache.sm)
+参见 [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](../../gem5/src/mem/ruby/protocol/MSI-cache.sm)
 
 ```c++
-state_declaration(State, desc="Cache states") {
- I,      AccessPermission:Invalid, desc="Not present/Invalid";
- // States moving out of I
- IS_D,   AccessPermission:Invalid, desc="Invalid, moving to S, waiting for data";
- IM_AD,  AccessPermission:Invalid, desc="Invalid, moving to M, waiting for acks and data";
- IM_A,   AccessPermission:Busy,    desc="Invalid, moving to M, waiting for acks";
+state_declaration(State, desc="缓存状态") {
+ I,      AccessPermission:Invalid, desc="不存在/无效";
+ // 从 I 状态移出的状态
+ IS_D,   AccessPermission:Invalid, desc="无效，移动到 S，等待数据";
+ IM_AD,  AccessPermission:Invalid, desc="无效，移动到 M，等待确认和数据";
+ IM_A,   AccessPermission:Busy,    desc="无效，移动到 M，等待确认";
 
- S,      AccessPermission:Read_Only, desc="Shared. Read-only, other caches may have the block";
+ S,      AccessPermission:Read_Only, desc="共享。只读，其他缓存可能拥有该块";
  . . .
 }
 ```
 
-**`AccessPermission:...`**: Used for functional accesses
-**`IS_D`**: Invalid, waiting for data to move to shared
+**`AccessPermission:...`**：用于功能访问
+**`IS_D`**：无效，等待数据移动到共享状态
 
 ---
 
-## Event declarations
+## 事件声明
 
-See [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](../../gem5/src/mem/ruby/protocol/MSI-cache.sm)
+参见 [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](../../gem5/src/mem/ruby/protocol/MSI-cache.sm)
 
 ```c++
-enumeration(Event, desc="Cache events") {
- // From the processor/sequencer/mandatory queue
- Load,           desc="Load from processor";
- Store,          desc="Store from processor";
+enumeration(Event, desc="缓存事件") {
+ // 来自处理器/序列器/强制队列
+ Load,           desc="来自处理器的加载";
+ Store,          desc="来自处理器的存储";
 
- // Internal event (only triggered from processor requests)
- Replacement,    desc="Triggered when block is chosen as victim";
+ // 内部事件（仅由处理器请求触发）
+ Replacement,    desc="当块被选为牺牲者时触发";
 
- // Forwarded request from other cache via dir on the forward network
- FwdGetS,        desc="Directory sent us a request to satisfy GetS. ";
-                      "We must have the block in M to respond to this.";
- FwdGetM,        desc="Directory sent us a request to satisfy GetM. ";
+ // 通过目录在转发网络上从其他缓存转发的请求
+ FwdGetS,        desc="目录向我们发送请求以满足 GetS。";
+                      "我们必须拥有 M 状态的块才能响应此请求。";
+ FwdGetM,        desc="目录向我们发送请求以满足 GetM。";
  . . .
 ```
 
 ---
 
-## Other structures and functions
+## 其他结构和函数
 
-See [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](../../gem5/src/mem/ruby/protocol/MSI-cache.sm)
+参见 [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](../../gem5/src/mem/ruby/protocol/MSI-cache.sm)
 
-- **Entry**: Declare the data structure for each entry
-  - Block data, block state, sometimes others (e.g., tokens)
-- **TBE/TBETable**: Transient Buffer Entry
-  - Like an MSHR, but not exactly (allocated more often)
-  - Holds data for blocks in transient states
-- **get/set State, AccessPermissions, functional read/write**
-  - Required to implement AbstractController
-  - Usually just copy-paste from examples
-
----
-
-## Ports and message buffers
-
-Not gem5 ports!
-
-- **out_port**: "Rename" the message buffer and declare message type
-- **in_port**: Much of the SLICC "magic" here.
-  - Called every cycle
-  - Look at head message
-  - Trigger events
-
-> **Note**: (General rule of thumb) You should only ever have `if` statements in `in_port` blocks. Never in **actions**.
+- **Entry**：声明每个条目的数据结构
+  - 块数据、块状态，有时还有其他（例如，令牌）
+- **TBE/TBETable**：瞬态缓冲区条目
+  - 类似于 MSHR，但不完全相同（分配更频繁）
+  - 保存瞬态状态块的数据
+- **get/set State、AccessPermissions、功能读/写**
+  - 实现 AbstractController 所必需
+  - 通常只是从示例中复制粘贴
 
 ---
 
-## In port blocks
+## 端口和消息缓冲区
+
+不是 gem5 端口！
+
+- **out_port**："重命名"消息缓冲区并声明消息类型
+- **in_port**：SLICC 的大部分"魔法"在这里。
+  - 每个周期调用
+  - 查看头部消息
+  - 触发事件
+
+> **注意**：（一般经验法则）你应该只在 `in_port` 块中有 `if` 语句。永远不要在**动作**中。
+
+---
+
+## 输入端口块
 
 ```c++
 in_port(forward_in, RequestMsg, forwardToCache) {
@@ -438,18 +438,18 @@ in_port(forward_in, RequestMsg, forwardToCache) {
  . . .
 ```
 
-It's weird syntax that looks like a function call, but it's not.
-Automatically populates a "local variable" called `in_msg`.
+这是看起来像函数调用的奇怪语法，但它不是。
+自动填充一个名为 `in_msg` 的"局部变量"。
 
-`trigger()` looks for a *transition*.
-It also automatically ensures all resources are available to complete the transition.
+`trigger()` 查找*转换*。
+它还自动确保所有资源都可用于完成转换。
 
 ---
 
-## Actions
+## 动作
 
 ```c++
-action(sendGetM, "gM", desc="Send GetM to the directory") {
+action(sendGetM, "gM", desc="向目录发送 GetM") {
  enqueue(request_out, RequestMsg, 1) {
     out_msg.addr := address;
     out_msg.Type := CoherenceRequestType:GetM;
@@ -460,14 +460,14 @@ action(sendGetM, "gM", desc="Send GetM to the directory") {
 }
 ```
 
-**`enqueue`** is like `peek`, but it automatically populates `out_msg`
+**`enqueue`** 类似于 `peek`，但它自动填充 `out_msg`
 
-Some variables are implicit in actions. These are passed in via `trigger()` in `in_port`.
-These are `address`, `cache_entry`, `tbe`
+某些变量在动作中是隐式的。这些通过 `in_port` 中的 `trigger()` 传入。
+这些是 `address`、`cache_entry`、`tbe`
 
 ---
 
-## Transitions
+## 转换
 
 ```c++
 transition(I, Store, IM_AD) {
@@ -482,63 +482,63 @@ transition({IM_AD, SM_AD}, {DataDirNoAcks, DataOwner}, M) {
 }
 ```
 
-- **`(I, Store, IM_AD)`**: From state `I` on event `Store` to state `IM_AD`
-- **`({IM_AD, SM_AD}, {DataDirNoAcks, DataOwner}, M)`**: From either `IM_AD` or `SM_AD` on either `DataDirNoAcks` or `DataOwner` to state `M`
-- Almost always `pop` at the end
-- Don't forget to use stats!
+- **`(I, Store, IM_AD)`**：从状态 `I` 在事件 `Store` 上转换到状态 `IM_AD`
+- **`({IM_AD, SM_AD}, {DataDirNoAcks, DataOwner}, M)`**：从 `IM_AD` 或 `SM_AD` 在 `DataDirNoAcks` 或 `DataOwner` 上转换到状态 `M`
+- 几乎总是在最后 `pop`
+- 不要忘记使用统计信息！
 
 ---
 
-## Now, the exercise
+## 现在，练习
 
-The code should be compiled by now!
+代码现在应该已经编译好了！
 
-See [`materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md`](../../materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md)
+参见 [`materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md`](../../materials/03-Developing-gem5-models/06-modeling-cache-coherence/README.md)
 
-You will:
+你将：
 
-1. Declare the protocol for the compiler
-2. Fill in the message types
-3. Complete the message buffers
-4. Test the protocol
-5. Find a bug
-6. Fix the bug
-7. Test with the ruby random tester
+1. 为编译器声明协议
+2. 填写消息类型
+3. 完成消息缓冲区
+4. 测试协议
+5. 找到一个 bug
+6. 修复 bug
+7. 使用 ruby 随机测试器进行测试
 
 ---
 
-## Debugging protocols
+## 调试协议
 
-### Run a parallel test
+### 运行并行测试
 
 ```sh
 build/ALL_MyMSI/gem5.opt configs/learning_gem5/part3/simple_ruby.py
 ```
 
-Result is a failure!
+结果是失败！
 
 ```termout
 build/ALL_MyMSI/mem/ruby/protocol/L1Cache_Transitions.cc:266: panic: Invalid transition
 system.caches.controllers0 time: 73 addr: 0x9100 event: DataDirNoAcks state: IS_D
 ```
 
-### Run with protocol trace
+### 使用协议跟踪运行
 
 ```sh
 build/ALL_MyMSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part3/simple_ruby.py
 ```
 
-Start fixing the errors and fill in the `MyMSI-cache.sm`
+开始修复错误并填写 `MyMSI-cache.sm`
 
 ---
 
-## Fixing the errors: Missing transition
+## 修复错误：缺少转换
 
-- Missing IS_D transition in cache
-  - write the data to the cache
-  - deallocate the TBE
-  - mark that this is an "external load hit"
-  - pop the response queue
+- 缓存中缺少 IS_D 转换
+  - 将数据写入缓存
+  - 释放 TBE
+  - 标记这是"外部加载命中"
+  - 弹出响应队列
 
 ```c++
 transition(IS_D, {DataDirNoAcks, DataOwner}, S) {
@@ -551,22 +551,22 @@ transition(IS_D, {DataDirNoAcks, DataOwner}, S) {
 
 ---
 
-## Fixing the errors: Missing action
+## 修复错误：缺少动作
 
-- Fill in the "write data to cache" action
-  - Get the data out of the message (how to get the message?)
-  - Set the cache entry's data (how? where does `cache_entry` come from?)
-  - Make sure to have `assert(is_valid(cache_entry))`
+- 填写"将数据写入缓存"动作
+  - 从消息中获取数据（如何获取消息？）
+  - 设置缓存条目的数据（如何？`cache_entry` 来自哪里？）
+  - 确保有 `assert(is_valid(cache_entry))`
 
 ```c++
-action(writeDataToCache, "wd", desc="Write data to the cache") {
+action(writeDataToCache, "wd", desc="将数据写入缓存") {
     peek(response_in, ResponseMsg) {
         assert(is_valid(cache_entry));
         cache_entry.DataBlk := in_msg.DataBlk;
     }
 }
 ```
-Try again (have to recompile after any change to the protocol):
+重试（对协议进行任何更改后必须重新编译）：
 ```sh
 scons build/ALL_MyMSI/gem5.opt -j$(nproc) PROTOCOL=MYMSI
 build/ALL_MyMSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part3/simple_ruby.py
@@ -574,21 +574,21 @@ build/ALL_MyMSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part3
 
 ---
 
-## Fixing the error: Why assert failure?
+## 修复错误：为什么断言失败？
 
-- Why assert failure?
-  - Fill in `allocateCacheBlock`!
-  - Make sure to call `set_cache_entry`. Asserting there is an entry available and that `cache_entry` is invalid is helpful.
+- 为什么断言失败？
+  - 填写 `allocateCacheBlock`！
+  - 确保调用 `set_cache_entry`。断言有可用条目且 `cache_entry` 无效是有帮助的。
 
 ```c++
-action(allocateCacheBlock, "a", desc="Allocate a cache block") {
+action(allocateCacheBlock, "a", desc="分配缓存块") {
     assert(is_invalid(cache_entry));
     assert(cacheMemory.cacheAvail(address));
     set_cache_entry(cacheMemory.allocate(address, new Entry));
 }
 ```
 
-Try again:
+重试：
 
 ```sh
 scons build/ALL_MyMSI/gem5.opt -j$(nproc) PROTOCOL=MYMSI
@@ -597,40 +597,40 @@ build/ALL_MyMSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part3
 
 ---
 
-## When debugging takes too long: RubyRandomTester
+## 当调试时间过长时：RubyRandomTester
 
-**At some point it might be taking while to get to new errors, so...**
+**在某些时候，可能需要一段时间才能遇到新错误，所以...**
 
-Run the Ruby random tester. This is a special "CPU" which exercises coherence corner cases.
+运行 Ruby 随机测试器。这是一个特殊的"CPU"，它测试一致性边界情况。
 
-- Modify the `test_caches.py` the same way as `msi_caches.py`
-
-```sh
-build/ALL_MyMSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part3/ruby_test.py
-```
-
-Notice you may want to change `checks_to_complete` and `num_cpus` in `test_caches.py`.
-You may also want to reduce the memory latency.
-
----
-
-## Using the random tester
+- 以与 `msi_caches.py` 相同的方式修改 `test_caches.py`
 
 ```sh
 build/ALL_MyMSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part3/ruby_test.py
 ```
 
-- Wow! now it should be way faster to see the error!
-- Now, you need to handle this in the cache! `transition(S, Inv, I)`
-  - If you get an invalidate...
-  - Send an ack, let the CPU know that this line was invalidated, deallocate the block, pop the queue
-- So, now, hmm, it looks like it works??? But here's still one more
-  - Some transitions are very rare: `transition(I, Store, IM_AD)`
-  - Try varying the parameters of the tester (without `ProtocolTrace`!) to find a combination which triggers an error (100000 checks, 8 CPUs, 50ns memory...)
-- Now, you can fix the error!
+注意你可能想要更改 `test_caches.py` 中的 `checks_to_complete` 和 `num_cpus`。
+你可能还想减少内存延迟。
 
 ---
-## Transitions
+
+## 使用随机测试器
+
+```sh
+build/ALL_MyMSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part3/ruby_test.py
+```
+
+- 哇！现在应该更快地看到错误了！
+- 现在，你需要在缓存中处理这个！`transition(S, Inv, I)`
+  - 如果你收到无效化...
+  - 发送确认，让 CPU 知道这一行已无效化，释放块，弹出队列
+- 所以，现在，嗯，看起来它工作了？？？但还有一个
+  - 某些转换非常罕见：`transition(I, Store, IM_AD)`
+  - 尝试改变测试器的参数（不使用 `ProtocolTrace`！）以找到触发错误的组合（100000 次检查，8 个 CPU，50ns 内存...）
+- 现在，你可以修复错误了！
+
+---
+## 转换
 
 
 ```sh
@@ -651,36 +651,36 @@ transition(I, Store,IM_AD) {}
 
 ```
 
-Run Scons and the Python script again
+再次运行 Scons 和 Python 脚本
 
 
 ------
 
 <!-- _class: code-60-percent no-logo -->
 
-## Fixing the error: Deadlock
+## 修复错误：死锁
 
-- Possible deadlock... hmm... This happens if *nothing* happens in the caches for a long time.
-  - What was the last thing that happened before the deadlock? Let's check what was *supposed* to happen
-  - Fill that in!
+- 可能的死锁...嗯...如果缓存中长时间*没有任何*事情发生，就会发生这种情况。
+  - 死锁之前发生的最后一件事是什么？让我们检查*应该*发生什么
+  - 填写它！
 
 ```c++
 transition({SM_AD, SM_A}, {Store, Replacement, FwdGetS, FwdGetM}) {
     stall;
 }
 
-action(loadHit, "Lh", desc="Load hit") {
-  // Set this entry as the most recently used for the replacement policy
-  // Send the data back to the sequencer/CPU. NOTE: False means it was not an "external hit", but hit in this local cache.
+action(loadHit, "Lh", desc="加载命中") {
+  // 将此条目设置为最近使用的，用于替换策略
+  // 将数据发送回序列器/CPU。注意：False 表示这不是"外部命中"，而是在此本地缓存中命中。
   assert(is_valid(cache_entry));
-  // Set this entry as the most recently used for the replacement policy
+  // 将此条目设置为最近使用的，用于替换策略
   cacheMemory.setMRU(cache_entry);
-  // Send the data back to the sequencer/CPU. NOTE: False means it was not an "external hit", but hit in this local cache.
+  // 将数据发送回序列器/CPU。注意：False 表示这不是"外部命中"，而是在此本地缓存中命中。
   sequencer.readCallback(address, cache_entry.DataBlk, false);
 }
 ```
 
-Try again (Scons and Python script)
+重试（Scons 和 Python 脚本）
 
 ```sh
 scons build/ALL_MyMSI/gem5.opt -j$(nproc) PROTOCOL=MYMSI
@@ -691,16 +691,16 @@ build/ALL_MyMSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part3
 
 <!-- _class: code-80-percent -->
 
-## Fixing the error: What to do on a store
+## 修复错误：存储时该做什么
 
-- Fix the next error (what to do on a store??)
-  - Allocate a block, allocate a TBE, send a message, pop the queue
-  - Also make sure that all actions that you need
-  - When sending, you need to construct a new message. See `RequestMsg` in `MyMSI-msg.sm`
+- 修复下一个错误（存储时该做什么？？）
+  - 分配一个块，分配一个 TBE，发送消息，弹出队列
+  - 还要确保所有需要的动作
+  - 发送时，需要构造新消息。参见 `MyMSI-msg.sm` 中的 `RequestMsg`
 
 ```c++
  action(sendGetM, "gM", desc="Send GetM to the directory") {
-        // Fill this in with an enqueue on the request output port
+        // 在请求输出端口上用 enqueue 填写这个
     enqueue(request_out, RequestMsg, 1) {
       out_msg.addr := address;
       out_msg.Type := CoherenceRequestType:GetM;
@@ -712,21 +712,21 @@ build/ALL_MyMSI/gem5.opt --debug-flags=ProtocolTrace configs/learning_gem5/part3
   }
 ```
 
-Run Scons and Python script
+运行 Scons 和 Python 脚本
 
 ---
 
 <!-- _class: code-60-percent -->
 
-## Final error: What to do when there is sharing?
+## 最终错误：存在共享时该做什么？
 
-- Next error: What to do when there is sharing??
-  - get data from memory (yes, this is an unoptimized protocol..)
-  - remove the *requestor* from the sharers (just in case)
-  - send an invalidate to all other sharers
-  - set the owner
-  - and pop the queue
-- Now edit `MyMSI-dir.sm`
+- 下一个错误：存在共享时该做什么？？
+  - 从内存获取数据（是的，这是一个未优化的协议..）
+  - 从共享者中移除*请求者*（以防万一）
+  - 向所有其他共享者发送无效化
+  - 设置所有者
+  - 并弹出队列
+- 现在编辑 `MyMSI-dir.sm`
 ```c++
 transition(S, GetM, M_m) {
     sendMemRead;
@@ -736,7 +736,7 @@ transition(S, GetM, M_m) {
     popRequestQueue;
 }
 ```
-Try again (Scons and Python script): (note: no protocol trace this time since it is mostly working)
+重试（Scons 和 Python 脚本）：（注意：这次没有协议跟踪，因为它基本正常工作了）
 
 ```sh
 build/ALL_MyMSI/gem5.opt configs/learning_gem5/part3/ruby_test.py
@@ -744,69 +744,69 @@ build/ALL_MyMSI/gem5.opt configs/learning_gem5/part3/ruby_test.py
 
 ---
 
-## Now that it's working... look at the stats
+## 现在它工作了...查看统计信息
 
-Re-run the simple pthread test and lets look at some stats!
+重新运行简单的 pthread 测试，让我们查看一些统计信息！
 
 ```sh
 build/ALL_MyMSI/gem5.opt configs/learning_gem5/part3/simple_ruby.py
 ```
 
-- How many forwarded messages did the L1 caches receive?
-- How many times times did a cache have to upgrade from S -> M?
-- What was the average miss latency for the L1?
-- What was the average miss latency *when another cache had the data*?
+- L1 缓存接收了多少转发消息？
+- 缓存必须从 S -> M 升级多少次？
+- L1 的平均未命中延迟是多少？
+- *当另一个缓存有数据时*的平均未命中延迟是多少？
 
 ---
 
-## Answers
+## 答案
 
-- How many forwarded messages did the L1 caches receive? `grep -i fwd m5out/stats.txt`
+- L1 缓存接收了多少转发消息？`grep -i fwd m5out/stats.txt`
   - (`...FwdGetM` + `...FwdGetS`) =  (16+13) = 29
-- How many times times did a cache have to upgrade from S -> M?
+- 缓存必须从 S -> M 升级多少次？
 `grep L1Cache_Controller.SM_AD.DataDirNoAcks::total m5out/stats.txt`
 565
-- What was the average miss latency for the L1?
+- L1 的平均未命中延迟是多少？
 `grep MachineType.L1Cache.miss_mach_latency_hist_seqr::mean  m5out/stats.txt`
 19.448276
-- What was the average miss latency *when another cache had the data*?
+- *当另一个缓存有数据时*的平均未命中延迟是多少？
 `grep RequestTypeMachineType.ST.L1Cache.miss_type_mach_latency_hist_seqr::mean m5out/stats.txt`
 18
 `grep RequestTypeMachineType.LD.L1Cache.miss_type_mach_latency_hist_seqr::mean`
-- multiply by sample size (...::sample) and then add together
+- 乘以样本大小（...::sample），然后相加
 
 ---
 
-## Ruby config scripts
+## Ruby 配置脚本
 
-- Don't follow gem5 style closely :(
-- Require lots of boilerplate
-- Standard Library does a much better job
+- 没有严格遵循 gem5 风格 :(
+- 需要大量样板代码
+- 标准库做得更好
 
-### What's needed in these scripts?
+### 这些脚本中需要什么？
 
-1. Instantiate the controllers
-Here is where you pass all of the parameters to the `.sm` files
-2. Create a `Sequencer` for each CPU (and DMA, etc.)
-More details in a moment
-3. Create and connect all of the network routers
-
----
-
-## Creating the topology
-
-- You can connect the routers any way you like:
-  - Mesh, torus, ring, crossbar, dragonfly, etc.
-- Usually hidden in `create_topology` (see configs/topologies)
-  - Problem: These make assumptions about controllers
-  - Inappropriate for non-default protocols
-
-After creating the topology (before simulation), Ruby's network model will find all of the valid paths from one node to another in the on-chip network.
-Thus, the OCN is completely separate from the types of controllers and the protocol.
+1. 实例化控制器
+这是你向 `.sm` 文件传递所有参数的地方
+2. 为每个 CPU（以及 DMA 等）创建一个 `Sequencer`
+稍后会有更多详细信息
+3. 创建并连接所有网络路由器
 
 ---
 
-## Point-to-point example
+## 创建拓扑
+
+- 你可以以任何方式连接路由器：
+  - 网格、环面、环形、交叉开关、蜻蜓等
+- 通常隐藏在 `create_topology` 中（参见 configs/topologies）
+  - 问题：这些对控制器做了假设
+  - 不适合非默认协议
+
+创建拓扑后（在模拟之前），Ruby 的网络模型将找到片上网络中从一个节点到另一个节点的所有有效路径。
+因此，OCN 与控制器类型和协议完全分离。
+
+---
+
+## 点对点示例
 
 ```python
 self.routers = [Switch(router_id = i) for i in range(len(controllers))]
@@ -816,77 +816,77 @@ link_count = 0
 self.int_links = []
 for ri in self.routers:
     for rj in self.routers:
-        if ri == rj: continue # Don't connect a router to itself!
+        if ri == rj: continue # 不要将路由器连接到自身！
         link_count += 1
         self.int_links.append(SimpleIntLink(link_id = link_count, src_node = ri, dst_node = rj))
 ```
 
-- **`self.routers`**: One router per controller in this case of point-to-point
-  - Must have a router for "internal" links
-- **`self.ext_links`**: Connects the controller to the router
-  - You can have multiple external links per router, but not for this point-to-point example
-- **`self.int_links`**: Connects the routers to each other
+- **`self.routers`**：在点对点的情况下，每个控制器一个路由器
+  - 必须有用于"内部"链路的路由器
+- **`self.ext_links`**：将控制器连接到路由器
+  - 每个路由器可以有多个外部链路，但此点对点示例中不行
+- **`self.int_links`**：将路由器彼此连接
 
 ---
 
-## Ports to Ruby to ports interface
+## 端口到 Ruby 到端口接口
 
 ![bg right width:600](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/ruby-architecture.drawio.svg)
 
-Remember this picture?
+还记得这张图吗？
 
-- At the top, cores connect to Ruby via the `Sequencer` which is called `mandatory_queue` in the SLICC file.
-  - When the request is complete, call `sequencer.readCallback` or `sequencer.writeCallback`.
-  - Make sure to include if it's a hit or miss for statistics. You can even include where the miss was serviced for more detailed stats.
-- At the bottom, any `Controller` can have a requestor port and you can send messages by using special message buffers `requestToMemory` and `responseFromMemory`.
+- 在顶部，核心通过 `Sequencer` 连接到 Ruby，在 SLICC 文件中称为 `mandatory_queue`。
+  - 当请求完成时，调用 `sequencer.readCallback` 或 `sequencer.writeCallback`。
+  - 确保包含它是命中还是未命中以用于统计。你甚至可以包含未命中在哪里被服务以获取更详细的统计信息。
+- 在底部，任何 `Controller` 都可以有一个请求者端口，你可以通过使用特殊消息缓冲区 `requestToMemory` 和 `responseFromMemory` 发送消息。
 
 ---
 
-## Where is...?
+## 在哪里...？
 
-### Configuration
+### 配置
 
-- configs/network: Configuration of network models
-- configs/topologies: Default cache topologies
-- configs/ruby: Protocol config and Ruby config
-- **NOTE**: Want to move more to the standard library!
-- Ruby config: configs/ruby/Ruby.py
-  - Entry point for Ruby configs and helper functions
-  - Selects the right protocol config "automatically"
+- configs/network：网络模型的配置
+- configs/topologies：默认缓存拓扑
+- configs/ruby：协议配置和 Ruby 配置
+- **注意**：希望更多内容移到标准库！
+- Ruby 配置：configs/ruby/Ruby.py
+  - Ruby 配置和辅助函数的入口点
+  - "自动"选择正确的协议配置
 
-### SLICC: *Don't be afraid to modify the compiler*
+### SLICC：*不要害怕修改编译器*
 
-- src/mem/slicc: Code for the compiler
+- src/mem/slicc：编译器的代码
 - src/mem/ruby/slicc_interface
-  - Structures used only in generated code
+  - 仅在生成的代码中使用的结构
   - AbstractController
 
 ---
 
-## Where is...?
+## 在哪里...？
 
 - src/mem/ruby/structures
-  - Structures used in Ruby (e.g., cache memory, replace policy)
+  - Ruby 中使用的结构（例如，缓存内存、替换策略）
 - src/mem/ruby/system
-  - Ruby wrapper code and entry point
+  - Ruby 包装代码和入口点
   - RubyPort/Sequencer
-  - RubySystem: Centralized information, checkpointing, etc.
-- src/mem/ruby/common: General data structures, etc.
-- src/mem/ruby/filters: Bloom filters, etc.
-- src/mem/ruby/network: Network model
-- src/mem/ruby/profiler: Profiling for coherence protocols
+  - RubySystem：集中信息、检查点等
+- src/mem/ruby/common：通用数据结构等
+- src/mem/ruby/filters：布隆过滤器等
+- src/mem/ruby/network：网络模型
+- src/mem/ruby/profiler：一致性协议的性能分析
 
 ---
 
-## Current protocols
+## 当前协议
 
-- GPU VIPER ("Realistic" GPU-CPU protocol)
-- GPU VIPER Region (HSC paper)
-- Garnet standalone (No coherence, just traffic injection)
-- MESI Three level (like two level, but with L0 cache)
-- MESI Two level (private L1s shared L2)
-- MI example (Example: Do not use for performance)
-- MOESI AMD (Core pairs, 3 level, optionally with region coherence)
+- GPU VIPER（"真实"GPU-CPU 协议）
+- GPU VIPER Region（HSC 论文）
+- Garnet standalone（无一致性，仅流量注入）
+- MESI 三级（类似于二级，但带有 L0 缓存）
+- MESI 二级（私有 L1 共享 L2）
+- MI 示例（示例：不要用于性能）
+- MOESI AMD（核心对，3 级，可选区域一致性）
 - MOESI CMP directory
 - MOESI CMP token
-- MOESI hammer (Like AMD hammer protocol for opteron/hyper transport)
+- MOESI hammer（类似于用于 opteron/hyper transport 的 AMD hammer 协议）

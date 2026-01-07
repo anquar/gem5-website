@@ -1,54 +1,54 @@
 ---
 layout: bootcamp
-title: "Modeling memory objects in gem5: Ports"
+title: "在 gem5 中建模内存对象：Ports"
 permalink: /bootcamp/developing-gem5/ports
 section: developing-gem5
 ---
 <!-- _class: title -->
 
-## Modeling memory objects in gem5: Ports
+## 在 gem5 中建模内存对象：Ports
 
-**IMPORTANT**: This slide deck builds on top of what has already been developed in [Introduction to SimObjects](./01-sim-objects-intro.md), [Debugging gem5](./02-debugging-gem5.md), and [Event Driven Simulation](./03-event-driven-sim.md).
+**重要提示**：本幻灯片基于 [SimObjects 简介](./01-sim-objects-intro.md)、[调试 gem5](./02-debugging-gem5.md) 和 [事件驱动仿真](./03-event-driven-sim.md) 中已开发的内容。
 
 ---
 
 ## Ports
 
-In gem5, `SimObjects` can use `Ports` to send/request data. `Ports` are gem5's **main interface to the memory**. There are two types of `Ports` in gem5: `RequestPort` and `ResponsePort`.
+在 gem5 中，`SimObjects` 可以使用 `Ports` 来发送/请求数据。`Ports` 是 gem5 的**内存主接口**。gem5 中有两种类型的 `Ports`：`RequestPort` 和 `ResponsePort`。
 
-As their names would suggest:
+正如它们的名称所示：
 
-- `RequestPorts`  make `requests` and await `responses`.
-- `ResponsePorts` await `requests` and send `responses`.
+- `RequestPorts` 发出 `requests`（请求）并等待 `responses`（响应）。
+- `ResponsePorts` 等待 `requests`（请求）并发送 `responses`（响应）。
 
-Make sure to differentiate between `request`/`response` and `data`. Both `requests` and `response` can carry `data` with them.
+请确保区分 `request`/`response` 和 `data`。`requests` 和 `response` 都可以携带 `data`（数据）。
 
 ---
 <!-- _class: two-col code-50-percent -->
 
 ## Packets
 
-`Packets` facilitate communication through ports. They can be either `request` or `response` packets.
-> **NOTE**: `Packet` in gem5 can change from a `request` to a `response`. This happens when the `request` arrives at a `SimObject` that can respond to it.
+`Packets`（数据包）通过端口促进通信。它们可以是 `request`（请求）或 `response`（响应）数据包。
+> **注意**：gem5 中的 `Packet` 可以从 `request` 变为 `response`。当 `request` 到达能够响应它的 `SimObject` 时会发生这种情况。
 
-Every `Packet` has the following fields:
+每个 `Packet` 都有以下字段：
 
-- `Addr`: Address of the memory location being accessed.
-- `Data`: Data associated with the `Packet` (the data that `Packet` carries).
-- `MemCmd`: Denotes the kind of `Packet` and what it should do.
-  - Examples include: `readReq`/`readResp`/`writeReq`/`writeResp`.
-- `RequestorID`: ID for the `SimObject` that created the request (requestor).
+- `Addr`：正在访问的内存位置的地址。
+- `Data`：与 `Packet` 关联的数据（`Packet` 携带的数据）。
+- `MemCmd`：表示 `Packet` 的类型及其应执行的操作。
+  - 示例包括：`readReq`/`readResp`/`writeReq`/`writeResp`。
+- `RequestorID`：创建请求的 `SimObject` 的 ID（请求者）。
 
-Class `Packet` is defined in [`gem5/src/mem/packet.hh`](../../gem5/src/mem/packet.hh). Note that, in our tutorial, we will deal with `Packet` in pointers. `PacketPtr` is a type in gem5 that is equivalent to `Packet*`.
+类 `Packet` 定义在 [`gem5/src/mem/packet.hh`](../../gem5/src/mem/packet.hh) 中。请注意，在本教程中，我们将使用指针来处理 `Packet`。`PacketPtr` 是 gem5 中的一个类型，等价于 `Packet*`。
 
 ---
 <!-- _class: no-logo code-50-percent -->
 
-## Ports in gem5
+## gem5 中的 Ports
 
-Let's take a look at [`gem5/src/mem/port.hh`](../../gem5/src/mem/port.hh) to see the declarations for `Port` classes.
+让我们看一下 [`gem5/src/mem/port.hh`](../../gem5/src/mem/port.hh) 来查看 `Port` 类的声明。
 
-Let's focus on the following functions. These functions make communication possible. Notice how `recvTimingReq` and `recvTimingResp` are `pure virtual` functions. This means that you can **not** instantiate an object of `RequestPort` or `ResponsePort` and instead you must extend them to fit your use case.
+让我们关注以下函数。这些函数使通信成为可能。请注意 `recvTimingReq` 和 `recvTimingResp` 是 `pure virtual`（纯虚）函数。这意味着你**不能**实例化 `RequestPort` 或 `ResponsePort` 的对象，而必须扩展它们以适应你的用例。
 
 ```cpp
 class RequestPort {
@@ -74,30 +74,30 @@ class ResponsePort {
 
 ---
 
-## Access Modes: Timing, Atomic, Functional
+## 访问模式：Timing、Atomic、Functional
 
-`Ports` allow 3 memory access modes:
+`Ports` 允许 3 种内存访问模式：
 
-1: In **`timing`** mode, accesses advance simulator time. In this mode, `requests` propagate down the memory hierarchy while each level imposes its latency and can potentially interleave processing of multiple requests. This mode is the only realistic mode in accessing the memory.
-2: In **`atomic`** mode, accesses do not directly advance simulator time, rather it's left to the **original** `requestor` to move simulator time. Accesses are done atomically (are **not** interleaved). This access mode is useful for fast-forwarding simulation.
-3: In **`functional`** mode, accesses to the memory are done through a chain of function calls. `Functional` mode does not advance simulator time. All accesses are done in series and are not interleaved. This access mode is useful for initializing simulation from files, i.e. talking from the host to the simulator.
+1：在 **`timing`**（时序）模式下，访问会推进仿真器时间。在此模式下，`requests`（请求）沿着内存层次结构向下传播，每一层都会施加其延迟，并可能交错处理多个请求。这是访问内存时唯一现实的模式。
+2：在 **`atomic`**（原子）模式下，访问不会直接推进仿真器时间，而是由**原始** `requestor`（请求者）来推进仿真器时间。访问以原子方式完成（**不会**交错）。此访问模式对于快速推进仿真很有用。
+3：在 **`functional`**（功能）模式下，对内存的访问通过函数调用链完成。`Functional` 模式不会推进仿真器时间。所有访问都是串行完成的，不会交错。此访问模式对于从文件初始化仿真很有用，即从主机与仿真器通信。
 
 ---
 
-## Timing Protocol in Action
+## 时序协议的实际应用
 
-> **IMPORTANT**: A `Port` can only be connected to **one other** `Port` and it must be of a different type: `RequestPort`/`ResponsePort` can only be connected to `ResponsePort`/`RequestPort`.
+> **重要提示**：一个 `Port` 只能连接到**另一个** `Port`，且必须是不同类型：`RequestPort`/`ResponsePort` 只能连接到 `ResponsePort`/`RequestPort`。
 
-If you look at [`gem5/src/mem/port.hh`](../../gem5/src/mem/port.hh) you'll see that class `RequestPort` has a `private` member called `ResponsePort* _responsePort` that holds a pointer to the `ResponsePort` that the `RequestPort` object is connected to (its `peer`).
+如果你查看 [`gem5/src/mem/port.hh`](../../gem5/src/mem/port.hh)，你会看到类 `RequestPort` 有一个名为 `ResponsePort* _responsePort` 的 `private` 成员，它持有 `RequestPort` 对象连接到的 `ResponsePort` 的指针（其 `peer`（对等端口））。
 
-Moreover, if you look at the definition of `sendTimingReq`/`sendTimingResp` in [`gem5/src/mem/port.hh`](../../gem5/src/mem/port.hh) you'll see that they will call and return `peer::recvTimingReq`/`peer::recvTimingResp`.
+此外，如果你查看 [`gem5/src/mem/port.hh`](../../gem5/src/mem/port.hh) 中 `sendTimingReq`/`sendTimingResp` 的定义，你会看到它们将调用并返回 `peer::recvTimingReq`/`peer::recvTimingResp`。
 
-Now let's look at 2 scenarios for communication, in these scenarios let's assume:
+现在让我们看看通信的 2 个场景，在这些场景中我们假设：
 
-- `Requestor` is a `SimObject` that has a `RequestPort`.
-- `Responder` is a `SimObject` that has a `ReponsePort`.
+- `Requestor`（请求者）是一个具有 `RequestPort` 的 `SimObject`。
+- `Responder`（响应者）是一个具有 `ResponsePort` 的 `SimObject`。
 
-**NOTE**: Note that while in our scenarios `Requestor` and `Responder` have one `Port`, `SimObjects` can have multiple ports of different types.
+**注意**：请注意，虽然在我们的场景中 `Requestor` 和 `Responder` 只有一个 `Port`，但 `SimObjects` 可以有多个不同类型的端口。
 
 ---
 <!-- _class: center-image -->
@@ -108,14 +108,14 @@ Now let's look at 2 scenarios for communication, in these scenarios let's assume
 
 ---
 
-## Scenario: Everything Goes Smoothly
+## 场景：一切顺利
 
-In this scenario:
+在此场景中：
 
-1: **`Requestor`** sends a `Packet` as the `request` (e.g. a `readReq`). In C++ terms `Requestor::RequestPort::sendTimingReq` is called which in turn calls `Responder::ResponsePort::recvTimingReq`.
-2: **`Responder`** is not busy and accepts the `request`. In C++ terms `Responder::ResponsePort::recvTimingReq` returns **true**. Since `Requestor` has received true, it will receive a `response` in the future.
-3: Simulator time advances, `Requestor` and `Responder` continues execution. When `Responder` has the `response` (e.g. `readResp`) ready, it will send the `response` to the `requestor`. In C++ terms `Responder::ResponsePort::sendTimingResp` is called which in turn calls `Requestor::RequestPort::recvTimingResp`.
-4: **`Requestor`** is not busy and accepts the `response`. In C++ terms `Requestor::RequestPort::recvTimingResp` returns true. Since `Responder` has received true, the transaction is complete.
+1：**`Requestor`**（请求者）发送一个 `Packet` 作为 `request`（例如 `readReq`）。用 C++ 术语来说，调用 `Requestor::RequestPort::sendTimingReq`，它又调用 `Responder::ResponsePort::recvTimingReq`。
+2：**`Responder`**（响应者）不忙并接受 `request`。用 C++ 术语来说，`Responder::ResponsePort::recvTimingReq` 返回 **true**。由于 `Requestor` 收到了 true，它将在未来收到 `response`。
+3：仿真器时间推进，`Requestor` 和 `Responder` 继续执行。当 `Responder` 准备好 `response`（例如 `readResp`）时，它将把 `response` 发送给 `requestor`。用 C++ 术语来说，调用 `Responder::ResponsePort::sendTimingResp`，它又调用 `Requestor::RequestPort::recvTimingResp`。
+4：**`Requestor`** 不忙并接受 `response`。用 C++ 术语来说，`Requestor::RequestPort::recvTimingResp` 返回 true。由于 `Responder` 收到了 true，事务完成。
 
 ---
 <!-- _class: center-image -->
@@ -126,41 +126,41 @@ In this scenario:
 
 ---
 
-## Scenario: Responder Is Busy
+## 场景：Responder 忙碌
 
-In this scenario:
+在此场景中：
 
-1: **`Requestor`** sends a `Packet` as the `request` (e.g. a `readReq`).
-2: **`Responder`** is busy and rejects the `request`. In C++ terms `Responder::ResponsePort::recvTimingReq` returns **false**. Since `Requestor` has received false, it waits for a `retry request` from `Responder`.
-3: When **`Responder`** becomes available (is not busy anymore), it will send a `retry request` to `Requestor`. In C++ terms `Responder::ResponsePort::sendReqRetry` is called which in turn calls `Requestor::RequestPort::recvReqRetry`.
-4: **`Requestor`** sends the `blocked Packet` as the `request` (e.g. a `readReq`).
-5: **`Responder`** is not busy and accepts the `request`.
-6: Simulator time advances, `Requestor` and `Responder` continue execution. When `Responder` has the `response` ready it will send the `response` to the `Requestor`.
-7: **`Requestor`** is not busy and can accept the `response`.
+1：**`Requestor`**（请求者）发送一个 `Packet` 作为 `request`（例如 `readReq`）。
+2：**`Responder`**（响应者）忙碌并拒绝 `request`。用 C++ 术语来说，`Responder::ResponsePort::recvTimingReq` 返回 **false**。由于 `Requestor` 收到了 false，它等待来自 `Responder` 的 `retry request`（重试请求）。
+3：当 **`Responder`** 变为可用（不再忙碌）时，它将向 `Requestor` 发送 `retry request`。用 C++ 术语来说，调用 `Responder::ResponsePort::sendReqRetry`，它又调用 `Requestor::RequestPort::recvReqRetry`。
+4：**`Requestor`** 发送被阻塞的 `Packet` 作为 `request`（例如 `readReq`）。
+5：**`Responder`** 不忙并接受 `request`。
+6：仿真器时间推进，`Requestor` 和 `Responder` 继续执行。当 `Responder` 准备好 `response` 时，它将把 `response` 发送给 `Requestor`。
+7：**`Requestor`** 不忙并可以接受 `response`。
 
 ---
 
-## Other Scenarios
+## 其他场景
 
-There are two other possible scenarios:
+还有两种可能的场景：
 
-1- A scenario where the `Requestor` is busy.
-2- A scenario where both `Requestor` and `Responder` are busy.
+1- `Requestor`（请求者）忙碌的场景。
+2- `Requestor` 和 `Responder`（响应者）都忙碌的场景。
 
-**CAUTION**: Scenarios where `Requestor` is busy should not happen normally. In reality, the `Requestor` makes sure it can receive the `response` for a `request` when it sends the request. I have never run into a situation where I had to design my `SimObjects` in a way that the `Requestor` will return false when `recvTimingResp` is called. That's not to say that if you find yourself in a situation like this, you have done something wrong; BUT I would look really hard into my code/design and verify I'm simulating something realistic.
+**警告**：`Requestor` 忙碌的场景通常不应该发生。实际上，`Requestor` 在发送请求时会确保它能够接收该请求的 `response`。我从未遇到过需要以 `Requestor` 在调用 `recvTimingResp` 时返回 false 的方式设计 `SimObjects` 的情况。这并不是说如果你遇到这种情况，你就做错了什么；但我会仔细检查我的代码/设计，并验证我正在模拟一些现实的东西。
 
 ---
 
 ## InspectorGadget
 
-In this step, we will implement our new `SimObject` called `InspectorGadget`. `InspectorGadget` will monitor all the traffic to the memory and make sure all the traffic is safe. In this tutorial, we will do this in multiple steps as laid out below.
+在这一步中，我们将实现一个名为 `InspectorGadget` 的新 `SimObject`。`InspectorGadget` 将监控所有到内存的流量，并确保所有流量都是安全的。在本教程中，我们将按以下步骤进行：
 
-- Step 1: We will implement `InspectorGadget` to forward traffic from CPU to memory and back, causing latency for queueing traffic.
-- Step 2: We will extend `InspectorGadget` to *inspect* the traffic, causing further delay (for `1 cycle`) for inspection.
-- Step 3: We will extend `InpsectorGadget` like below:
-  - It will do multiple inspection every cycle, resulting in higher traffic throughput.
-  - It will expose `inspection_latency` as a parameter.
-- Step 4: We will extend `InspectorGadget` to allow for pipelining of the inspections.
+- 步骤 1：我们将实现 `InspectorGadget` 以转发从 CPU 到内存及返回的流量，导致排队流量的延迟。
+- 步骤 2：我们将扩展 `InspectorGadget` 以*检查*流量，导致检查的进一步延迟（`1 个周期`）。
+- 步骤 3：我们将按以下方式扩展 `InspectorGadget`：
+  - 它将在每个周期进行多次检查，从而产生更高的流量吞吐量。
+  - 它将 `inspection_latency`（检查延迟）作为参数暴露。
+- 步骤 4：我们将扩展 `InspectorGadget` 以允许检查的流水线化。
 
 ---
 
@@ -180,12 +180,12 @@ Here is a diagram of what `InspectorGadget` will look like eventually.
 
 ## ClockedObject
 
-A `ClockedObject` is a child class of `SimObject` that provides facilities for managing time in `cycles`. Every `ClockedObject` has a `clk_domain` parameter that defines its clock frequency. Using the `clk_domain`, the `ClockedObject` provides functionalities like below:
+`ClockedObject` 是 `SimObject` 的子类，提供以 `cycles`（周期）管理时间的设施。每个 `ClockedObject` 都有一个 `clk_domain` 参数，用于定义其时钟频率。使用 `clk_domain`，`ClockedObject` 提供如下功能：
 
-- `clockEdge(Cycles n)`: A function that returns the time of the `nth` clock edge into the future.
-- `nextCycle()`: A function that returns the time of first clock edge into the future, i.e. `nextCycle() := clockEdge(Cycles(1))`.
+- `clockEdge(Cycles n)`：返回未来第 `n` 个时钟边沿时间的函数。
+- `nextCycle()`：返回未来第一个时钟边沿时间的函数，即 `nextCycle() := clockEdge(Cycles(1))`。
 
-This class is defined in [`gem5/src/sim/clocked_object.hh`](../../gem5/src/sim/clocked_object.hh) as shown below:
+此类定义在 [`gem5/src/sim/clocked_object.hh`](../../gem5/src/sim/clocked_object.hh) 中，如下所示：
 
 ```cpp
 class ClockedObject : public SimObject, public Clocked
@@ -205,9 +205,9 @@ class ClockedObject : public SimObject, public Clocked
 
 ---
 
-## InspectorGadget: Adding Files
+## InspectorGadget: 添加文件
 
-Now let's go ahead and create a `SimObject` declaration file for `InspectorGadget`. Do it by running the following commands:
+现在让我们继续为 `InspectorGadget` 创建一个 `SimObject` 声明文件。通过运行以下命令来完成：
 
 ```sh
 cd /workspaces/2024/gem5/src
@@ -216,7 +216,7 @@ cd bootcamp/inspector-gadget
 touch InspectorGadget.py
 ```
 
-Now, let's also create a `SConscript` for registering `InspectorGadget`. Do it by running the following command:
+现在，让我们也创建一个 `SConscript` 来注册 `InspectorGadget`。通过运行以下命令来完成：
 
 ```sh
 touch SConscript
@@ -226,19 +226,19 @@ touch SConscript
 
 ## InspectoGadget: SimObject Declaration File
 
-Now, inside `InspectorGadget.py`, let's define `InspectorGadget` as a `ClockedObject`. To do that, we need to import `ClockedObject`. Do it by adding the following line to `InspectorGadget.py`.
+现在，在 `InspectorGadget.py` 中，让我们将 `InspectorGadget` 定义为 `ClockedObject`。 To do that, we need to import `ClockedObject`. Do it by adding the following line to `InspectorGadget.py`.
 
 ```python
 from m5.objects.ClockedObject import ClockedObject
 ```
 
-The remaining part of the declaration is for now similar to that of `HelloSimObject` in [Introduction to SimObjects](01-sim-objects-intro.md). Do that part on your own. When you are done, you can find my version of the code in the next slide.
+声明的其余部分目前与 [SimObjects 简介](01-sim-objects-intro.md) 中的 `HelloSimObject` 类似。请自行完成该部分。完成后，你可以在下一张幻灯片中找到我的代码版本。
 
 ---
 
-## InspectorGadget: SimObject Declaration File So Far
+## InspectorGadget: 目前的 SimObject 声明文件
 
-This is what should be in `InspectorGadget.py` now:
+这应该是 `InspectorGadget.py` 中现在的内容：
 
 ```python
 from m5.objects.ClockedObject import ClockedObject
@@ -251,33 +251,33 @@ class InspectorGadget(ClockedObject):
 
 ---
 
-## InspectorGadget: Ports in Python
+## InspectorGadget: Python 中的 Ports
 
-So far we have looked at the declaration of `Ports` in C++. However, to create an instance of a C++ class in Python we need a declaration of that class in Python. `Ports` are defined under [`gem5/src/python/m5/params.py`](../../gem5/src/python/m5/params.py). However, `Ports` do not inherit from class `Param`. I strongly recommend that you take a short look at [`gem5/src/python/m5/params.py`](../../gem5/src/python/m5/params.py).
+到目前为止，我们已经看到了 C++ 中 `Ports` 的声明。但是，要在 Python 中创建 C++ 类的实例，我们需要在 Python 中声明该类。`Ports` 定义在 [`gem5/src/python/m5/params.py`](../../gem5/src/python/m5/params.py) 下。但是，`Ports` 不继承自类 `Param`。我强烈建议你简要查看一下 [`gem5/src/python/m5/params.py`](../../gem5/src/python/m5/params.py)。
 
-Try to find what kind of parameters you can add to any `SimObject`/`ClockedObject`.
+尝试找出你可以向任何 `SimObject`/`ClockedObject` 添加什么类型的参数。
 
-Our next step is to define a `RequestPort` and a `ResponsePort` for `InspectorGadget`. To do this add the following import line to `InspectorGadget.py`.
+我们的下一步是为 `InspectorGadget` 定义一个 `RequestPort` 和一个 `ResponsePort`。为此，请在 `InspectorGadget.py` 中添加以下导入行。
 
 ```python
 from m5.params import *
 ```
 
-**NOTE**: My personal preference in Python is to import modules very explicitly. However, when importing `m5.params`, I think it's ok to do import `*`. This is mainly because, when I'm creating `SimObjects`, I might need different kinds of parameters that I might not know about in advance.
+**注意**：我个人在 Python 中的偏好是非常明确地导入模块。但是，在导入 `m5.params` 时，我认为使用 `import *` 是可以的。这主要是因为，当我创建 `SimObjects` 时，我可能需要不同类型的参数，而这些参数我可能事先不知道。
 
 ---
 
-## InspectorGadget: Adding Ports
+## InspectorGadget: 添加 Ports
 
-Now, let's finally add two ports to `InspectorGadget`; One port will be on the side where the CPU would be in the computer system and one port will be on the side where the memory would be. Therefore, let's call them `cpu_side_port` and `mem_side_port` respectively.
+现在，让我们最终向 `InspectorGadget` 添加两个端口；一个端口将在计算机系统中 CPU 所在的一侧，另一个端口将在内存所在的一侧。因此，让我们分别称它们为 `cpu_side_port` 和 `mem_side_port`。
 
-**Question**: What type should `cpu_side_port` and `mem_side_port` be?
+**问题**：`cpu_side_port` 和 `mem_side_port` 应该是什么类型？
 
-Before looking at the answer, try to answer the question for yourself.
+在查看答案之前，请尝试自己回答这个问题。
 
-**Answer**: `cpu_side_port` should be a `ResponsePort` and `mem_side_port` should be a `RequestPort`.
+**答案**：`cpu_side_port` 应该是 `ResponsePort`，`mem_side_port` 应该是 `RequestPort`。
 
-Make sure this answer makes sense to you before moving on to the next slide.
+在继续下一张幻灯片之前，请确保这个答案对你来说是有意义的。
 
 ---
 

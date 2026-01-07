@@ -1,91 +1,91 @@
 ---
 layout: bootcamp
-title: gem5 Tests
+title: gem5 测试
 permalink: /bootcamp/contributing/testing
 section: contributing
 author: Bobby R. Bruce
 ---
 <!-- _class: title -->
 
-## gem5 Tests
+## gem5 测试
 
-To check that your changes to gem5 work, you should run some of our gem5 tests.
-
----
-
-## Contributing and testing
-
-In general, we would like to ask that all contributions come with tests.
-
-In practice, if we asked for tests this way we would receive no contributions.
-
-### Our outlook on testing
-
-- If a feature isn't tested, we don't "support it" (e.g., DRAMSim3).
-- If the "gem5 developers" want to add a supported feature, we are usually the ones to add a test.
-- Adding tests takes time away from fixing bugs, adding new features, etc.
+为了检查您对 gem5 的更改是否正常工作，您应该运行一些 gem5 测试。
 
 ---
 
-## gem5 Test Categories
+## 贡献和测试
 
-We run tests on the gem5 codebases regularly to ensure that changes do not break the code.
-These tests exist in four main categories;
+一般来说，我们希望所有贡献都附带测试。
 
-1. **CPP Unit tests**: These are tests that run C++ code. In gem5, we use the Google Test framework.
-2. **Python Unit tests**: These are tests that run Python code. In gem5, we use the Python unittest framework.
-3. **TestLib Tests**: These are tests that run gem5 simulations, verify exit codes, and compare output to expected output ("testlib" is the name of the framework used to do this).
-4. **Compilation Tests**: Tests which compile gem5 under different configurations with different compilers/environments.
+但实际上，如果我们这样要求测试，我们将收不到任何贡献。
 
-> There are some tests we run which don't fit into these categories, but these are the main ones.
+### 我们对测试的看法
+
+- 如果某个功能没有经过测试，我们不会"支持它"（例如，DRAMSim3）。
+- 如果"gem5 开发者"想要添加一个受支持的功能，通常由我们来添加测试。
+- 添加测试会占用修复错误、添加新功能等的时间。
 
 ---
 
-## gem5 Test Schedule
+## gem5 测试类别
 
-1. **CI Tests**: These tests are run on every pull request to gem5, and every update to any pull request. The CI tests consist of the CPP and Python unit tests and a subset of the TestLib tests and Compilation tests. These are designed to run "quickly" (by gem5 standards), in under 4 hours.
-2. **Daily Tests**: These tests are run every day on the gem5 codebase.
-These tests consist of the larger Testlib tests. They typically take 12 hours or more to complete.
-3.  **Weekly Tests**: These tests are run weekly on the gem5 codebase.
-These tests consist of the largest Testlib test suite and the Compilation tests. These tests typically take 1 to 2 days to complete.
-4. **Compiler Tests**: These tests are run every week.
-These run a cross product of gem5 compilation targets and compilers the project currently supports. These tests usually take around 12 hours to complete.
+我们定期在 gem5 代码库上运行测试，以确保更改不会破坏代码。
+这些测试主要分为四类：
+
+1. **CPP 单元测试**：这些是运行 C++ 代码的测试。在 gem5 中，我们使用 Google Test 框架。
+2. **Python 单元测试**：这些是运行 Python 代码的测试。在 gem5 中，我们使用 Python unittest 框架。
+3. **TestLib 测试**：这些测试运行 gem5 模拟，验证退出代码，并将输出与预期输出进行比较（"testlib" 是用于执行此操作的框架名称）。
+4. **编译测试**：在不同配置下使用不同编译器/环境编译 gem5 的测试。
+
+> 我们运行的一些测试不属于这些类别，但以上是主要的测试类别。
+
+---
+
+## gem5 测试计划
+
+1. **CI 测试**：这些测试在每次向 gem5 提交 pull request 时运行，以及在每次更新任何 pull request 时运行。CI 测试包括 CPP 和 Python 单元测试以及 TestLib 测试和编译测试的子集。这些测试设计为"快速"运行（按 gem5 标准），在 4 小时内完成。
+2. **每日测试**：这些测试每天在 gem5 代码库上运行。
+这些测试包括较大的 Testlib 测试。它们通常需要 12 小时或更长时间才能完成。
+3.  **每周测试**：这些测试每周在 gem5 代码库上运行。
+这些测试包括最大的 Testlib 测试套件和编译测试。这些测试通常需要 1 到 2 天才能完成。
+4. **编译器测试**：这些测试每周运行一次。
+这些测试运行 gem5 编译目标和项目当前支持的编译器的交叉组合。这些测试通常需要大约 12 小时才能完成。
 
 ---
 
 ## GitHub Actions
 
-The complete GitHub Actions workflow for these tests can be found in the [.github/workflows/](https://github.com/gem5/gem5/blob/v24.0/.github/workflows) in the gem5 repository.
+这些测试的完整 GitHub Actions 工作流可以在 gem5 仓库的 [.github/workflows/](https://github.com/gem5/gem5/blob/v24.0/.github/workflows) 中找到。
 
-We not go over these in this session but you can look over these yaml files and see how GitHub Actions is triggered to run these the gem5 tests.
+我们在本次课程中不会详细介绍这些，但您可以查看这些 yaml 文件，了解如何触发 GitHub Actions 来运行这些 gem5 测试。
 
-These tests run on "self-hosted" runners. There is a machine at Wisconsin (loupe) which runs these tests.
+这些测试在"自托管"运行器上运行。在威斯康星州有一台机器（loupe）运行这些测试。
 
-> Bonus points if you know what a "loupe" is
+> 如果您知道"loupe"是什么，会有加分
 
 ---
 
-## CPP Unit tests
+## CPP 单元测试
 
-[src/base/bitfield.test.cc](https://github.com/gem5/gem5/blob/v24.0/src/base/bitfield.test.cc) is a typical example of a CPP unit test in gem5.
+[src/base/bitfield.test.cc](https://github.com/gem5/gem5/blob/v24.0/src/base/bitfield.test.cc) 是 gem5 中 CPP 单元测试的典型示例。
 
-It is a GTest. More information on GTest can be found at <https://google.github.io/googletest/>
+它是一个 GTest。有关 GTest 的更多信息可以在 <https://google.github.io/googletest/> 找到。
 
-The SConscript file in the same directory as the test file is used to build the test.
+与测试文件位于同一目录中的 SConscript 文件用于构建测试。
 
 ```python
 GTest('bitfield.test', 'bitfield.test.cc', 'bitfield.cc')
 ```
 
-The format is `GTest(<test_name>, <test_source>, <source_files>)`.
+格式为 `GTest(<test_name>, <test_source>, <source_files>)`。
 
 ---
 
-### Running the CPP Unit Tests
+### 运行 CPP 单元测试
 
-You can run all unit tests with  `scons build/ALL/unittests.opt` command.
+您可以使用 `scons build/ALL/unittests.opt` 命令运行所有单元测试。
 
-To run a specific test:
+要运行特定测试：
 
 ```shell
 scons build/ALL/base/bitfield.test.opt
@@ -94,98 +94,98 @@ scons build/ALL/base/bitfield.test.opt
 
 ---
 
-## Python Unit Tests
+## Python 单元测试
 
-[tests/pyunit/util/pyunit_convert_check.py](https://github.com/gem5/gem5/blob/v24.0/tests/pyunit/util/pyunit_convert_check.py) is a typical example of a Python unit test in gem5.
+[tests/pyunit/util/pyunit_convert_check.py](https://github.com/gem5/gem5/blob/v24.0/tests/pyunit/util/pyunit_convert_check.py) 是 gem5 中 Python 单元测试的典型示例。
 
-More information on Python's unittest framework can be found at <https://docs.python.org/3/library/unittest.html>
+有关 Python unittest 框架的更多信息可以在 <https://docs.python.org/3/library/unittest.html> 找到。
 
-The tests are run with `gem5 tests/run_pyunit.py` command.
-In our case, any file in the "tests/pyunit" directory with the prefix "pyunit_" is considered a test by the test runner.
+测试使用 `gem5 tests/run_pyunit.py` 命令运行。
+在我们的情况下，测试运行器会将 "tests/pyunit" 目录中任何前缀为 "pyunit_" 的文件视为测试。
 
-Individual subdirectories in "tests/pyunit" can be specified and run separately by passing those subdirectories as arguments to "tests/run_pytests.py". E.g.: `gem5 tests/run_pyunit.py --directory tests/pyunit/util`.
-
----
-
-## Compiler Tests
-
-Compiler tests are run weekly on the gem5 codebase.
-
-These tests are specified directly in a GitHub Action workflow: [.github/workflows/compiler-tests.yaml](https://github.com/gem5/gem5/blob/v24.0/.github/workflows/compiler-tests.yaml)
-
-These tests use a series of Docker images to test compilation of various gem5 configurations with different compilers.
-
-If your system deviates from what we test in the compiler-tests, we do not support that compiler.
+可以通过将子目录作为参数传递给 "tests/run_pytests.py" 来指定并单独运行 "tests/pyunit" 中的各个子目录。例如：`gem5 tests/run_pyunit.py --directory tests/pyunit/util`。
 
 ---
 
-## TestLib Tests
+## 编译测试
 
-TestLib is a library we developed to help run gem5 integration tests.
+编译测试每周在 gem5 代码库上运行。
 
-> There is some regret on rolling our own testing framework. It increases the maintenance burden and doesn't provide much benefit.
+这些测试直接在 GitHub Action 工作流中指定：[.github/workflows/compiler-tests.yaml](https://github.com/gem5/gem5/blob/v24.0/.github/workflows/compiler-tests.yaml)
 
-TestLib tests are the most important tests in gem5.
-These tests run gem5 simulations and verify the output of the simulation.
-The tests are written in Python and use the "testlib" framework to run the simulations and verify the output.
+这些测试使用一系列 Docker 镜像来测试使用不同编译器编译各种 gem5 配置。
 
-We do not have very good coverage of unittests, so most of our testing is in integration tests via the TestLib.
+如果您的系统偏离了我们在编译测试中测试的内容，我们不支持该编译器。
 
 ---
 
-## Using TestLib
+## TestLib 测试
 
-The tests are run using the `./main.py` command in the `test` directory of the gem5 repository.
+TestLib 是我们开发的用于帮助运行 gem5 集成测试的库。
 
-It's useful to just focus on a subdirectory of tests when running tests:
+> 对于开发自己的测试框架，我们有些遗憾。它增加了维护负担，并没有提供太多好处。
+
+TestLib 测试是 gem5 中最重要的测试。
+这些测试运行 gem5 模拟并验证模拟的输出。
+测试用 Python 编写，使用 "testlib" 框架来运行模拟并验证输出。
+
+我们的单元测试覆盖率不是很好，因此我们的大部分测试都是通过 TestLib 进行的集成测试。
+
+---
+
+## 使用 TestLib
+
+测试使用 gem5 仓库的 `test` 目录中的 `./main.py` 命令运行。
+
+在运行测试时，只关注测试的子目录很有用：
 
 ```shell
 ./main.py run gem5/memory
 ```
 
-The above will only run the "quick" tests in the "tests/gem5/memory" directory.
-The "quick" tests are the testlib tests run in the CI pipeline. To run the tests in the "daily" or "weekly" test suites, you can use the `--length` to specify `long` or `very-long` (`quick` is the `length` default).
+上述命令只会运行 "tests/gem5/memory" 目录中的"快速"测试。
+"快速"测试是在 CI 管道中运行的 testlib 测试。要运行"每日"或"每周"测试套件中的测试，您可以使用 `--length` 指定 `long` 或 `very-long`（`quick` 是 `length` 的默认值）。
 
 ---
 
-## Using TestLib
+## 使用 TestLib
 
-The `./main.py list` command can be used to list all the tests in a directory, which we'll demonstrate here:
+`./main.py list` 命令可用于列出目录中的所有测试，我们在这里演示：
 
 ```shell
-# List all the long tests in tests/gem5/memory: Those run in the Daily Tests.
+# 列出 tests/gem5/memory 中所有长测试：这些在每日测试中运行。
 ./main.py list --length long gem5/memory
 
-# lists all the very long tests in tests/gem5/memory: Those run in the Weekly Tests.
+# 列出 tests/gem5/memory 中所有超长测试：这些在每周测试中运行。
 ./main.py list --length very-long gem5/memory
 ```
 
 ---
 
-## How TestLib Tests are declared
+## TestLib 测试的声明方式
 
-Let's look at ["tests/gem5/m5_util"](https://github.com/gem5/gem5/blob/v24.0/tests/gem5/m5_util) to see how a test is declared.
+让我们查看 ["tests/gem5/m5_util"](https://github.com/gem5/gem5/blob/v24.0/tests/gem5/m5_util) 以了解如何声明测试。
 
-In this directory there is "test_exit.py".
-Any file with the prefix "test_" is considered a test by the testlib framework and will be automatically run when the tests are executed.
+在此目录中有 "test_exit.py"。
+任何前缀为 "test_" 的文件都被 testlib 框架视为测试，并在执行测试时自动运行。
 
-"configs" is a directory of configuration scripts that are used to run the tests defined in "test_exit.py".
+"configs" 是一个配置脚本目录，用于运行 "test_exit.py" 中定义的测试。
 
-Now, let's look into "test_exit.py" and see how the tests are declared.
+现在，让我们查看 "test_exit.py" 并了解如何声明测试。
 
 ---
 
-## Declaring how to test
+## 声明如何测试
 
-Import testlib library (found in `gem5/ext/testlib`)
+导入 testlib 库（位于 `gem5/ext/testlib`）
 
 ```python
 from testlib import *
 ```
 
-Many of the tests use regex matching. For example, we check to see if the `m5_exit` instruction is encountered below and then create a *verifier*.
+许多测试使用正则表达式匹配。例如，我们检查下面是否遇到 `m5_exit` 指令，然后创建一个 *verifier*。
 
-**`verifier`** is used by the testlib to check the output.
+**`verifier`** 由 testlib 用于检查输出。
 
 ```py
 m5_exit_regex = re.compile(
@@ -198,20 +198,20 @@ a = verifier.MatchRegex(m5_exit_regex)
 
 <!-- _class: code-80-percent -->
 
-## Declaring the test
+## 声明测试
 
-Now, we use a special function `gem5_verify_config` to run gem5 and then apply our verifier.
+现在，我们使用特殊函数 `gem5_verify_config` 来运行 gem5，然后应用我们的验证器。
 
 ```py
 gem5_verify_config(
-    name="m5_exit_test", # The test name
-    verifiers=[a], # The verifier (must be iterable!)
+    name="m5_exit_test", # 测试名称
+    verifiers=[a], # 验证器（必须是可迭代的！）
     fixtures=(),
-    config=joinpath( # The path to the config file to run.
+    config=joinpath( # 要运行的配置文件路径。
         config.base_dir,
         "tests", "gem5", "m5_util", "configs", "simple_binary_run.py",
     ),
-    config_args=[ # The arguments to pass to the config file.
+    config_args=[ # 传递给配置文件的参数。
         "x86-m5-exit",
         "--resource-directory",
         resource_path,
@@ -222,20 +222,20 @@ gem5_verify_config(
 
 ---
 
-## Valid ISAs parameter
+## Valid ISAs 参数
 
-The ISAs to run on this test. In this cases "ALL/gem5.opt" is used.
+在此测试上运行的 ISA。在这种情况下使用 "ALL/gem5.opt"。
 
 - `constants.arg_tag`: "ARM/gem5.opt"
 - `constants.x86_tag`: "X86/gem5.opt"
 - `constants.riscv_tag`: "RISCV/gem5.opt"
 
 
-While not specified directly we could determine whether the tests runs as `quick`, `long`, or `very-long` with a `length` which accepts `constants.quick_tag`, `constants.long_tag`, or `constants.very_long_tag` as arguments (default is `constants.quick_tag`).
+虽然没有直接指定，但我们可以使用 `length` 参数来确定测试是作为 `quick`、`long` 还是 `very-long` 运行，它接受 `constants.quick_tag`、`constants.long_tag` 或 `constants.very_long_tag` 作为参数（默认是 `constants.quick_tag`）。
 
 ---
 
-## Viewing the tests
+## 查看测试
 
 ```shell
 ./main.py list gem5/m5_util
@@ -258,74 +258,74 @@ TestUID:tests/gem5/m5_util/test_exit.py:m5_exit_test-ALL-x86_64-opt:m5_exit_test
 
 ---
 
-## Running the tests
+## 运行测试
 
-Then run with
+然后运行
 
 ```shell
 ./main.py run gem5/m5_util
 ```
 
-**Note**: This will try and build "ALL/gem5.opt" each time you run the tests.
-This can be time consuming.
-You can pre-build the ALL/gem5.opt build with `scons build/ALL/gem5.opt -j$(nproc)` then, when running `./main.py run gem5/m5_util` add the `--skip-build` flag to skip the build step: `./main.py run --skip-build gem5/m5_util`.
+**注意**：这会在每次运行测试时尝试构建 "ALL/gem5.opt"。
+这可能很耗时。
+您可以使用 `scons build/ALL/gem5.opt -j$(nproc)` 预先构建 ALL/gem5.opt，然后在运行 `./main.py run gem5/m5_util` 时添加 `--skip-build` 标志以跳过构建步骤：`./main.py run --skip-build gem5/m5_util`。
 
-If you want/need to build at this step, pass `-j$(nproc)` to the `./main.py run` command.
+如果您想/需要在此步骤构建，请将 `-j$(nproc)` 传递给 `./main.py run` 命令。
 
 ---
 
-## Exercise: Creating a TestLib Test
+## 练习：创建 TestLib 测试
 
-Go to [materials/06-Contributing/02-testing/01-testlib-example](../../materials/06-Contributing/).
+转到 [materials/06-Contributing/02-testing/01-testlib-example](../../materials/06-Contributing/)。
 
-Move "01-testlib-example" to "tests/gem5/" in the gem5 repository.
+将 "01-testlib-example" 移动到 gem5 仓库中的 "tests/gem5/"。
 
-Provided in "test_example.py" is the `gem5_verify_config` function which is used to define testlib tests.
+"test_example.py" 中提供了用于定义 testlib 测试的 `gem5_verify_config` 函数。
 
 ```python
 gem5_verify_config(
-    name="test-example-1", # Name of the test. Must be unique.
-    verifiers=(), # Outside exit-code zero check, additional  to be added.
-    fixtures=(), # Fixtures: this is largely deprecated and can be ignored.
-    config=joinpath(), # The path to the config script.
-    config_args=[], # The arguments to be passed to the config script.
-    valid_isas=(constants.arm_tag), # Need to run on ARM ISA
-    length=constants.quick_tag, # A quick test to run in the CI pipeline
+    name="test-example-1", # 测试名称。必须唯一。
+    verifiers=(), # 除了退出代码零检查之外，要添加的额外验证器。
+    fixtures=(), # Fixtures：这在很大程度上已被弃用，可以忽略。
+    config=joinpath(), # 配置脚本的路径。
+    config_args=[], # 要传递给配置脚本的参数。
+    valid_isas=(constants.arm_tag), # 需要在 ARM ISA 上运行
+    length=constants.quick_tag, # 在 CI 管道中运行的快速测试
 )
 ```
 
 ---
 
-## In this exercise we will do the following:
+## 在此练习中，我们将执行以下操作：
 
-1. Create a test that runs the `example_config.py` script without any arguments and verifies it runs correctly.
-2. Have this test use the `--to-print` argument to print "Arm Simulation Completed." at the end of the simulation.
-3. Update this test with a verifier that checks the output of the simulation after the run is complete.
-4. Write a second test that does the same as the first test but with a different output message (inclusive of a verifier).
+1. 创建一个测试，运行 `example_config.py` 脚本而不带任何参数，并验证它正确运行。
+2. 让此测试使用 `--to-print` 参数在模拟结束时打印 "Arm Simulation Completed."。
+3. 使用验证器更新此测试，该验证器在运行完成后检查模拟的输出。
+4. 编写第二个测试，执行与第一个测试相同的操作，但使用不同的输出消息（包括验证器）。
 
-After each step run the tests to verify the changes:
+在每一步之后运行测试以验证更改：
 `./main.py run gem5/01-testing-example`
 
 ---
 
-## Hints and tips
+## 提示和技巧
 
-- Adding `-vvv` to the end of the test command will give you more information about the test, particularly if an error occurs.
-- Look at the other tests in "tests/gem5" for examples of how to write tests.
-- You can pre-build the ARM/gem5.opt build using
+- 在测试命令末尾添加 `-vvv` 将为您提供有关测试的更多信息，特别是在发生错误时。
+- 查看 "tests/gem5" 中的其他测试，了解如何编写测试的示例。
+- 您可以使用以下命令预先构建 ARM/gem5.opt：
 
 ```bash
 scons build/ARM/gem5.opt -j$(nproc)
 ```
 
-Then, when running `./main.py run gem5/02-testing`, add the `--skip-build` flag to skip the build step.
+然后，在运行 `./main.py run gem5/02-testing` 时，添加 `--skip-build` 标志以跳过构建步骤。
 
-The completed examples can be found at [materials/06-Contributing/02-testing/01-testlib-example/completed](/materials/06-Contributing/02-testing/01-testlib-example/completed).
+已完成的示例可以在 [materials/06-Contributing/02-testing/01-testlib-example/completed](/materials/06-Contributing/02-testing/01-testlib-example/completed) 找到。
 
 ---
 
-## Congratulations!
+## 恭喜！
 
-You now know how to create tests for gem5 and run them to verify your changes.
+您现在知道如何为 gem5 创建测试并运行它们以验证您的更改。
 
-We strongly encourage you to write tests for any changes you make to gem5 to ensure that your changes work as expected and do not break any existing functionality.
+我们强烈建议您为对 gem5 所做的任何更改编写测试，以确保您的更改按预期工作并且不会破坏任何现有功能。

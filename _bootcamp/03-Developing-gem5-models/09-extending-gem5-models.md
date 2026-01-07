@@ -1,28 +1,28 @@
 ---
 layout: bootcamp
-title: Developing SimObjects in gem5
+title: 在 gem5 中开发 SimObjects
 permalink: /bootcamp/developing-gem5/extending-gem5-models
 section: developing-gem5
 ---
 <!-- _class: title -->
 
-## Useful Tools to Extend gem5 Models
+## 扩展 gem5 模型的有用工具
 
 ---
 
-## The Ninja Feature of gem5
+## gem5 的隐藏功能
 
-There are many useful tools inside gem5 that do not have proper documentation.
-In this section, we will cover
+gem5 内部有许多有用的工具，但没有适当的文档。
+在本节中，我们将介绍
 
-- Probe point
+- 探针点（Probe point）
 <!-- - Bitset
 - Random number generation -->
 <!-- - Signal ports? a big maybe. if I have extra time I'll dive in to gem5/src/dev/IntPin.py -->
 
-### OOO Action
+### 行动提示
 
-If you have never built /gem5/build/X86/gem5.fast, please do so with the following command, as gem5 takes a long time to build.
+如果您从未构建过 /gem5/build/X86/gem5.fast，请使用以下命令进行构建，因为 gem5 需要很长时间才能构建完成。
 
 ```bash
 cd gem5
@@ -33,74 +33,74 @@ scons build/X86/gem5.fast -j$(nproc)
 
 <!-- _class: start -->
 
-## Probe Point
+## 探针点（Probe Point）
 
 ---
 
-## Probe Point
+## 探针点（Probe Point）
 
-There are three components related to probe point in gem5:
+gem5 中与探针点相关的三个组件：
 
 1. [ProbeManger](https://github.com/gem5/gem5/blob/stable/src/sim/probe/probe.hh#L163)
 2. [ProbePoint](https://github.com/gem5/gem5/blob/stable/src/sim/probe/probe.hh#L146)
 3. [ProbeListener](https://github.com/gem5/gem5/blob/stable/src/sim/probe/probe.hh#L126)
 
-### Use-case of Probe Points
+### 探针点的用例
 
-- Profiling a component without adding too much to the component's codebase
-- Making more flexible exit events
-- Tracking advance behaviors
-- More
+- 在不向组件代码库添加太多内容的情况下分析组件
+- 创建更灵活的退出事件
+- 跟踪高级行为
+- 更多用途
 
 ---
 
 <!-- _class: center-image -->
 
-## More about Probe Point
+## 关于探针点的更多信息
 
-- Every SimObject has a ProbeManager
-- The ProbeManager manages all registered ProbePoints and the connected ProbeListeners for the SimObject
-- One ProbePoint can notify multiple ProbeListeners, and one ProbeListener can listen to multiple ProbePoints
-- One ProbeListener can only attach to one SimObject
+- 每个 SimObject 都有一个 ProbeManager
+- ProbeManager 管理 SimObject 的所有已注册 ProbePoint 和连接的 ProbeListener
+- 一个 ProbePoint 可以通知多个 ProbeListener，一个 ProbeListener 可以监听多个 ProbePoint
+- 一个 ProbeListener 只能附加到一个 SimObject
 
 ![](/bootcamp/03-Developing-gem5-models/09-extending-gem5-models-imgs/probepoint-diagram.drawio.svg)
 
 ---
 
-## How to use Probe Point?
+## 如何使用探针点？
 
-1. Create a ProbePoint in a SimObject
-2. Register the ProbePoint with the SimObject's ProbeManager
-3. Create a ProbeListener
-4. Connect the ProbeListener to the SimObject and register it with the SimObject's ProbeManager
+1. 在 SimObject 中创建一个 ProbePoint
+2. 将 ProbePoint 注册到 SimObject 的 ProbeManager
+3. 创建一个 ProbeListener
+4. 将 ProbeListener 连接到 SimObject 并将其注册到 SimObject 的 ProbeManager
 
-Let's try it with a simple example!
-
----
-
-## Hands-On Time!
-
-### 01-local-inst-tracker
-
-Currently, gem5 does not have a straight-forward method to raise an exit event after we execute (commit) a number of instructions for multi-core simulation. We can easily create one with Probe Point. We will start with creating a ProbeListener that listens to each core's `ppRetiredInsts` ProbePoint, then in `02-global-inst-tracker`, we will create a SimObject to manage all the ProbeListeners to raise an exit event after the simulation executes (commits) a number of instructions.
-
-### Goal
-
-1. Create a ProbeListener called the local-instruction-tracker
-2. Connect the ProbeListener to the BaseCPU and register our ProbeListener with the BaseCPU's ProbeManager
-3. Run a simple simulation with the local-instruction-tracker
+让我们用一个简单的例子来试试！
 
 ---
 
-## Hands-On Time!
+## 动手实践时间！
 
 ### 01-local-inst-tracker
 
-All completed materials can be found under [`materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/complete`](/materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/complete).
+目前，gem5 没有直接的方法在多核仿真中执行（提交）一定数量的指令后触发退出事件。我们可以使用探针点轻松创建一个。我们将首先创建一个监听每个核心 `ppRetiredInsts` ProbePoint 的 ProbeListener，然后在 `02-global-inst-tracker` 中，我们将创建一个 SimObject 来管理所有 ProbeListener，以便在仿真执行（提交）一定数量的指令后触发退出事件。
 
-Let's start with creating `inst_tracker.hh` and `inst_tacker.cc` under `/src/cpu/probes`.
+### 目标
 
-In the `inst_tracker.hh` file, we need to include the headers and necessary libraries:
+1. 创建一个名为 local-instruction-tracker 的 ProbeListener
+2. 将 ProbeListener 连接到 BaseCPU，并将我们的 ProbeListener 注册到 BaseCPU 的 ProbeManager
+3. 使用 local-instruction-tracker 运行一个简单的仿真
+
+---
+
+## 动手实践时间！
+
+### 01-local-inst-tracker
+
+所有完成的材料可以在 [`materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/complete`](/materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/complete) 下找到。
+
+让我们开始在 `/src/cpu/probes` 下创建 `inst_tracker.hh` 和 `inst_tacker.cc`。
+
+在 `inst_tracker.hh` 文件中，我们需要包含头文件和必要的库：
 
 ```cpp
 #ifndef __CPU_PROBES_INST_TRACKER_HH__
@@ -115,7 +115,7 @@ In the `inst_tracker.hh` file, we need to include the headers and necessary libr
 
 ## 01-local-inst-tracker
 
-Then, we can create a `ProbeListenerObject` called `LocalInstTracker`. A `ProbeListenerObject` is a minimum wrapper of the `ProbeListener` that allows us to attach it to the SimObject we want to listen to.
+然后，我们可以创建一个名为 `LocalInstTracker` 的 `ProbeListenerObject`。`ProbeListenerObject` 是 `ProbeListener` 的最小包装器，允许我们将其附加到要监听的 SimObject。
 
 ```cpp
 namespace gem5
@@ -129,32 +129,32 @@ class LocalInstTracker : public ProbeListenerObject
 }
 ```
 
-Now, we have a constructor for the `LocalInstTracker` and a virtual function `regProbeListeners()`. The `regProbeListeners` is called automatically when the simulation starts. We will use it to attach to the ProbePoint.
+现在，我们有了 `LocalInstTracker` 的构造函数和一个虚函数 `regProbeListeners()`。`regProbeListeners` 在仿真开始时自动调用。我们将使用它来附加到 ProbePoint。
 
 ---
 
 ## 01-local-inst-tracker
 
-Our goal is to count the number of committed instructions for our attached core so we can listen to the `ppRetiredInsts` ProbePoint that already exists in the `BaseCPU` SimObject.
+我们的目标是计算附加核心已提交的指令数量，因此我们可以监听 `BaseCPU` SimObject 中已存在的 `ppRetiredInsts` ProbePoint。
 
-Let's look at the `ppRetiredInsts` ProbePoint a bit.
-It is a `PMU probe point` that as suggested in [src/cpu/base.hh](https://github.com/gem5/gem5/blob/stable/src/sim/probe/pmu.hh) that it will notify the listeners with a `uint64_t` variable.
-In [src/cpu/base.cc:379](https://github.com/gem5/gem5/blob/stable/src/cpu/base.cc#L379), we can see that it is registered to the `BaseCPU` SimObject's ProbeManager with the string `"RetiredInsts"`. All ProbePoints are registered with the ProbeManager with a unique string variable, so we can use this string later to attach our listeners to this ProbePoint. Lastly, we can find that this ProbePoint notifies its listeners with an integer `1` when there is an instruction committed in [src/cpu/base.cc:393](https://github.com/gem5/gem5/blob/stable/src/cpu/base.cc#L393).
-Now that we know what ProbePoint we are targeting, we can set it up for our LocalInstTracker.
+让我们看一下 `ppRetiredInsts` ProbePoint。
+它是一个 `PMU probe point`，如 [src/cpu/base.hh](https://github.com/gem5/gem5/blob/stable/src/sim/probe/pmu.hh) 中所示，它将使用 `uint64_t` 变量通知监听器。
+在 [src/cpu/base.cc:379](https://github.com/gem5/gem5/blob/stable/src/cpu/base.cc#L379) 中，我们可以看到它使用字符串 `"RetiredInsts"` 注册到 `BaseCPU` SimObject 的 ProbeManager。所有 ProbePoint 都使用唯一的字符串变量注册到 ProbeManager，因此我们稍后可以使用此字符串将监听器附加到此 ProbePoint。最后，我们可以在 [src/cpu/base.cc:393](https://github.com/gem5/gem5/blob/stable/src/cpu/base.cc#L393) 中发现，当有指令提交时，此 ProbePoint 会使用整数 `1` 通知其监听器。
+既然我们知道了目标 ProbePoint，就可以为 LocalInstTracker 设置它了。
 
 ---
 
 ## 01-local-inst-tracker
 
-In the `inst_tracker.hh`, we need to add two things:
+在 `inst_tracker.hh` 中，我们需要添加两样东西：
 
-1. The type of argument we are going to receive from the ProbePoint. In our case here is a `uint64_t` variable
+1. 我们将从 ProbePoint 接收的参数类型。在我们的例子中，这是一个 `uint64_t` 变量
 
 ```cpp
 typedef ProbeListenerArg<LocalInstTracker, uint64_t> LocalInstTrackerListener;
 ```
 
-2. We need to have a function to handle the notification from the ProbePoint. Since we are counting the number of instructions committed and wanting to exit when it reaches a certain threshold, let's also create two `uint64_t` variables for this purpose
+2. 我们需要一个函数来处理来自 ProbePoint 的通知。由于我们要计算已提交的指令数量，并在达到某个阈值时退出，让我们为此创建两个 `uint64_t` 变量
 
 ```cpp
 void checkPc(const uint64_t& inst);
@@ -166,9 +166,9 @@ uint64_t instThreshold;
 
 ## 01-local-tracker
 
-Here comes an optional part. The Probe Point tool allows dynamic attachment and detachment during the simulation. Therefore, we can create a way to start and stop listening for our LocalInstTracker.
+这里是一个可选部分。探针点工具允许在仿真期间动态附加和分离。因此，我们可以为 LocalInstTracker 创建一种开始和停止监听的方法。
 
-In the `inst_tracker.hh`,
+在 `inst_tracker.hh` 中，
 
 ```cpp
 bool listening;
@@ -183,7 +183,7 @@ void startListening() {
 
 ## 01-local-tracker
 
-In the `inst_tracker.cc`, let's define the constructor fist
+在 `inst_tracker.cc` 中，让我们先定义构造函数
 
 ```cpp
 LocalInstTracker::LocalInstTracker(const LocalInstTrackerParams &p)
@@ -194,13 +194,13 @@ LocalInstTracker::LocalInstTracker(const LocalInstTrackerParams &p)
 {}
 ```
 
-This means that we initialize the `instCount` as 0, `instThreshold` with the parameter `inst_threshold`, and listening with the parameter `start_listening`.
+这意味着我们将 `instCount` 初始化为 0，使用参数 `inst_threshold` 初始化 `instThreshold`，使用参数 `start_listening` 初始化 listening。
 
 ---
 
 ## 01-local-tracker
 
-Then, let's define the `regProbeListeners` function, which will be called automatically when the simulation starts, also as we defined above when `startListening` is called.
+然后，让我们定义 `regProbeListeners` 函数，该函数在仿真开始时自动调用，也如我们上面定义的，当调用 `startListening` 时也会调用。
 
 ```cpp
 void
@@ -213,13 +213,13 @@ LocalInstTracker::regProbeListeners()
 }
 ```
 
-As we can see, it uses the `LocalInstTrackerListener` type that we defined earlier. It connects our listener with the ProbePoint that is registered with the string variable `"RetiredInsts"`. When the ProbePoint notifies the Manager, it will call our function `checkPc` with the notified variable, a `uint64_t` variable in our case.
+正如我们所见，它使用我们之前定义的 `LocalInstTrackerListener` 类型。它将我们的监听器与使用字符串变量 `"RetiredInsts"` 注册的 ProbePoint 连接起来。当 ProbePoint 通知管理器时，它将使用通知的变量（在我们的例子中是 `uint64_t` 变量）调用我们的函数 `checkPc`。
 
 ---
 
 ## 01-local-tracker
 
-For our `checkPc` function, it should count the instruction committed, check if it reaches the threshold, then raises an exit event when it does.
+对于我们的 `checkPc` 函数，它应该计算已提交的指令，检查是否达到阈值，然后在达到时触发退出事件。
 
 ```cpp
 void
@@ -232,11 +232,11 @@ LocalInstTracker::checkPc(const uint64_t& inst)
 }
 ```
 
-The `exitSimLoopNow` will create an event immediately, with the string variable. It will immediately exit the simulation. This string variable is categorized as `ExitEvent.MAX_INSTS` in the standard library.
+`exitSimLoopNow` 将立即创建一个事件，使用字符串变量。它将立即退出仿真。此字符串变量在标准库中被归类为 `ExitEvent.MAX_INSTS`。
 
 ---
 
-Lastly, let's defined the `stopListening` function for dynamic detachment
+最后，让我们定义用于动态分离的 `stopListening` 函数
 
 ```cpp
 void
@@ -250,15 +250,15 @@ LocalInstTracker::stopListening()
 }
 ```
 
-This is a really rough example of how it can be done. It does not check what ProbePoint the listeners are attaching to, so if our ProbeListener listens to multiple ProbePoints, we will need to check the registered string variables for detaching the correct ProbeListeners.
-For our simple case here, this rough method will serve the purpose.
-For more detailed information about how the dynamic detachment can be done, please refer to [src/sim/probe/probe.hh](https://github.com/gem5/gem5/blob/stable/src/sim/probe/probe.hh)
+这是一个非常粗略的示例，说明如何完成此操作。它不检查监听器附加到哪个 ProbePoint，因此如果我们的 ProbeListener 监听多个 ProbePoint，我们需要检查注册的字符串变量以分离正确的 ProbeListener。
+对于我们这里的简单情况，这种粗略的方法就足够了。
+有关如何完成动态分离的更多详细信息，请参阅 [src/sim/probe/probe.hh](https://github.com/gem5/gem5/blob/stable/src/sim/probe/probe.hh)
 
 ---
 
 ## 01-local-tracker
 
-In addition to the above functionality, we can also add some getter and setter functions, such as
+除了上述功能外，我们还可以添加一些 getter 和 setter 函数，例如
 
 ```cpp
 void changeThreshold(uint64_t newThreshold) {
@@ -281,8 +281,8 @@ uint64_t getThreshold() const {
 
 ## 01-local-inst-tracker
 
-Now, let's set up the Python object of the LocalInstTracker.
-Let's create a file called `InstTracker.py` under the same directory `src/cpu/probes`.
+现在，让我们设置 LocalInstTracker 的 Python 对象。
+让我们在同一目录 `src/cpu/probes` 下创建一个名为 `InstTracker.py` 的文件。
 
 ```python
 from m5.objects.Probe import ProbeListenerObject
@@ -313,7 +313,7 @@ class LocalInstTracker(ProbeListenerObject):
 
 ## 01-local-inst-tracker
 
-Like all new objects, we need to register it in Scons, so let's modify [src/cpu/probes/SConscript](../../gem5/src/cpu/probes/SConscript) and add
+与所有新对象一样，我们需要在 Scons 中注册它，因此让我们修改 [src/cpu/probes/SConscript](../../gem5/src/cpu/probes/SConscript) 并添加
 
 ```python
 SimObject(
@@ -323,9 +323,9 @@ SimObject(
 Source("inst_tracker.cc")
 ```
 
-Now we have everything setup for our `LocalInstTracker`!
+现在我们已经为 `LocalInstTracker` 设置好了一切！
 
-Let's build gem5 again
+让我们再次构建 gem5
 
 ```bash
 cd gem5
@@ -336,14 +336,14 @@ scons build/X86/gem5.fast -j$(nproc)
 
 ## 01-local-inst-tracker
 
-After it is built, we can test our `LocalInstTracker` with the [materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/simple-sim.py](../../materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/simple-sim.py)
+构建完成后，我们可以使用 [materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/simple-sim.py](../../materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker/simple-sim.py) 测试我们的 `LocalInstTracker`
 
 ```bash
 cd /workspaces/2024/materials/03-Developing-gem5-models/09-extending-gem5-models/01-local-inst-tracker
 /workspaces/2024/gem5/build/X86/gem5.fast -re --outdir=simple-sim-m5out simple-sim.py
 ```
 
-This SE script runs a simple openmp workload that sums up an array of numbers. The source code of this workload can be found in [materials/03-Developing-gem5-models/09-extending-gem5-models/simple-omp-workload/simple_workload.c](../../materials/03-Developing-gem5-models/09-extending-gem5-models/simple-omp-workload/simple_workload.c).
+此 SE 脚本运行一个简单的 openmp 工作负载，对数字数组求和。此工作负载的源代码可以在 [materials/03-Developing-gem5-models/09-extending-gem5-models/simple-omp-workload/simple_workload.c](../../materials/03-Developing-gem5-models/09-extending-gem5-models/simple-omp-workload/simple_workload.c) 中找到。
 
 ```c
 m5_work_begin(0, 0);
@@ -360,7 +360,7 @@ m5_work_end(0, 0);
 
 ## 01-local-inst-tracker
 
-For our SE script, we first attach a LocalInstTracker to each core object with a threshold of 100,000 instructions. We will not start listening to the core's committed instructions from the start of the simulation.
+对于我们的 SE 脚本，我们首先将 LocalInstTracker 附加到每个核心对象，阈值为 100,000 条指令。我们不会从仿真开始就监听核心的已提交指令。
 
 ```python
 from m5.objects import LocalInstTracker
@@ -377,7 +377,7 @@ for core in processor.get_cores():
 
 ## 01-local-inst-tracker
 
-We will start listening when the simulation raises an workbegin exit event, so we need a workbegin handler to do that
+当仿真触发 workbegin 退出事件时，我们将开始监听，因此我们需要一个 workbegin 处理程序来执行此操作
 
 ```python
 def workbegin_handler():
@@ -387,7 +387,7 @@ def workbegin_handler():
     yield False
 ```
 
-Let's make a workend exit event handler for fun:
+让我们创建一个 workend 退出事件处理程序：
 
 ```python
 def workend_handler():
@@ -399,7 +399,7 @@ def workend_handler():
 
 ## 01-local-inst-tracker
 
-We know that after reaching the threshold, our LocalInstTracker will raise an `ExitEvent.MAX_INSTS` exit event, so we need a handler for it too
+我们知道，在达到阈值后，我们的 LocalInstTracker 将触发 `ExitEvent.MAX_INSTS` 退出事件，因此我们也需要为其创建一个处理程序
 
 ```python
 def max_inst_handler():
@@ -421,7 +421,7 @@ def max_inst_handler():
 
 ## 01-local-inst-tracker
 
-After setting these handlers with `simulator`
+使用 `simulator` 设置这些处理程序后
 
 ```python
 simulator = Simulator(
@@ -434,7 +434,7 @@ simulator = Simulator(
 )
 ```
 
-We should expect 8 `MAX_INSTS` events after the `WORKBEGIN` event.
+我们应该期望在 `WORKBEGIN` 事件之后有 8 个 `MAX_INSTS` 事件。
 
 ---
 
@@ -442,7 +442,7 @@ We should expect 8 `MAX_INSTS` events after the `WORKBEGIN` event.
 
 ## 01-local-inst-tracker
 
-We should expect to see below log in `simout.txt`
+我们应该期望在 `simout.txt` 中看到以下日志
 
 ```bash
 Global frequency set at 1000000000000 ticks per second
@@ -482,9 +482,9 @@ Simulation Done
 
 ## 01-local-inst-tracker
 
-Congratulations! We now have our LocalInstTracker!
-However, this local instruction exit event can be done with the [scheduleInstStop](https://github.com/studyztp/gem5/blob/studyztp/probe-user-inst/src/cpu/BaseCPU.py#L72) function in `BaseCPU`. Our goal is to have an instruction exit event that tracks the global committed instructions, which does not have an interface to do so easily in gem5 yet.
-Since each ProbeListener can only attach to one SimObject, we can modify our LocalInstTracker to notify a global object to keep tracking all committed instructions in all ProbeListeners.
+恭喜！我们现在有了 LocalInstTracker！
+但是，这个本地指令退出事件可以使用 `BaseCPU` 中的 [scheduleInstStop](https://github.com/studyztp/gem5/blob/studyztp/probe-user-inst/src/cpu/BaseCPU.py#L72) 函数来完成。我们的目标是拥有一个跟踪全局已提交指令的指令退出事件，这在 gem5 中还没有简单的接口来实现。
+由于每个 ProbeListener 只能附加到一个 SimObject，我们可以修改 LocalInstTracker 以通知全局对象来跟踪所有 ProbeListener 中的所有已提交指令。
 
 <!-- do a visualization here -->
 ![](/bootcamp/03-Developing-gem5-models/09-extending-gem5-models-imgs/global-listener.drawio.svg)
@@ -493,10 +493,10 @@ Since each ProbeListener can only attach to one SimObject, we can modify our Loc
 
 ## 02-global-inst-tracker
 
-All materials about this section can be found under [`materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker`](/materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker).
+本节的所有材料可以在 [`materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker`](/materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker) 下找到。
 
-We can create a new SimObject to help us to keep track of all ProbeListeners.
-Let's start to modify the `inst_tracker.hh` by adding a new SimObject class called `GlobalInstTracker`.
+我们可以创建一个新的 SimObject 来帮助我们跟踪所有 ProbeListener。
+让我们开始修改 `inst_tracker.hh`，添加一个名为 `GlobalInstTracker` 的新 SimObject 类。
 
 ```cpp
 #include "params/GlobalInstTracker.hh"
@@ -511,7 +511,7 @@ class GlobalInstTracker : public SimObject
 
 ## 02-global-inst-tracker
 
-Since all the counting and threshold checking will be done by the `GlobalInstTracker`, let's move all the related variables and functions to the `GlobalInstTracker`.
+由于所有计数和阈值检查都将由 `GlobalInstTracker` 完成，让我们将所有相关变量和函数移动到 `GlobalInstTracker`。
 
 ```cpp
   private:
@@ -536,7 +536,7 @@ public:
 
 ## 02-global-inst-tracker
 
-So our `LocalInstTracker` now should only be like the following. Note that it has an pointer to a `GlobalInstTracker`. This is how we can notify the `GlobalInstTracker` from the `LocalInstTracker`.
+所以我们的 `LocalInstTracker` 现在应该只像下面这样。请注意，它有一个指向 `GlobalInstTracker` 的指针。这就是我们如何从 `LocalInstTracker` 通知 `GlobalInstTracker`。
 
 ```cpp
 class LocalInstTracker : public ProbeListenerObject
@@ -566,9 +566,9 @@ class LocalInstTracker : public ProbeListenerObject
 
 ## 02-global-inst-tracker
 
-Now, we need to decide how the `GlobalInstTracker` handles the notification from the `LocalInstTracker`.
-We want it to count the number of global committed instruction, check if it reaches the threshold, and raise an exit event if it does.
-Therefore, in `inst_tracker.hh`, let's add a `checkPc` function to the `GlobalInstTracker` too.
+现在，我们需要决定 `GlobalInstTracker` 如何处理来自 `LocalInstTracker` 的通知。
+我们希望它计算全局已提交指令的数量，检查是否达到阈值，如果达到则触发退出事件。
+因此，在 `inst_tracker.hh` 中，让我们也为 `GlobalInstTracker` 添加一个 `checkPc` 函数。
 
 ```cpp
 void checkPc(const uint64_t& inst);
@@ -591,7 +591,7 @@ GlobalInstTracker::checkPc(const uint64_t& inst)
 
 ## 02-global-inst-tracker
 
-Now, we need to modify the original `checkPc` function for the `LocalInstTracker` to notify the `GlobalInstTracker`
+现在，我们需要修改 `LocalInstTracker` 的原始 `checkPc` 函数以通知 `GlobalInstTracker`
 
 ```cpp
 void
@@ -601,7 +601,7 @@ LocalInstTracker::checkPc(const uint64_t& inst)
 }
 ```
 
-Don't forget to change the constructor of the `LocalInstTracker`
+不要忘记更改 `LocalInstTracker` 的构造函数
 
 ```cpp
 LocalInstTracker::LocalInstTracker(const LocalInstTrackerParams &p)
@@ -615,7 +615,7 @@ LocalInstTracker::LocalInstTracker(const LocalInstTrackerParams &p)
 
 ## 02-global-inst-tracker
 
-We are almost done with C++ part. Let's don't forget about the `GlobalInstTracker`'s constructor in the `inst_tracker.cc`
+我们几乎完成了 C++ 部分。让我们不要忘记 `inst_tracker.cc` 中 `GlobalInstTracker` 的构造函数
 
 ```cpp
 GlobalInstTracker::GlobalInstTracker(const GlobalInstTrackerParams &p)
@@ -625,7 +625,7 @@ GlobalInstTracker::GlobalInstTracker(const GlobalInstTrackerParams &p)
 {}
 ```
 
-After this, we need to modify the `InstTracker.py` for the new `GlobalInstTracker` and the modified `LocalInstTracker`
+之后，我们需要为新的 `GlobalInstTracker` 和修改后的 `LocalInstTracker` 修改 `InstTracker.py`
 
 ---
 
@@ -675,7 +675,7 @@ class LocalInstTracker(ProbeListenerObject):
 
 ## 02-global-inst-tracker
 
-Finally, the [gem5/src/cpu/probes/SConscript](../../gem5/src/cpu/probes/SConscript)
+最后，[gem5/src/cpu/probes/SConscript](../../gem5/src/cpu/probes/SConscript)
 
 ```python
 SimObject(
@@ -685,7 +685,7 @@ SimObject(
 Source("inst_tracker.cc")
 ```
 
-Let's build gem5 with our new `GlobalInstTracker`!
+让我们使用新的 `GlobalInstTracker` 构建 gem5！
 
 ```bash
 cd gem5
@@ -696,22 +696,22 @@ scons build/X86/gem5.fast -j$(nproc)
 
 ## 02-global-inst-tracker
 
-There is a simple SE script in [materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/simple-sim.py](../../materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/simple-sim.py).
+在 [materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/simple-sim.py](../../materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/simple-sim.py) 中有一个简单的 SE 脚本。
 
-We can test our `GlobalInstTracker` with it using the command
+我们可以使用以下命令测试我们的 `GlobalInstTracker`
 
 ```bash
 cd /workspaces/2024/materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker
 /workspaces/2024/gem5/build/X86/gem5.fast -re --outdir=simple-sim-m5out simple-sim.py
 ```
 
-This script runs the same workload we did in 01-local-inst-tracker, but with the `GlobalInstTracker` setup.
+此脚本运行与我们在 01-local-inst-tracker 中相同的工作负载，但使用 `GlobalInstTracker` 设置。
 
 ---
 
 ## 02-global-inst-tracker
 
-It creates a `GlobalInstTracker` and when each `LocalInstTracker` attaches to the core, it passes itself as a reference to the `global_inst_tracker` parameter
+它创建一个 `GlobalInstTracker`，当每个 `LocalInstTracker` 附加到核心时，它将自身作为引用传递给 `global_inst_tracker` 参数
 
 ```python
 from m5.objects import LocalInstTracker, GlobalInstTracker
@@ -733,17 +733,17 @@ for core in processor.get_cores():
 
 ## 02-global-inst-tracker
 
-We start to listen when workbegin is raised, then exit the simulation after 100,000 instructions are committed accumulatively by all cores.
-Also, we reset the stats at workbegin, so we can verify if the `GlobalInstTracker` actually did its job.
+当触发 workbegin 时，我们开始监听，然后在所有核心累计提交 100,000 条指令后退出仿真。
+此外，我们在 workbegin 时重置统计信息，以便我们可以验证 `GlobalInstTracker` 是否真正完成了它的工作。
 
-If the simulation finished, we can count the stats.
-There is a helper python file [materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/count_commited_inst.py](../../materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/count_commited_inst.py) for us to easily calculate the total committed instructions by all 8 cores.
+如果仿真完成，我们可以统计统计信息。
+有一个辅助 Python 文件 [materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/count_commited_inst.py](../../materials/03-Developing-gem5-models/09-extending-gem5-models/02-global-inst-tracker/count_commited_inst.py)，可以帮助我们轻松计算所有 8 个核心的总已提交指令数。
 
-Let's run it with
+让我们运行它
 ```python
 python3 count_commited_inst.py
 ```
-We should see the following if the `GlobalInstTracker` works.
+如果 `GlobalInstTracker` 正常工作，我们应该看到以下内容。
 
 ```bash
 Total committed instructions: 100000
@@ -751,7 +751,6 @@ Total committed instructions: 100000
 
 ---
 
-## Summary
+## 总结
 
-The ProbePoint is a useful tool to profile or add helper features for our simulation without adding too much to the components' codebase.
-
+探针点（ProbePoint）是一个有用的工具，可以在不向组件代码库添加太多内容的情况下分析或为我们的仿真添加辅助功能。

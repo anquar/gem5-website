@@ -1,11 +1,11 @@
 ---
 layout: bootcamp
-title: Extending gem5 with SystemC
+title: 使用 SystemC 扩展 gem5
 permalink: /bootcamp/other-simulators/systemc
 section: other-simulators
 ---
 <!-- _class: title -->
 
-## Extending gem5 with SystemC
+## 使用 SystemC 扩展 gem5
 
-See [`gem5/src/systemc`](../../gem5/src/systemc/)
+参见 [`gem5/src/systemc`](../../gem5/src/systemc/)

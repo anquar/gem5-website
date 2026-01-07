@@ -1,47 +1,47 @@
 ---
 layout: bootcamp
-title: Using gem5's implementation of the CHI Protocol
+title: 使用 gem5 的 CHI 协议实现
 permalink: /bootcamp/developing-gem5/chi-protocol
 section: developing-gem5
 ---
 <!-- _class: title -->
 
-## Using gem5's implementation of the CHI Protocol
+## 使用 gem5 的 CHI 协议实现
 
 ---
 
-## Example
+## 示例
 
-- Let's build a simple two-level cache hiearchy
-  - Private L1 caches
-  - Shared L2/directory (home node)
+- 让我们构建一个简单的两级缓存层次结构
+  - 私有 L1 缓存
+  - 共享 L2/目录（主节点）
 <!-- - Extend this to allow for multiple L2s (banked by address) -->
 <!-- - Multiple memory controllers as well -->
 
-Code in [`materials/03-Developing-gem5-models/07-chi-protocol`](../../materials/03-Developing-gem5-models/07-chi-protocol/).
+代码位于 [`materials/03-Developing-gem5-models/07-chi-protocol`](../../materials/03-Developing-gem5-models/07-chi-protocol/)。
 
 ---
 
-## Use some components
+## 使用一些组件
 
-- There are some components already available for CHI
-  - Just a `private_l1_moesi_cache` for now
-  - Point-to-point network
+- CHI 已经有一些可用的组件
+  - 目前只有一个 `private_l1_moesi_cache`
+  - 点对点网络
 
-See [`gem5/src/python/gem5/components/cachehierarchies/chi/nodes/private_l1_moesi_cache.py`](../../gem5/src/python/gem5/components/cachehierarchies/chi/nodes/private_l1_moesi_cache.py).
+参见 [`gem5/src/python/gem5/components/cachehierarchies/chi/nodes/private_l1_moesi_cache.py`](../../gem5/src/python/gem5/components/cachehierarchies/chi/nodes/private_l1_moesi_cache.py)。
 
 ---
 
-## Create an L2 home node object
+## 创建 L2 主节点对象
 
-In CHI you have to specify many of the parameters to configure the cache.
-We'll use the `AbstractNode` as the base class for our cache which hides some of the boilerplate.
+在 CHI 中，您必须指定许多参数来配置缓存。
+我们将使用 `AbstractNode` 作为缓存的基础类，它隐藏了一些样板代码。
 
-For our L2, we want to parameterize just the size and the associativity. The other parameters are required for the `AbstractNode` class.
+对于我们的 L2，我们只想参数化大小和关联度。其他参数是 `AbstractNode` 类所必需的。
 
 ```python
 class SharedL2(AbstractNode):
-    """A home node (HNF) with a shared cache"""
+    """一个带有共享缓存的主节点（HNF）"""
 
     def __init__(
         self,
@@ -55,24 +55,24 @@ class SharedL2(AbstractNode):
 
 ---
 
-## Create the cache object
+## 创建缓存对象
 
 ```python
 self.cache = RubyCache(
     size=size,
     assoc=assoc,
-    # Can choose any replacement policy
+    # 可以选择任何替换策略
     replacement_policy=RRIPRP(),
 )
 ```
 
-You can choose any replacement policy from [`gem5/src/mem/cache/replacement_policies/ReplacementPolicies.py`](../../gem5/src/mem/cache/replacement_policies/ReplacementPolicies.py).
+您可以从 [`gem5/src/mem/cache/replacement_policies/ReplacementPolicies.py`](../../gem5/src/mem/cache/replacement_policies/ReplacementPolicies.py) 中选择任何替换策略。
 
 ---
 
-## Set the CHI parameters
+## 设置 CHI 参数
 
-Set up home node that allows three hop protocols and enable the "owned" state.
+设置允许三跳协议的主节点并启用"owned"状态。
 
 ```python
 self.is_HN = True
@@ -83,9 +83,9 @@ self.allow_SD = True
 
 ---
 
-## Set more CHI parameters
+## 设置更多 CHI 参数
 
-MOESI / Mostly inclusive for shared / Exclusive for unique
+MOESI / 共享时主要包含 / 唯一时独占
 
 ```python
 self.alloc_on_seq_acc = False
@@ -103,13 +103,13 @@ self.dealloc_backinv_shared = False
 
 ---
 
-## Now, let's create the hierarchy
+## 现在，让我们创建层次结构
 
-Set the parameters we care about (and ignore others)
+设置我们关心的参数（忽略其他参数）
 
 ```python
 class PrivateL1SharedL2CacheHierarchy(AbstractRubyCacheHierarchy):
-    """A two level cache based on CHI
+    """基于 CHI 的两级缓存
     """
 
     def __init__(self, l1_size: str, l1_assoc: int, l2_size: str, l2_assoc: int):
@@ -121,11 +121,11 @@ class PrivateL1SharedL2CacheHierarchy(AbstractRubyCacheHierarchy):
 
 ---
 
-## Set up the hierarchy
+## 设置层次结构
 
-Remember, `incorporate_cache` is the main method we need to implement. Much of the boilerplate is already available for you.
+记住，`incorporate_cache` 是我们需要实现的主要方法。大部分样板代码已经为您准备好了。
 
-You should add code to create the shared L2 cache.
+您应该添加代码来创建共享的 L2 缓存。
 
 ```python
 def incorporate_cache(self, board):
@@ -142,9 +142,9 @@ def incorporate_cache(self, board):
 
 ---
 
-## Next, let's create the run script
+## 接下来，让我们创建运行脚本
 
-First, let's use the traffic generator. Put the following code in `run_test.py`
+首先，让我们使用流量生成器。将以下代码放入 `run_test.py`
 
 ```python
 from hierarchy import PrivateL1SharedL2CacheHierarchy
@@ -163,7 +163,7 @@ sim.run()
 
 ---
 
-## Test the new hierarchy and look at the stats
+## 测试新的层次结构并查看统计信息
 
 ```sh
 > gem5-chi run_test.py
@@ -186,10 +186,10 @@ board.processor.cores3.generator.writeBW 948724311.716480
 
 ---
 
-## Now, let's run a full system simulation
+## 现在，让我们运行全系统仿真
 
-Let's create a script to run IS from NPB.
-Just add the following to the template in [`materials/03-Developing-gem5-models/07-chi-protocol/run-is.py`](../../materials/03-Developing-gem5-models/07-chi-protocol/run-is.py/).
+让我们创建一个脚本来运行 NPB 中的 IS。
+只需将以下内容添加到 [`materials/03-Developing-gem5-models/07-chi-protocol/run-is.py`](../../materials/03-Developing-gem5-models/07-chi-protocol/run-is.py/) 中的模板。
 
 ```python
 from hierarchy import PrivateL1SharedL2CacheHierarchy
@@ -203,13 +203,13 @@ cache_hierarchy = PrivateL1SharedL2CacheHierarchy(
 
 ---
 
-## Run the script
+## 运行脚本
 
 ```sh
 gem5 run-is.py
 ```
 
-You should see the following output pretty quickly
+您应该很快看到以下输出
 
 ```text
 ...
@@ -218,28 +218,28 @@ switching cpus
 ...
 ```
 
-This takes about 5 minutes to complete, but you can check the output while it's running with
-`tail -f m5out/board.pc.com_1.terminal`.
+这大约需要 5 分钟完成，但您可以在运行时使用以下命令检查输出
+`tail -f m5out/board.pc.com_1.terminal`。
 
 ---
 
-## Grab some stats
+## 获取一些统计信息
 
-Finally, let's grab some stats that seem interesting (we'll use these more in the next section).
+最后，让我们获取一些看起来有趣的统计信息（我们将在下一节中更多地使用这些信息）。
 
 ```text
 board.cache_hierarchy.ruby_system.m_missLatencyHistSeqr::mean   185.561335
 board.processor.switch0.core.commitStats0.ipc     0.149605
 ```
 
-We have an average miss latency of 185 cycles (lots of L2 misses!) and an IPC of 0.15.
+我们的平均缺失延迟为 185 个周期（很多 L2 缺失！），IPC 为 0.15。
 
-### Note: This example has not been debugged and may have FS issues
+### 注意：此示例尚未调试，可能存在 FS 问题
 
 ---
 
-## Summary
+## 总结
 
-- We've created a simple two-level cache hierarchy using the CHI protocol
-- We've run a simple traffic generator and a full system simulation
-- We've seen how to set up the CHI protocol in gem5 with the standard library
+- 我们使用 CHI 协议创建了一个简单的两级缓存层次结构
+- 我们运行了一个简单的流量生成器和全系统仿真
+- 我们了解了如何使用标准库在 gem5 中设置 CHI 协议

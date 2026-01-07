@@ -1,37 +1,37 @@
 ---
 layout: bootcamp
-title: Extending gem5 with DRAMSim and DRAMSys
+title: 使用 DRAMSim 和 DRAMSys 扩展 gem5
 permalink: /bootcamp/other-simulators/dram
 section: other-simulators
 ---
 <!-- _class: title -->
 
-## Extending gem5 with DRAMSim and DRAMSys
+## 使用 DRAMSim 和 DRAMSys 扩展 gem5
 
 
 ---
 
-## Ports are useful interfaces to other simulators
+## 端口是与其他模拟器交互的有用接口
 
 ---
 
-## Why use an external simulator?
+## 为什么使用外部模拟器？
 
-> Note: I don't advise using external DRAM simulators.
-> gem5's DRAM model is accurate enough for most research
+> 注意：我不建议使用外部 DRAM 模拟器。
+> gem5 的 DRAM 模型对于大多数研究来说已经足够准确
 
-The main reasons to use an external DRAM simulator are:
+使用外部 DRAM 模拟器的主要原因有：
 
-- For comparisons between gem5's DRAM models and other simulators (e.g., when developing a new DRAM model for gem5)
-- When you have already modified the other simulator and need to drive it with realistic traffic
+- 用于比较 gem5 的 DRAM 模型与其他模拟器（例如，在为 gem5 开发新的 DRAM 模型时）
+- 当您已经修改了其他模拟器并需要使用真实的流量来驱动它时
 
 ---
 
-## Getting DRAMSys
+## 获取 DRAMSys
 
-See [`gem5/ext/dramsys/README`](../../gem5/ext/dramsys/README) for deatils.
+详情请参见 [`gem5/ext/dramsys/README`](../../gem5/ext/dramsys/README)。
 
-Run
+运行
 
 ```sh
 cd ext/dramsys
@@ -40,9 +40,9 @@ git clone https://github.com/tukl-msd/DRAMSys --branch v5.0 --depth 1 DRAMSys
 
 ---
 
-## Buidling DRAMSys
+## 构建 DRAMSys
 
-After you add the DRAMSys repo to `ext/dramsys`, it will automatically be built into gem5.
+将 DRAMSys 仓库添加到 `ext/dramsys` 后，它将自动构建到 gem5 中。
 
 ```sh
 scons build/NULL/gem5.opt -j$(nproc)
@@ -50,16 +50,16 @@ scons build/NULL/gem5.opt -j$(nproc)
 
 ---
 
-## Using DRAMSys
+## 使用 DRAMSys
 
-See <https://github.com/tukl-msd/DRAMSys> for documentation on DRAMSys
+关于 DRAMSys 的文档，请参见 <https://github.com/tukl-msd/DRAMSys>
 
-To configure gem5 to use DRAMSys, you can use the standard library.
-DRAMSys can be used as a `MemorySystem` just like the `SingleChannel` or `MultiChannel` memories.
+要配置 gem5 使用 DRAMSys，您可以使用标准库。
+DRAMSys 可以作为 `MemorySystem` 使用，就像 `SingleChannel` 或 `MultiChannel` 内存一样。
 
-Open [`materials/05-Other-simulators/02-dram/dramsys-example.py`](../../materials/05-Other-simulators/02-dram/dramsys-example.py).
+打开 [`materials/05-Other-simulators/02-dram/dramsys-example.py`](../../materials/05-Other-simulators/02-dram/dramsys-example.py)。
 
-Add the following lines to create a memory system with DDR4 from DRAMSys
+添加以下行以使用 DRAMSys 创建带有 DDR4 的内存系统
 
 ```python
 memory = DRAMSysMem(
@@ -72,24 +72,24 @@ memory = DRAMSysMem(
 
 ---
 
-## Configuring DRAMSys
+## 配置 DRAMSys
 
-Options for DRAMSys:
+DRAMSys 的选项：
 
-- `configuration`: See [`gem5/ext/dramsys/DRAMSys/configs/`](../../gem5/ext/dramsys/DRAMSys/configs/) for the provided configurations.
-  - Must be absolute or relative to your run path.
-- `resource_directory`: Pointer to the configs directory.
-  - Must be absolute or relative to your run path.
-- `recordable`: Whether DRAMSys should record a trace file
+- `configuration`：请参见 [`gem5/ext/dramsys/DRAMSys/configs/`](../../gem5/ext/dramsys/DRAMSys/configs/) 以查看提供的配置。
+  - 必须是绝对路径或相对于运行路径的路径。
+- `resource_directory`：指向配置目录的指针。
+  - 必须是绝对路径或相对于运行路径的路径。
+- `recordable`：DRAMSys 是否应记录跟踪文件
 
-### Note on implementation
+### 实现说明
 
-- DRAMSys uses TLM 2.0
-- This is a good example of how to get gem5 to talk to a TLM object.
+- DRAMSys 使用 TLM 2.0
+- 这是如何让 gem5 与 TLM 对象通信的一个很好的示例。
 
 ---
 
-## DRAMSys output
+## DRAMSys 输出
 
 ```sh
 ../../../gem5/build/NULL/gem5.opt dramsys-example.py
@@ -102,21 +102,21 @@ board.memory.dramsys.DRAMSys.controller0  AVG BW\IDLE:     87.97 Gb/s |  11.00 G
 board.memory.dramsys.DRAMSys.controller0  MAX BW:         119.40 Gb/s |  14.93 GB/s | 100.00 %
 ```
 
-Outputs a file, `board.memory.dramsys.DRAMSys_ddr4-example_example_ch0.tdb` which is a database trace.
+输出一个文件 `board.memory.dramsys.DRAMSys_ddr4-example_example_ch0.tdb`，这是一个数据库跟踪文件。
 
-> Does not use gem5's stats output!
+> 不使用 gem5 的统计输出！
 
 ---
 
 ## DRAMSim
 
-Similar to DRAMSys in how to obtain and use
+在获取和使用方式上与 DRAMSys 类似
 
-> Note: DRAMSim3 is not tested regularly
+> 注意：DRAMSim3 没有定期测试
 
-See [`gem5/ext/dramsim3/README`](../../gem5/ext/dramsim3/README) for details.
+详情请参见 [`gem5/ext/dramsim3/README`](../../gem5/ext/dramsim3/README)。
 
-To get DRAMsim run the code below and recompile gem5.
+要获取 DRAMsim，请运行以下代码并重新编译 gem5。
 
 ```sh
 cd ext/dramsim3
@@ -130,9 +130,9 @@ make -j$(nproc)
 
 ---
 
-## Using DRAMSim3
+## 使用 DRAMSim3
 
-In `gem5.components.memory.dramsim_3` there are single channel configurations available.
+在 `gem5.components.memory.dramsim_3` 中有可用的单通道配置。
 
 ```python
 from gem5.components.memory.dramsim_3 import SingleChannelHBM
@@ -142,9 +142,9 @@ from gem5.components.memory.dramsim_3 import SingleChannelHBM
 memory = SingleChannelHBM(size="1GiB")
 ```
 
-You can extend this with other memories using `SingleChannel` from that module.
+您可以使用该模块中的 `SingleChannel` 扩展其他内存类型。
 
-Find the list of DRAMSim configs: [`gem5/ext/dramsim3/DRAMsim3/configs`](../../gem5/ext/dramsim3/DRAMsim3/configs)
+查找 DRAMSim 配置列表：[`gem5/ext/dramsim3/DRAMsim3/configs`](../../gem5/ext/dramsim3/DRAMsim3/configs)
 
 ```python
 SingleChannel(<memory type from configs>, <size>)
@@ -152,5 +152,4 @@ SingleChannel(<memory type from configs>, <size>)
 
 ---
 
-## NOTE: DRAMSim3 doesn't work with v24.0.0.0!
-
+## 注意：DRAMSim3 不适用于 v24.0.0.0！

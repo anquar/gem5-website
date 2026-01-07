@@ -1,47 +1,47 @@
 ---
 layout: bootcamp
-title: Modeling the on-chip network with Garnet
+title: 使用 Garnet 建模片上网络
 permalink: /bootcamp/developing-gem5/ruby-network
 section: developing-gem5
 ---
 <!-- _class: title -->
 
-## Modeling the on-chip network with Garnet
+## 使用 Garnet 建模片上网络
 
 ---
 
-## Review of Ruby
+## Ruby 回顾
 
-- **Controller Models** *(e.g, caches)*: Manage coherence state and issue requests
-- **Controller Topology** *(how the caches are connected)*: Determines how messages are routed
-- **Interconnect Model** *(e.g., on-chip routers)*: Determines performance of routing
-- **Interface** *(how to get messages in/out of Ruby)*
+- **控制器模型** *(例如，缓存)*: 管理一致性状态并发出请求
+- **控制器拓扑** *(缓存如何连接)*: 决定消息如何路由
+- **互连模型** *(例如，片上路由器)*: 决定路由性能
+- **接口** *(如何将消息传入/传出 Ruby)*
 
 ![Inside Ruby: controllers around an interconnect model cloud bg right fit](/bootcamp/03-Developing-gem5-models/06-modeling-cache-coherence-imgs/ruby-inside.drawio.svg)
 
 ---
 
-## Network on chip
+## 片上网络
 
-Made up of both **topology** and **interconnect** model
+由**拓扑**和**互连**模型组成
 
-### Topology
+### 拓扑
 
-Specified in the Python configuration with how routers/switches are connected
+在 Python 配置中指定路由器/交换机如何连接
 
-### Interconnect
+### 互连
 
-- Simple: Fast, can only change link bandwidth/latency
-- Garnet: Detailed model for routers, flow control, and link architecture
+- Simple: 快速，只能更改链路带宽/延迟
+- Garnet: 详细的路由器、流控制和链路架构模型
 
-First we'll create a new topology (a ring) and then we'll extend it to use Garnet.
+首先我们将创建一个新的拓扑（环形），然后扩展它以使用 Garnet。
 
 ---
 
-## Creating a new topology
+## 创建新拓扑
 
-From [Modeling Cache Coherence](06-modeling-cache-coherence.md)
-Need an *external link* between each controller and a router.
+来自[缓存一致性建模](06-modeling-cache-coherence.md)
+每个控制器和路由器之间需要一个*外部链路*。
 
 ```python
 self.routers = [
@@ -60,15 +60,15 @@ self.ext_links = [
 
 ---
 
-## Creating a new topology
+## 创建新拓扑
 
-From [Modeling Cache Coherence](06-modeling-cache-coherence.md)
-Create internal links between routers.
+来自[缓存一致性建模](06-modeling-cache-coherence.md)
+在路由器之间创建内部链路。
 
 ```python
 for ri in self.routers:
     for rj in self.routers:
-        # Don't connect a router to itself!
+        # 不要将路由器连接到自身！
         if ri == rj: continue
         link_count += 1
         self.int_links.append(
@@ -83,23 +83,23 @@ for ri in self.routers:
 
 ---
 
-## Let's create a ring topology for the CHI protocol
+## 让我们为 CHI 协议创建一个环形拓扑
 
-Building off of [CHI protocol](07-chi-protocol.md)
+基于[CHI 协议](07-chi-protocol.md)构建
 
 ![diagram showing a ring topology with four cores, two memory controllers and two L2s](/bootcamp/03-Developing-gem5-models/08-ruby-network-imgs/ring.drawio.svg)
 
 ---
 
-## Create the topology file
+## 创建拓扑文件
 
-Open [../../materials/03-Developing-gem5-models/08-ruby-network/ring.py](../../materials/03-Developing-gem5-models/08-ruby-network/ring.py)
+打开 [../../materials/03-Developing-gem5-models/08-ruby-network/ring.py](../../materials/03-Developing-gem5-models/08-ruby-network/ring.py)
 
-Note: There are a lot off oddities in this code. Most of it, you'll just have to take my word for it...
+注意：这段代码中有很多奇怪的地方。大部分内容，你只需要相信我的话...
 
 ---
 
-## Extend the `SimpleNetwork` class
+## 扩展 `SimpleNetwork` 类
 
 ```python
 class Ring(SimpleNetwork):
@@ -109,18 +109,18 @@ class Ring(SimpleNetwork):
         self.ruby_system = ruby_system
 ```
 
-Note that netifs is only used for Garnet. Also, the `ruby_system` has to be set manually.
+注意 netifs 仅用于 Garnet。此外，必须手动设置 `ruby_system`。
 
 ---
 
-## The `connectControllers` method
+## `connectControllers` 方法
 
-This is where the meat of the topology is created.
-In our case, we are going to make this topology very specific.
+这是创建拓扑核心内容的地方。
+在我们的例子中，我们将使这个拓扑非常具体。
 
-Important note: the layout of the topology is tightly related to the number of cores, L2 banks, memory controllers, etc.
+重要提示：拓扑的布局与核心数量、L2 缓存组、内存控制器等密切相关。
 
-Think about how you would lay out a mesh topology, for instance.
+例如，考虑一下如何布局网格拓扑。
 
 ```python
 def connectControllers(
@@ -134,9 +134,9 @@ def connectControllers(
 
 ---
 
-## Create routers for the L1D and L1I caches
+## 为 L1D 和 L1I 缓存创建路由器
 
-L1I and L1D can share the same router. L2s get their own routers.
+L1I 和 L1D 可以共享同一个路由器。L2 缓存有自己独立的路由器。
 
 ```python
 self.l1_routers = [Switch(router_id=i) for i in range(4)]
@@ -150,12 +150,12 @@ self.l1d_ext_links = [
 ]
 ```
 
-Note: the `link_id` is important. You have to manually increment it and make sure that the ids are all unique for each type.
-Like many things, there are probably better ways, but this is how it's done...
+注意：`link_id` 很重要。你必须手动递增它，并确保每种类型的 id 都是唯一的。
+就像很多事情一样，可能有更好的方法，但这就是它的实现方式...
 
 ---
 
-## Create routers for the L2s and memory
+## 为 L2 缓存和内存创建路由器
 
 ```python
 self.l2_routers = [Switch(router_id=4+i) for i in range(2)]
@@ -171,11 +171,11 @@ self.mem_ext_links = [
 ]
 ```
 
-Don't forget the link ids!
+不要忘记链路 id！
 
 ---
 
-## Finally, if we're running is FS mode, we need DMAs
+## 最后，如果我们在 FS 模式下运行，需要 DMA
 
 ```python
 if dma_ctrls:
@@ -189,10 +189,10 @@ if dma_ctrls:
 
 ---
 
-## Create internal links
+## 创建内部链路
 
-This is where we create our ring.
-For something different, let's do a uni-directional ring.
+这是我们创建环形拓扑的地方。
+为了有所不同，让我们做一个单向环形。
 
 ```python
 self.int_links = [
@@ -213,9 +213,9 @@ self.int_links = [
 
 ---
 
-## A little more boilerplate
+## 更多样板代码
 
-We have to tell the parent network class about our links and routers. It requires the member variables `routers`, `ext_links`, and `int_links`.
+我们必须告诉父网络类我们的链路和路由器。它需要成员变量 `routers`、`ext_links` 和 `int_links`。
 
 ```python
 self.ext_links = (
@@ -234,7 +234,7 @@ self.routers = (
 
 ---
 
-## Testing results
+## 测试结果
 
 ```sh
 gem5 run-test.py
@@ -247,13 +247,13 @@ board.processor.cores2.generator.readBW  2057532576.265793
 board.processor.cores3.generator.readBW  2124156465.403641
 ```
 
-Note: this is almost 10% lower than what we saw with point-to-point!
+注意：这比我们看到的点对点连接低近 10%！
 
 ---
 
 <!-- _class: two-col -->
 
-## Idea! Swap the L2 and the memory
+## 想法！交换 L2 和内存的位置
 
 ```python
     dst_node=self.l2_routers[0],
@@ -287,7 +287,7 @@ SimpleIntLink(
 
 ---
 
-## Run again
+## 再次运行
 
 ```sh
 gem5 run-test.py
@@ -312,77 +312,77 @@ board.processor.cores3.generator.readBW  2504614981.400951
 
 ## Simple vs Garnet
 
-### Router microarchitecture
+### 路由器微架构
 
-- Switch: Simple network
-  - Router latency
-  - Number of virtual channels
-- Garnet Router: Garnet network
-  - Number of virtual channels
-  - Number of virtual networks
-  - Size of flits (flow control units)
+- Switch: Simple 网络
+  - 路由器延迟
+  - 虚拟通道数量
+- Garnet Router: Garnet 网络
+  - 虚拟通道数量
+  - 虚拟网络数量
+  - 数据片（流控制单元）大小
 
-### Link microarchitecture
+### 链路微架构
 
-- Simple network:
-  - Just specifies the "bandwidth factor"
-- Garnet network:
-  - Separate links for data link and flow control links: Network and credit links
-  - Supports clock domain crossing
-  - Serialization and deserialization
-  - Width of the link
-
----
-
-## Routing
-
-- Table-based Routing
-  - Shortest path
-  - Chooses the route with minimum number of link traversals
-  - Link weight  impacts routing
-- Custom Routing algorithms
+- Simple 网络:
+  - 仅指定"带宽因子"
+- Garnet 网络:
+  - 数据链路和流控制链路分开：网络链路和信用链路
+  - 支持时钟域交叉
+  - 串行化和反串行化
+  - 链路宽度
 
 ---
 
-## Garnet Extensions
+## 路由
 
-- Clock domain crossings
-  - If the external and internal links operating at a different frequency this should be enabled for the `GarnetExtLink`
-  - If two internal links have different frequencies, this should be enabled for the `GarnetIntLink`
-- Serialization and deserialization
-  - This is required if the external link has a different flit size than the internal link for the `GarnetExtLink`
-  - This is required if two internal links have a different flit sizes for the `GarnetIntLink`
-- Credit links and bridges for clock domains are automatically created
+- 基于表的路由
+  - 最短路径
+  - 选择链路遍历次数最少的路径
+  - 链路权重影响路由
+- 自定义路由算法
 
 ---
 
-## Example?
+## Garnet 扩展
 
-... Unfortunately, this isn't working. But I have a hack...
-
-There is definitely a buffer filling up somewhere that's causing a deadlock.
-
-The problem is I'm not sure if it's in the network, the protocol, or something else.
-
-So it goes, when using Ruby and Garnet!
+- 时钟域交叉
+  - 如果外部和内部链路以不同频率运行，应为 `GarnetExtLink` 启用此功能
+  - 如果两个内部链路具有不同频率，应为 `GarnetIntLink` 启用此功能
+- 串行化和反串行化
+  - 如果外部链路的数据片大小与 `GarnetExtLink` 的内部链路不同，则需要此功能
+  - 如果两个内部链路的数据片大小不同，则 `GarnetIntLink` 需要此功能
+- 时钟域的信用链路和桥接器会自动创建
 
 ---
 
-## Changes for Garnet
+## 示例？
 
-1. Make a copy of `ring.py`
+... 不幸的是，这不起作用。但我有一个变通方法...
+
+肯定有某个地方的缓冲区正在填满，导致死锁。
+
+问题是我不能确定是在网络、协议还是其他地方。
+
+使用 Ruby 和 Garnet 时就是这样！
+
+---
+
+## Garnet 的更改
+
+1. 复制 `ring.py`
 
 ```sh
 cp ring.py ring_garnet.py
 ```
 
-2. Change `hierarchy.py` to use `ring_garnet` and also remove the following line
+2. 更改 `hierarchy.py` 以使用 `ring_garnet`，并删除以下行
 
 ```diff
 -     self.ruby_system.network.setup_buffers()
 ```
 
-3. Make the following substitutions in `ring_garnet.py`
+3. 在 `ring_garnet.py` 中进行以下替换
 
 - `SimpleNetwork` -> `GarnetNetwork`
 - `SimpleExtLink` -> `GarnetExtLink`
@@ -390,27 +390,26 @@ cp ring.py ring_garnet.py
 
 ---
 
-## One more change (and a hack)
+## 还有一个更改（以及一个变通方法）
 
-Also add the following to `Ring.connectControllers`
+还要在 `Ring.connectControllers` 中添加以下内容
 
 ```python
 self.netifs = [GarnetNetworkInterface(id=i) \
             for (i,n) in enumerate(self.ext_links)]
 ```
 
-Add the following to the constructor to hack around the deadlock.
+在构造函数中添加以下内容以绕过死锁。
 
 ```python
-# There's definitely something wrong with something if I have to
-# do this to get it to work.
+# 如果我必须这样做才能让它工作，肯定有什么地方出了问题。
 self.ni_flit_size = 64
 self.vcs_per_vnet = 16
 ```
 
 ---
 
-## Now, run the test again!
+## 现在，再次运行测试！
 
 ```sh
 gem5 run-test.py
@@ -423,5 +422,5 @@ board.processor.cores2.generator.readBW  3317362747.135825
 board.processor.cores3.generator.readBW  3113523561.473372
 ```
 
-Notice: It takes a lot longer to simulate with Garnet than it does with `SimpleNetwork`.
-More fidelity means longer simulation!
+注意：使用 Garnet 进行模拟比使用 `SimpleNetwork` 需要更长的时间。
+更高的保真度意味着更长的模拟时间！

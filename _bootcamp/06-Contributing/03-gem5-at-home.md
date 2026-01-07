@@ -1,125 +1,124 @@
 ---
 layout: bootcamp
-title: gem5 at home
+title: gem5 在家使用
 permalink: /bootcamp/contributing/gem5-at-home
 section: contributing
 author: William Shaddix
 ---
 <!-- _class: title -->
 
-## gem5 at home (or work/school)
+## gem5 在家（或工作/学校）使用
 
 ---
 
-## Getting help
+## 获取帮助
 
-gem5 has lots of resources to get help:
+gem5 有很多获取帮助的资源：
 
-1. Documentation at [gem5 doxygen](http://doxygen.gem5.org/)
-2. Ways to reach out for help:
-   - [Github discussions](https://github.com/orgs/gem5/discussions) **This is the main place for questions**
-   - [gem5 Slack channel](https://join.slack.com/t/gem5-workspace/shared_invite/zt-2e2nfln38-xsIkN1aRmofRlAHOIkZaEA)
-   - Join our mailing lists:
-      - [gem5-dev@gem5.org : For discussions regarding gem5 development](https://harmonylists.io/list/gem5-dev.gem5.org)
-      - [gem5-users@gem5.org : For general discussions about gem5 and its use](https://harmonylists.io/list/gem5-users.gem5.org)
-      - [gem5-announce@gem5.org : For general gem5 announcements](https://harmonylists.io/list/gem5-announce.gem5.org)
-3. [Youtube videos](https://www.youtube.com/@gem5)
+1. 文档位于 [gem5 doxygen](http://doxygen.gem5.org/)
+2. 寻求帮助的方式：
+   - [Github discussions](https://github.com/orgs/gem5/discussions) **这是提问的主要场所**
+   - [gem5 Slack 频道](https://join.slack.com/t/gem5-workspace/shared_invite/zt-2e2nfln38-xsIkN1aRmofRlAHOIkZaEA)
+   - 加入我们的邮件列表：
+      - [gem5-dev@gem5.org : 用于讨论 gem5 开发相关话题](https://harmonylists.io/list/gem5-dev.gem5.org)
+      - [gem5-users@gem5.org : 用于讨论 gem5 及其使用的一般话题](https://harmonylists.io/list/gem5-users.gem5.org)
+      - [gem5-announce@gem5.org : 用于 gem5 的一般公告](https://harmonylists.io/list/gem5-announce.gem5.org)
+3. [Youtube 视频](https://www.youtube.com/@gem5)
 
-These links and more information are also available at [https://www.gem5.org/ask-a-question/](https://www.gem5.org/ask-a-question/)
+这些链接和更多信息也可在 [https://www.gem5.org/ask-a-question/](https://www.gem5.org/ask-a-question/) 获取
 
-> We do our best to get to questions, but they often go unanswered. This isn't because it's not a good question, but because we don't have enough volunteers.
-
----
-
-## Running gem5 at home
-
-- gem5 performance qualities
-   - Single threaded
-   - Consumes lots of RAM (if you want to model 32 GB of memory, it needs 32 GB of memory to model it)
-   - Can take a lot of time
-- Because of this its best to run multiple experiments in parallel
-- Recommended hardware:
-   - High single thread performance
-   - Doesn't need many cores
-   - LOTS OF RAM
+> 我们尽力回答问题，但问题经常得不到回复。这不是因为问题不好，而是因为我们没有足够的志愿者。
 
 ---
 
-## System software requirements
+## 在家运行 gem5
 
-- Ubuntu 22.04+ (at least GCC 10)
-   - 20.04 works, but there are bugs in GCC 8 (or 9, whatever the default is) and you have to upgrade the GCC version.
+- gem5 性能特点
+   - 单线程
+   - 消耗大量 RAM（如果你想模拟 32 GB 的内存，它需要 32 GB 的内存来模拟它）
+   - 可能需要很长时间
+- 因此，最好并行运行多个实验
+- 推荐的硬件：
+   - 高单线程性能
+   - 不需要太多核心
+   - 大量内存
+
+---
+
+## 系统软件要求
+
+- Ubuntu 22.04+（至少 GCC 10）
+   - 20.04 也可以工作，但 GCC 8（或 9，无论默认是什么）存在 bug，你必须升级 GCC 版本。
 - Python 3.6+
 - SCons
-- Many optional requirements.
+- 许多可选要求。
 
-This *should* work on most Linux systems and on MacOS.
+这在大多数 Linux 系统和 MacOS 上*应该*可以工作。
 
-See our Dockerfiles for the most up-to-date version information:
+查看我们的 Dockerfiles 以获取最新的版本信息：
 
 [`gem5/util/dockerfiles/`](https://github.com/gem5/gem5/tree/stable/util/dockerfiles)
 
 ---
 
-## Using dockerfiles
+## 使用 dockerfiles
 
-If you have trouble, we have docker images.
+如果你遇到问题，我们提供了 docker 镜像。
 
-Here's a generic docker command that should work.
+这是一个应该可以工作的通用 docker 命令。
 
 ```sh
 docker run --rm -v $(pwd):$(pwd) -w $(pwd) ghcr.io/gem5/ubuntu-24.04_all-dependencies:v24-0 <your command>
 ```
 
-- Runs the image at `https://ghcr.io/gem5/ubuntu-24.04_all-dependencies:v24-0`.
-- Automatically removes the docker image (`--rm`)
-- Sets it up so that the current directory (`-v $(pwd):$(pwd)`) is available inside the docker container
-- Sets the working directory to the current directory (`-w $(pwd)`)
-- Runs a command.
-- Every command will now need to run with this to make sure the libraries are set up correctly.
+- 运行位于 `https://ghcr.io/gem5/ubuntu-24.04_all-dependencies:v24-0` 的镜像。
+- 自动删除 docker 镜像（`--rm`）
+- 设置当前目录（`-v $(pwd):$(pwd)`）在 docker 容器内可用
+- 将工作目录设置为当前目录（`-w $(pwd)`）
+- 运行命令。
+- 现在每个命令都需要使用此方式运行，以确保库设置正确。
 
-> I cannot **strongly enough** emphasize that you should not run interactively in the docker container. Use it to just run one command at a time.
-
----
-
-## The devcontainer
-
-The devcontainer we've been using is based off of `ghcr.io/gem5/ubuntu-24.04_all-dependencies:v24-0`, but also includes some gem5 binaries.
-
-You can find it at `ghcr.io/gem5/devcontainer:bootcamp-2024`.
-
-The source will be at [`gem5/utils/dockerfiles/devcontainer`](https://github.com/gem5/gem5/blob/stable/util/dockerfiles/devcontainer/Dockerfile) soon.
+> 我**强烈**强调，你不应该在 docker 容器中交互式运行。使用它一次只运行一个命令。
 
 ---
 
-## Recommended practices
+## 开发容器
 
-- Unless planning on contributing to gem5 or you need to use recently developed work, use the ```stable``` branch.
-- Create branches off of stable.
-- Don't modify parameters of python files in `src/`. Instead create *extensions* of stdlib types or SimObjects.
-- Don't be afraid to read the code. The code is the best documentation.
+我们一直在使用的开发容器基于 `ghcr.io/gem5/ubuntu-24.04_all-dependencies:v24-0`，但也包含一些 gem5 二进制文件。
+
+你可以在 `ghcr.io/gem5/devcontainer:bootcamp-2024` 找到它。
+
+源代码将很快在 [`gem5/utils/dockerfiles/devcontainer`](https://github.com/gem5/gem5/blob/stable/util/dockerfiles/devcontainer/Dockerfile) 提供。
+
+---
+
+## 推荐实践
+
+- 除非计划为 gem5 做贡献或需要使用最近开发的工作，否则使用 ```stable``` 分支。
+- 从 stable 创建分支。
+- 不要修改 `src/` 中 python 文件的参数。相反，创建 stdlib 类型或 SimObjects 的*扩展*。
+- 不要害怕阅读代码。代码是最好的文档。
 
 ---
 
 <!-- _class: start -->
 
-## Final things
+## 最后
 
 ---
 
-## Big thanks
+## 非常感谢
 
 ![Everyone who has contributed to the bootcamp width:1200px](/bootcamp/06-Contributing/../01-Introduction/00-introduction-to-bootcamp-imgs/devs.drawio.svg)
 
 ---
 
-## Big thanks to you all!
+## 非常感谢大家！
 
 ![Group photo height:300px](/bootcamp/06-Contributing/03-gem5-at-home-imgs/group.jpg)
 
-Please let us know how we did:
+请告诉我们您的反馈：
 
 <https://forms.gle/ZLZdv9h126d8GFrS7>
 
 ![QR code for google form bg right 60%](/bootcamp/06-Contributing/03-gem5-at-home-imgs/qr-code.png)
-

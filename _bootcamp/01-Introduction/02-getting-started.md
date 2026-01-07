@@ -187,7 +187,7 @@ X86DemoBoard 具有以下属性：
 - MESI 两级缓存层次结构，32kB 数据和指令缓存以及 1MB L2 缓存。
 - 将作为全系统模拟运行。
 
-源代码可用：[src/python/gem5/prebuilt/demo/x86_demo_board.py](../../gem5/src/python/gem5/prebuilt/demo/x86_demo_board.py)。
+源代码可用：[src/python/gem5/prebuilt/demo/x86_demo_board.py](https://github.com/gem5/gem5/blob/stable/src/python/gem5/prebuilt/demo/x86_demo_board.py)。
 
 ---
 

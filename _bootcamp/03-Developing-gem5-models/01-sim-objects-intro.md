@@ -270,7 +270,7 @@ Speaker Notes
 ## SimObject 定义文件：创建文件
 
 让我们在以下位置为我们的 `SimObject` 创建一个 python 文件：
-[src/bootcamp/hello-sim-object/HelloSimObject.py](../../gem5/src/bootcamp/hello-sim-object/HelloSimObject.py)
+[src/bootcamp/hello-sim-object/HelloSimObject.py](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/HelloSimObject.py)
 
 由于 gem5 仍在编译，首先打开一个新终端。
 
@@ -294,7 +294,7 @@ Speaker Notes
 
 ## SimObject 定义文件：导入和定义
 
-在你选择的编辑器中打开 [src/bootcamp/hello-sim-object/HelloSimObject.py](../../gem5/src/bootcamp/hello-sim-object/HelloSimObject.py)。
+在你选择的编辑器中打开 [src/bootcamp/hello-sim-object/HelloSimObject.py](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/HelloSimObject.py)。
 
 在 `HelloSimObject.py` 中，我们将定义一个表示我们 `HelloSimObject` 的新类。
 我们需要从 `m5.objects.SimObject` 导入 `SimObject` 的定义。
@@ -340,7 +340,7 @@ class HelloSimObject(SimObject):
 - `cxx_header` 表示在 C++ 中声明 `SimObject` 的 C++ 头文件路径。**重要**：此路径应相对于 `gem5/src` 指定。
 - `cxx_class` 是你的 `SimObject` 类在 C++ 中的名称。
 
-`type`、`cxx_header` 和 `cxx_class` 是由 `MetaSimObject` 元类定义的关键字。有关这些关键字的完整列表，请查看 [src/python/m5/SimObject::MetaSimObject](../../gem5/src/python/m5/SimObject.py)。可以跳过这些关键字变量中的一些（如果不是全部）。但是，我强烈建议你至少定义 `type`、`cxx_header`、`cxx_class`。
+`type`、`cxx_header` 和 `cxx_class` 是由 `MetaSimObject` 元类定义的关键字。有关这些关键字的完整列表，请查看 [src/python/m5/SimObject::MetaSimObject](https://github.com/gem5/gem5/blob/stable/src/python/m5/SimObject.py)。可以跳过这些关键字变量中的一些（如果不是全部）。但是，我强烈建议你至少定义 `type`、`cxx_header`、`cxx_class`。
 
 ---
 
@@ -355,7 +355,7 @@ Speaker Notes
 
 - 我强烈建议将 `type` 设置为 Python 中 `SimObject` 类的名称。我还建议确保 C++ 类名与 Python 类名相同。你会在整个 gem5 代码库中看到这*并不*总是如此。但是，我强烈建议遵循此规则以避免任何编译问题。
 
-- 我们稍后会看到，当构建 gem5 时，将有一个**自动生成**的结构体定义来存储该类的参数。结构体的名称将由 `SimObject` 本身的名称决定。例如，如果 `SimObject` 的名称是 `HelloSimObject`，存储其参数的结构体将是 `HelloSimObjectParams`。此定义将在构建目录中的 [params/HelloSimObject.hh](../../gem5/build/NULL/params/HelloSimObject.hh) 文件下。此结构体在 C++ 中实例化 `SimObject` 对象时使用。
+- 我们稍后会看到，当构建 gem5 时，将有一个**自动生成**的结构体定义来存储该类的参数。结构体的名称将由 `SimObject` 本身的名称决定。例如，如果 `SimObject` 的名称是 `HelloSimObject`，存储其参数的结构体将是 `HelloSimObjectParams`。此定义将在构建目录中的 [params/HelloSimObject.hh](https://github.com/gem5/gem5/blob/stable/build/NULL/params/HelloSimObject.hh) 文件下。此结构体在 C++ 中实例化 `SimObject` 对象时使用。
 
 <!-- An object of a SimObject class? -->
 
@@ -393,7 +393,7 @@ Speaker Notes
 
 ## SimObject 头文件：前几行
 
-在你选择的编辑器中打开 [src/bootcamp/hello-sim-object/hello_sim_object.hh](../../gem5/src/bootcamp/hello-sim-object/hello_sim_object.hh) 并向其中添加以下代码。
+在你选择的编辑器中打开 [src/bootcamp/hello-sim-object/hello_sim_object.hh](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/hello_sim_object.hh) 并向其中添加以下代码。
 
 ```cpp
 #ifndef __BOOTCAMP_HELLO_SIM_OBJECT_HELLO_SIM_OBJECT_HH__
@@ -456,13 +456,13 @@ Speaker Notes
 ## SimObject 源文件：所有代码
 
 让我们在以下位置为 `HelloSimObject` 创建一个源文件：
-[src/bootcamp/hello-sim-object/hello_sim_object.cc](../../gem5/src/bootcamp/hello-sim-object/hello_sim_object.cc)。
+[src/bootcamp/hello-sim-object/hello_sim_object.cc](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/hello_sim_object.cc)。
 
 ```sh
 touch src/bootcamp/hello-sim-object/hello_sim_object.cc
 ```
 
-在你选择的编辑器中打开 [src/bootcamp/hello-sim-object/hello_sim_object.cc](../../gem5/src/bootcamp/hello-sim-object/hello_sim_object.cc) 并向其中添加以下代码。
+在你选择的编辑器中打开 [src/bootcamp/hello-sim-object/hello_sim_object.cc](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/hello_sim_object.cc) 并向其中添加以下代码。
 
 ```cpp
 #include "bootcamp/hello-sim-object/hello_sim_object.hh"
@@ -520,7 +520,7 @@ Speaker Notes
 touch src/bootcamp/hello-sim-object/SConscript
 ```
 
-将以下内容添加到 [SConscript](../../gem5/src/bootcamp/hello-sim-object/SConscript)。
+将以下内容添加到 [SConscript](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/SConscript)。
 
 ```python
 Import("*")
@@ -563,7 +563,7 @@ Speaker Notes
 scons build/NULL/gem5.opt -j$(nproc)
 ```
 
-在等待 gem5 构建时，我们将创建一个使用 `HelloSimObject` 的配置脚本。在单独的终端中，让我们在 [gem5/configs](../../gem5/configs/) 内创建该脚本。首先，让我们为脚本创建目录结构。在基础 **gem5** 目录中运行以下命令集以创建清晰的结构。
+在等待 gem5 构建时，我们将创建一个使用 `HelloSimObject` 的配置脚本。在单独的终端中，让我们在 [gem5/configs](https://github.com/gem5/gem5/blob/stable/configs/) 内创建该脚本。首先，让我们为脚本创建目录结构。在基础 **gem5** 目录中运行以下命令集以创建清晰的结构。
 
 ```sh
 mkdir configs/bootcamp
@@ -586,7 +586,7 @@ Speaker Notes
 
 ## 配置脚本：第一个 Hello 示例：m5 和 Root
 
-在你选择的编辑器中打开 [configs/bootcamp/first-hello-example.py](../../gem5/configs/bootcamp/hello-sim-object/first-hello-example.py)。
+在你选择的编辑器中打开 [configs/bootcamp/first-hello-example.py](https://github.com/gem5/gem5/blob/stable/configs/bootcamp/hello-sim-object/first-hello-example.py)。
 
 要运行模拟，我们需要与 gem5 的后端接口。`m5` 将允许我们调用 C++ 后端来在 C++ 中实例化 `SimObjects` 并模拟它们。要将 `m5` 导入到配置脚本中，请将以下内容添加到代码中。
 
@@ -861,7 +861,7 @@ Speaker Notes
 
 <!-- ask Jason for good example analogy for Model vs Params (cache is a model and cache size is a param) -->
 
-正如我们之前提到的，gem5 允许我们参数化模型。gem5 中的整个参数类集在 `m5.params` 下定义，因此让我们继续从 `m5.params` 将所有内容导入到 `SimObject` 定义文件中。在你选择的编辑器中打开 [src/bootcamp/hello-sim-object/HelloSimObject.py](../../gem5/src/bootcamp/hello-sim-object/HelloSimObject.py) 并向其中添加以下行。
+正如我们之前提到的，gem5 允许我们参数化模型。gem5 中的整个参数类集在 `m5.params` 下定义，因此让我们继续从 `m5.params` 将所有内容导入到 `SimObject` 定义文件中。在你选择的编辑器中打开 [src/bootcamp/hello-sim-object/HelloSimObject.py](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/HelloSimObject.py) 并向其中添加以下行。
 
 ```python
 from m5.params import *
@@ -873,7 +873,7 @@ from m5.params import *
 num_hellos = Param.Int("Number of times to say Hello.")
 ```
 
-请务必查看 [src/python/m5/params.py](../../gem5/src/python/m5/params.py) 以获取有关不同参数类以及如何添加参数的更多信息。
+请务必查看 [src/python/m5/params.py](https://github.com/gem5/gem5/blob/stable/src/python/m5/params.py) 以获取有关不同参数类以及如何添加参数的更多信息。
 **注意**：`Params` 允许你为它们定义默认值。我强烈建议除非真的需要，否则不要定义默认值。
 
 ---
@@ -914,7 +914,7 @@ Speaker Notes
 
 ## 使用 num_hellos
 
-现在，我们将使用 `num_hellos` 在 `HelloSimObject` 的构造函数中多次打印 `Hello from ...`。在你选择的编辑器中打开 [src/bootcamp/hello-sim-object/hello_sim_object.cc](../../gem5/src/bootcamp/hello-sim-object/hello_sim_object.cc)。
+现在，我们将使用 `num_hellos` 在 `HelloSimObject` 的构造函数中多次打印 `Hello from ...`。在你选择的编辑器中打开 [src/bootcamp/hello-sim-object/hello_sim_object.cc](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/hello_sim_object.cc)。
 
 如下更改 `HelloSimObject::HelloSimObject`：
 
@@ -949,7 +949,7 @@ Speaker Notes
 
 正如我们之前提到的，`SimObject` 的参数在自动生成的头文件中定义，文件名与 `SimObject` 的名称相同。
 
-现在我们已经向 `HelloSimObject` 添加了一个参数，它现在应该在 [build/NULL/params/HelloSimObject.hh](../../gem5/build/NULL/params/HelloSimObject.hh) 中的 `HelloSimObjectParams` 下定义。
+现在我们已经向 `HelloSimObject` 添加了一个参数，它现在应该在 [build/NULL/params/HelloSimObject.hh](https://github.com/gem5/gem5/blob/stable/build/NULL/params/HelloSimObject.hh) 中的 `HelloSimObjectParams` 下定义。
 
 如果你查看头文件，你应该看到类似这样的内容。
 
@@ -993,13 +993,13 @@ Speaker Notes
 
 ## 配置脚本：第二个 Hello 示例
 
-让我们创建 [first-hello-example.py](../../gem5/configs/bootcamp/hello-sim-object/first-hello-example.py) 的副本，命名为 [second-hello-example.py](../../gem5/configs/bootcamp/hello-sim-object/second-hello-example.py)。只需在基础 **gem5** 目录中运行以下命令即可。
+让我们创建 [first-hello-example.py](https://github.com/gem5/gem5/blob/stable/configs/bootcamp/hello-sim-object/first-hello-example.py) 的副本，命名为 [second-hello-example.py](https://github.com/gem5/gem5/blob/stable/configs/bootcamp/hello-sim-object/second-hello-example.py)。只需在基础 **gem5** 目录中运行以下命令即可。
 
 ```sh
 cp configs/bootcamp/hello-sim-object/first-hello-example.py configs/bootcamp/hello-sim-object/second-hello-example.py
 ```
 
-现在，在你选择的编辑器中打开 [second-hello-example.py](../../gem5/configs/bootcamp/hello-sim-object/second-hello-example.py) 并更改代码，以便在实例化 `HelloSimObject` 时为 `num_hellos` 传递一个值。下面是一个完整的示例。
+现在，在你选择的编辑器中打开 [second-hello-example.py](https://github.com/gem5/gem5/blob/stable/configs/bootcamp/hello-sim-object/second-hello-example.py) 并更改代码，以便在实例化 `HelloSimObject` 时为 `num_hellos` 传递一个值。下面是一个完整的示例。
 
 ```python
 import m5
@@ -1044,19 +1044,19 @@ Speaker Notes
 ## 步骤总结
 
 - 创建基本的 `SimObject`
-    - [`SimObject` 定义文件](../../gem5/src/bootcamp/hello-sim-object/HelloSimObject.py) (.py)
+    - [`SimObject` 定义文件](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/HelloSimObject.py) (.py)
         - 定义模型的参数集。
-    - [`SimObject` 头文件](../../gem5/src/bootcamp/hello-sim-object/hello_sim_object.hh) (.hh)
+    - [`SimObject` 头文件](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/hello_sim_object.hh) (.hh)
         - 在 C++ 中声明 `SimObject` 类。
-    - [`SimObject` 源文件](../../gem5/src/bootcamp/hello-sim-object/hello_sim_object.cc) (.cc 扩展名)：
+    - [`SimObject` 源文件](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/hello_sim_object.cc) (.cc 扩展名)：
         - 实现 `SimObject` 的功能。
-    - [`SConscript`](../../gem5/src/bootcamp/hello-sim-object/SConscript)
+    - [`SConscript`](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/SConscript)
         - 将我们的 `SimObject` 注册到 gem5。
-    - 自动生成的 [`SimObjectParams` 头文件](../../gem5/build/NULL/params/HelloSimObject.hh) (.hh)
+    - 自动生成的 [`SimObjectParams` 头文件](https://github.com/gem5/gem5/blob/stable/build/NULL/params/HelloSimObject.hh) (.hh)
         - 声明一个存储 `SimObject` 所有参数的 C++ 结构体。
-    - [配置文件](../../gem5/configs/bootcamp/hello-sim-object/first-hello-example.py) (.py)
+    - [配置文件](https://github.com/gem5/gem5/blob/stable/configs/bootcamp/hello-sim-object/first-hello-example.py) (.py)
         - 实例化 `SimObject` 并运行模拟。
 - 添加参数（`num_hellos`）
-    - 更新[定义文件](../../gem5/src/bootcamp/hello-sim-object/HelloSimObject.py)和[源文件](../../gem5/src/bootcamp/hello-sim-object/hello_sim_object.cc)。
-    - 编写新的[配置文件](../../gem5/configs/bootcamp/hello-sim-object/second-hello-example.py)。
+    - 更新[定义文件](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/HelloSimObject.py)和[源文件](https://github.com/gem5/gem5/blob/stable/src/bootcamp/hello-sim-object/hello_sim_object.cc)。
+    - 编写新的[配置文件](https://github.com/gem5/gem5/blob/stable/configs/bootcamp/hello-sim-object/second-hello-example.py)。
     - 重新编译并重新运行。

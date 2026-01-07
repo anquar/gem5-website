@@ -87,7 +87,7 @@ section: using-gem5
 
 ## O3CPU 模型具有许多参数
 
-[src/cpu/o3/BaseO3CPU.py](../../gem5/src/cpu/o3/BaseO3CPU.py)
+[src/cpu/o3/BaseO3CPU.py](https://github.com/gem5/gem5/blob/stable/src/cpu/o3/BaseO3CPU.py)
 
 ```python
 decodeToFetchDelay = Param.Cycles(1, "Decode to fetch delay")

@@ -86,7 +86,7 @@ gem5 内存通常配置的主要方式是通道数和通道/rank/bank/行/列位
 
 标准库中已经为你实现了很多示例。
 
-请参阅 [`gem5/src/python/gem5/components/memory/multi_channel.py`](../../gem5/src/python/gem5/components/memory/multi_channel.py) 和 [`gem5/src/python/gem5/components/memory/single_channel.py`](../../gem5/src/python/gem5/components/memory/single_channel.py) 作为示例。
+请参阅 [`gem5/src/python/gem5/components/memory/multi_channel.py`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/memory/multi_channel.py) 和 [`gem5/src/python/gem5/components/memory/single_channel.py`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/memory/single_channel.py) 作为示例。
 
 此外，
 
@@ -136,7 +136,7 @@ gem5 run-mem.py
 
 ## 运行通道化内存
 
-- 打开 [`gem5/src/python/gem5/components/memory/single_channel.py`](../../gem5/src/python/gem5/components/memory/single_channel.py)
+- 打开 [`gem5/src/python/gem5/components/memory/single_channel.py`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/memory/single_channel.py)
 - 我们看到 `SingleChannel` 内存，例如：
 
 ```python
@@ -194,7 +194,7 @@ SingleChannelDDR4_2400()
 ## 添加新的通道化内存
 
 - 打开 [`materials/02-Using-gem5/06-memory/lpddr2.py`](https://github.com/gem5bootcamp/2024/blob/main/materials/02-Using-gem5/06-memory/lpddr2.py)
-- 如果我们想在标准库中添加 LPDDR2 作为新内存，我们首先确保在 [`dram_interfaces` 目录](../../gem5/src/python/gem5/components/memory/dram_interfaces/lpddr2.py)中有它的 DRAM 接口
+- 如果我们想在标准库中添加 LPDDR2 作为新内存，我们首先确保在 [`dram_interfaces` 目录](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/memory/dram_interfaces/lpddr2.py)中有它的 DRAM 接口
 - 然后我们需要通过在 `lpddr2.py` 的顶部添加以下内容来确保导入它：
 ```python
 from gem5.components.memory.abstract_memory_system import AbstractMemorySystem
@@ -243,7 +243,7 @@ LPDDR2 的性能不如 DDR4。
 
 - 监控两个端口之间通信的 SimObject
 - 对时序没有任何影响
-- [`gem5/src/mem/CommMonitor.py`](../../gem5/src/mem/CommMonitor.py)
+- [`gem5/src/mem/CommMonitor.py`](https://github.com/gem5/gem5/blob/stable/src/mem/CommMonitor.py)
 
 ---
 
@@ -327,10 +327,10 @@ gem5 comm_monitor.py
 ### 在 gem5 中使用地址交错
 
 - 我们可以使用 AddrRange 构造函数来定义选择器函数
-  - [`src/base/addr_range.hh`](../../gem5/src/base/addr_range.hh)
+  - [`src/base/addr_range.hh`](https://github.com/gem5/gem5/blob/stable/src/base/addr_range.hh)
 
 - 示例：标准库的多通道内存
-  - [`gem5/src/python/gem5/components/memory/multi_channel.py`](../../gem5/src/python/gem5/components/memory/multi_channel.py)
+  - [`gem5/src/python/gem5/components/memory/multi_channel.py`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/memory/multi_channel.py)
 
 ---
 

@@ -89,9 +89,9 @@ illegal instruction (core dumped)
 
 **arm64 是 `0x10010000`**
 
-您可以通过更改 `System` SimObject 中的 `m5ops_base` 地址来配置这些"魔法"地址。源代码位于 [`gem5/src/sim/System.py`](../../gem5/src/sim/System.py)。
+您可以通过更改 `System` SimObject 中的 `m5ops_base` 地址来配置这些"魔法"地址。源代码位于 [`gem5/src/sim/System.py`](https://github.com/gem5/gem5/blob/stable/src/sim/System.py)。
 
-可以在 [`gem5/src/python/gem5/components/boards/x86_board.py`](../../gem5/src/python/gem5/components/boards/x86_board.py) 下找到一个高级示例。
+可以在 [`gem5/src/python/gem5/components/boards/x86_board.py`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/boards/x86_board.py) 下找到一个高级示例。
 
 ```python
 @overrides(AbstractSystemBoard) <- it inherits (System, AbstractBoard)
@@ -618,7 +618,7 @@ Simulation Done
 如果您感兴趣，可以查看 `03-cpt` 目录内的 [`m5.cpt`](/materials/02-Using-gem5/08-accelerating-simulation/03-checkpoint-and-restore/03-cpt/m5.cpt) 以查看正在保存的内容。
 
 如果检查点是使用旧版本的 gem5 创建的，并使用新版本的 gem5 恢复，gem5 检查点可能会过时。
-在这种情况下，我们可能需要使用新版本 gem5 的 [`gem5/util/cpt_upgrader.py`](../../gem5/util/cpt_upgrader.py) 来更新它。
+在这种情况下，我们可能需要使用新版本 gem5 的 [`gem5/util/cpt_upgrader.py`](https://github.com/gem5/gem5/blob/stable/util/cpt_upgrader.py) 来更新它。
 
 <!-- I feel like there is still something to add here -->
 

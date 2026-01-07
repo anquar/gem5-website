@@ -313,7 +313,7 @@ class LocalInstTracker(ProbeListenerObject):
 
 ## 01-local-inst-tracker
 
-与所有新对象一样，我们需要在 Scons 中注册它，因此让我们修改 [src/cpu/probes/SConscript](../../gem5/src/cpu/probes/SConscript) 并添加
+与所有新对象一样，我们需要在 Scons 中注册它，因此让我们修改 [src/cpu/probes/SConscript](https://github.com/gem5/gem5/blob/stable/src/cpu/probes/SConscript) 并添加
 
 ```python
 SimObject(
@@ -675,7 +675,7 @@ class LocalInstTracker(ProbeListenerObject):
 
 ## 02-global-inst-tracker
 
-最后，[gem5/src/cpu/probes/SConscript](../../gem5/src/cpu/probes/SConscript)
+最后，[gem5/src/cpu/probes/SConscript](https://github.com/gem5/gem5/blob/stable/src/cpu/probes/SConscript)
 
 ```python
 SimObject(

@@ -159,7 +159,7 @@ m5term 3456
 
 gem5 resources 已经有代码可以使用上述方法创建通用 Ubuntu 镜像。
 
-- 代码路径：[`gem5-resources/src/x86-ubuntu`](../../gem5-resources/src/x86-ubuntu)
+- 代码路径：[`gem5-resources/src/x86-ubuntu`](https://github.com/gem5/gem5-resources/blob/stable/src/x86-ubuntu)
 
 让我们浏览创建过程的重要部分。
 

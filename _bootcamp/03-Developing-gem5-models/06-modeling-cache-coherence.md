@@ -196,12 +196,12 @@ cp -r materials/03-Developing-gem5-models/06-modeling-cache-coherence/MyMSI* gem
 
 ## 声明协议
 
-修改 [`src/mem/ruby/protocol/MyMSI.slicc`](../../gem5/src/mem/ruby/protocol/MyMSI.slicc)
+修改 [`src/mem/ruby/protocol/MyMSI.slicc`](https://github.com/gem5/gem5/blob/stable/src/mem/ruby/protocol/MyMSI.slicc)
 
 - 需要告诉 Scons 状态机文件
 - 在名为 `<protocol>.slicc` 的文件中
 - 可以将相同状态机（`.sm`）文件用于多个协议
-- 通常，你希望在 [`src/mem/ruby/protocol`](../../gem5/src/mem/ruby/protocol/) 目录中执行此操作。
+- 通常，你希望在 [`src/mem/ruby/protocol`](https://github.com/gem5/gem5/blob/stable/src/mem/ruby/protocol/) 目录中执行此操作。
 
 ```text
 protocol "MyMSI";
@@ -218,7 +218,7 @@ include "MyMSI-dir.sm";
 
 ## 声明消息类型
 
-修改 [`src/mem/ruby/protocol/MyMSI-msg.sm`](../../gem5/src/mem/ruby/protocol/MyMSI-msg.sm)
+修改 [`src/mem/ruby/protocol/MyMSI-msg.sm`](https://github.com/gem5/gem5/blob/stable/src/mem/ruby/protocol/MyMSI-msg.sm)
 
 ```c++
 enumeration(CoherenceRequestType, desc="请求消息类型") {
@@ -238,7 +238,7 @@ enumeration(CoherenceResponseType, desc="响应消息类型") {
 
 ## 目录的消息缓冲区
 
-修改 [`src/mem/ruby/protocol/MyMSI-dir.sm`](../../gem5/src/mem/ruby/protocol/MyMSI-dir.sm)
+修改 [`src/mem/ruby/protocol/MyMSI-dir.sm`](https://github.com/gem5/gem5/blob/stable/src/mem/ruby/protocol/MyMSI-dir.sm)
 
 ```c++
     // 从目录*到*缓存的转发请求。
@@ -261,7 +261,7 @@ enumeration(CoherenceResponseType, desc="响应消息类型") {
 
 ## 编译你的新协议
 
-首先，在 `Kconfig` 构建器中注册协议。修改 [`src/mem/ruby/protocol/Kconfig`](../../gem5/src/mem/ruby/protocol/Kconfig)。
+首先，在 `Kconfig` 构建器中注册协议。修改 [`src/mem/ruby/protocol/Kconfig`](https://github.com/gem5/gem5/blob/stable/src/mem/ruby/protocol/Kconfig)。
 
 ```Kconfig
 config PROTOCOL
@@ -302,7 +302,7 @@ scons -j$(nproc) build/ALL_MyMSI/gem5.opt PROTOCOL=MyMSI
 
 ## 创建运行脚本
 
-修改 [`configs/learning_gem5/part3/msi_caches.py`](../../gem5/configs/learning_gem5/part3/msi_caches.py) 以使用你的新协议。
+修改 [`configs/learning_gem5/part3/msi_caches.py`](https://github.com/gem5/gem5/blob/stable/configs/learning_gem5/part3/msi_caches.py) 以使用你的新协议。
 此文件为 gem5 代码库中已有的 MSI 缓存设置 Ruby 协议。为了简单起见，我们将使用它。
 
 ```sh
@@ -318,7 +318,7 @@ build/ALL_MyMSI/gem5.opt configs/learning_gem5/part3/simple_ruby.py
 
 ## 让我们看一些代码：输入端口定义
 
-来自 [`gem5/src/learning_gem5/part3/MSI-cache.sm`](../../gem5/src/learning_gem5/part3/MSI-cache.sm)
+来自 [`gem5/src/learning_gem5/part3/MSI-cache.sm`](https://github.com/gem5/gem5/blob/stable/src/learning_gem5/part3/MSI-cache.sm)
 
 ```c++
 in_port(mandatory_in, RubyRequest, mandatoryQueue) {
@@ -353,7 +353,7 @@ in_port(mandatory_in, RubyRequest, mandatoryQueue) {
 
 ## 状态声明
 
-参见 [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](../../gem5/src/mem/ruby/protocol/MSI-cache.sm)
+参见 [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](https://github.com/gem5/gem5/blob/stable/src/mem/ruby/protocol/MSI-cache.sm)
 
 ```c++
 state_declaration(State, desc="缓存状态") {
@@ -375,7 +375,7 @@ state_declaration(State, desc="缓存状态") {
 
 ## 事件声明
 
-参见 [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](../../gem5/src/mem/ruby/protocol/MSI-cache.sm)
+参见 [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](https://github.com/gem5/gem5/blob/stable/src/mem/ruby/protocol/MSI-cache.sm)
 
 ```c++
 enumeration(Event, desc="缓存事件") {
@@ -397,7 +397,7 @@ enumeration(Event, desc="缓存事件") {
 
 ## 其他结构和函数
 
-参见 [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](../../gem5/src/mem/ruby/protocol/MSI-cache.sm)
+参见 [`gem5/src/mem/ruby/protocol/MSI-cache.sm`](https://github.com/gem5/gem5/blob/stable/src/mem/ruby/protocol/MSI-cache.sm)
 
 - **Entry**：声明每个条目的数据结构
   - 块数据、块状态，有时还有其他（例如，令牌）

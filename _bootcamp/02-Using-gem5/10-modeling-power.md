@@ -42,7 +42,7 @@ gem5 有一个通用的功耗模型，向 Python 暴露 `getDynamicPower` 和 `g
 还有一个使用 RC 电路模型的热模型。
 今天我们不会讨论热模型。
 
-参见 [`gem5/src/sim/power/`](../../gem5/src/sim/power/)
+参见 [`gem5/src/sim/power/`](https://github.com/gem5/gem5/blob/stable/src/sim/power/)
 
 我们将使用 `MathExprPowerModel`，但你也可以创建自己的模型。
 应该很快会有一个新的 `PythonFunction` 功耗模型。
@@ -52,7 +52,7 @@ gem5 有一个通用的功耗模型，向 Python 暴露 `getDynamicPower` 和 `g
 ## MathExprPowerModel
 
 我们将使用 `MathExprPowerModel`
-参见 [`gem5/src/sim/power/MathExprPowerModel.py`](../../gem5/src/sim/power/MathExprPowerModel.py)
+参见 [`gem5/src/sim/power/MathExprPowerModel.py`](https://github.com/gem5/gem5/blob/stable/src/sim/power/MathExprPowerModel.py)
 
 这允许你为功耗模型指定一个数学表达式，就像我们之前看到的那样。
 

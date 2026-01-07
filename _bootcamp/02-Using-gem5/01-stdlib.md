@@ -240,7 +240,7 @@ gem5/src/python/gem5/prebuilt
 
 ###
 
-- gem5 标准库位于 [`src/python/gem5`](../../gem5/src/python/gem5/)
+- gem5 标准库位于 [`src/python/gem5`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/)
 - 两种类型
   - 预构建：具有设定参数的完整系统
   - 组件：用于构建系统的组件
@@ -636,7 +636,7 @@ simulator.run()
 - The standard library allows users to specify a board and specify the properties of the board by specify the components that are connected to it.
 - The Simulator takes a board and launches the simulation and gives an API which allows for control of the simulation: specifying the simulation stopping and restarting condition, replacing components "on the fly", defining when the simulation should stop and start, etc.
 
-有关模拟器源代码，请参见 [`src/python/gem5/simulate/simulator.py`](../../gem5/src/python/gem5/simulate/simulator.py)。
+有关模拟器源代码，请参见 [`src/python/gem5/simulate/simulator.py`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/simulator.py)。
 
 我们将在[加速模拟](08-accelerating-simulation.md)中了解更多信息。
 
@@ -659,7 +659,7 @@ simulator.run()
 - **`schedule_max_insts(inst_number)`**: Set the number of instructions to run before stopping. Generates a `MAX_INSTS` exit event that can be handled. Note that if running multiple cores, this happens if *any* core reaches this number of instructions.
 - **`get_stats()``**: Get the statistics from the simulation. Returns a dictionary of statistics.
 
-有关更多详细信息，请参见 [`src/python/gem5/simulate/simulator.py`](../../gem5/src/python/gem5/simulate/simulator.py)。
+有关更多详细信息，请参见 [`src/python/gem5/simulate/simulator.py`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/simulate/simulator.py)。
 
 我们将在训练营的其他部分详细介绍如何使用 `Simulator` 对象。
 
@@ -723,8 +723,8 @@ class MyOutOfOrderCore(BaseCPUCore):
         super().__init__(ArmO3CPU(), ISA.Arm)
 ```
 
-参见 [`...gem5/components/processors/base_cpu_core.py`](../../gem5/src/python/gem5/components/processors/base_cpu_core.py)
-和 [`src/cpu/o3/BaseO3CPU.py`](../../gem5/src/cpu/o3/BaseO3CPU.py)
+参见 [`...gem5/components/processors/base_cpu_core.py`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/processors/base_cpu_core.py)
+和 [`src/cpu/o3/BaseO3CPU.py`](https://github.com/gem5/gem5/blob/stable/src/cpu/o3/BaseO3CPU.py)
 
 ```python
   self.core.fetchWidth = width

@@ -29,7 +29,7 @@ section: other-simulators
 
 ## 获取 DRAMSys
 
-详情请参见 [`gem5/ext/dramsys/README`](../../gem5/ext/dramsys/README)。
+详情请参见 [`gem5/ext/dramsys/README`](https://github.com/gem5/gem5/blob/stable/ext/dramsys/README)。
 
 运行
 
@@ -76,7 +76,7 @@ memory = DRAMSysMem(
 
 DRAMSys 的选项：
 
-- `configuration`：请参见 [`gem5/ext/dramsys/DRAMSys/configs/`](../../gem5/ext/dramsys/DRAMSys/configs/) 以查看提供的配置。
+- `configuration`：请参见 [`gem5/ext/dramsys/DRAMSys/configs/`](https://github.com/gem5/gem5/blob/stable/ext/dramsys/DRAMSys/configs/) 以查看提供的配置。
   - 必须是绝对路径或相对于运行路径的路径。
 - `resource_directory`：指向配置目录的指针。
   - 必须是绝对路径或相对于运行路径的路径。
@@ -92,7 +92,7 @@ DRAMSys 的选项：
 ## DRAMSys 输出
 
 ```sh
-../../../gem5/build/NULL/gem5.opt dramsys-example.py
+../https://github.com/gem5/gem5/blob/stable/build/NULL/gem5.opt dramsys-example.py
 ```
 
 ```test
@@ -114,7 +114,7 @@ board.memory.dramsys.DRAMSys.controller0  MAX BW:         119.40 Gb/s |  14.93 G
 
 > 注意：DRAMSim3 没有定期测试
 
-详情请参见 [`gem5/ext/dramsim3/README`](../../gem5/ext/dramsim3/README)。
+详情请参见 [`gem5/ext/dramsim3/README`](https://github.com/gem5/gem5/blob/stable/ext/dramsim3/README)。
 
 要获取 DRAMsim，请运行以下代码并重新编译 gem5。
 
@@ -144,7 +144,7 @@ memory = SingleChannelHBM(size="1GiB")
 
 您可以使用该模块中的 `SingleChannel` 扩展其他内存类型。
 
-查找 DRAMSim 配置列表：[`gem5/ext/dramsim3/DRAMsim3/configs`](../../gem5/ext/dramsim3/DRAMsim3/configs)
+查找 DRAMSim 配置列表：[`gem5/ext/dramsim3/DRAMsim3/configs`](https://github.com/gem5/gem5/blob/stable/ext/dramsim3/DRAMsim3/configs)
 
 ```python
 SingleChannel(<memory type from configs>, <size>)

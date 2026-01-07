@@ -251,7 +251,7 @@ self.clusters = [
 
 ## L3 缓存
 
-对于 L1/L2 缓存，我们使用了标准库中的预配置缓存。对于 L3，我们将创建自己的配置。我们需要指定 [Cache](../../gem5/src/mem/cache/Cache.py) 中参数的值。
+对于 L1/L2 缓存，我们使用了标准库中的预配置缓存。对于 L3，我们将创建自己的配置。我们需要指定 [Cache](https://github.com/gem5/gem5/blob/stable/src/mem/cache/Cache.py) 中参数的值。
 
 ```python
 class L3Cache(Cache):

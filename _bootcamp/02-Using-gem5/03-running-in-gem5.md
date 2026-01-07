@@ -844,7 +844,7 @@ gem5 在其标准库中有很多工具，但如果您想在研究中模拟特定
 
 如前所述，我们需要将内存地址范围划分为大小相等的部分，并配置每个 `LinearGeneratorCore` 以模拟对不同部分的访问。
 
-为了划分，我们将使用 [`gem5/src/python/gem5/components/processors/abstract_generator.py`](../../gem5/src/python/gem5/components/processors/abstract_generator.py) 中的 `partition_range()` 函数。
+为了划分，我们将使用 [`gem5/src/python/gem5/components/processors/abstract_generator.py`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/processors/abstract_generator.py) 中的 `partition_range()` 函数。
 
 此函数接受 `min_addr` 到 `max_addr` 的范围，并将其划分为 `num_partitions` 个等长的片段。
 

@@ -796,7 +796,7 @@ decode QUADRANT default Unknown::unknown() {
 
 接下来，让我们将其添加到 RISC-V "decoder.isa" 文件中。
 
-让我们在 [decoder.isa](../../gem5/src/arch/riscv/isa/decoder.isa) 的第 2057 行添加这个
+让我们在 [decoder.isa](https://github.com/gem5/gem5/blob/stable/src/arch/riscv/isa/decoder.isa) 的第 2057 行添加这个
 
 需要注意的是，此文件中已经定义了其他共享相同 QUADRANT 和 OPCODE5 值的指令。因此，我们只需要插入：
 
@@ -860,7 +860,7 @@ scons build/RISCV/gem5.opt -j 8
 现在让我们运行 `add16_test.py` 脚本
 
 ```bash
-../../../../gem5/build/RISCV/gem5.opt ./add16_test.py
+../../https://github.com/gem5/gem5/blob/stable/build/RISCV/gem5.opt ./add16_test.py
 ```
 
 如我们所见，测试通过了

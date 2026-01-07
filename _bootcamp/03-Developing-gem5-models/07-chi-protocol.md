@@ -28,7 +28,7 @@ section: developing-gem5
   - 目前只有一个 `private_l1_moesi_cache`
   - 点对点网络
 
-参见 [`gem5/src/python/gem5/components/cachehierarchies/chi/nodes/private_l1_moesi_cache.py`](../../gem5/src/python/gem5/components/cachehierarchies/chi/nodes/private_l1_moesi_cache.py)。
+参见 [`gem5/src/python/gem5/components/cachehierarchies/chi/nodes/private_l1_moesi_cache.py`](https://github.com/gem5/gem5/blob/stable/src/python/gem5/components/cachehierarchies/chi/nodes/private_l1_moesi_cache.py)。
 
 ---
 
@@ -66,7 +66,7 @@ self.cache = RubyCache(
 )
 ```
 
-您可以从 [`gem5/src/mem/cache/replacement_policies/ReplacementPolicies.py`](../../gem5/src/mem/cache/replacement_policies/ReplacementPolicies.py) 中选择任何替换策略。
+您可以从 [`gem5/src/mem/cache/replacement_policies/ReplacementPolicies.py`](https://github.com/gem5/gem5/blob/stable/src/mem/cache/replacement_policies/ReplacementPolicies.py) 中选择任何替换策略。
 
 ---
 

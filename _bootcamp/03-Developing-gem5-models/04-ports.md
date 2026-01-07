@@ -39,14 +39,14 @@ section: developing-gem5
   - 示例包括：`readReq`/`readResp`/`writeReq`/`writeResp`。
 - `RequestorID`：创建请求的 `SimObject` 的 ID（请求者）。
 
-类 `Packet` 定义在 [`gem5/src/mem/packet.hh`](../../gem5/src/mem/packet.hh) 中。请注意，在本教程中，我们将使用指针来处理 `Packet`。`PacketPtr` 是 gem5 中的一个类型，等价于 `Packet*`。
+类 `Packet` 定义在 [`gem5/src/mem/packet.hh`](https://github.com/gem5/gem5/blob/stable/src/mem/packet.hh) 中。请注意，在本教程中，我们将使用指针来处理 `Packet`。`PacketPtr` 是 gem5 中的一个类型，等价于 `Packet*`。
 
 ---
 <!-- _class: no-logo code-50-percent -->
 
 ## gem5 中的 Ports
 
-让我们看一下 [`gem5/src/mem/port.hh`](../../gem5/src/mem/port.hh) 来查看 `Port` 类的声明。
+让我们看一下 [`gem5/src/mem/port.hh`](https://github.com/gem5/gem5/blob/stable/src/mem/port.hh) 来查看 `Port` 类的声明。
 
 让我们关注以下函数。这些函数使通信成为可能。请注意 `recvTimingReq` 和 `recvTimingResp` 是 `pure virtual`（纯虚）函数。这意味着你**不能**实例化 `RequestPort` 或 `ResponsePort` 的对象，而必须扩展它们以适应你的用例。
 
@@ -88,9 +88,9 @@ class ResponsePort {
 
 > **重要提示**：一个 `Port` 只能连接到**另一个** `Port`，且必须是不同类型：`RequestPort`/`ResponsePort` 只能连接到 `ResponsePort`/`RequestPort`。
 
-如果你查看 [`gem5/src/mem/port.hh`](../../gem5/src/mem/port.hh)，你会看到类 `RequestPort` 有一个名为 `ResponsePort* _responsePort` 的 `private` 成员，它持有 `RequestPort` 对象连接到的 `ResponsePort` 的指针（其 `peer`（对等端口））。
+如果你查看 [`gem5/src/mem/port.hh`](https://github.com/gem5/gem5/blob/stable/src/mem/port.hh)，你会看到类 `RequestPort` 有一个名为 `ResponsePort* _responsePort` 的 `private` 成员，它持有 `RequestPort` 对象连接到的 `ResponsePort` 的指针（其 `peer`（对等端口））。
 
-此外，如果你查看 [`gem5/src/mem/port.hh`](../../gem5/src/mem/port.hh) 中 `sendTimingReq`/`sendTimingResp` 的定义，你会看到它们将调用并返回 `peer::recvTimingReq`/`peer::recvTimingResp`。
+此外，如果你查看 [`gem5/src/mem/port.hh`](https://github.com/gem5/gem5/blob/stable/src/mem/port.hh) 中 `sendTimingReq`/`sendTimingResp` 的定义，你会看到它们将调用并返回 `peer::recvTimingReq`/`peer::recvTimingResp`。
 
 现在让我们看看通信的 2 个场景，在这些场景中我们假设：
 
@@ -185,7 +185,7 @@ Here is a diagram of what `InspectorGadget` will look like eventually.
 - `clockEdge(Cycles n)`：返回未来第 `n` 个时钟边沿时间的函数。
 - `nextCycle()`：返回未来第一个时钟边沿时间的函数，即 `nextCycle() := clockEdge(Cycles(1))`。
 
-此类定义在 [`gem5/src/sim/clocked_object.hh`](../../gem5/src/sim/clocked_object.hh) 中，如下所示：
+此类定义在 [`gem5/src/sim/clocked_object.hh`](https://github.com/gem5/gem5/blob/stable/src/sim/clocked_object.hh) 中，如下所示：
 
 ```cpp
 class ClockedObject : public SimObject, public Clocked
@@ -253,7 +253,7 @@ class InspectorGadget(ClockedObject):
 
 ## InspectorGadget: Python 中的 Ports
 
-到目前为止，我们已经看到了 C++ 中 `Ports` 的声明。但是，要在 Python 中创建 C++ 类的实例，我们需要在 Python 中声明该类。`Ports` 定义在 [`gem5/src/python/m5/params.py`](../../gem5/src/python/m5/params.py) 下。但是，`Ports` 不继承自类 `Param`。我强烈建议你简要查看一下 [`gem5/src/python/m5/params.py`](../../gem5/src/python/m5/params.py)。
+到目前为止，我们已经看到了 C++ 中 `Ports` 的声明。但是，要在 Python 中创建 C++ 类的实例，我们需要在 Python 中声明该类。`Ports` 定义在 [`gem5/src/python/m5/params.py`](https://github.com/gem5/gem5/blob/stable/src/python/m5/params.py) 下。但是，`Ports` 不继承自类 `Param`。我强烈建议你简要查看一下 [`gem5/src/python/m5/params.py`](https://github.com/gem5/gem5/blob/stable/src/python/m5/params.py)。
 
 尝试找出你可以向任何 `SimObject`/`ClockedObject` 添加什么类型的参数。
 
@@ -434,7 +434,7 @@ Make sure to add the following include statement to the top of the file since we
 
 Recall, `RequestPort` and `ResponsePort` classes were abstract classes, i.e. they had `pure virtual` functions which means objects cannot be instantiated from that class. Therefore, for us to use `Ports` we need to extend the classes and implement their `pure virtual` functions.
 
-Before anything, let's go ahead and import the header file that contains the declaration for `Port` classes. We also need to include [`mem/packet.hh`](../../gem5/src/mem/packet.hh) since we will be dealing with and moving around `Packets` a lot. Do it by adding the following lines to `inspector_gadget.hh`:
+Before anything, let's go ahead and import the header file that contains the declaration for `Port` classes. We also need to include [`mem/packet.hh`](https://github.com/gem5/gem5/blob/stable/src/mem/packet.hh) since we will be dealing with and moving around `Packets` a lot. Do it by adding the following lines to `inspector_gadget.hh`:
 
 ```cpp
 #include "mem/packet.hh"
@@ -547,7 +547,7 @@ Now that we have declared `CPUSidePort` and `MemSidePort` classes (which are not
 
 ## SimObject::getPort
 
-Let's take a look at [`gem5/src/sim/sim_object.hh`](../../gem5/src/sim/sim_object.hh) again. Below is a snippet of code from the declaration of the function `getPort` in the class `SimObject`.
+Let's take a look at [`gem5/src/sim/sim_object.hh`](https://github.com/gem5/gem5/blob/stable/src/sim/sim_object.hh) again. Below is a snippet of code from the declaration of the function `getPort` in the class `SimObject`.
 
 ```cpp
   public:

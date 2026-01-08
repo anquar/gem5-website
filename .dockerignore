@@ -1,7 +1,7 @@
 # Dependencies
 Gemfile.lock
 node_modules
-vendor/
+/vendor/
 .bundle/
 
 # Jekyll generated files

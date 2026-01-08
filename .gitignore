@@ -1,6 +1,7 @@
 Gemfile.lock
 
 vendor/
+!assets/vendor/
 .bundle/
 
 _site/

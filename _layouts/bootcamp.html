@@ -14,7 +14,7 @@ layout: default
 </div>
 <div class="sidenav">
   {% for section in site.data.bootcamp.sections %}
-    <a class="item" {% if section.items.size > 0 %}data-toggle="collapse" href="#{{ section.id }}"{% else %}href="{{ section.url | prepend: site.baseurl }}"{% endif %} role="button" aria-expanded="{% if page.section == section.id %}true{% else %}false{% endif %}" aria-controls="{{ section.id }}">
+    <a class="item" {% if section.items.size > 0 %}data-bs-toggle="collapse" href="#{{ section.id }}"{% else %}href="{{ section.url | prepend: site.baseurl }}"{% endif %} role="button" aria-expanded="{% if page.section == section.id %}true{% else %}false{% endif %}" aria-controls="{{ section.id }}">
       {{ section.title }}
     </a>
     {% if section.items %}

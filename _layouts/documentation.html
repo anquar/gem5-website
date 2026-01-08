@@ -18,7 +18,7 @@ layout: default
   {% for doc in site.data.documentation.docs %}
     {% if doc.id == page.doc or doc.title == page.doc %}
     {% for item in doc.items %}
-      <a class="item" {% if item.url %}href="{{ item.url | prepend: site.baseurl }}"{% else %}data-toggle="collapse" href="#{{ item.id }}"{% endif %} role="button" aria-expanded="false" aria-controls="collapseExample">
+      <a class="item" {% if item.url %}href="{{ item.url | prepend: site.baseurl }}"{% else %}data-bs-toggle="collapse" href="#{{ item.id }}"{% endif %} role="button" aria-expanded="false" aria-controls="{{ item.id }}">
         {{ item.title }}
       </a>
       <div class="collapse {% if page.parent == item.id %}show{% endif %}" id="{{ item.id }}">

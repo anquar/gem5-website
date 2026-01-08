@@ -130,7 +130,8 @@ scons defconfig build/my_gem5/ build_opts/ALL
 scons menuconfig build/my_gem5/
 ```
 
-<script src="https://asciinema.org/a/nMSV0wVOKNavHSJEt3I77jxyu.js" id="asciicast-nMSV0wVOKNavHSJEt3I77jxyu" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/nMSV0wVOKNavHSJEt3I77jxyu -->
+<!-- <script src="https://asciinema.org/a/nMSV0wVOKNavHSJEt3I77jxyu.js" id="asciicast-nMSV0wVOKNavHSJEt3I77jxyu" async="true"></script> -->
 
 ---
 
@@ -694,7 +695,8 @@ Speaker Notes
 ./build/NULL/gem5.opt ./configs/bootcamp/hello-sim-object/first-hello-example.py
 ```
 
-<script src="https://asciinema.org/a/ffjsHBq6mPCR1DPxT15WCkm58.js" id="asciicast-ffjsHBq6mPCR1DPxT15WCkm58" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/ffjsHBq6mPCR1DPxT15WCkm58 -->
+<!-- <script src="https://asciinema.org/a/ffjsHBq6mPCR1DPxT15WCkm58.js" id="asciicast-ffjsHBq6mPCR1DPxT15WCkm58" async="true"></script> -->
 
 ---
 <!-- _class: start -->
@@ -1030,7 +1032,8 @@ Speaker Notes
 ./build/NULL/gem5.opt ./configs/bootcamp/hello-sim-object/second-hello-example.py
 ```
 
-<script src="https://asciinema.org/a/P1nULfk7VRZGvQURZJryl7mAK.js" id="asciicast-P1nULfk7VRZGvQURZJryl7mAK" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/P1nULfk7VRZGvQURZJryl7mAK -->
+<!-- <script src="https://asciinema.org/a/P1nULfk7VRZGvQURZJryl7mAK.js" id="asciicast-P1nULfk7VRZGvQURZJryl7mAK" async="true"></script> -->
 
 ---
 <!-- _class: start -->

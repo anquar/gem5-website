@@ -1426,7 +1426,8 @@ In the next slide, there is a recording of my terminal when running the command 
 
 ## Output: first-inspector-gadget-example.py
 
-<script src="https://asciinema.org/a/9j5QCBXn5098Oa63FpEmoYvLK.js" id="asciicast-9j5QCBXn5098Oa63FpEmoYvLK" async data-rows=32></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/9j5QCBXn5098Oa63FpEmoYvLK -->
+<!-- <script src="https://asciinema.org/a/9j5QCBXn5098Oa63FpEmoYvLK.js" id="asciicast-9j5QCBXn5098Oa63FpEmoYvLK" async data-rows=32></script> -->
 
 ---
 

@@ -665,7 +665,8 @@ scons build/NULL/gem5.opt -j$(nproc)
 
 ---
 
-<script src="https://asciinema.org/a/UiLAZT0Ryi75nkLQSs0AC0OWI.js" id="asciicast-UiLAZT0Ryi75nkLQSs0AC0OWI" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/UiLAZT0Ryi75nkLQSs0AC0OWI -->
+<!-- <script src="https://asciinema.org/a/UiLAZT0Ryi75nkLQSs0AC0OWI.js" id="asciicast-UiLAZT0Ryi75nkLQSs0AC0OWI" async="true"></script> -->
 
 ---
 <!-- _class: start -->
@@ -1121,7 +1122,8 @@ cp -r ../materials/03-Developing-gem5-models/03-event-driven-sim/step-2/configs/
 
 ---
 
-<script src="https://asciinema.org/a/9vTP6wE1Yu0ihlKjA4j7TxEMm.js" id="asciicast-9vTP6wE1Yu0ihlKjA4j7TxEMm" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/9vTP6wE1Yu0ihlKjA4j7TxEMm -->
+<!-- <script src="https://asciinema.org/a/9vTP6wE1Yu0ihlKjA4j7TxEMm.js" id="asciicast-9vTP6wE1Yu0ihlKjA4j7TxEMm" async="true"></script> -->
 
 ---
 
@@ -1137,7 +1139,8 @@ cp -r ../materials/03-Developing-gem5-models/03-event-driven-sim/step-2/configs/
 
 ---
 
-<script src="https://asciinema.org/a/2cz336gLt2ZZBysroLhVbqBHs.js" id="asciicast-2cz336gLt2ZZBysroLhVbqBHs" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/2cz336gLt2ZZBysroLhVbqBHs -->
+<!-- <script src="https://asciinema.org/a/2cz336gLt2ZZBysroLhVbqBHs.js" id="asciicast-2cz336gLt2ZZBysroLhVbqBHs" async="true"></script> -->
 
 ---
 <!-- _class: start -->

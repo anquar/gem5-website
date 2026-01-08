@@ -31,7 +31,8 @@ cd gem5
 
 ---
 
-<script src="https://asciinema.org/a/QYXO2Amv573jfLXvz3xYteP7Y.js" id="asciicast-QYXO2Amv573jfLXvz3xYteP7Y" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/QYXO2Amv573jfLXvz3xYteP7Y -->
+<!-- <script src="https://asciinema.org/a/QYXO2Amv573jfLXvz3xYteP7Y.js" id="asciicast-QYXO2Amv573jfLXvz3xYteP7Y" async="true"></script> -->
 
 ---
 <!-- _class: start -->
@@ -187,7 +188,8 @@ inline constexpr const auto& HelloExampleFlag =
 
 以下是预期的输出。
 
-<script src="https://asciinema.org/a/J0TmNzOj29N74la4qOxdBLV6H.js" id="asciicast-J0TmNzOj29N74la4qOxdBLV6H" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/J0TmNzOj29N74la4qOxdBLV6H -->
+<!-- <script src="https://asciinema.org/a/J0TmNzOj29N74la4qOxdBLV6H.js" id="asciicast-J0TmNzOj29N74la4qOxdBLV6H" async="true"></script> -->
 
 ---
 <!-- _class: code-70-percent -->
@@ -239,7 +241,8 @@ print(f"Exited simulation because: {exit_event.getCause()}.")
 
 以下是我执行此操作时终端的录制。
 
-<script src="https://asciinema.org/a/pKOaIXfzYQUXTsA7VSEvcMHQp.js" id="asciicast-pKOaIXfzYQUXTsA7VSEvcMHQp" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/pKOaIXfzYQUXTsA7VSEvcMHQp -->
+<!-- <script src="https://asciinema.org/a/pKOaIXfzYQUXTsA7VSEvcMHQp.js" id="asciicast-pKOaIXfzYQUXTsA7VSEvcMHQp" async="true"></script> -->
 
 ---
 
@@ -253,7 +256,8 @@ print(f"Exited simulation because: {exit_event.getCause()}.")
 
 以下是我执行此操作时终端的录制。
 
-<script src="https://asciinema.org/a/4c7TuxpxfMNR9i89olMr3HITB.js" id="asciicast-4c7TuxpxfMNR9i89olMr3HITB" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/4c7TuxpxfMNR9i89olMr3HITB -->
+<!-- <script src="https://asciinema.org/a/4c7TuxpxfMNR9i89olMr3HITB.js" id="asciicast-4c7TuxpxfMNR9i89olMr3HITB" async="true"></script> -->
 
 ---
 <!-- _class: start -->

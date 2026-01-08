@@ -140,7 +140,8 @@ scons build/ALL/gem5.opt -j [number of cores]
 - 如果您使用 codespaces，我们为您准备了预构建的二进制文件。
 - 我们稍后会讨论构建系统和选项。
 
-<script src="https://asciinema.org/a/6rAd24brgGqb3Sj8Kmvy1msaG.js" id="asciicast-6rAd24brgGqb3Sj8Kmvy1msaG" async="true"></script>
+<!-- 离线环境：终端录制不可用。在线环境请访问：https://asciinema.org/a/6rAd24brgGqb3Sj8Kmvy1msaG -->
+<!-- <script src="https://asciinema.org/a/6rAd24brgGqb3Sj8Kmvy1msaG.js" id="asciicast-6rAd24brgGqb3Sj8Kmvy1msaG" async="true"></script> -->
 
 ---
 <!-- _class: center-image -->

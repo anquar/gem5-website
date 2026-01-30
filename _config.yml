@@ -1,6 +1,6 @@
 # Site Settings
-title: gem5 (中文)
-description: gem5 模拟器官方中文文档
+title: gem5中文网站
+description: gem5 模拟器非官方中文文档
 lang: zh-CN
 sourceurl: "https://gem5.googlesource.com/public/gem5-website/+/refs/heads/stable/README.md"
 url: "https://www.gem5.org/"

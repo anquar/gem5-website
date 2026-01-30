@@ -47,7 +47,7 @@ git remote -v
 git clone https://github.com/anquar/gem5-website
 cd website
 bundle install
-bundle exec jekyll serve --config _config.yml,_config_dev.yml
+bundle exec jekyll serve --config _config.yml
 ```
 
 > 注意：请优先使用 `bundle exec jekyll ...`（或直接运行 `bash ./script/build` / `bash ./script/serve`），

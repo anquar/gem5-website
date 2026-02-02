@@ -39,7 +39,7 @@ if docker image inspect "${IMAGE_NAME}:${IMAGE_TAG}" > /dev/null 2>&1; then
     echo "镜像已导入: ${IMAGE_NAME}:${IMAGE_TAG}"
     echo ""
     echo "要运行容器，请使用:"
-    echo "  docker run -d -p 4000:4000 --name gem5-website ${IMAGE_NAME}:${IMAGE_TAG}"
+    echo "  docker run -d -p 4000:80 --name gem5-website ${IMAGE_NAME}:${IMAGE_TAG}"
     echo "或者使用 Docker Compose:"
     echo "  docker compose up -d"
     echo ""

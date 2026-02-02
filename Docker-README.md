@@ -26,19 +26,26 @@ docker compose up --build
 
 2. 运行容器：
    ```bash
-   docker run -p 4000:4000 -v $(pwd):/app gem5-website
+   # 容器内部暴露 80 端口，映射到主机的 4000 端口
+   docker run -d --rm -p 4000:80 gem5-website
    ```
 
-## 配置
+## 镜像说明
 
-- 使用 Jekyll 开发服务器，支持实时重载
-- 挂载当前目录以实现实时更新
-- 运行在端口 4000
+为了最小化镜像大小并提高生产环境性能，Dockerfile 采用了**多阶段构建**：
+
+1. **构建阶段**：包含 Ruby 环境和编译工具，用于构建 Jekyll 站点。
+2. **运行阶段**：基于轻量级的 `nginx:alpine` 镜像，仅包含构建好的静态文件 (`_site` 目录)。
+
+这也意味着：
+- 生成的镜像**不包含**源代码或 Ruby 开发环境。
+- 不支持文件的实时热重载（Live Reload）。
+- 镜像体积显著减小（通常 < 50MB）。
 
 ## 包含的文件
 
-- `Dockerfile`: Docker 配置
-- `docker-compose.yml`: Docker Compose 配置文件
+- `Dockerfile`: 多阶段构建配置
+- `docker-compose.yml`: 生产环境预览配置
 - `.dockerignore`: Docker 构建时要排除的文件
 
 ## 离线部署
@@ -99,7 +106,7 @@ docker compose up --build
 
 2. **运行容器**：
    ```bash
-   docker run -d -p 4000:4000 --name gem5-website gem5-website:latest
+   docker run -d -p 4000:80 --name gem5-website gem5-website:latest
    ```
 
    或者使用 Docker Compose（需要先修改 `docker-compose.yml` 中的镜像名称）：
@@ -112,14 +119,6 @@ docker compose up --build
 
 ### 离线部署注意事项
 
-- **镜像大小**：导出的镜像文件可能较大（通常几百 MB 到几 GB），请确保有足够的存储空间
-- **平台兼容性**：确保导出和导入环境使用相同的 CPU 架构（如 x86_64）
-- **依赖完整性**：Dockerfile 已优化，确保所有依赖（包括 Ruby gems 和系统包）都包含在镜像中
-- **版本锁定**：建议在构建前生成 `Gemfile.lock` 以确保依赖版本一致性：
-  ```bash
-  bundle install
-  ```
-
-## 开发
-
-docker-compose 配置将当前目录挂载到容器中的 `/app`，允许在开发过程中实时重载更改。`_site` 目录被排除在挂载之外，以防止冲突。
+- **镜像大小**：由于采用了多阶段构建，镜像文件会非常小，便于传输。
+- **平台兼容性**：确保导出和导入环境使用相同的 CPU 架构（如 x86_64）。
+- **静态资源**：镜像仅包含构建后的静态资源，不包含源码。

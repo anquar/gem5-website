@@ -1,7 +1,7 @@
-# 构建阶段：安装编译工具和依赖
+# 第一阶段：构建环境
 FROM ruby:3.0-slim AS builder
 
-# Install build dependencies
+# 安装构建依赖
 RUN apt-get update && apt-get install -y \
     build-essential \
     nodejs \
@@ -10,32 +10,31 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy Gemfile and Gemfile.lock (if exists) for reproducible builds
+# 复制 Gemfile 和 Gemfile.lock
 COPY Gemfile Gemfile.lock* ./
 
-# Install gems for the correct platform
+# 安装 Gems
 RUN bundle lock --add-platform x86_64-linux 2>/dev/null || true && \
     bundle install --without development test && \
     bundle clean --force
 
-# 运行阶段：只包含运行时需要的文件
-FROM ruby:3.0-slim
-
-# Install runtime dependencies only
-RUN apt-get update && apt-get install -y \
-    nodejs \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# Copy installed gems from builder stage
-COPY --from=builder /usr/local/bundle /usr/local/bundle
-
-# Copy the application files
+# 复制源代码
 COPY . .
 
-# Expose port 4000 for Jekyll
-EXPOSE 4000
+# 构建静态网站
+# 使用生产环境配置构建，输出到默认的 _site 目录
+ENV JEKYLL_ENV=production
+RUN bundle exec jekyll build --config _config.yml
 
-# Build the site and serve
-CMD ["sh", "-c", "bundle exec jekyll serve --host=0.0.0.0 --port=4000"]
+# 第二阶段：运行环境 (Nginx)
+# 使用极小的 nginx:alpine 镜像，仅用于提供静态文件服务
+FROM nginx:alpine
+
+# 从构建阶段复制生成的静态文件到 Nginx 默认目录
+COPY --from=builder /app/_site /usr/share/nginx/html
+
+# 暴露 80 端口 (原作为 4000，生产环境静态服务通常为 80)
+EXPOSE 80
+
+# 启动 Nginx
+CMD ["nginx", "-g", "daemon off;"]
